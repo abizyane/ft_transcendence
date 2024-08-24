@@ -1,0 +1,54 @@
+/* @import  url('https://fonts.googleapis.com/css2?  family=Montserrat:ital,wght@0,100;0,200;1,100;1,200&display=swap'); */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+
+.purple_button {
+  padding: 2%;
+  padding-left: 3rem;
+  padding-right: 3rem;
+  height: 2.5rem;
+  border-radius: 0.75rem;
+  display: flex; /* flex */ 
+  align-items: center; /* items-center */
+  justify-content: center; /* justify-center */
+  font-size: 1rem; /* text-base */
+  font-weight: 700; /* font-bold */
+  color: white; /* text-white */
+}
+
+.purple_button:hover {
+  box-shadow: 0 0 0 1px rgba(159, 122, 234, 0.5); /* hover:ring hover:ring-violet-300 */
+}
+/* 
+:root {
+  --foreground-rgb: 0, 0, 0;
+  --background-start-rgb: 214, 219, 220;
+  --background-end-rgb: 255, 255, 255;
+} */
+
+/* @media (prefers-color-scheme: dark) {
+  :root {
+    --foreground-rgb: 255, 255, 255;
+    --background-start-rgb: 0, 0, 0;
+    --background-end-rgb: 0, 0, 0;
+  }
+} */
+
+/* body {
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+  color: rgb(var(--foreground-rgb));
+} */
+
+.montserrat_font {
+  font-family: Montserrat, system-ui, -apple-system, BlinkMacSystemFont,
+    "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue",
+    sans-serif;
+}
+/* 
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  } */
+/* } */
