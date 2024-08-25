@@ -9,9 +9,10 @@ media
 venv
 
 # React
-# node_modules/
+node_modules/
 npm-debug.log
-# build/
+build/
+.next/
 # .npm/
 
 # Docker

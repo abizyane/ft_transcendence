@@ -1,5 +1,9 @@
 version: '3.9'
 
+networks:
+  default:
+    name: astropong
+
 services:
   frontend:
     build: 
@@ -32,25 +36,25 @@ services:
       - database
     env_file:
       - .env
-    restart: always
     healthcheck:
       test: ["CMD-SHELL", "python manage.py check || exit 1"]
       interval: 10s
       timeout: 5s
       retries: 5
+    restart: always
 
   database:
     image: postgres:13
     container_name: postgres-db
+    volumes:
+      - ./database/data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
     env_file:
       - .env
-    restart: always
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U $POSTGRES_USER -d $POSTGRES_DB || exit 1"]
       interval: 10s
       timeout: 5s
       retries: 5
-    volumes:
-      - ./database/data:/var/lib/postgresql/data
-    ports:
-      - "5432:5432"
+    restart: always

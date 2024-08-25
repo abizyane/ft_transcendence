@@ -16,7 +16,7 @@ class ChatRoomConsumer(AsyncWebsocketConsumer):
         
         self.sender = sender
         self.receiver = receiver
-        
+
         # if user.is_anonymous or (user.username != sender and user.username != receiver):
         #     await self.accept() 
         #     await self.send_error(f"{user} is not allowed to connect to this chat.")
@@ -43,7 +43,19 @@ class ChatRoomConsumer(AsyncWebsocketConsumer):
         text_data_json = await self.validate_json(text_data)
         if not text_data_json:
             return
+        
+        message_type = text_data_json.get('type')
 
+        if message_type == 'chat_message':
+            await self.handle_chat_message(text_data_json)
+        elif message_type == 'typing':
+            await self.handle_typing(text_data_json)
+        elif message_type == 'stop_typing':
+            await self.handle_stop_typing(text_data_json)
+        else:
+            await self.send_error('Invalid message type.')
+
+    async def handle_chat_message(self, text_data_json):
         sender, receiver = await self.get_users()
         if not sender or not receiver:
             await self.send_error('User not found.')
@@ -65,11 +77,45 @@ class ChatRoomConsumer(AsyncWebsocketConsumer):
 
         await self.send_notification(sender, receiver)
 
+    async def handle_typing(self, text_data_json):
+        await self.channel_layer.group_send(
+            self.room_group_name,
+            {
+                'type': 'typing',
+                'sender': self.sender,
+                'receiver': self.receiver,
+            }
+        )
+
+    async def handle_stop_typing(self, text_data_json):
+        await self.channel_layer.group_send(
+            self.room_group_name,
+            {
+                'type': 'stop_typing',
+                'sender': self.sender,
+                'receiver': self.receiver,
+            }
+        )
+
     async def chat_message(self, event):
         message = event['message']
         await self.send(text_data=json.dumps({
             'message': message,
             'type': 'chat_message',
+        }))
+
+    async def typing(self, event):
+        await self.send(text_data=json.dumps({
+            'type': 'typing',
+            'sender': event['sender'],
+            'receiver': event['receiver'],
+        }))
+
+    async def stop_typing(self, event):
+        await self.send(text_data=json.dumps({
+            'type': 'stop_typing',
+            'sender': event['sender'],
+            'receiver': event['receiver'],
         }))
 
     async def send_notification(self, sender, receiver):

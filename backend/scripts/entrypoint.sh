@@ -1,15 +1,20 @@
 #!/bin/sh
 
-if ! grep -q "port 6379" /etc/redis/redis.conf; then
-    echo "port 6379" >> /etc/redis/redis.conf
+if ! grep -q "port 6379" /etc/redis.conf; then
+    echo "port 6379" >> /etc/redis.conf
 fi
 
-if ! grep -q "daemonize yes" /etc/redis/redis.conf; then
-    echo "daemonize yes" >> /etc/redis/redis.conf
+if ! grep -q "daemonize yes" /etc/redis.conf; then
+    echo "daemonize yes" >> /etc/redis.conf
 fi
 
-redis-server /etc/redis/redis.conf
+redis-server /etc/redis.conf
 
+until pg_isready -h $POSTGRES_HOST -p $POSTGRES_PORT -U $POSTGRES_USER
+do
+    echo "Waiting for postgres..."
+    sleep 1
+done
 python manage.py makemigrations chat notification astropong
 python manage.py migrate
 
