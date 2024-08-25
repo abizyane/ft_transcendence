@@ -4,7 +4,7 @@ from .models import Notifications
 from django.http import Http404
 from rest_framework.pagination import PageNumberPagination
 from rest_framework import serializers
-from chat.models import User
+from astropong.models.UserModel import User
 
 # User = get_user_model()
 

@@ -3,7 +3,8 @@ import json
 from channels.generic.websocket import AsyncWebsocketConsumer
 from channels.db import database_sync_to_async
 from django.db.models import Q
-from .models import Message, Relationship, User
+from .models import Message
+from astropong.models.UserModel import User, Relationship
 from .views import MessageSerializer
 from channels.layers import get_channel_layer
 from datetime import datetime

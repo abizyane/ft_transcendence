@@ -15,6 +15,7 @@ do
     echo "Waiting for postgres..."
     sleep 1
 done
+
 python manage.py makemigrations chat notification astropong
 python manage.py migrate
 

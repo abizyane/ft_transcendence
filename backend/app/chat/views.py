@@ -1,6 +1,7 @@
 from rest_framework import serializers, views
 from rest_framework.response import Response
-from .models import Message, User, Relationship
+from .models import Message
+from astropong.models.UserModel import User, Relationship
 from django.db.models import Q
 from django.http import Http404
 from rest_framework.pagination import PageNumberPagination
