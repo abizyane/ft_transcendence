@@ -36,6 +36,7 @@ class LobbyConsumer(AsyncWebsocketConsumer):
         await self.channel_layer.group_add(self.lobby_name, self.channel_name)
         print(len(LobbyConsumer.players_pool))
         print(self.user)
+        self.game_id = None
         if (len(LobbyConsumer.players_pool) >= 2):
             await self.set_ready()
 
@@ -43,6 +44,9 @@ class LobbyConsumer(AsyncWebsocketConsumer):
         del LobbyConsumer.players_pool[self.channel_name]
         await self.channel_layer.group_discard(
             self.lobby_name, self.channel_name
+        )
+        await self.channel_layer.group_discard(
+            self.game_id, self.channel_name
         )
 
     async def broadcast(self, event):
@@ -63,23 +67,29 @@ class LobbyConsumer(AsyncWebsocketConsumer):
 
     async def set_ready(self):
         game = await self.set_game()
-        await self.channel_layer.group_send(self.lobby_name,
+        game_id = f'game_{game.id}'
+        for channel_name,player in LobbyConsumer.players_pool.items():
+            self.channel_layer.group_add(self.game_id, channel_name)
+        await self.channel_layer.group_send(game_id,
         {
             'type': 'broadcast',
             'command': 'set_ready',
             'link': f'game_start/{game.pk}'
         })
-        await self.close()
 
-    
 
-    
+
+
 
 class GameConsumer(AsyncWebsocketConsumer) :
     games = {}
     async def connect(self):
         self.id = self.scope['url_route']['kwargs']['game_id']
+        self.user = self.scope['user']
         self.groupe_name = f'game_{self.id}'
+        print(self.user)
+        self.game_db = await self.get_game_db();
+        self.isAllowed(self.game_db)
         if not GameConsumer.games.get(self.groupe_name):
             GameConsumer.games[self.groupe_name] = Game(self.groupe_name)
         await self.channel_layer.group_add(
@@ -152,3 +162,7 @@ class GameConsumer(AsyncWebsocketConsumer) :
                 await asyncio.sleep(fps)
             except Exception as e:
                 print(e)
+
+    @database_sync_to_async
+    def get_game_db(self):
+        return Game.objects.filter(id=self.id).first()

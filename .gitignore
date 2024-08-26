@@ -17,7 +17,6 @@ build/
 
 # Docker
 .DS_Store
-.dockerignore
 *.env
 example_env
 
