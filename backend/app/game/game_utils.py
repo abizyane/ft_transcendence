@@ -1,0 +1,105 @@
+import math
+import json
+
+class Ball:
+    def __init__(self, game):
+        self.game = game
+        self.rad = 15
+        self.posX = game.width / 2
+        self.posY = game.height / 2
+        self.speed = 5
+        self.angle = 45
+        self.dirX = math.cos(self.angle)
+        self.dirY = math.sin(self.angle)
+        pass
+    def checkCollide(self):
+        if (self.posY + self.rad >= self.game.height or self.posY - self.rad <= 0 ):
+            self.dirY *= -1
+        #blue Range 
+        if (self.posX < self.game.width * 1/4):
+            if (self.posX - self.rad <= 0):
+                self.game.players_color['red'].score += 1
+                self.reset_ball()
+            if (self.posX - self.rad <= self.game.blue.x + self.game.blue.width and (self.posY >= self.game.blue.y and self.posY <= self.game.blue.y + self.game.blue.height) and not self.game.blue.isHiting):
+                self.dirX *= -1
+                self.game.blue.isHiting = True
+        #red Range
+        elif (self.posX > self.game.width * 3/4):
+            if (self.posX + self.rad >= self.game.width):
+                self.game.players_color['blue'].score += 1
+                self.reset_ball()
+            if (self.posX + self.rad >= self.game.red.x and (self.posY >= self.game.red.y and self.posY <= self.game.red.y + self.game.red.height) and not self.game.red.isHiting):
+                self.dirX *= -1
+                self.game.red.isHiting = True
+        else:
+            self.game.red.isHiting = False
+            self.game.blue.isHiting = False
+            
+    
+    def reset_ball(self):
+        self.posX = self.game.width / 2
+
+    def update(self):
+        self.checkCollide()
+        self.posX += (self.dirX * self.speed)
+        self.posY += (self.dirY * self.speed)
+
+class Player:
+    def __init__(self, channel_name=None, game=None):
+        self.channel_name = channel_name;
+        self.id = 0
+        self.score = 0
+        self.width = 12
+        self.height = 50
+        self.y = game.height/ 2
+        self.color = ''
+        self.speed = 5
+        self.isW = False
+        self.isS = False
+        self.isHiting = False
+    pass
+
+    def update(self, game):
+        if self.isW:
+            self.y -= 0 if (self.y - self.speed) < 0 else self.speed
+        if self.isS:
+            self.y += 0 if (self.y + self.speed + self.height) > game.height else self.speed
+        pass
+
+    def get_data(self):
+        return(self.__dict__)
+
+class Game:
+    def __init__(self, id):
+        self.game_id = id
+        self.joined_players = 0
+        self.players = {}
+        self.players_color ={}
+        self.width = 1080
+        self.height= 720
+        self.status = 0
+        self.ball = Ball(self)
+        self.blue = None
+        self.red = None
+
+    def set_players(self, channel_name, id):
+        if len(self.players) == 2:
+            raise Exception('Room is Full')
+        if not self.players.get(channel_name):
+            self.players[channel_name] = Player(channel_name, self)
+        self.players[channel_name].id = id
+
+    def set_players_color(self):
+        self.players_color = {player.color: player for player in self.players.values()}
+        self.blue = self.players_color['blue']
+        self.red = self.players_color['red']
+    
+    def get_json_info(self, channel_name):
+        data = {
+            'type': 'send_id',
+            'player_id': channel_name,
+            'player_color': self.players[channel_name].color,
+            'width': self.width,
+            'height': self.height,
+        }
+        return json.dumps(data)

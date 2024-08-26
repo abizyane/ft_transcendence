@@ -21,6 +21,7 @@ django_asgi_app = get_asgi_application()
 
 from chat.routing import websocket_urlpatterns as chat_routing
 from notification.routing import websocket_urlpatterns as notifications_routing
+from game.routing import websocket_urlpatterns as game_routing
 
 application = ProtocolTypeRouter(
     {
@@ -29,7 +30,8 @@ application = ProtocolTypeRouter(
             AuthMiddlewareStack(
                 URLRouter(
                     chat_routing +
-                    notifications_routing
+                    notifications_routing+
+                    game_routing
                 )
             )
         ),
