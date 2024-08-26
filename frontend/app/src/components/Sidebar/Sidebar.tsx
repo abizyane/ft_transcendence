@@ -9,7 +9,7 @@ import Image from "next/image";
 
 
 
-const MobileSidebar = () => {
+const Sidebar = () => {
   return (
     <>
       <div className="bottom-0 w-full absolute border-gray-600 border-t-[1.2px] h-20  backdrop-blur-lg">
@@ -45,4 +45,4 @@ const MobileSidebar = () => {
   );
 };
 
-export default MobileSidebar;
+export default Sidebar;

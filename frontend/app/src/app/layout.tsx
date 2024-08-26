@@ -16,9 +16,9 @@ export default function RootLayout({
   return (
 
     <html lang="en">
-    <body className="w-full bg-[url('../../public/wallpaper.png')] bg-no-repeat bg-cover h-full bg-black">
-        <div className="flex h-screen">
-                <div className=""> 
+    <body className="w-full bg-[url('../../public/wallpaper.png')] bg-no-repeat bg-cover min-h-screen bg-black">
+        <div className="flex min-h-screen">
+                <div className="hidden xs:block"> 
                     <Logo />
                 </div>
                 {children}

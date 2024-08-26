@@ -57,7 +57,7 @@ const LoginForm = () => {
   };
 
   return (
-    <div className="w-full h-full flex justify-center items-center">
+    <div className="w-full max-h-screen flex justify-center items-center">
       <div className="font-mont p-6 backdrop-blur-lg bg-gray-800 bg-opacity-10 rounded-xl shadow-lg mx-auto my-auto">
         <h2 className="text-3xl font-bold text-white">Login</h2>
         <form className="mt-8 space-y-6" onSubmit={handleSubmit(onSubmit)}>
@@ -82,7 +82,7 @@ const LoginForm = () => {
                 </div>
               )}
             </div>
-            <div className="py-8">
+            <div className="pt-8">
               <label htmlFor="password" className="sr-only">
                 Password
               </label>

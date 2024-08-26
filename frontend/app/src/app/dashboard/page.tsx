@@ -30,7 +30,7 @@ const Dashboard = () => {
   return (
     <>
         <div className='p-6 flex justify-center items-center overflow-hidden max-h-screen'>
-        <Component />
+        {/* <Component /> */}
         </div>
 
     </>
