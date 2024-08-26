@@ -33,3 +33,5 @@ Desktop.ini
 # Linux
 .*
 *~
+
+*/database/data
