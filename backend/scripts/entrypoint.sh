@@ -8,7 +8,9 @@ if ! grep -q "daemonize yes" /etc/redis.conf; then
     echo "daemonize yes" >> /etc/redis.conf
 fi
 
+cd ..
 redis-server /etc/redis.conf
+cd /app
 
 until pg_isready -h $POSTGRES_HOST -p $POSTGRES_PORT -U $POSTGRES_USER
 do
