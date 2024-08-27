@@ -7,6 +7,7 @@ from .game_utils import Ball,Game,Player
 from astropong.models import User
 from astropong.serializers import UserSerializer
 from game.models import Game, Profile
+from game.serializers import GameSerializer
 import json
 import math
 import asyncio
@@ -66,16 +67,30 @@ class LobbyConsumer(AsyncWebsocketConsumer):
         return Profile.objects.filter(user_id=self.user.id).first()
 
     async def set_ready(self):
-        game = await self.set_game()
-        game_id = f'game_{game.id}'
-        for channel_name,player in LobbyConsumer.players_pool.items():
-            self.channel_layer.group_add(self.game_id, channel_name)
-        await self.channel_layer.group_send(game_id,
-        {
-            'type': 'broadcast',
-            'command': 'set_ready',
-            'link': f'game_start/{game.pk}'
-        })
+        try:
+            game = await self.set_game()
+            self.game_id = f'game_{game.id}'
+            for channel_name, player in LobbyConsumer.players_pool.items():
+                await self.channel_layer.group_add(self.game_id, channel_name)
+            await self.channel_layer.group_send(
+                self.game_id,
+                {
+                    'type': 'broadcast',
+                    'command': 'set_ready',
+                    'link': f'game_start/{game.pk}'
+                }
+            )
+        
+            await self.channel_layer.send(self.game_id,{
+                'type': 'websocket.close'
+            })
+        except Exception as e:
+            print(f'An error occurred: {e}')
+
+
+        async def websocket_close(self, event):
+            await self.close()
+
 
 
 
@@ -87,18 +102,20 @@ class GameConsumer(AsyncWebsocketConsumer) :
         self.id = self.scope['url_route']['kwargs']['game_id']
         self.user = self.scope['user']
         self.groupe_name = f'game_{self.id}'
-        print(self.user)
-        self.game_db = await self.get_game_db();
-        self.isAllowed(self.game_db)
-        if not GameConsumer.games.get(self.groupe_name):
-            GameConsumer.games[self.groupe_name] = Game(self.groupe_name)
-        await self.channel_layer.group_add(
-            self.groupe_name, self.channel_name
-        )
-        self.game = GameConsumer.games[self.groupe_name]
-        await self.accept()
-        await self.set_player_id();
+        try:
+            game = await self.get_game_db()
+            await self.print_game(game)
+            
+        except Exception as e:
+            print(f'An error occurred while fetching the game: {e}')
 
+        await self.accept()
+        # await self.send(text_data={"game":GameSerializer(game).data})
+
+    @database_sync_to_async
+    def print_game(self,game):
+        print(f'Game type: {type(game)}')
+        print(f'Game content: {game}')
 
     async def disconnect(self, code):
         await self.channel_layer.group_discard(
@@ -165,4 +182,4 @@ class GameConsumer(AsyncWebsocketConsumer) :
 
     @database_sync_to_async
     def get_game_db(self):
-        return Game.objects.filter(id=self.id).first()
+        return Game.objects.first()
