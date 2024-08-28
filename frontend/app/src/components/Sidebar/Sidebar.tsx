@@ -13,8 +13,6 @@ const Sidebar = () => {
   return (
     <>
       <div className="bottom-0 md:left-0 h-20  md:min-h-full w-full md:w-24 absolute border-gray-600 border-t-[1.2px] md:border-t-0 md:border-r-[1.2px] backdrop-blur-lg ">
-        {/* left-0  w-24 border-gray-600 border-r-[1.2px] backdrop-blur-lg 
-        flex flex-col space-y-12 min-h-full items-center justify-center */}
         <div className="flex p-4 flex-row space-x-8 md:space-x-0 md:space-y-12 items-center justify-center  md:flex-col md:min-h-full">
           <Image
             src={home}

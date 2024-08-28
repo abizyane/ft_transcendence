@@ -55,9 +55,9 @@ const Navbar = () => {
   return (
     <>
       <nav className="absolute right-0 top-0 m-4 h-10 rounded-xl z-10 md:w-calc-100-minus-24">
-        <div className="flex justify-between md:justify-between md:pl-2 items-center w-full">
+        <div className="flex justify-between md:justify-between md:pl-10 items-center w-full">
           {/* Search Bar */}
-          <div className="hidden bg-black rounded-xl w-[20%] md:w-[30%] md:h-[10%] border-[0.5px] md:flex">
+          <div className="hidden bg-black rounded-xl w-[20%] md:w-[260px] md:h-[10%] border-[0.5px] md:flex">
             <svg
               className="w-6 h-6 text-gray-500 m-2"
               fill="none"
@@ -121,7 +121,7 @@ const Navbar = () => {
             </div>
 
           {/* Settings Icon */}
-            <div className="relative" ref={settingsRef}>
+            <div className="hidden md:block relative" ref={settingsRef}>
               <div
                 className="hidden bg-black rounded-md w-12 h-12 md:flex justify-center items-center"
                 onClick={toggleSettingsDropdown}
@@ -148,16 +148,15 @@ const Navbar = () => {
                 </div>
               )}
             </div>
-        <div className="relative">
+        <div className=" hidden md:block relative">
           <Image
             src="/Profil.jpg"
             alt="User Profile"
             width={64}
-            height={64}
-            className="hidden md:block"
+            height={48}
           />
         </div>
-        <div className="flex-col  items-center">
+        <div className=" hidden md:block flex-col  items-center">
           <span className="text-white hidden md:block">Name</span>
           <div className="hidden md:flex md:items-center">
             <span className="ml-4 text-white hidden md:block">online</span>
