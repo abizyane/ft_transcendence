@@ -19,7 +19,7 @@ class Profile(models.Model):
         return self.user_id.username
     
     def history(self):
-        games = Game.get_all_games(self.id)
+        games = GameModel.get_all_games(self.id)
         if not games:
             print('No game played Yet !')
             return None
@@ -29,15 +29,16 @@ class Profile(models.Model):
             print(score, opponent)
 
 
-class Game(models.Model):
+class GameModel(models.Model):
     player_1 = models.ForeignKey(Profile, related_name="player_one", on_delete=models.CASCADE)
     player_2 = models.ForeignKey(Profile, related_name="player_two", on_delete=models.CASCADE)
+    status = models.CharField(max_length=5, null=True)
     created = models.DateTimeField(default=timezone.now, null=False)
     updated = models.DateTimeField(default=timezone.now, null=False)
     created.editable = False
 
     def get_all_games(player_id:int) -> models.QuerySet:
-        games = Game.objects.filter(player_1=player_id) | Game.objects.filter(player_2=player_id)
+        games = GameModel.objects.filter(player_1=player_id) | GameModel.objects.filter(player_2=player_id)
         return games.order_by("created")
 
     def get_opponent(self, player:Profile):
@@ -63,7 +64,7 @@ class Game(models.Model):
         return f"{self.player_1.get_username()} vs {self.player_2.get_username()}"
 
 class Scores(models.Model):
-    game_id = models.OneToOneField(Game, on_delete=models.CASCADE)
+    game_id = models.OneToOneField(GameModel, on_delete=models.CASCADE)
     score_1 = models.IntegerField()
     score_2 = models.IntegerField()
     created = models.DateTimeField(default=timezone.now, null=False)
@@ -73,12 +74,12 @@ class Scores(models.Model):
     
 
     def get_all_player_scores(player_id:int):
-        games = Game.get_all_games(player_id)
+        games = GameModel.get_all_games(player_id)
         scores = Scores.objects.filter(game_id__in=games)
         return scores
 
     # def history(player:Profile):
-    #     games = Game.get_all_games(player_id=player.id);
+    #     games = GameModel.get_all_games(player_id=player.id);
     #     for game in games :
     #         score = Scores.objects.all()[game.id].get_player_game_score(player.id)
     #         oppenent = game.get_opponent(player.id)

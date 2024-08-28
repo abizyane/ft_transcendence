@@ -6,7 +6,7 @@ from asgiref.sync import async_to_sync
 from .game_utils import Ball,Game,Player
 from astropong.models import User
 from astropong.serializers import UserSerializer
-from game.models import Game, Profile
+from game.models import GameModel, Profile
 from game.serializers import GameSerializer
 import json
 import math
@@ -35,8 +35,6 @@ class LobbyConsumer(AsyncWebsocketConsumer):
         await self.accept()
         LobbyConsumer.players_pool[self.channel_name] = await self.get_profile()
         await self.channel_layer.group_add(self.lobby_name, self.channel_name)
-        print(len(LobbyConsumer.players_pool))
-        print(self.user)
         self.game_id = None
         if (len(LobbyConsumer.players_pool) >= 2):
             await self.set_ready()
@@ -60,7 +58,7 @@ class LobbyConsumer(AsyncWebsocketConsumer):
     @database_sync_to_async
     def set_game(self):
         ps = list(LobbyConsumer.players_pool)
-        return Game.objects.create(player_1=LobbyConsumer.players_pool[ps[0]], player_2= LobbyConsumer.players_pool[ps[1]])
+        return GameModel.objects.create(player_1=LobbyConsumer.players_pool[ps[0]], player_2= LobbyConsumer.players_pool[ps[1]])
     
     @database_sync_to_async
     def get_profile(self):
@@ -99,18 +97,56 @@ class LobbyConsumer(AsyncWebsocketConsumer):
 class GameConsumer(AsyncWebsocketConsumer) :
     games = {}
     async def connect(self):
-        self.id = self.scope['url_route']['kwargs']['game_id']
-        self.user = self.scope['user']
-        self.groupe_name = f'game_{self.id}'
-        try:
-            game = await self.get_game_db()
-            await self.print_game(game)
-            
-        except Exception as e:
-            print(f'An error occurred while fetching the game: {e}')
+        # try:
+            self.id = self.scope['url_route']['kwargs']['game_id']
+            self.user = await self.get_user()
+            self.groupe_name = f'game_{self.id}'
+            self.game_db = None
+            self.game = None
+            self.player = await self.get_profile()
+            await self.accept()
+            await self.init_game()
+        # except Exception as e:
+            # print(f'Error: {e}')
 
-        await self.accept()
         # await self.send(text_data={"game":GameSerializer(game).data})
+
+    @database_sync_to_async
+    def get_profile(self):
+        return Profile.objects.filter(user_id=self.user.id).first()
+    
+    async def get_user(self):
+        try:
+            query = self.scope["query_string"].decode()
+            token = (query.split("="))[1]
+            user = await get_user(token)
+        except Exception as e:
+            raise e
+        return user
+
+    async def init_game(self):
+        self.game_db = await self.get_game_db()
+        # await self.print_game(self.game_db)
+        await self.user_has_access()
+        await self.channel_layer.group_add(self.groupe_name, self.channel_name)
+        if not GameConsumer.games.get(self.groupe_name):
+            GameConsumer.games[self.groupe_name] = Game(int(self.id))
+        self.game = GameConsumer.games[self.groupe_name]
+        self.game.players[self.user] = Player(self.user, self.game)
+        if (len(self.game.players) == 2):
+            await self.set_game_status()
+
+    @database_sync_to_async
+    def set_game_status(self):
+        game = GameModel.objects.filter(id=self.id).first()
+        game.status = 'START'
+        game.save()
+        
+    @database_sync_to_async
+    def user_has_access(self):
+        players = [self.game_db.player_1.get_username(), self.game_db.player_2.get_username()]
+        if self.player.get_username() not in players:
+            raise ValueError(f'Game ID {self.id} Not Is Unaccessible')
 
     @database_sync_to_async
     def print_game(self,game):
@@ -182,4 +218,7 @@ class GameConsumer(AsyncWebsocketConsumer) :
 
     @database_sync_to_async
     def get_game_db(self):
-        return Game.objects.first()
+        game = GameModel.objects.get(id=self.id)
+        if not game:
+            raise ValueError('Game ID False')
+        return game
