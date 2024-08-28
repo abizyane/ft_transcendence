@@ -5,49 +5,10 @@ import notifications from '@iconify/icons-tabler/bell-filled';
 import settings from '@iconify/icons-icon-park-solid/setting';
 import { useEffect, useRef, useState } from "react";
 
-
-//function to check if notif or settings clicked 
-const WebNavbar = () => {
-  const notificationsRef = useRef<HTMLDivElement>(null);
-const settingsRef = useRef<HTMLDivElement>(null);
-  const [isNotificationsOpen, setIsNotificationsOpen] = useState(false);
-  const [isSettingsOpen, setIsSettingsOpen] = useState(false);
-  
-
-  const toggleNotificationsDropdown = () => {
-    setIsNotificationsOpen(!isNotificationsOpen);
-    if (isSettingsOpen) setIsSettingsOpen(false); // Close settings if open
-  };
-
-  const toggleSettingsDropdown = () => {
-    setIsSettingsOpen(!isSettingsOpen);
-    if (isNotificationsOpen) setIsNotificationsOpen(false); // Close notifications if open
-  };
-
-  const handleClickOutside = (event : MouseEvent) => {
-    if (notificationsRef.current && !notificationsRef.current.contains(event.target as Node)) {
-      setIsNotificationsOpen(false);
-    }
-    if (settingsRef.current && !settingsRef.current.contains(event.target as Node)) {
-      setIsSettingsOpen(false);
-    }
-  };
-
-  useEffect(() => {
-    if (isNotificationsOpen || isSettingsOpen) {
-      document.addEventListener('mousedown', handleClickOutside);
-    } else {
-      document.removeEventListener('mousedown', handleClickOutside);
-    }
-    return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
-    };
-  }, [isNotificationsOpen, isSettingsOpen]);
-
   return (
     <>
       <nav className="flex justify-between items-center w-full text-white px-24 py-2">
-        <div className="flex bg-black rounded-xl w-[20%] border-[0.5px] ">
+        <div className="flex bg-black rounded-xl  w-24 border-[0.5px] ">
           <svg
             className="w-8 h-8 text-gray-500 m-2"
             fill="none"
@@ -68,7 +29,6 @@ const settingsRef = useRef<HTMLDivElement>(null);
             className="w-full bg-transparent placeholder-gray-500 focus:outline-none "
           />
         </div>
-        <div className="flex justify-end space-x-4">
         <div className="flex justify-end space-x-4">
       <div className="relative" ref={notificationsRef}>
         <div className="bg-black rounded-md w-12 h-12 flex justify-center items-center" onClick={toggleNotificationsDropdown}>
