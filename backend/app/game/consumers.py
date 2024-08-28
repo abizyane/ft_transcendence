@@ -12,6 +12,7 @@ import json
 import math
 import asyncio
 import jwt
+import time
 import asgiref.sync
 
 @asgiref.sync.sync_to_async
@@ -97,7 +98,7 @@ class LobbyConsumer(AsyncWebsocketConsumer):
 class GameConsumer(AsyncWebsocketConsumer) :
     games = {}
     async def connect(self):
-        # try:
+        try:
             self.id = self.scope['url_route']['kwargs']['game_id']
             self.user = await self.get_user()
             self.groupe_name = f'game_{self.id}'
@@ -106,15 +107,15 @@ class GameConsumer(AsyncWebsocketConsumer) :
             self.player = await self.get_profile()
             await self.accept()
             await self.init_game()
-        # except Exception as e:
-            # print(f'Error: {e}')
+        except Exception as e:
+            print(f'Error: {e}')
 
-        # await self.send(text_data={"game":GameSerializer(game).data})
-
+    """ GET PROFILE FROM USER"""
     @database_sync_to_async
     def get_profile(self):
         return Profile.objects.filter(user_id=self.user.id).first()
     
+    """ GET USER FROM TOKEN """
     async def get_user(self):
         try:
             query = self.scope["query_string"].decode()
@@ -129,18 +130,34 @@ class GameConsumer(AsyncWebsocketConsumer) :
         # await self.print_game(self.game_db)
         await self.user_has_access()
         await self.channel_layer.group_add(self.groupe_name, self.channel_name)
+        await self.send(text_data=json.dumps({
+            "type" : "send.status",
+            "status" : "WAIT"
+        }))
         if not GameConsumer.games.get(self.groupe_name):
             GameConsumer.games[self.groupe_name] = Game(int(self.id))
         self.game = GameConsumer.games[self.groupe_name]
         self.game.players[self.user] = Player(self.user, self.game)
+        asyncio.create_task(self.wait())
         if (len(self.game.players) == 2):
             await self.set_game_status()
+            await self.send(json.dumps({
+                "type": "send.status",
+                "status": "START"
+            }))
+
+    async def wait(self):
+        start_time = time.time()
+        elapsed_time = 0
+        while (len(self.game.players) < 2):
+            elapsed_time = time.time() - start_time
+            if elapsed_time == 7:
+                raise self.Timeout()
 
     @database_sync_to_async
     def set_game_status(self):
-        game = GameModel.objects.filter(id=self.id).first()
-        game.status = 'START'
-        game.save()
+        self.game_db.status = 'START'
+        self.game_db.save()
         
     @database_sync_to_async
     def user_has_access(self):
@@ -221,4 +238,12 @@ class GameConsumer(AsyncWebsocketConsumer) :
         game = GameModel.objects.get(id=self.id)
         if not game:
             raise ValueError('Game ID False')
+        game.status = 'WAIT'
+        game.save()
         return game
+    
+    class Timeout(Exception):
+        def __init__(self, *args: object) -> None:
+            super().__init__(message='Time out')
+        def __str__(self) -> str:
+            return super().__str__()
