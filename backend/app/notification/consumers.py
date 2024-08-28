@@ -20,12 +20,13 @@ class NotificationConsumer(AsyncWebsocketConsumer):
         )
 
     async def receive(self, text_data):
-        text_data_json = self.validate_json(text_data)
-        if not text_data_json:
-            return
+        # text_data_json = self.validate_json(text_data)
+        # if not text_data_json:
+        #     return
         
-        notification_id = text_data_json['notification_id']
-        await self.mark_notification_as_seen(notification_id)
+        # notification_id = text_data_json['notification_id']
+        # await self.mark_notification_as_seen(notification_id)
+        pass
 
     @database_sync_to_async
     def mark_notification_as_seen(self, notification_id):
@@ -50,7 +51,7 @@ class NotificationConsumer(AsyncWebsocketConsumer):
 
     async def notification(self, event):
         notification = await self.create_notification(event['receiver'], event['notification_type'], event['content'])
-        User = get_user_model()
+        # User = get_user_model()
         await self.send(text_data=json.dumps({
             'notification_id': notification.notification_id,
             'receiver': event['receiver'],
@@ -60,10 +61,3 @@ class NotificationConsumer(AsyncWebsocketConsumer):
             'timestamp': event['timestamp'],
             'seen': event['seen'],
         }))
-
-    def validate_json(self, text_data):
-        try:
-            return json.loads(text_data)
-        except json.JSONDecodeError:
-            print(f"Invalid JSON: {text_data}")
-            return None
