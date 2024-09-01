@@ -25,9 +25,9 @@ const Dashboard = () => {
 
   return (
     <>
-         <div className='bg-gray-600  mb-20 mt-14 md:ml-32 md:mr-10 md:overflow-y-scroll md:mb-0 md:h-[calc(100vh-112px)]'> 
-         <div className='m-4'>
-          background
+         <div className='backdrop-blur-lg w-full mb-20 mt-10  mr-3 md:ml-32 md:mr-10 md:overflow-y-scroll md:mb-0 md:h-[calc(100vh-112px)]'> 
+         <div className='m-4 flex-1'>
+          {/* background
           this is the content place 
           this is the content place 
           this is the content place 
@@ -233,8 +233,8 @@ const Dashboard = () => {
           this is the content place 
           this is the content place 
           this is the content place 
-          this is the content place 
-        {/* <Component /> */}
+          this is the content place  */}
+          <Component />
         </div>
         </div>
 
