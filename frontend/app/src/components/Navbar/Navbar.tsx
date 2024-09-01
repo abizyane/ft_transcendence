@@ -54,7 +54,7 @@ const Navbar = () => {
 
   return (
     <>
-      <nav className="absolute right-0 top-0 m-4 h-10 rounded-xl z-10 md:w-calc-100-minus-24">
+      <nav className="absolute right-0 top-0 m-4 h-10 rounded-xl z-10 md:w-desktop">
         <div className="flex justify-between md:justify-between md:pl-10 items-center w-full">
           {/* Search Bar */}
           <div className="hidden bg-black rounded-xl w-[20%] md:w-[260px] md:h-[10%] border-[0.5px] md:flex">
