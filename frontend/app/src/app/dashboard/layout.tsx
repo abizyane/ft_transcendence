@@ -10,13 +10,11 @@ interface AuthLayoutProps {
 export default function AuthLayout({ children }: AuthLayoutProps) {
   return (
     <>
-      <Sidebar /> 
-      <div className="flex flex-col flex-grow">
-        <Navbar /> 
-        <div className="flex-grow flex items-center justify-center mt-4">
+      <Navbar /> 
+        <div className="flex-grow ">
           {children}
         </div>
-      </div> 
+      <Sidebar /> 
     </>
   );
 }

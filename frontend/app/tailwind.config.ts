@@ -23,7 +23,7 @@ const config: Config = {
         mont: ["Montserrat", "sans-serif"],
       },
       screens: {
-        'xs': '321px',   
+        'xs': '320px',   
         'sm': '640px',
         'md': '768px',
         'lg': '1024px',

@@ -14,13 +14,13 @@ export default function RootLayout({
   return (
 
     <html lang="en">
-    <body className="w-full bg-[url('../../public/wallpaper.png')] bg-no-repeat bg-cover min-h-screen bg-black">
-        <div className="flex min-h-screen">
-                <div className="hidden xs:block"> 
-                    <Logo />
-                </div>
-                {children}
-        </div>
+  <body className="w-full bg-[url('../../public/wallpaper.png')] bg-no-repeat bg-cover min-h-screen bg-black m-0">
+  <div className="flex flex-col items-center justify-center min-h-screen text-center p-4">
+    <div className="hidden xs:block mb-6">
+      <Logo />
+    </div>
+        {children}
+    </div>
     </body>
 </html>
   );
