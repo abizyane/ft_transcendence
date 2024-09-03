@@ -11,7 +11,7 @@ export default function AuthLayout({ children }: AuthLayoutProps) {
   return (
     <>
       <Navbar /> 
-        <div className="flex-grow w-full mt-10 xs:mt-0 bg-blue-800">
+        <div className="flex-grow w-full mt-10 xs:mt-0 ">
           {children}
         </div>
       <Sidebar /> 

@@ -19,7 +19,9 @@
     "react-dom": "latest",
     "react-hook-form": "^7.52.1",
     "yup": "^1.4.0",
-    "zod": "^3.23.8"
+    "zod": "^3.23.8",
+    "react-chartjs-2": "latest",
+    "chart.js": "latest"
   },
   "devDependencies": {
     "@types/node": "20.14.9",
