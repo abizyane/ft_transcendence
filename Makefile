@@ -22,9 +22,9 @@ down:
 	@echo "${C_RED}Stopping services...${C_RESET}"
 	$(DC_CMD) down
 
-# test:
-#	 @echo "${C_YELLOW}Running tests...${C_RESET}"
-#	 $(DC_CMD) run --rm app go test ./...
+test:
+	 @echo "${C_YELLOW}Running tests...${C_RESET}"
+	 $(DC_CMD) run --rm app go test ./...
 
 state:
 	@echo "${C_YELLOW}Checking state...${C_RESET}"
@@ -47,7 +47,11 @@ clean: down
 fclean: clean
 	@echo "${C_RED}Full cleaning...${C_RESET}"
 	@docker system prune -af --volumes > /dev/null 2>&1
+	@echo "${C_RED}Full cleaning Done!${C_RESET}"
+
+cleanall: fclean
 	@rm -rf $(DATA_PATH)
-	@echo "${C_RED}Done!${C_RESET}"
+	@echo "${C_RED}Postgres data Removed!${C_RESET}"
+
 
 re: fclean all
