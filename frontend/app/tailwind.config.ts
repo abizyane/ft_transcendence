@@ -31,6 +31,9 @@ const config: Config = {
         '2xl': '1536px',
      
     },
+    width: {
+      'calc-100-minus-24': 'calc(100% - 112px)',
+    },
   },
   },
   plugins: [],

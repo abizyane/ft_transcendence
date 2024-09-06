@@ -12,8 +12,8 @@ import Image from "next/image";
 const Sidebar = () => {
   return (
     <>
-      <div className="bottom-0 w-full absolute border-gray-600 border-t-[1.2px] h-20  backdrop-blur-lg">
-        <div className="flex p-4 flex-row space-x-12 items-center justify-center flex-1">
+      <div className="bottom-0 md:left-0 h-20  md:min-h-full w-full md:w-24 absolute border-gray-600 border-t-[1.2px] md:border-t-0 md:border-r-[1.2px] backdrop-blur-lg ">
+        <div className="flex p-4 flex-row space-x-8 md:space-x-0 md:space-y-12 items-center justify-center  md:flex-col md:min-h-full">
           <Image
             src={home}
             alt="home"
