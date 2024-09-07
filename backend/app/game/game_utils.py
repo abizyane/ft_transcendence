@@ -45,12 +45,14 @@ class Ball:
         self.posY += (self.dirY * self.speed)
 
 class Player:
-    def __init__(self, channel_name=None, game=None):
+    def __init__(self, channel_name=None, user=None, game=None):
         self.channel_name = channel_name;
+        self.user = user
         self.id = 0
         self.score = 0
         self.width = 12
         self.height = 50
+        self.x = 0
         self.y = game.height/ 2
         self.color = ''
         self.speed = 5
@@ -82,9 +84,12 @@ class Game:
         self.blue = None
         self.red = None
 
-    def set_players(self, channel_name, id):
+    def is_full(self):
         if len(self.players) == 2:
-            raise Exception('Room is Full')
+            raise self.RoomIsFull()
+
+    def set_players(self, channel_name, id):
+        self.is_full()
         if not self.players.get(channel_name):
             self.players[channel_name] = Player(channel_name, self)
         self.players[channel_name].id = id
@@ -103,3 +108,7 @@ class Game:
             'height': self.height,
         }
         return json.dumps(data)
+    
+    class RoomIsFull(Exception):
+        def __init__(self):
+            super().__init__(f'You Cannot join this game , Room {self.game_id} is Full')
