@@ -14,7 +14,7 @@
     "@iconify/react": "^5.0.1",
     "formik": "^2.4.6",
     "js-cookie": "^3.0.5",
-    "next": "latest",
+    "next": "^14.2.8",
     "react": "latest",
     "react-dom": "latest",
     "react-hook-form": "^7.52.1",

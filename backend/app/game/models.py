@@ -30,8 +30,8 @@ class Profile(models.Model):
 
 
 class GameModel(models.Model):
-    player_1 = models.ForeignKey(Profile, related_name="player_one", on_delete=models.CASCADE)
-    player_2 = models.ForeignKey(Profile, related_name="player_two", on_delete=models.CASCADE)
+    player_1 = models.ForeignKey(Profile, related_name="player_one", null=True,on_delete=models.CASCADE)
+    player_2 = models.ForeignKey(Profile, related_name="player_two", null=True,on_delete=models.CASCADE)
     status = models.CharField(max_length=5, null=True)
     created = models.DateTimeField(default=timezone.now, null=False)
     updated = models.DateTimeField(default=timezone.now, null=False)

@@ -45,10 +45,10 @@ class Ball:
         self.posY += (self.dirY * self.speed)
 
 class Player:
-    def __init__(self, channel_name=None, user=None, game=None):
-        self.channel_name = channel_name;
-        self.user = user
-        self.id = 0
+    def __init__(self, channel_name=None, id=None, game=None):
+        self.channel_name = channel_name
+        # self.user = username
+        self.id = id
         self.score = 0
         self.width = 12
         self.height = 50
@@ -76,6 +76,7 @@ class Game:
         self.game_id = id
         self.joined_players = 0
         self.players = {}
+        self.profiles = {}
         self.players_color ={}
         self.width = 1080
         self.height= 720

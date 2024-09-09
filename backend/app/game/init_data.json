@@ -76,7 +76,7 @@
 
 
     {
-        "model":"game.Game",
+        "model":"game.GameModel",
         "pk":1,
         "fields":{
             "player_1": 1,
@@ -84,7 +84,7 @@
         }
     },
     {
-        "model":"game.Game",
+        "model":"game.GameModel",
         "pk":2,
         "fields":{
             "player_1": 1,
@@ -92,7 +92,7 @@
         }
     },
     {
-        "model":"game.Game",
+        "model":"game.GameModel",
         "pk":3,
         "fields":{
             "player_1": 3,
@@ -100,7 +100,7 @@
         }
     },
     {
-        "model":"game.Game",
+        "model":"game.GameModel",
         "pk":4,
         "fields":{
             "player_1": 4,
