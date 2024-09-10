@@ -42,10 +42,12 @@ class GameConsumer(AsyncWebsocketConsumer) :
             self.game = None
             self.player, self.username = await self.get_profile()
             self.player_id
+            self.action = ''
         except Exception as e:
             print(f'Error: {e}')
         await self.accept()
         await self.init_game()
+        await self.init_2();
 
     """ GET PROFILE FROM USER"""
     @database_sync_to_async
@@ -67,7 +69,7 @@ class GameConsumer(AsyncWebsocketConsumer) :
         return user
 
     def get_last_game(self):
-        action = ''
+        self.action = ''
         try:
             games_list = list(GameConsumer.games.keys())
             if not games_list:
@@ -75,19 +77,20 @@ class GameConsumer(AsyncWebsocketConsumer) :
             last_game_name = games_list[-1]
             last_game = GameConsumer.games.get(int(last_game_name))
             last_game.is_full()
-            action = 'JOIN'
+            self.action = 'JOIN'
         except (GameConsumer.NoGameInQueue, Game.RoomIsFull):
             queue_id = len(games_list)
             # self.queue_id = queue_id
             last_game = self.create_new_game(queue_id)
-            action = 'CREATE'
-        return last_game,action
+            self.action = 'CREATE'
+        return last_game,self.action
 
     def create_new_game(self,queue_id):
         GameConsumer.games[queue_id] = Game(queue_id)
         return GameConsumer.games[queue_id] 
 
-    def join_game(self):
+    async def join_game(self):
+        await asyncio.sleep(0)
         self.game.profiles[self.channel_name] = self.player
         self.game.players[self.channel_name] = Player(self.channel_name, len(self.game.players), self.game)
 
@@ -98,45 +101,40 @@ class GameConsumer(AsyncWebsocketConsumer) :
             "status" : "WAIT",
             'user': self.user.username
         }))
-        self.game, action = self.get_last_game()
-        if action == 'CREATE':
+        self.game, self.action = self.get_last_game()
+        # print(self.game is Ga)
+        if self.action == 'CREATE':
             self.game_db = await self.create_game()
             self.game.id = self.game_db.pk
         else:
             self.game_db = await self.add_player_game()
-        print(self.game.id)
         self.group_name = f'game_{self.game.id}'
+        
+        await self.join_game()
+        if self.action == 'JOIN':
+            self.game.status = 1
         await self.channel_layer.group_add(self.group_name, self.channel_name)
-        self.join_game()
-        await self.wait()
-        print('Joined')
-        if (len(self.game.players) == 2):
-            print((self.game.id))
-            await self.channel_layer.group_send(self.group_name,
-            {
-                'type': 'broadcast',
-                'message_type' : 'ss',
-                'message': self.game.id
-            })
-            if action == 'JOIN':
-                await self.set_game_status(self.game_db, 'START')
-            await self.channel_layer.group_send(self.group_name, {
-                'type':'broadcast',
-                'message_type': 'game_status',
-                'message': 'START'
+        
+        
+    async def init_2(self):
+        if (self.action == 'JOIN'):
+            await self.set_game_status(self.game_db,'START')
+            await self.channel_layer.group_send(self.group_name,{
+                'type': 'broadcast_game_start',
+                'status': 'START'
             })
             await self.start_game()
-    
+
     async def wait(self):
          while (len(self.game.players) != 2):
             await asyncio.sleep(0.1)
             pass
 
-    async def broadcast(self, event):
-        await self.send(text_data=json.dumps({
-            'message_type': event['message_type'],
-            'message': event['message']
-        }))
+    async def broadcast_game_start(self, event):
+      await self.send(text_data=json.dumps({
+          'message_type': 'game_start',
+          'game_id': event['status']
+      }))
     @database_sync_to_async
     def add_player_game(self):
         game = GameModel.objects.get(pk=self.game.id)
@@ -162,9 +160,12 @@ class GameConsumer(AsyncWebsocketConsumer) :
 
     async def receive(self, text_data):
         text_data_json = json.loads(text_data)
-        msgtype = text_data_json['type']
+        print(text_data_json)
+        msgtype = text_data_json.get('type')
         if msgtype == 'input':
             await self.player_position(text_data_json)
+        if msgtype == 'start':
+            await self.start_game()
 
 
     async def player_position(self, data):
@@ -179,7 +180,7 @@ class GameConsumer(AsyncWebsocketConsumer) :
             if not p == self.channel_name:
                 player2 = self.game.players[p]
         await self.send(text_data=json.dumps({
-            'type': 'send_position',
+            'type': 'ss',
             'player': player.get_data(),
             'player_two': player2.get_data(),
             'ball': {'x': str(self.game.ball.posX), 'y':str(self.game.ball.posY)},
@@ -188,8 +189,12 @@ class GameConsumer(AsyncWebsocketConsumer) :
         }))
 
     async def start_game(self):
+        await self.channel_layer.group_send(self.group_name,{
+                'type': 'send_position',
+                'status': 'START'})
         players = []
         players = list(self.game.players.values())
+        print(players)
         players[0].color = 'blue'
         players[1].color = 'red'
         self.game.set_players_color()
@@ -199,15 +204,18 @@ class GameConsumer(AsyncWebsocketConsumer) :
         for p in self.game.players.keys():
             if not p == self.channel_name:
                 player2 = self.game.players[p]
-        fps = 1/60
+        asyncio.create_task(self.game_loop(ball, player, player2))
+        
+    async def game_loop(self, ball, player, player2):
+        fps = 1/144
         while True:
             try:
                 ball.update()
                 player.update(self.game)
                 player2.update(self.game)
-                await self.channel_layer.group_send(self.group_name,
-                {
-                    'type': 'send_position',
+                await self.channel_layer.group_send(self.group_name, {
+                  'type': 'send_position',
+                  'status': 'UPDATE',
                 })
                 await asyncio.sleep(fps)
             except Exception as e:

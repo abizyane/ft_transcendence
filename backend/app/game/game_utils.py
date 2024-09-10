@@ -112,4 +112,4 @@ class Game:
     
     class RoomIsFull(Exception):
         def __init__(self):
-            super().__init__(f'You Cannot join this game , Room {self.game_id} is Full')
+            super().__init__(f'You Cannot join this game , Room  is Full')
