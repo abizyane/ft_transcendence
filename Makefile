@@ -42,6 +42,7 @@ clean: down
 	@echo "${C_RED}Cleaning...${C_RESET}"
 	@docker rm $$(docker ps -a -q) 2> /dev/null || true
 	@docker rmi $$(docker images -q) 2> /dev/null || true
+
 	@docker network prune -f > /dev/null 2>&1
 
 fclean: clean
@@ -49,7 +50,7 @@ fclean: clean
 	@docker system prune -af --volumes > /dev/null 2>&1
 	@echo "${C_RED}Full cleaning Done!${C_RESET}"
 
-cleanall: fclean
+cleandata: fclean
 	@rm -rf $(DATA_PATH)
 	@echo "${C_RED}Postgres data Removed!${C_RESET}"
 

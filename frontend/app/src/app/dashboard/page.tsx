@@ -1,9 +1,5 @@
 'use client';
 import { useEffect, useState } from 'react';
-import MobileNavbar from "@/components/Navbar/MobileNavbar";
-import WebNavbar from "@/components/Navbar/WebNavbar";
-import MobileSidebar from "@/components/Sidebar/MobileSidebar";
-import WebSidebar from "@/components/Sidebar/WebSidebar";
 import Component from '@/components/Component/Component';
 
 const Dashboard = () => {
@@ -29,9 +25,19 @@ const Dashboard = () => {
 
   return (
     <>
-        <div className='p-6 flex justify-center items-center overflow-hidden max-h-screen'>
-        {/* <Component /> */}
-        </div>
+<div className="flex flex-1 relative md:w-full overflow-hidden md:overflow-auto">
+  {/* <!-- Main Content Area --> */}
+  <div className="flex-1 flex items-center justify-center p-4 relative ">
+    <div className="bg-gray-800 rounded-xl w-full max-w-full md:ml-20 md:overflow-hidden md:max-w-screen-2xl border border-gray-600 mb-4 md:mb-0">
+      {/* <!-- Child elements go here --> */}
+          <Component/>
+      {/* <p className="text-gray-400">This is some content inside the parent div.</p> */}
+      {/* More content here */}
+      {/* <button className="mt-4 px-4 py-2 bg-blue-600 text-white rounded">Button</button> */}
+    </div>
+  </div>
+</div>
+
 
     </>
   );

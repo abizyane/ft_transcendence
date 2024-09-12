@@ -3,17 +3,18 @@ import "../globals.css";
 import Sidebar from '@/components/Sidebar/Sidebar';
 import Navbar from '@/components/Navbar/Navbar';
 
-export default function  AuthLayout  ({ children  } )  {
+interface AuthLayoutProps {
+  children: ReactNode;
+}
+
+export default function AuthLayout({ children }: AuthLayoutProps) {
   return (
     <>
-               <Sidebar /> 
-                <div className="flex flex-col flex-grow ">
-                        <Navbar /> 
-                        <div className="flex-grow flex items-center justify-center mt-4">
-                                {children}
-                        </div>
-                    </div> 
+      <Navbar /> 
+        <div className="flex-grow w-full mt-10 xs:mt-0 ">
+          {children}
+        </div>
+      <Sidebar /> 
     </>
   );
-};
-
+}
