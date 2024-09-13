@@ -70,6 +70,13 @@
   dependencies:
     iconify-icon "^2.1.0"
 
+"@iconify-icons/mdi@^1.2.48":
+  version "1.2.48"
+  resolved "https://registry.npmjs.org/@iconify-icons/mdi/-/mdi-1.2.48.tgz"
+  integrity sha512-51bfNoRLhYDfxSu0Nyi/uRVq6q/tP4TyEc0vvuNwImrXpxrRJUAWJF2A36CfBkXm3hO9IBlph/CD/XNDJKgG6w==
+  dependencies:
+    "@iconify/types" "*"
+
 "@iconify/icons-icon-park-solid@^1.2.8":
   version "1.2.8"
   resolved "https://registry.npmjs.org/@iconify/icons-icon-park-solid/-/icons-icon-park-solid-1.2.8.tgz"
