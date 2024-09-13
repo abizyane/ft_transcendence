@@ -3,7 +3,12 @@
 @tailwind components;
 @tailwind utilities;
 
+.golden {
+background: linear-gradient(90.54deg, #9E7A03 0.28%, #725802 5.43%, #876802 6.08%, #6F5502 6.58%, #634C02 57.91%, #382B01 99.72%);
+box-shadow: 0px 0px 0px 1px rgba(207, 207, 207, 0.25);
+backdrop-filter: blur(25px);
 
+}
 .purple_button {
   padding: 2%;
   padding-left: 3rem;

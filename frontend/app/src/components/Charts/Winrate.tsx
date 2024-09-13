@@ -27,7 +27,7 @@ const DoughnutChart = () => {
   };
 
   return (
-    <div className="relative w-full h-full">
+    <div className="relative w-full h-fit">
       <Doughnut data={data} options={options} />
       <div className="absolute inset-0 flex items-center justify-center">
         <p className="text-white font-mont text-sm">20%</p>
