@@ -1,3 +1,4 @@
+// components/DoughnutChart.js
 import { Doughnut } from 'react-chartjs-2';
 import { Chart as ChartJS, ArcElement, Tooltip, Legend } from 'chart.js';
 
@@ -7,28 +8,29 @@ const DoughnutChart = () => {
   const data = {
     datasets: [
       {
-        data: [20, 80], // 20% win rate, 80% empty space
-        backgroundColor: ['#8A2BE2', '#E0E0E0'], // Violet for the win rate, light grey for the rest
-        borderWidth: 0, // Removes the border
+        data: [20, 80],
+        backgroundColor: ['#8A2BE2', '#E0E0E0'],
+        borderWidth: 0,
       },
     ],
   };
 
   const options = {
-    cutout: '70%', // Makes space in the center for text
+    responsive: true,
+    maintainAspectRatio: false,
+    cutout: '70%',
     plugins: {
       tooltip: {
-        enabled: false, // Disables the tooltip
+        enabled: false,
       },
     },
   };
 
   return (
-    <div className="relative">
+    <div className="relative w-full h-full">
       <Doughnut data={data} options={options} />
-      {/* Centered Text */}
       <div className="absolute inset-0 flex items-center justify-center">
-        <p className="text-white font-bold text-xl">Win Rate 20%</p>
+        <p className="text-white font-mont text-sm">20%</p>
       </div>
     </div>
   );

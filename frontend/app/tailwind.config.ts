@@ -39,6 +39,9 @@ const config: Config = {
       'desktop': 'calc(100% - 112px)',
       'phone': 'calc(100% - 112px)',
     },
+    fontSize: {
+      '2xs': '0.625rem', // Example for extra small text
+    },
   },
   },
   plugins: [],

@@ -12,7 +12,7 @@ const Component = () => {
   <div className="flex gap-2">
     {/* Left Column with Picture */}
     <div className="flex-shrink-0 w-3/5">
-      <div className="mb-2">
+      <div className="mb-4">
         <Image
           src="/Profil.jpg"
           alt="User Profile"
@@ -34,18 +34,20 @@ const Component = () => {
     {/* Right Column with Welcome Message and Chart */}
     <div className="flex flex-col w-2/5">
       {/* Welcome Message */}
-      <div className="border-[2px] border-violet-primary rounded-3xl h-auto p-1 mb-1">
+      <div className="border-[2px] border-violet-primary rounded-3xl h-auto p-1 mb-2">
         <h1 className="text-base mr-2 md:text-2xl font-bold text-violet-primary">Welcome!</h1>
         <p className="text-base md:text-2xl font-bold text-white">Ahallali</p>
       </div>
       
       {/* Chart Section */}
-      <div className="bg-gray-700 p-4 rounded-xl border border-gray-600 h-auto">
-        <p className="text-white font-bold text-xl mb-4">Chart Section</p>
-        {/* <div className="h-64 bg-gray-600 rounded-xl flex items-center justify-center text-white">
-           <DoughnutChart />
-        </div> */}
+      <div className="p-2 rounded-xl border h-auto border-violet-primary">
+      <div className="relative w-full h-full flex flex-col items-center justify-center bg-gray-800 rounded-xl">
+        <p className="text-white font-mont text-xs m-1">Win Rate</p> {/* Text on top with margin */}
+        <div className="relative w-full h-full flex items-center justify-center">
+          <DoughnutChart />
+        </div>
       </div>
+    </div>
     </div>
   </div>
 </div>

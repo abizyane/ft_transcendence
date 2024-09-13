@@ -31,9 +31,6 @@ const Dashboard = () => {
     <div className="bg-gray-800 rounded-xl w-full max-w-full md:ml-20 md:overflow-hidden md:max-w-screen-2xl border border-gray-600 mb-4 md:mb-0">
       {/* <!-- Child elements go here --> */}
           <Component/>
-      {/* <p className="text-gray-400">This is some content inside the parent div.</p> */}
-      {/* More content here */}
-      {/* <button className="mt-4 px-4 py-2 bg-blue-600 text-white rounded">Button</button> */}
     </div>
   </div>
 </div>

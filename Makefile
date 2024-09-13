@@ -3,7 +3,7 @@ C_GREEN = \033[1;32m
 C_YELLOW = \033[1;33m
 C_RESET = \033[0m
 
-DC_CMD = @docker-compose -f infrastructure/docker-compose.yml
+DC_CMD = @docker compose -f infrastructure/docker-compose.yml
 DATA_PATH = ./infrastructure/database/data
 
 all: build up
