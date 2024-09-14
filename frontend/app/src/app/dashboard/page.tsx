@@ -49,7 +49,7 @@ const Dashboard = () => {
                       >
                         <div className="flex items-center space-x-2">
                           <img
-                            src="/profil.jpg"
+                            src="/Profil.jpg"
                             alt="User Image"
                             className="w-8 h-8 md:w-12 md:h-12 rounded-full"
                           />
@@ -67,7 +67,7 @@ const Dashboard = () => {
                             <p className="text-xs text-gray-400">@username</p>
                           </div>
                           <img
-                            src="/profil.jpg"
+                            src="/Profil.jpg"
                             alt="User Image"
                             className="w-8 h-8 md:w-12 md:h-12 rounded-full"
                           />
@@ -96,7 +96,7 @@ const Dashboard = () => {
                   {/* Profile Picture and Details */}
                   <div className="flex items-center space-x-4">
                     <img
-                      src="/profil.jpg"
+                      src="/Profil.jpg"
                       alt="User Image"
                       className="w-12 h-12 rounded-full"
                     />
@@ -121,7 +121,7 @@ const Dashboard = () => {
                   {/* Profile Picture and Details */}
                   <div className="flex items-center space-x-4">
                     <img
-                      src="/profil.jpg"
+                      src="/Profil.jpg"
                       alt="User Image"
                       className="w-12 h-12 rounded-full"
                     />
@@ -146,7 +146,7 @@ const Dashboard = () => {
                   {/* Profile Picture and Details */}
                   <div className="flex items-center space-x-4">
                     <img
-                      src="/profil.jpg"
+                      src="/Profil.jpg"
                       alt="User Image"
                       className="w-12 h-12 rounded-full"
                     />
@@ -188,7 +188,7 @@ const Dashboard = () => {
                   {/* Profile Picture and Details */}
                   <div className="flex items-center space-x-4">
                     <img
-                      src="/profil.jpg"
+                      src="/Profil.jpg"
                       alt="User Image"
                       className="w-12 h-12 rounded-full"
                     />
@@ -218,7 +218,7 @@ const Dashboard = () => {
                   {/* Profile Picture and Details */}
                   <div className="flex items-center space-x-4">
                     <img
-                      src="/profil.jpg"
+                      src="/Profil.jpg"
                       alt="User Image"
                       className="w-12 h-12 rounded-full"
                     />
@@ -248,7 +248,7 @@ const Dashboard = () => {
                   {/* Profile Picture and Details */}
                   <div className="flex items-center space-x-4">
                     <img
-                      src="/profil.jpg"
+                      src="/Profil.jpg"
                       alt="User Image"
                       className="w-12 h-12 rounded-full"
                     />
