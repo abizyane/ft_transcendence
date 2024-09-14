@@ -31,7 +31,7 @@ const LineChart: React.FC = () => {
         borderColor: "#8A2BE2",
         backgroundColor: "rgba(138, 43, 226, 0.2)",
         fill: true,
-        pointRadius: 5, // Ensures points are visible
+        pointRadius: 5,
       },
     ],
   };
@@ -67,8 +67,6 @@ const LineChart: React.FC = () => {
 
   return (
     <div className="relative w-full h-[200px] p-1">
-      {" "}
-      {/* Adjust the height as needed */}
       <Line data={data} options={options} />
     </div>
   );
