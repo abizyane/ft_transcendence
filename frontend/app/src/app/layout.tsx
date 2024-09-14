@@ -12,16 +12,15 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-
     <html lang="en">
-  <body className="w-full bg-[url('../../public/wallpaper.png')] bg-no-repeat bg-cover min-h-screen bg-black m-0">
-  <div className="flex  flex-col items-center justify-center min-h-screen text-center p-4">
-    <div className="hidden xs:block w-full h-14">
-      <Logo />
-    </div>
-        {children}
-    </div>
-    </body>
-</html>
+      <body className="w-full bg-[url('../../public/wallpaper.png')] bg-no-repeat bg-cover min-h-screen bg-black m-0">
+        <div className="flex  flex-col items-center justify-center min-h-screen text-center p-1">
+          <div className="hidden xs:block w-full h-14">
+            <Logo />
+          </div>
+          {children}
+        </div>
+      </body>
+    </html>
   );
 }

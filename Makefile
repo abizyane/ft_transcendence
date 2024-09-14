@@ -3,7 +3,7 @@ C_GREEN = \033[1;32m
 C_YELLOW = \033[1;33m
 C_RESET = \033[0m
 
-DC_CMD = @docker-compose -f infrastructure/docker-compose.yml
+DC_CMD = @docker compose -f infrastructure/docker-compose.yml
 DATA_PATH = ./infrastructure/database/data
 
 all: build up
@@ -17,10 +17,23 @@ up:
 	@echo "${C_GREEN}Starting up services...${C_RESET}"
 	$(DC_CMD) up -d
 	@echo "${C_GREEN}Done!${C_RESET}"
+# @if ! docker network inspect astropong > /dev/null 2>&1; then \
+#     echo "${C_GREEN}Starting up services...${C_RESET}"; \
+#     $(DC_CMD) up -d; \
+#     echo "${C_GREEN}Done!${C_RESET}"; \
+# else \
+#     echo "${C_GREEN}Services are already up.${C_RESET}"; \
+# fi
 
 down: 
 	@echo "${C_RED}Stopping services...${C_RESET}"
 	$(DC_CMD) down
+# @if docker network inspect astropong > /dev/null 2>&1; then \
+#     echo "${C_RED}Stopping services...${C_RESET}"; \
+#     $(DC_CMD) down; \
+# else \
+#     echo "${C_RED}Services are already down.${C_RESET}"; \
+# fi
 
 test:
 	 @echo "${C_YELLOW}Running tests...${C_RESET}"
@@ -42,15 +55,18 @@ clean: down
 	@echo "${C_RED}Cleaning...${C_RESET}"
 	@docker rm $$(docker ps -a -q) 2> /dev/null || true
 	@docker rmi $$(docker images -q) 2> /dev/null || true
-
 	@docker network prune -f > /dev/null 2>&1
+	@rm -rf ./frontend/app/node_modules
+	@rm -rf ./frontend/app/.next
+	@rm -rf ./frontend/app/package-lock.json
+	@echo "${C_RED}Cleaning Done!${C_RESET}"
 
 fclean: clean
 	@echo "${C_RED}Full cleaning...${C_RESET}"
 	@docker system prune -af --volumes > /dev/null 2>&1
 	@echo "${C_RED}Full cleaning Done!${C_RESET}"
 
-cleandata: fclean
+dclean: fclean
 	@rm -rf $(DATA_PATH)
 	@echo "${C_RED}Postgres data Removed!${C_RESET}"
 

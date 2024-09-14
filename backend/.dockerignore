@@ -2,7 +2,6 @@
 *.pyc
 *.pyo
 *.pyd
-__pycache__
 *.so
 *.pyc
 *.pyo
@@ -25,5 +24,6 @@ __pycache__
 *.py[co]
 *$
 *~
+migrations
 #/
 #*.tmp

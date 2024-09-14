@@ -1,7 +1,7 @@
-import React, { ReactNode } from 'react';
+import React, { ReactNode } from "react";
 import "../globals.css";
-import Sidebar from '@/components/Sidebar/Sidebar';
-import Navbar from '@/components/Navbar/Navbar';
+import Sidebar from "@/components/Sidebar/Sidebar";
+import Navbar from "@/components/Navbar/Navbar";
 
 interface AuthLayoutProps {
   children: ReactNode;
@@ -10,11 +10,9 @@ interface AuthLayoutProps {
 export default function AuthLayout({ children }: AuthLayoutProps) {
   return (
     <>
-      <Navbar /> 
-        <div className="flex-grow w-full mt-10 xs:mt-0 ">
-          {children}
-        </div>
-      <Sidebar /> 
+      <Navbar />
+      <div className="flex-grow min-w-full mt-10 p-2 md:mt-10 md:ml-24 md:p-14">{children}</div>
+      <Sidebar />
     </>
   );
 }
