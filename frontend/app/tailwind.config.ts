@@ -32,7 +32,7 @@ const config: Config = {
      
     },
     width: {
-      'desktop': 'calc(100% - 112px)',
+      'desktop': 'calc(100% - 100px)',
       'phone': 'calc(100% - 112px)',
     },
     height: {

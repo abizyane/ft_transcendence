@@ -27,11 +27,11 @@ const DoughnutChart = () => {
   };
 
   return (
-    <div className=" w-full h-full">
-      <Doughnut data={data} options={options} />
-      <div className="absolute inset-0 flex items-center justify-center">
-        <p className="text-white font-mont text-sm">20%</p>
+    <div className=" w-[99%] h-[99%] ">
+      <div className=" absolute z-50  w-full h-full flex justify-center items-center">
+        <p className="text-white font-mont sm:font-bold text-xs">20%</p>
       </div>
+      <Doughnut data={data} options={options} />
     </div>
   );
 };
