@@ -33,6 +33,18 @@ const Page = () => {
             Mode Tournements
           </div>
         </Link>
+        <Link  href="dashboard/game/tournements">
+          <div className="h-3/4">
+            <img
+              src={multiplayers.src}
+              alt="mode multiplayers"
+              className="w-full h-full   lg:max-w-[600px]   object-cover rounded-t-xl"
+            />
+          </div>
+          <div className="bg-black h-1/4 text-center text-xl md:text-3xl font-bold text-white rounded-b-xl">
+            Mode Tournements
+          </div>
+        </Link>
         </div>
       </div>
     </>
