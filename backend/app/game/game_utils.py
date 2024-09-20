@@ -59,6 +59,7 @@ class Player:
         self.isW = False
         self.isS = False
         self.isHiting = False
+        self.win_state = 'Neutral'
     pass
 
     def update(self, game):
@@ -110,6 +111,24 @@ class Game:
         }
         return json.dumps(data)
     
+    def update(self):
+        self.ball.update()
+        self.players[0].update()
+        self.players[1].update()
+        
+    def update_status(self):
+        scores = [player.score for player in  self.players]
+        if 10 in scores:
+            self.status = 0
+    def set_winner(self):
+        for player in self.players:
+            if player.score == 10:
+                player.win_state = "WIN"
+            else:
+                player.win_state = "LOSE"
+            
+       
+        
     class RoomIsFull(Exception):
         def __init__(self):
             super().__init__(f'You Cannot join this game , Room  is Full')
