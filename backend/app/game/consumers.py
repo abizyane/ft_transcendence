@@ -201,18 +201,19 @@ class GameConsumer(AsyncWebsocketConsumer) :
         ball = self.game.ball
         player = self.game.players[self.channel_name]
         player2 = None
+        self.game.status = 1
         for p in self.game.players.keys():
             if not p == self.channel_name:
                 player2 = self.game.players[p]
-        asyncio.create_task(self.game_loop(ball, player, player2))
+        self.task = asyncio.create_task(self.game_loop())
         
-    async def game_loop(self, ball, player, player2):
+
+    async def game_loop(self):
         fps = 1/144
-        while True:
+        while self.game.status:
             try:
-                ball.update()
-                player.update(self.game)
-                player2.update(self.game)
+                self.game.update()
+                self.game.update_status()
                 await self.channel_layer.group_send(self.group_name, {
                   'type': 'send_position',
                   'status': 'UPDATE',
@@ -220,14 +221,32 @@ class GameConsumer(AsyncWebsocketConsumer) :
                 await asyncio.sleep(fps)
             except Exception as e:
                 print(e)
+        self.game.set_winner()
+        self.channel_layer.group_send(self.group_name,{
+            'type': 'game_over'
+        })
+    
+    async def game_over(self, event):
+        self.close()
+        # self.send(text_data=json.dumps{})
+    def finalize_game(self):
+        #send End
+        #set_status_ end
+        self.channel_layer.group_send(self.group_name, {
+          'type': 'broadcast_game_start',
+          'message' : 'End'  
+        })
+        
 
     @database_sync_to_async
     def get_game_db(self):
         game = GameModel.objects.get(id=self.id)
         if not game:
             raise ValueError('Game ID False')
-        set_game_status(game, 'WAIT')
+        self.set_game_status(game, 'WAIT')
         return game
+    
+    
 
     class NoGameInQueue(Exception):
         pass
