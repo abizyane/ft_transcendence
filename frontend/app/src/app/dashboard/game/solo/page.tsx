@@ -26,13 +26,13 @@ const Page = () => {
     <>
       <div className="bg-custom-gradient bg-opacity-60 lg:m-10 rounded-xl flex flex-wrap gap-4 border-[1px] border-violet-primary mb-10 w-full justify-center items-center ">
         {/* Common style for all the boxes */}
-          <Link href="dashboard/game/solo" className="w-[92%] max-w-[366.4px] mr-4 md:mr-10 ">
+          <Link href="dashboard/game/solo" className="w-[92%] max-w-[376.4px] mr-4 md:mr-10 ">
             <div className="lg:max-w-[600px] md:w-[400px] md:h-[400px] lg:w-[400px] lg:h-[730px] m-2 flex flex-col rounded-2xl border-4 border-violet-primary overflow-hidden">
               <div className="w-full h-3/4 flex flex-col ">
                 {friends.map((friend) => (
                   <div
                     key={friend.id}
-                    className="flex items-center justify-between p-2 m-1 rounded-lg bg-red-500 border-[1px]  border-gray-600"
+                    className="flex items-center justify-between p-2 m-1 rounded-lg border-[1px] bg-gray-400  border-violet-primary"
                   >
                     {/* Friend's profile picture */}
                     <img
@@ -43,7 +43,7 @@ const Page = () => {
                     {/* Friend's name and username */}
                     <div className="flex flex-col ml-4">
                       <span className="font-light text-nowrap">{friend.name}</span>
-                      <span className="text-sm text-gray-600">
+                      <span className="text-sm text-black">
                         @{friend.username}
                       </span>
                     </div>
@@ -63,7 +63,7 @@ const Page = () => {
             </div>
           </Link>
 
-        <Link href="dashboard/game/tournaments">
+        <Link href="solo/maps">
           <div className="w-[90%] max-w-[400px]  lg:max-w-[600px] md:w-[400px] md:h-[400px] lg:w-[400px] lg:h-full m-2 flex flex-col rounded-2xl border-4 border-violet-primary">
             <div className="h-3/4">
               <img
@@ -78,7 +78,7 @@ const Page = () => {
           </div>
         </Link>
 
-        <Link href="dashboard/game/tournaments">
+        <Link href="solo/maps">
           <div className="w-[90%] max-w-[400px]  lg:max-w-[600px] md:w-[400px] md:h-[400px] lg:w-[400px] lg:h-full m-2 flex flex-col rounded-2xl border-4 border-violet-primary">
             <div className="h-3/4">
               <img
@@ -93,7 +93,7 @@ const Page = () => {
           </div>
         </Link>
 
-        <Link href="dashboard/game/tournaments">
+        <Link href="solo/maps">
           <div className="w-[90%] max-w-[400px]  lg:max-w-[600px] md:w-[400px] md:h-[400px] lg:w-[400px] lg:h-full m-2 flex flex-col rounded-2xl border-4 border-violet-primary">
             <div className="h-3/4 flex justify-center items-center">
             <img
