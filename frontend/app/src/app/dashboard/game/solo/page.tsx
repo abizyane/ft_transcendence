@@ -24,10 +24,9 @@ const friends = [
 const Page = () => {
   return (
     <>
-      <div className="bg-custom-gradient bg-opacity-60 lg:m-10 rounded-xl flex flex-wrap gap-4 border-[1px] border-violet-primary mb-10 w-full justify-center items-center ">
-        {/* Common style for all the boxes */}
-          <Link href="dashboard/game/solo" className="w-[92%] max-w-[376.4px] mr-4 md:mr-10 ">
-            <div className="lg:max-w-[600px] md:w-[400px] md:h-[400px] lg:w-[400px] lg:h-[730px] m-2 flex flex-col rounded-2xl border-4 border-violet-primary overflow-hidden">
+      <div className="bg-custom-gradient bg-opacity-60  rounded-xl flex flex-wrap gap-4 border-[1px] border-violet-primary  w-full justify-center items-center ">
+          <Link href="dashboard/game/solo" >
+            <div className="flex flex-col rounded-2xl border-4 border-violet-primary overflow-hidden">
               <div className="w-full h-3/4 flex flex-col ">
                 {friends.map((friend) => (
                   <div
@@ -62,22 +61,20 @@ const Page = () => {
               </div>
             </div>
           </Link>
-
-        <Link href="solo/maps">
-          <div className="w-[90%] max-w-[400px]  lg:max-w-[600px] md:w-[400px] md:h-[400px] lg:w-[400px] lg:h-full m-2 flex flex-col rounded-2xl border-4 border-violet-primary">
-            <div className="h-3/4">
-              <img
-                src={Vsbot.src}
-                alt="VS AI"
-                className="w-full h-full object-cover rounded-t-xl"
-              />
-            </div>
-            <div className="bg-black h-1/4 text-center text-xl md:text-3xl font-bold text-white rounded-b-xl">
-              VS AI
-            </div>
-          </div>
-        </Link>
-
+          <Link href="solo/maps">
+            <div className="w-[90%] max-w-[400px]  lg:max-w-[600px] md:w-[400px] md:h-[400px] lg:w-[400px] lg:h-full m-2 flex flex-col rounded-2xl border-4 border-violet-primary">
+              <div className="h-3/4">
+                <img
+                  src={Vsbot.src}
+                  alt="VS AI"
+                          className="w-full h-full object-cover rounded-t-xl"
+                        />
+                      </div>
+                      <div className="bg-black h-1/4 text-center text-xl md:text-3xl font-bold text-white rounded-b-xl">
+                        VS AI
+                      </div>
+                    </div>
+                  </Link>
         <Link href="solo/maps">
           <div className="w-[90%] max-w-[400px]  lg:max-w-[600px] md:w-[400px] md:h-[400px] lg:w-[400px] lg:h-full m-2 flex flex-col rounded-2xl border-4 border-violet-primary">
             <div className="h-3/4">
@@ -107,9 +104,12 @@ const Page = () => {
             </div>
           </div>
         </Link>
+        {/* Common style for all the boxes */}
       </div>
     </>
   );
 };
 
 export default Page;
+
+

@@ -4,7 +4,6 @@ export default function Home() {
   return (
     <>
     <div className="h-16">
-
         <Logo />
     </div>
       <Landingpage />
