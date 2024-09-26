@@ -5,7 +5,7 @@ import Link from "next/link";
 const Page = () => {
   return (
     <>
-      <div className=" bg-gray-800 bg-opacity-60  rounded-xl flex flex-col gap-4 border-[1px] border-violet-primary   w-full  md:min-h-[700px] md:max-h-[800px]   lg:min-h-[900px] lg:max-h-[1200px] justify-center items-center md:flex-row">
+      <div className=" bg-gray-800 bg-opacity-60  rounded-xl flex flex-col gap-4 border-[1px] border-violet-primary   w-full lg:w-fit  md:min-h-[700px] md:max-h-[800px]   lg:min-h-[900px] lg:max-h-[1200px] justify-center items-center md:flex-row">
         <div className="min-w-[200px] max-w-[400px]  lg:max-w-[600px]   m-2 mt-8 md:mt-2  h-fit flex flex-col rounded-2xl border-4 border-violet-primary overflow-hidden">
          <Link  href="game/solo">
           <div className="h-3/4">

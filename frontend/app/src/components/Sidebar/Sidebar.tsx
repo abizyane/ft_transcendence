@@ -20,7 +20,7 @@ export default function  Sidebar() {
     activeIcon === icon ? 'filter brightness-100' : 'filter brightness-50';
 
   return (
-    <div className=" bottom-0 left-0 w-full lg:w-24 lg:h-full border-gray-800 bg-gray-800 border-t-[1.2px] lg:border-t-0 lg:border-r-[1.2px] backdrop-blur-lg">
+    <div className=" bottom-0 left-0 w-full lg:w-24 lg:h-full   backdrop-blur-md">
       <div className="w-full lg:min-h-full flex p-4 flex-row space-x-8 lg:space-x-0 lg:space-y-12 items-center justify-center lg:flex-col">
         <Link href="/dashboard" onClick={() => handleIconClick('home')}>
           <Image

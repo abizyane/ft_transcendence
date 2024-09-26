@@ -7,7 +7,7 @@ import Link from "next/link";
 const Page = () => {
   return (
     <>
-<div className="bg-custom-gradient border-2 border-violet-primary w-full h-full gap-4 rounded-xl  p-5">
+<div className="bg-custom-gradient border-2 border-violet-primary w-full h-full gap-4 rounded-xl  p-5 ">
   <h1 className="w-full text-white text-center font-bold text-nowrap md:text-2xl lg:text-3xl mb-6">
     CHOOSE YOUR GALAXY
   </h1>

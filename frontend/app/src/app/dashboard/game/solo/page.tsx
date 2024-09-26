@@ -24,7 +24,7 @@ const friends = [
 const Page = () => {
   return (
     <>
-      <div className="bg-custom-gradient bg-opacity-60  rounded-xl flex flex-wrap gap-4 border-[1px] border-violet-primary  w-full justify-center items-center ">
+      <div className="bg-custom-gradient bg-opacity-60  rounded-xl flex flex-wrap gap-4 border-[1px] border-violet-primary  w-full justify-center items-center lg:w-fit ">
           <Link href="dashboard/game/solo" >
             <div className="flex flex-col rounded-2xl border-4 border-violet-primary overflow-hidden">
               <div className="w-full h-3/4 flex flex-col ">
