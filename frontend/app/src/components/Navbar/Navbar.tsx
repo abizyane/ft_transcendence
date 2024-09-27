@@ -60,7 +60,6 @@ const Navbar = () => {
           <Logo/>
         </div>
         <div className="flex justify-end md:justify-between md:pl-10 items-center w-full">
-          {/* Search Bar */}
           <div className="hidden bg-black rounded-xl  w-[20%] md:w-[260px] md:h-10 border-[0.5px] md:flex">
             <svg
               className="w-6 h-6 text-gray-500 m-2"

@@ -5,7 +5,7 @@ import Link from "next/link";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useRouter } from "next/navigation"; // Use Next.js router for navigation
+import { useRouter } from "next/navigation";
 import { useState } from "react";
 
 const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
@@ -21,7 +21,7 @@ const formSchema = z.object({
 type FormData = z.infer<typeof formSchema>;
 
 const LoginForm = () => {
-  const [errorMessage, setErrorMessage] = useState<string | null>(null); // State for error message
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const {
     register,
     handleSubmit,
@@ -50,7 +50,7 @@ const LoginForm = () => {
         router.push("/dashboard");
       } else {
         const errorData = await response.json();
-        setErrorMessage("Invalid email or password"); // Set error message on login failure
+        setErrorMessage("Invalid email or password");
       }
     } catch (error) {
       console.error("An unexpected error occurred:", error);
@@ -68,7 +68,6 @@ const LoginForm = () => {
         <h2 className="text-3xl font-bold text-white mb-4">Login</h2>
         <form className="mt-8 space-y-6" onSubmit={handleSubmit(onSubmit)}>
           <div className="rounded-md shadow-sm -space-y-px">
-            {/* <!-- Email Input --> */}
             <div>
               <label htmlFor="email-address" className="sr-only">Email address</label>
               <input
@@ -87,7 +86,6 @@ const LoginForm = () => {
                 </div>
               )}
             </div>
-            {/* <!-- Password Input --> */}
             <div className="pt-8">
               <label htmlFor="password" className="sr-only">Password</label>
               <input
@@ -107,7 +105,6 @@ const LoginForm = () => {
               )}
             </div>
           </div>
-          {/* <!-- Submit Button --> */}
           <div className="flex justify-center items-center">
             <button
               type="submit"
@@ -118,7 +115,6 @@ const LoginForm = () => {
             </button>
           </div>
         </form>
-        {/* <!-- Alternative Sign-in --> */}
         <div className="text-center text-white mt-4">or continue with</div>
         <div className="w-full flex justify-center mt-4">
           <button
@@ -134,7 +130,6 @@ const LoginForm = () => {
             />
           </button>
         </div>
-        {/* <!-- Registration Link --> */}
         <div className="text-center text-white mt-4">
           Don't have an account yet?&nbsp;
           <Link href="../auth/register" className="hover:opacity-70">

@@ -18,7 +18,6 @@ const friends = [
     username: "achraf_bizyane",
     profilePic: "../../../../../Profil.jpg",
   },
-  // Add more friends here
 ];
 
 const Page = () => {
@@ -33,20 +32,17 @@ const Page = () => {
                     key={friend.id}
                     className="flex items-center justify-between p-2 m-1 rounded-lg border-[1px] bg-gray-400  border-violet-primary"
                   >
-                    {/* Friend's profile picture */}
                     <img
                       src={friend.profilePic}
                       alt={`${friend.name}'s profile`}
                       className="w-8 h-8 rounded-full object-cover"
                     />
-                    {/* Friend's name and username */}
                     <div className="flex flex-col ml-4">
                       <span className="font-light text-nowrap">{friend.name}</span>
                       <span className="text-sm text-black">
                         @{friend.username}
                       </span>
                     </div>
-                    {/* Challenge button */}
                     <button className="bg-black rounded-full p-2">
                       <Icon
                         icon={battleIcon}
@@ -104,7 +100,6 @@ const Page = () => {
             </div>
           </div>
         </Link>
-        {/* Common style for all the boxes */}
       </div>
     </>
   );
