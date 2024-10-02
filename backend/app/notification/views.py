@@ -3,16 +3,8 @@ from rest_framework.response import Response
 from .models import Notifications
 from django.http import Http404
 from rest_framework.pagination import PageNumberPagination
-from rest_framework import serializers
 from astropong.models.UserModel import User
 from rest_framework import viewsets
-
-# User = get_user_model()
-
-class NotificationSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Notifications
-        fields = ['notification_id', 'user', 'type', 'content', 'timestamp', 'seen']
 
 class NotificationPageNumberPagination(PageNumberPagination):
     page_size = 4

@@ -17,7 +17,7 @@
     "chart.js": "^4.4.4",
     "formik": "^2.4.6",
     "js-cookie": "^3.0.5",
-    "next": "14.2.11",
+    "next": "latest",
     "react": "latest",
     "react-chartjs-2": "^5.2.0",
     "react-dom": "latest",
@@ -26,8 +26,8 @@
     "zod": "^3.23.8"
   },
   "devDependencies": {
-    "@types/node": "22.5.5",
-    "@types/react": "18.3.5",
+    "@types/node": "22.7.4",
+    "@types/react": "18.3.11",
     "@types/react-dom": "^18",
     "eslint": "^8",
     "eslint-config-next": "14.2.3",
@@ -36,7 +36,7 @@
     "typescript": "5.6.2"
   },
   "resolutions": {
-    "@types/react": "18.3.5",
+    "@types/react": "18.3.11",
     "@types/react-dom": "^18"
   }
 }

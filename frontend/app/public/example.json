@@ -1,0 +1,15 @@
+{
+  "profilePicture": "https://example.com/profile.jpg",
+  "username": "JohnDoe",
+  "level": 10,
+  "xp": 1200,
+  "doughnutData": {
+    "labels": ["Win Rate"],
+    "datasets": [
+      {
+        "data": [70, 30],
+        "backgroundColor": ["#8A2BE2", "#E0E0E0"]
+      }
+    ]
+  }
+}

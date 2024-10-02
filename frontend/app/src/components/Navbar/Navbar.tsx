@@ -7,6 +7,7 @@ import notifications from "@iconify/icons-tabler/bell-filled";
 import settings from "@iconify/icons-icon-park-solid/setting";
 
 import { useEffect, useRef, useState } from "react";
+import Logo from "../Logo/Logo";
 
 //function to check if notif or settings clicked
 
@@ -54,10 +55,12 @@ const Navbar = () => {
 
   return (
     <>
-      <nav className="absolute right-0 top-0 m-4 h-10 rounded-xl z-10 md:w-desktop">
-        <div className="flex justify-between md:justify-between md:pl-10 items-center w-full">
-          {/* Search Bar */}
-          <div className="hidden bg-black rounded-xl w-[20%] md:w-[260px] md:h-[10%] border-[0.5px] md:flex">
+      <nav className="  backdrop-blur-md  border-gray-800 flex justify-between right-0 top-0 h-16  md:w-full">
+        <div className="z-50 ml-3">
+          <Logo/>
+        </div>
+        <div className="flex justify-end md:justify-between md:pl-10 items-center w-full">
+          <div className="hidden bg-black rounded-xl  w-[20%] md:w-[260px] md:h-10 border-[0.5px] md:flex">
             <svg
               className="w-6 h-6 text-gray-500 m-2"
               fill="none"
@@ -78,12 +81,13 @@ const Navbar = () => {
               className="w-full bg-transparent placeholder-gray-500 focus:outline-none"
             />
           </div>
+          <div className="md:justify-end md:p-1">
 
           {/* Notification Icon */}
           <div className="flex space-x-4 md:justify-end">
             <div className="relative" ref={notificationsRef}>
               <div
-                className="bg-black rounded-md w-12 h-12 flex justify-center items-center"
+                className="bg-black rounded-md w-9 h-9  md:h-12 md:w-12 flex justify-center items-center"
                 onClick={toggleNotificationsDropdown}
               >
                 <Icon
@@ -114,16 +118,16 @@ const Navbar = () => {
               <Image
                 src={bar}
                 alt="option-bar"
-                className="w-7 h-7"
-                width={48}
-                height={48}
+                className="w-9 h-9"
+                width={36}
+                height={36}
               />
             </div>
 
           {/* Settings Icon */}
             <div className="hidden md:block relative" ref={settingsRef}>
               <div
-                className="hidden bg-black rounded-md w-12 h-12 md:flex justify-center items-center"
+                className="hidden bg-black rounded-md w-9 h-9 md:h-12 md:w-12 md:flex justify-center items-center"
                 onClick={toggleSettingsDropdown}
               >
                 <Icon
@@ -149,12 +153,7 @@ const Navbar = () => {
               )}
             </div>
         <div className=" hidden md:block relative">
-          <Image
-            src="/Profil.jpg"
-            alt="User Profile"
-            width={64}
-            height={48}
-          />
+            <img src="/Profil.jpg" alt="User Profile"   width="72" height="60"  />
         </div>
         <div className=" hidden md:block flex-col  items-center">
           <span className="text-white hidden md:block">Name</span>
@@ -165,6 +164,7 @@ const Navbar = () => {
         </div>
           </div>
         </div>
+            </div>
 
       </nav>
     </>

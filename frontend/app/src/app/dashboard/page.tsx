@@ -1,7 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
 import Component from "@/components/Component/Component";
-import Linechart from "@/components/Charts/Linechart";
+import Linechart from "@/components/Charts/linechart";
 import { Icon } from "@iconify/react";
 import chatIcon from "@iconify-icons/mdi/chat-processing";
 import battleIcon from "@iconify-icons/mdi/sword-fight";
@@ -9,27 +9,24 @@ import battleIcon from "@iconify-icons/mdi/sword-fight";
 const Dashboard = () => {
   return (
     <>
-      <div className="flex flex-1 relative md:w-full px-1 overflow-hidden md:overflow-auto">
-        {/* Main Content Area */}
-        <div className="flex-1 flex flex-col items-center justify-center mb-14 mt-2 relative">
-          {/* Container for First and Second Components in a Row */}
-          <div className="flex flex-col md:flex-row w-full space-y-4 md:space-y-0 md:space-x-4">
-            {/* First Component */}
-            <div className="bg-gray-800 rounded-xl w-full max-w-full md:max-w-screen-2xl border border-gray-600 mb-4 md:mb-0">
+      <div className="flex flex-1  lg:w-full px-1 overflow-hidden">
+        <div className="flex-1 w-full flex flex-col items-center justify-center mb-14 mt-2 relative">
+          <div className="flex flex-col lg:flex-row w-full space-y-4 lg:space-y-0 lg:space-x-4">
+            <div className="bg-gray-800 rounded-xl lg:w-2/4 lg:border border-gray-600 mb-4 lg:mb-0">
               <Component />
             </div>
-
-            {/* Second Component */}
-            <div className="bg-gray-800 rounded-xl w-full max-w-full md:max-w-screen-2xl border border-gray-600">
-              <p className="m-2 text-white text-2xl font-extrabold">
+            <div className="bg-gray-800 rounded-xl flex-1 border border-gray-600">
+              <p className="m-2 text-white text-2xl font-extrabold w-full">
                 Experience Performance
               </p>
-              <Linechart />
+              <div className=" w-[99%]">
+
+                  <Linechart />
+              </div>
             </div>
           </div>
-          <div className="flex flex-col md:flex-row w-full space-y-4 md:space-y-0 md:space-x-4">
-            {/* Third Component */}
-            <div className="mt-8 w-full md:mt-4 md:w-1/3 md:flex md:flex-col ">
+          <div className="flex flex-col lg:flex-row w-full space-y-4 lg:space-y-0 lg:space-x-4">
+            <div className="mt-8 w-full lg:mt-4 lg:w-1/3 lg:flex lg:flex-col overflow-hidden">
               <div className="bg-gray-800 rounded-xl border border-gray-600 flex flex-col flex-1 mb-4">
                 <div className="m-2 flex justify-between items-center">
                   <p className="m-2 text-white text-2xl font-extrabold">
@@ -39,19 +36,18 @@ const Dashboard = () => {
                     <p className="text-white">View All</p>
                   </div>
                 </div>
-                <div className="p-2 flex-1 overflow-auto">
+                <div className="p-1 sm:p-2 flex-1 overflow-auto">
                   <div className="flex flex-col space-y-2">
-                    {/* Repeat Entries */}
                     {[1, 2, 3].map((_, index) => (
                       <div
                         key={index}
                         className="flex flex-row items-center justify-between bg-gray-700 p-2 rounded-[34px]  border border-gray-600"
                       >
-                        <div className="flex items-center space-x-2">
+                        <div className="flex items-center space-x-0 sm:space-x-2">
                           <img
                             src="/Profil.jpg"
                             alt="User Image"
-                            className="w-8 h-8 md:w-12 md:h-12 rounded-full"
+                            className="w-8 h-8 lg:w-12 lg:h-12 rounded-full"
                           />
                           <div className="flex flex-col">
                             <p className="font-bold text-white text-xs">Name</p>
@@ -61,7 +57,7 @@ const Dashboard = () => {
                         <p className="font-semibold text-white text-center">
                           4:5
                         </p>
-                        <div className="flex items-center space-x-2">
+                        <div className="flex items-center space-x-0 sm:space-x-2">
                           <div className="flex flex-col items-center">
                             <p className="font-bold text-white text-xs">Name</p>
                             <p className="text-xs text-gray-400">@username</p>
@@ -69,7 +65,7 @@ const Dashboard = () => {
                           <img
                             src="/Profil.jpg"
                             alt="User Image"
-                            className="w-8 h-8 md:w-12 md:h-12 rounded-full"
+                            className="w-8 h-8 lg:w-12 lg:h-12 rounded-full"
                           />
                         </div>
                       </div>
@@ -78,10 +74,8 @@ const Dashboard = () => {
                 </div>
               </div>
             </div>
-
-            {/* Fourth Component */}
-            <div className="mt-4 w-full md:w-1/3 ">
-              <div className="bg-gray-800 rounded-xl border border-gray-600 mb-4 mt-4 md:mt-4">
+            <div className="mt-4 w-full lg:w-1/3 ">
+              <div className="bg-gray-800 rounded-xl border border-gray-600 mb-4 mt-4 lg:mt-4">
                 <div className="m-2 flex justify-between items-center">
                   <p className="m-2 text-white text-2xl font-extrabold">
                     Top Players
@@ -90,10 +84,7 @@ const Dashboard = () => {
                     <p className="text-white">View All</p>
                   </div>
                 </div>
-
-                {/* Player Profile Container */}
                 <div className="flex items-center justify-between m-3 golden rounded-[34px] pl-2 py-2 pr-5 border border-gray-600">
-                  {/* Profile Picture and Details */}
                   <div className="flex items-center space-x-4">
                     <img
                       src="/Profil.jpg"
@@ -107,8 +98,6 @@ const Dashboard = () => {
                       </p>
                     </div>
                   </div>
-
-                  {/* Gold Badge */}
                   <div className="flex items-center">
                     <img
                       src="GoldBadge.svg"
@@ -118,7 +107,6 @@ const Dashboard = () => {
                   </div>
                 </div>
                 <div className="flex items-center justify-between m-3 silver rounded-[34px] pl-2 py-2 pr-5 border border-gray-600">
-                  {/* Profile Picture and Details */}
                   <div className="flex items-center space-x-4">
                     <img
                       src="/Profil.jpg"
@@ -132,8 +120,6 @@ const Dashboard = () => {
                       </p>
                     </div>
                   </div>
-
-                  {/*Silver Badge*/}
                   <div className="flex items-center">
                     <img
                       src="SilverBadge.svg"
@@ -143,7 +129,6 @@ const Dashboard = () => {
                   </div>
                 </div>
                 <div className="flex items-center justify-between m-3 bronze rounded-[34px] pl-2 py-2 pr-5 border border-gray-600">
-                  {/* Profile Picture and Details */}
                   <div className="flex items-center space-x-4">
                     <img
                       src="/Profil.jpg"
@@ -157,8 +142,6 @@ const Dashboard = () => {
                       </p>
                     </div>
                   </div>
-
-                  {/* Bronze Badge */}
                   <div className="flex items-center">
                     <img
                       src="BronzeBadge.svg"
@@ -169,11 +152,8 @@ const Dashboard = () => {
                 </div>
               </div>
             </div>
-
-            {/* Fifth Component */}
-
-            <div className="mt-4 w-full md:w-1/3">
-              <div className="bg-gray-800 rounded-xl border border-gray-600 mb-4 md:mt-4">
+            <div className="mt-4 w-full lg:w-1/3">
+              <div className="bg-gray-800 rounded-xl border border-gray-600 mb-4 lg:mt-4">
                 <div className="m-2 flex justify-between items-center">
                   <p className="m-2 text-white text-2xl font-extrabold">
                     Top Players
@@ -182,10 +162,7 @@ const Dashboard = () => {
                     <p className="text-white">View All</p>
                   </div>
                 </div>
-
-                {/* Player Profile Container */}
                 <div className="flex items-center justify-between m-3 rounded-[34px] pl-2 py-2 pr-5 border border-gray-600">
-                  {/* Profile Picture and Details */}
                   <div className="flex items-center space-x-4">
                     <img
                       src="/Profil.jpg"
@@ -199,8 +176,6 @@ const Dashboard = () => {
                       </p>
                     </div>
                   </div>
-
-                  {/* Icons */}
                   <div className="flex items-center space-x-2">
                     <div className="bg-black rounded-full p-2">
                       <Icon icon={chatIcon} className="w-8 h-8 text-blue-500" />
@@ -215,7 +190,6 @@ const Dashboard = () => {
                 </div>
 
                 <div className="flex items-center justify-between m-3  rounded-[34px] pl-2 py-2 pr-5 border border-gray-600">
-                  {/* Profile Picture and Details */}
                   <div className="flex items-center space-x-4">
                     <img
                       src="/Profil.jpg"
@@ -229,8 +203,6 @@ const Dashboard = () => {
                       </p>
                     </div>
                   </div>
-
-                  {/* Icons */}
                   <div className="flex items-center space-x-2">
                     <div className="bg-black rounded-full p-2">
                       <Icon icon={chatIcon} className="w-8 h-8 text-blue-500" />
@@ -245,7 +217,6 @@ const Dashboard = () => {
                 </div>
 
                 <div className="flex items-center justify-between m-3 rounded-[34px] pl-2 py-2 pr-5 border border-gray-600">
-                  {/* Profile Picture and Details */}
                   <div className="flex items-center space-x-4">
                     <img
                       src="/Profil.jpg"
@@ -259,8 +230,6 @@ const Dashboard = () => {
                       </p>
                     </div>
                   </div>
-
-                  {/* Icons */}
                   <div className="flex items-center space-x-2">
                     <div className="bg-black rounded-full p-2">
                       <Icon icon={chatIcon} className="w-8 h-8 text-blue-500" />
