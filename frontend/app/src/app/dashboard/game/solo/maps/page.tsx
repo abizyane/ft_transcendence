@@ -7,12 +7,12 @@ import Link from "next/link";
 const Page = () => {
   return (
     <>
-<div className="bg-custom-gradient border-2 border-violet-primary w-full h-full gap-4 rounded-xl  p-5 ">
+<div className="bg-custom-gradient border-2 border-violet-primary h-full gap-4 rounded-xl p-5 lg:w-fit">
   <h1 className="w-full text-white text-center font-bold text-nowrap md:text-2xl lg:text-3xl mb-6">
     CHOOSE YOUR GALAXY
   </h1>
-  <div className="flex flex-col lg:flex-row gap-4 w-full h-full">
-    <div className="w-full lg:w-1/3 border-[2px] border-violet-primary rounded-xl flex flex-col">
+  <div className="flex flex-col lg:flex-row lg:items-center lg:justify-center gap-4 w-full h-full">
+    <div className="w-full lg:w-1/5 border-[2px] border-violet-primary rounded-xl flex flex-col">
     <Link href="maps/matchmaking">
       <div className="flex-grow">
         <img src={Mars.src} alt="MarsMap" className="w-full h-full object-cover rounded-t-xl" />
@@ -23,7 +23,7 @@ const Page = () => {
     </Link>
     </div>
 
-    <div className="w-full lg:w-1/3 border-[2px] border-violet-primary rounded-xl flex flex-col">
+    <div className="w-full lg:w-1/5 border-[2px] border-violet-primary rounded-xl flex flex-col">
     <Link href="maps/matchmaking">
       <div className="flex-grow">
         <img src={Earth.src} alt="EarthMap" className="w-full h-full object-cover rounded-t-xl" />
@@ -34,7 +34,7 @@ const Page = () => {
     </Link>
     </div>
 
-    <div className="w-full lg:w-1/3 border-[2px] border-violet-primary rounded-xl flex flex-col">
+    <div className="w-full lg:w-1/5 border-[2px] border-violet-primary rounded-xl flex flex-col">
     <Link href="maps/matchmaking">
       <div className="flex-grow">
         <img src={Jupiter.src} alt="JupiterMap" className="w-full h-full object-cover rounded-t-xl" />
