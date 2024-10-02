@@ -1,7 +1,7 @@
 import Image from "next/image";
 import Mars from "../../../../../../../../public/Mars.jpeg";
 import VS from "../../../../../../../../public/VS.jpeg";
-
+import Canvas from "@/components/Canva/page";
 const users = [
   {
     id: 1,
@@ -43,7 +43,7 @@ const Page = () => {
           </div>
         </div>
         <div
-          className="flex-grow w-full flex items-center justify-center border-4 border-white rounded-lg relative"
+          className="flex-grow w-full h-full flex items-center justify-center border-4 border-white rounded-lg relative"
           style={{
             backgroundImage: "url('/Mars.jpeg')", 
             backgroundSize: "cover",
@@ -51,8 +51,9 @@ const Page = () => {
             opacity: 0.7,
           }}
         >
-          <div className="absolute inset-0 bg-black opacity-25 rounded-lg" />
-                    {/* Canvas */}
+          <div className=" opacity-25 rounded-lg"/>
+
+                    <Canvas></Canvas>
         </div>
       </div>
       </div>
