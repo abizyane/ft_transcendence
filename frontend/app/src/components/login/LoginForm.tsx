@@ -5,7 +5,8 @@ import Link from "next/link";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useRouter } from "next/navigation"; // Use Next.js router for navigation
+import { useRouter } from "next/navigation";
+import { useState } from "react";
 
 const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
@@ -20,6 +21,7 @@ const formSchema = z.object({
 type FormData = z.infer<typeof formSchema>;
 
 const LoginForm = () => {
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const {
     register,
     handleSubmit,
@@ -48,8 +50,7 @@ const LoginForm = () => {
         router.push("/dashboard");
       } else {
         const errorData = await response.json();
-        console.error("Error:", errorData.message);
-  
+        setErrorMessage("Invalid email or password");
       }
     } catch (error) {
       console.error("An unexpected error occurred:", error);
@@ -57,23 +58,26 @@ const LoginForm = () => {
   };
 
   return (
-    <div className="w-full max-h-screen flex justify-center items-center">
-      <div className="font-mont p-6 backdrop-blur-lg bg-gray-800 bg-opacity-10 rounded-xl shadow-lg mx-auto my-auto">
-        <h2 className="text-3xl font-bold text-white">Login</h2>
+    <div className="w-full min-h-screen flex flex-col justify-center items-center p-4">
+      {errorMessage && (
+        <div className="w-full max-w-md bg-red-500 text-white text-center py-2 mb-4 rounded-md">
+          {errorMessage}
+        </div>
+      )}
+      <div className="font-mont p-6 backdrop-blur-lg bg-gray-800 bg-opacity-10 rounded-xl shadow-lg max-w-sm w-full">
+        <h2 className="text-3xl font-bold text-white mb-4">Login</h2>
         <form className="mt-8 space-y-6" onSubmit={handleSubmit(onSubmit)}>
           <div className="rounded-md shadow-sm -space-y-px">
             <div>
-              <label htmlFor="email-address" className="sr-only">
-                Email address
-              </label>
+              <label htmlFor="email-address" className="sr-only">Email address</label>
               <input
                 id="email-address"
                 type="email"
                 autoComplete="email"
                 {...register("email")}
-                className={`relative block w-full px-3 py-2 text-gray-900 placeholder-gray-500 outline-none bg-gray-200 border ${
+                className={`relative block w-full px-3 py-2 text-gray-900 placeholder-gray-500 bg-gray-200 border ${
                   errors.email ? "border-red-500" : "border-gray-300"
-                } rounded-md `}
+                } rounded-md outline-none`}
                 placeholder="Email address"
               />
               {errors.email && (
@@ -83,9 +87,7 @@ const LoginForm = () => {
               )}
             </div>
             <div className="pt-8">
-              <label htmlFor="password" className="sr-only">
-                Password
-              </label>
+              <label htmlFor="password" className="sr-only">Password</label>
               <input
                 id="password"
                 type="password"
@@ -93,7 +95,7 @@ const LoginForm = () => {
                 {...register("password")}
                 className={`relative block w-full px-3 py-2 text-gray-900 placeholder-gray-500 bg-gray-200 border ${
                   errors.password ? "border-red-500" : "border-gray-300"
-                } rounded-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10`}
+                } rounded-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500`}
                 placeholder="Password"
               />
               {errors.password && (
@@ -106,8 +108,8 @@ const LoginForm = () => {
           <div className="flex justify-center items-center">
             <button
               type="submit"
-              className="purple_button bg-violet-primary"
-              disabled={isSubmitting} 
+              className="purple_button bg-violet-primary py-2 px-4 rounded-md text-white"
+              disabled={isSubmitting}
             >
               {isSubmitting ? "Signing in..." : "Sign in"}
             </button>
@@ -117,14 +119,14 @@ const LoginForm = () => {
         <div className="w-full flex justify-center mt-4">
           <button
             type="button"
-            className="relative flex justify-center px-10 py-2 font-medium bg-white rounded-full"
+            className="relative flex justify-center px-6 py-2 font-medium bg-white rounded-full"
           >
             <Image
               src="https://res.cloudinary.com/dwxvnezhn/image/upload/f_auto,q_auto/v1/pics/hxangc1kyhtibnepmygf"
               alt="42 Logo"
-              className="w-7 h-7"
-              width={28}
-              height={28}
+              className="w-6 h-6"
+              width={24}
+              height={24}
             />
           </button>
         </div>

@@ -1,7 +1,7 @@
 version: '3.9'
 
 networks:
-  default:
+  infra:
     name: astropong
 
 services:
@@ -17,12 +17,14 @@ services:
       - "3000:3000"
     depends_on:
       - backend
-    restart: always
+    networks:
+      - infra
     healthcheck:
       test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost:3000"]
       interval: 10s
       timeout: 5s
       retries: 3
+    restart: always
 
   backend:
     build: 
@@ -38,6 +40,8 @@ services:
       - database
     env_file:
       - .env
+    networks:
+      - infra
     healthcheck:
       test: ["CMD-SHELL", "python manage.py check || exit 1"]
       interval: 10s
@@ -47,13 +51,15 @@ services:
 
   database:
     image: postgres:13
-    container_name: postgres-db
+    container_name: ${POSTGRES_HOST}
     volumes:
       - ./database/data:/var/lib/postgresql/data
     ports:
       - "5432:5432"
     env_file:
       - .env
+    networks:
+      - infra
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U $POSTGRES_USER -d $POSTGRES_DB || exit 1"]
       interval: 10s

@@ -1,36 +1,11 @@
-from rest_framework import serializers, views
+from rest_framework import views
 from rest_framework.response import Response
 from .models import Message
 from astropong.models.UserModel import User, Relationship
 from django.db.models import Q
 from django.http import Http404
 from rest_framework.pagination import PageNumberPagination
-
-class UserSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = User
-        fields = ['username', 'profile_pic', 'is_online']
-
-class MessageSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Message
-        fields = ['message_id','message', 'timestamp', 'seen']
-
-class ConversationSerializer(serializers.ModelSerializer):
-    sender = UserSerializer(read_only=True)
-    receiver = UserSerializer(read_only=True)
-
-    class Meta:
-        model = Message
-        fields = ['message_id','message', 'timestamp', 'seen', 'sender', 'receiver']
-
-class ChatRoomSerializer(serializers.Serializer):
-    sender = UserSerializer(read_only=True)
-    receiver = UserSerializer(read_only=True)
-    messages = MessageSerializer(many=True)
-
-    class Meta:
-        fields = ['sender', 'receiver', 'messages']
+from .serializers import MessageSerializer, ConversationSerializer, ChatRoomSerializer
 
 class ConversationsPageNumberPagination(PageNumberPagination):
     page_size = 7
@@ -77,7 +52,7 @@ class ChatRoomView(MessagesView):
             paginated_response = self.get_messages(request, sender, receiver)
         except Http404 as e:
             return Response({'error': str(e)}, status=404)
-        
+
         messages = paginated_response.data.get('results', [])
         if not messages:
             return Response({'error': 'No messages found between the specified users.'}, status=404)

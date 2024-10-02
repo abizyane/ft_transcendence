@@ -1,19 +1,34 @@
-import React, { ReactNode } from 'react';
+import React, { ReactNode } from "react";
 import "../globals.css";
-import Sidebar from '@/components/Sidebar/Sidebar';
-import Navbar from '@/components/Navbar/Navbar';
+import Sidebar from "@/components/Sidebar/Sidebar";
+import Navbar from "@/components/Navbar/Navbar";
 
-export default function  AuthLayout  ({ children  } )  {
+interface AuthLayoutProps {
+  children: ReactNode;
+}
+
+export default function AuthLayout({ children }: AuthLayoutProps) {
   return (
-    <>
-               <Sidebar /> 
-                <div className="flex flex-col flex-grow ">
-                        <Navbar /> 
-                        <div className="flex-grow flex items-center justify-center mt-4">
-                                {children}
-                        </div>
-                    </div> 
-    </>
-  );
-};
+<div className="w-full min-h-screen flex flex-col justify-start items-start">
+  <div className="w-full h-16"><Navbar /></div>
+
+  {/* Main content area */}
+  <div className="w-full flex lg:flex-row flex-col-reverse flex-grow overflow-hidden">
+    {/* Sidebar section */}
+    <div className="lg:h-screen lg:w-24 w-full z-50 lg:z-0">
+      <Sidebar />
+    </div>
+
+    {/* Main content area */}
+    <div className="w-full flex justify-center items-center">
+      <div className="w-full h-max lg:h-fit flex flex-col justify-center items-center p-2">
+        {children}
+      </div>
+    </div>
+  </div>
+</div>
+
+
+);
+}
 

@@ -10,8 +10,8 @@ const config: Config = {
     extend: {
       backgroundImage: {
         "gradient-radial": "radial-gradient(var(--tw-gradient-stops))",
-        "gradient-conic":
-          "conic-gradient(from 180deg at 50% 50%, var(--tw-gradient-stops))",
+        "gradient-conic": "conic-gradient(from 180deg at 50% 50%, var(--tw-gradient-stops))",
+        'custom-gradient': 'linear-gradient(89.78deg, rgba(88, 85, 85, 0.21) 3.46%, rgba(87, 79, 79, 0.21) 99.5%)',
       },
       colors: {
         "white-primary": "#FFFFFF",
@@ -23,7 +23,7 @@ const config: Config = {
         mont: ["Montserrat", "sans-serif"],
       },
       screens: {
-        'xs': '321px',   
+        'xs': '320px',   
         'sm': '640px',
         'md': '768px',
         'lg': '1024px',
@@ -32,7 +32,15 @@ const config: Config = {
      
     },
     width: {
-      'calc-100-minus-24': 'calc(100% - 112px)',
+      'desktop': 'calc(100% - 100px)',
+      'phone': 'calc(100% - 112px)',
+    },
+    height: {
+      'desktop': 'calc(100% - 112px)',
+      'phone': 'calc(100% - 112px)',
+    },
+    fontSize: {
+      '2xs': '0.625rem', // Example for extra small text
     },
   },
   },

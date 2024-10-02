@@ -15,7 +15,7 @@ cd /app
 until pg_isready -h $POSTGRES_HOST -p $POSTGRES_PORT -U $POSTGRES_USER
 do
     echo "Waiting for postgres..."
-    sleep 1
+    sleep 2
 done
 
 python manage.py makemigrations chat notification astropong game

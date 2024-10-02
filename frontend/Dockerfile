@@ -1,11 +1,17 @@
+FROM node:20.17-alpine3.20 AS builder
+
+WORKDIR /app
+
+COPY app/. .
+
+RUN npm install --loglevel=error
+
 FROM node:20.17-alpine3.20
 
 WORKDIR /app
 
-COPY app/package*.json ./
+COPY --from=builder /app ./
 
-RUN npm install && npm install -g next
+RUN npx next telemetry disable
 
-COPY app/. .
-
-CMD ["next", "dev"]
+CMD ["npx", "next", "dev"]

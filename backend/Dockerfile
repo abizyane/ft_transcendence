@@ -14,7 +14,7 @@ RUN apk add --no-cache postgresql-dev\
     redis &&\
     pip install --no-cache-dir -r requirements.txt
     
-    COPY scripts/entrypoint.sh /entrypoint.sh 
-    RUN chmod +x /entrypoint.sh
-    
-    CMD ["/entrypoint.sh"]
+COPY scripts/entrypoint.sh /entrypoint.sh 
+RUN chmod +x /entrypoint.sh
+
+CMD ["/entrypoint.sh"]
