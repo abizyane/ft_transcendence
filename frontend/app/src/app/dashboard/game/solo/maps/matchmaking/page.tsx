@@ -1,5 +1,7 @@
 import Mars from "../../../../../../../public/Mars.jpeg";
-import VS from "../../../../../../../public/VS.jpeg"
+import VS from "../../../../../../../public/VS.jpeg";
+import Link from "next/link";
+
 // Sample users data
 const users = [
   {
@@ -76,6 +78,7 @@ const Page = () => {
           </p>
         </div>
       </div>
+      <Link href="matchmaking/ponggame" className="bg-blue-500 text-blue-800"> <button>start</button> </Link>
     </div>
   );
 };

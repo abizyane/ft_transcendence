@@ -9,11 +9,8 @@ interface AuthLayoutProps {
 
 export default function AuthLayout({ children }: AuthLayoutProps) {
   return (
-<div className="w-full min-h-screen flex flex-col">
-  {/* Navbar at the top */}
-  <div className="w-full h-16 min-h-16">
-    <Navbar />
-  </div>
+<div className="w-full min-h-screen flex flex-col justify-start items-start">
+  <div className="w-full h-16"><Navbar /></div>
 
   {/* Main content area */}
   <div className="w-full flex lg:flex-row flex-col-reverse flex-grow overflow-hidden">
@@ -31,5 +28,7 @@ export default function AuthLayout({ children }: AuthLayoutProps) {
   </div>
 </div>
 
+
 );
 }
+
