@@ -13,9 +13,9 @@ export default function AuthLayout({ children }: AuthLayoutProps) {
   <div className="w-full h-16"><Navbar /></div>
 
   {/* Main content area */}
-  <div className="w-full flex lg:flex-row flex-col-reverse flex-grow overflow-hidden">
+  <div className="w-full flex lg:flex-row flex-col-reverse justify-center items-center flex-grow overflow-hidden">
     {/* Sidebar section */}
-    <div className="lg:h-screen lg:w-24 w-full z-50 lg:z-0">
+    <div className="lg:h-screen lg:w-24 fixed bottom-0 lg:static  w-full z-50 lg:z-0">
       <Sidebar />
     </div>
 

@@ -130,7 +130,7 @@ const Registration = () => {
         </div>
         <div className="text-center text-white mt-4">
           Already have an account?&nbsp;
-          <Link href="../auth/login" className="hover:opacity-70">
+          <Link href="/auth/login" className="hover:opacity-70">
             Login
           </Link>
         </div>

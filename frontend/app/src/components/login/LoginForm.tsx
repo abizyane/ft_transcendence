@@ -132,7 +132,7 @@ const LoginForm = () => {
         </div>
         <div className="text-center text-white mt-4">
           Don't have an account yet?&nbsp;
-          <Link href="../auth/register" className="hover:opacity-70">
+          <Link href="/auth/register" className="hover:opacity-70">
             Register
           </Link>
         </div>
