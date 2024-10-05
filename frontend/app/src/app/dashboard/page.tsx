@@ -156,7 +156,7 @@ const Dashboard = () => {
               <div className="bg-gray-800 rounded-xl border border-gray-600 mb-4 lg:mt-4">
                 <div className="m-2 flex justify-between items-center">
                   <p className="m-2 text-white text-2xl font-extrabold">
-                    Top Players
+                    Friends
                   </p>
                   <div className="m-2 p-2 border border-white backdrop-blur-lg bg-opacity-30 bg-white rounded-xl">
                     <p className="text-white">View All</p>
