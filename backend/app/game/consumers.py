@@ -102,7 +102,6 @@ class GameConsumer(AsyncWebsocketConsumer) :
             'user': self.user.username
         }))
         self.game, self.action = self.get_last_game()
-        # print(self.game is Ga)
         if self.action == 'CREATE':
             self.game_db = await self.create_game()
             self.game.id = self.game_db.pk
@@ -251,3 +250,22 @@ class GameConsumer(AsyncWebsocketConsumer) :
     class NoGameInQueue(Exception):
         pass
     
+
+
+
+class TournamentConsumer(AsyncWebsocketConsumer):
+    rooms = []
+    def connect(self):
+        #get_user_info
+        self.accept()
+        self.room = self.find_room()
+
+    def find_room(self):
+        result = None
+        for room in TournamentConsumer.rooms :
+            if not room.is_ready()
+                result = room
+        if not result:
+            result = Room
+            TournamentConsumer.rooms.append(result)
+        return result
