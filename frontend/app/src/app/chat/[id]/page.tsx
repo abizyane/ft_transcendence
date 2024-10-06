@@ -1,22 +1,23 @@
 "use client";
-import { useRouter } from "next/router";
+import { useRouter } from "next/navigation";
 import React, { useState } from "react";
 
+
+
+
 const UserChatPage = () => {
-  // const router = useRouter();
-  // const { id } = router.query; // Extract the ID from the URL
-  const [messages, setMessages] = useState([]); // State to hold chat messages
-  const [input, setInput] = useState(""); // State to hold input value
+  const [messages, setMessages] = useState([]); 
+  const [input, setInput] = useState("");
 
   const handleSendMessage = () => {
     if (input.trim()) {
       const newMessage = {
         text: input,
-        sender: "me", // Change based on sender
-        timestamp: new Date().toLocaleTimeString(), // Get current time
+        sender: "me", 
+        timestamp: new Date().toLocaleTimeString(),
       };
       setMessages((prevMessages) => [...prevMessages, newMessage]);
-      setInput(""); // Clear the input field after sending
+      setInput("");
     }
   };
 

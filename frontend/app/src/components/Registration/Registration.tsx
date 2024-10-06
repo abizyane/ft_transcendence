@@ -6,6 +6,7 @@ import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useState } from 'react';
+import { useRouter } from 'next/navigation';
 
 const formSchema = z.object({
   username: z.string().min(4, 'Username must be at least 4 characters'),
@@ -38,7 +39,9 @@ const Registration = () => {
       if (response.ok) {
         setSuccessMessage('Registration successful! Redirecting...');
         setTimeout(() => {
-          window.location.href = '../auth/login';
+          if (typeof window !== 'undefined') {
+            router.push('/auth/login');
+          }
         }, 2000); // Delay for success message to be shown
       } else {
         const errorData = await response.json();

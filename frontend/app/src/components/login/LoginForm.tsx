@@ -41,7 +41,7 @@ const LoginForm = () => {
         },
         body: JSON.stringify(data),
       });
-
+      console.log(response);
       if (response.ok) {
         const responseData = await response.json();
         const jwt = responseData.jwt;
