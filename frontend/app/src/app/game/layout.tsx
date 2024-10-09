@@ -21,7 +21,7 @@ export default function GameLayout({ children }: GameLayoutProps) {
 
     {/* Main content area */}
     <div className="w-full ">
-      <div className="w-full h-full lg:h-h-fit flex flex-col justify-center items-center p-2">
+      <div className="w-full h-full  flex flex-col justify-center items-center p-2">
         {children}
       </div>
     </div>

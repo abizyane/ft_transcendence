@@ -28,32 +28,32 @@ const Page = () => {
   return (
     <div className="w-full flex flex-col items-center  h-full">
       {/* Responsive Container */}
-      <div className="bg-custom-gradient bg-opacity-60 rounded-xl flex flex-col md:flex-row md:flex-wrap gap-6 border-[1px] border-violet-primary w-full justify-center items-center p-4 h-fit mb-24 lg:mb-0">
+      <div className="bg-custom-gradient bg-opacity-60 rounded-xl flex flex-col md:flex-row md:flex-wrap gap-6 border-[1px] border-violet-primary w-full justify-center items-center p-4 h-full mb-24 lg:mb-0">
         {/* Invite A Friend Card */}
         <div
-          onMouseEnter={() => setHoveredIndex(0)}
-          onMouseLeave={() => setHoveredIndex(null)}
-          className={`flex  flex-col w-[70%] md:w-[40%] lg:w-[20%]  lg:h-[70%] rounded-2xl border-4 m-2 border-violet-primary overflow-hidden transform transition-transform duration-300 ${hoveredIndex === 0 ? 'scale-105' : hoveredIndex === null ? 'scale-100' : 'blur-sm'}`}
+          // onMouseEnter={() => setHoveredIndex(0)}
+          // onMouseLeave={() => setHoveredIndex(null)}
+          className={`flex  flex-col w-[70%] md:w-[40%] md:h-[40%] xl:w-[20%]  xl:h-[90%]  rounded-2xl border-4 m-2 border-violet-primary overflow-hidden transform transition-transform duration-300 ${hoveredIndex === 0 ? 'scale-105' : hoveredIndex === null ? 'scale-100' : 'blur-sm'}`}
         >
           <Link href="dashboard/game/solo">
-            <div className="relative w-full h-48   overflow-hidden">
+            <div className=" w-full h-48   overflow-hidden">
               {friends.map((friend) => (
                 <div
                   key={friend.id}
-                  className="flex items-center justify-between p-2 m-1 rounded-lg border-[1px] bg-gray-600 border-violet-primary"
+                  className="flex items-center justify-between p-1 m-1 rounded-lg border-[1px] bg-gray-600 border-violet-primary"
                 >
                   <img
                     src={friend.profilePic}
                     alt={`${friend.name}'s profile`}
                     className="w-8 h-8 rounded-full object-cover"
                   />
-                  <div className="flex flex-col ml-4">
-                    <span className="font-light text-nowrap">{friend.name}</span>
-                    <span className="text-sm text-black">
+                  <div className="flex flex-col ml-1">
+                    <span className="font-extralight text-nowrap">{friend.name}</span>
+                    <span className="text-xs text-black">
                       @{friend.username}
                     </span>
                   </div>
-                  <button className="bg-black/50 rounded-full p-2">
+                  <button className="bg-black/50 rounded-full p-1">
                     <Icon
                       icon={battleIcon}
                       className="w-4 h-4 text-red-500"
@@ -61,7 +61,7 @@ const Page = () => {
                   </button>
                 </div>
               ))}
-              <div className="absolute bottom-0 left-0 right-0 bg-black/50 h-1/4 text-center text-lg md:text-xl lg:text-2xl font-bold text-white flex items-center justify-center">
+              <div className="absolute  bottom-0 left-0 right-0 bg-black/50 text-center text-lg md:text-xl lg:text-2xl font-bold text-white flex items-center justify-center">
                 Invite A Friend
               </div>
             </div>
@@ -70,28 +70,29 @@ const Page = () => {
 
         {/* VS AI Card */}
         <div
-          onMouseEnter={() => setHoveredIndex(1)}
-          onMouseLeave={() => setHoveredIndex(null)}
-          className={`w-[70%] md:w-[40%] lg:w-[20%]  lg:h-[70%]  m-2  flex flex-col rounded-2xl border-4 border-violet-primary overflow-hidden transform transition-transform duration-300 ${hoveredIndex === 1 ? 'scale-105' : hoveredIndex === null ? 'scale-100' : 'blur-sm'}`}
-        >
-          <Link href="solo/maps">
-            <div className="relative h-48 bg-cover bg-center" style={{ backgroundImage: `url(${Vsbot.src})` }}>
-              <div className="absolute bottom-0 left-0 right-0 bg-black/50 h-1/4 text-center text-lg md:text-xl lg:text-2xl font-bold text-white flex items-center justify-center">
-                VS AI
-              </div>
-            </div>
-          </Link>
-        </div>
+  onMouseEnter={() => setHoveredIndex(1)}
+  onMouseLeave={() => setHoveredIndex(null)}
+  className={`w-[70%] md:w-[40%] xl:w-[20%] h-[22%] md:h-[40%] xl:h-[90%] m-2 flex flex-col rounded-2xl border-4 border-violet-primary overflow-hidden transform transition-transform duration-300 ${hoveredIndex === 1 ? 'scale-105' : hoveredIndex === null ? 'scale-100' : 'blur-sm'}`}
+>
+  <Link href="solo/maps" className='h-full'>
+    <div className="h-full w-full bg-cover bg-center" style={{ backgroundImage: `url(${Vsbot.src})`, backgroundSize: 'cover', backgroundPosition: 'center' }}>
+      <div className="absolute bottom-0 left-0 right-0 bg-black/50 text-center text-lg md:text-xl lg:text-2xl font-bold text-white flex items-center justify-center">
+        VS AI
+      </div>
+    </div>
+  </Link>
+</div>
+
 
         {/* Local Game Card */}
         <div
           onMouseEnter={() => setHoveredIndex(2)}
           onMouseLeave={() => setHoveredIndex(null)}
-          className={`w-[70%] md:w-[40%] lg:w-[20%]  lg:h-[70%] m-2 flex flex-col rounded-2xl border-4 border-violet-primary overflow-hidden transform transition-transform duration-300 ${hoveredIndex === 2 ? 'scale-105' : hoveredIndex === null ? 'scale-100' : 'blur-sm'}`}
+          className={`w-[70%] md:w-[40%] xl:w-[20%] md:h-[40%]  xl:h-[90%] m-2 flex flex-col rounded-2xl border-4 border-violet-primary overflow-hidden transform transition-transform duration-300 ${hoveredIndex === 2 ? 'scale-105' : hoveredIndex === null ? 'scale-100' : 'blur-sm'}`}
         >
-          <Link href="solo/maps">
-            <div className="relative h-48 bg-cover bg-center" style={{ backgroundImage: `url(${Localgame.src})` }}>
-              <div className="absolute bottom-0 left-0 right-0 bg-black/50 h-1/4 text-center text-lg md:text-xl lg:text-2xl font-bold text-white flex items-center justify-center">
+          <Link href="solo/maps" className='h-full'>
+            <div className=" h-48 md:h-full bg-cover bg-center" style={{ backgroundImage: `url(${Localgame.src})` }}>
+              <div className="absolute bottom-0 left-0 right-0 bg-black/50  text-center text-lg md:text-xl lg:text-2xl font-bold text-white flex items-center justify-center">
                 Local Game
               </div>
             </div>
@@ -102,11 +103,11 @@ const Page = () => {
         <div
           onMouseEnter={() => setHoveredIndex(3)}
           onMouseLeave={() => setHoveredIndex(null)}
-          className={`w-[70%] md:w-[40%] lg:w-[20%]  lg:h-[70%] m-2 flex flex-col rounded-2xl border-4 border-violet-primary overflow-hidden transform transition-transform duration-300 ${hoveredIndex === 3 ? 'scale-105' : hoveredIndex === null ? 'scale-100' : 'blur-sm'}`}
+          className={`w-[70%] md:w-[40%] xl:w-[20%] md:h-[40%] xl:h-[90%] m-2 flex flex-col rounded-2xl border-4 border-violet-primary overflow-hidden transform transition-transform duration-300 ${hoveredIndex === 3 ? 'scale-105' : hoveredIndex === null ? 'scale-100' : 'blur-sm'}`}
         >
-          <Link href="solo/maps">
-            <div className="relative h-48 bg-cover bg-center" style={{ backgroundImage: `url(${Random.src})` }}>
-              <div className="absolute bottom-0 left-0 right-0 bg-black/50 h-1/4 text-center text-lg md:text-xl lg:text-2xl font-bold text-white flex items-center justify-center">
+          <Link href="solo/maps" className='h-full'>
+            <div className=" h-48 md:h-full bg-cover bg-center" style={{ backgroundImage: `url(${Random.src})` }}>
+              <div className="absolute bottom-0 left-0 right-0 bg-black/50  text-center text-lg md:text-xl lg:text-2xl font-bold text-white flex items-center justify-center">
                 Random Match
               </div>
             </div>
