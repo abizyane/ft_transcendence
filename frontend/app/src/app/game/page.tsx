@@ -10,7 +10,7 @@ const Page = () => {
 
   return (
     <>
-      <div className="bg-gray-800 bg-opacity-60 rounded-xl flex flex-col gap-4 border-[1px] border-violet-primary w-fit h-fit justify-center items-center md:flex-row mb-24 lg:mb-0">
+      <div className="bg-gray-800 bg-opacity-60 rounded-xl flex flex-col gap-4 border-[1px] border-violet-primary w-fit  h-fit justify-center items-center md:flex-row mb-24 lg:mb-0">
         
         <div
           onMouseEnter={() => setHoveredIndex(0)}
@@ -19,7 +19,7 @@ const Page = () => {
         >
           <Link href="game/solo">
             <div
-              className="relative h-[70vh] w-full z-0 bg-cover bg-center rounded-t-xl"
+              className="relative h-[30vh] md:h-[70vh] w-full z-0 bg-cover bg-center rounded-t-xl"
               style={{ backgroundImage: `url(${solo.src})` }}
             >
               <p className="absolute bottom-0 left-0 right-0 bg-black/50 text-center text-xl md:text-3xl font-bold text-white rounded-b-xl p-4">
@@ -36,7 +36,7 @@ const Page = () => {
         >
           <Link href="dashboard/game/tournaments">
             <div
-              className="relative h-[70vh] w-full z-0 bg-cover bg-center rounded-t-xl"
+              className="relative h-[30vh] md:h-[70vh] w-full z-0 bg-cover bg-center rounded-t-xl"
               style={{ backgroundImage: `url(${multiplayers.src})` }}
             >
               <p className="absolute bottom-0 text-nowrap left-0 right-0 bg-black/50 text-center text-xl md:text-3xl font-bold text-white rounded-b-xl p-4">
