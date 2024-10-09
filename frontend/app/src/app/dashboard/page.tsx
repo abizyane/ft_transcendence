@@ -1,7 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
 import Component from "@/components/Component/Component";
-import Linechart from "@/components/Charts/linechart";
+import Linechart from "@/components/Charts/Linechart";
 import { Icon } from "@iconify/react";
 import chatIcon from "@iconify-icons/mdi/chat-processing";
 import battleIcon from "@iconify-icons/mdi/sword-fight";
@@ -16,10 +16,10 @@ const Dashboard = () => {
               <Component />
             </div>
             <div className="bg-gray-800 rounded-xl flex-1 border border-gray-600">
-              <p className="m-2 text-white text-2xl font-extrabold w-full">
+              <p className="m-2 text-white text-2xl p-4 font-extrabold w-full">
                 Experience Performance
               </p>
-              <div className=" w-[99%]">
+              <div className=" w-[99%] justify-center items-center  ">
 
                   <Linechart />
               </div>

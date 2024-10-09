@@ -8,7 +8,7 @@ const page = () => {
     <div className="h-16">
       <Logo/>
     </div>
-    <div className="flex justify-center items-center h-screen w-full"> 
+    <div className="flex justify-center items-center min-h-screen w-full mb-2"> 
       <Registration />
     </div>
     </>

@@ -1,6 +1,6 @@
-import Mars from "../../../../../../public/Mars.jpeg";
-import Earth from "../../../../../../public/Earth.jpeg";
-import Jupiter from "../../../../../../public/Jupiter.jpeg";
+import Mars from "../../../../../public/Mars.jpeg";
+import Earth from "../../../../../public/Earth.jpeg";
+import Jupiter from "../../../../../public/Jupiter.jpeg";
 import Link from "next/link";
 
 

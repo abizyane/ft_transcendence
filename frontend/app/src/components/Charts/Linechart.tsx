@@ -66,7 +66,7 @@ const LineChart: React.FC = () => {
   };
 
   return (
-    <div className=" w-full p-1 h-[200px] lg:h-[500px] ">
+    <div className=" w-full p-1 h-60">
       <Line data={data} options={options} style={{width:"100%"}} />
       &nbsp;
     </div>

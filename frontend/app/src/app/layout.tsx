@@ -13,7 +13,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className="w-full bg-[url('../../public/wallpaper.png')] bg-no-repeat bg-cover min-h-screen bg-black">
+      <body className="w-full bg-[url('../../public/wallpaper.png')] bg-no-repeat bg-cover  bg-black">
           {children}
       </body>
     </html>

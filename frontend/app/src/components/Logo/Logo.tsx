@@ -9,7 +9,7 @@ const Logo = () => {
   <img 
     src="https://res.cloudinary.com/dwxvnezhn/image/upload/f_auto,q_auto/v1/pics/nbs3tv67mny656ohbayx" 
     alt="Logo" 
-    width="80" 
+    width="80"
     height="50"
   />
   </Link>

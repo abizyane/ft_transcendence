@@ -54,7 +54,7 @@ const Registration = () => {
 
   return (
     
-    <div className="flex flex-col items-center justify-center bg-gray-800 bg-opacity-60 p-6 rounded-xl shadow-lg max-w-sm">
+    <div className="flex flex-col  items-center justify-center bg-gray-800 bg-opacity-60 p-6 rounded-xl shadow-lg ">
       {successMessage && (
         <div className="text-green-500 text-center mb-4">{successMessage}</div>
       )}

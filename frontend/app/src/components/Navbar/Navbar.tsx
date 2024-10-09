@@ -55,7 +55,7 @@ const Navbar = () => {
 
   return (
     <>
-      <nav className="  backdrop-blur-md  border-gray-800 flex justify-between right-0 top-0 h-16  md:w-full">
+      <nav className=" backdrop-blur-md  border-gray-800 flex justify-between right-0 top-0 h-16  md:w-full">
         <div className="z-50 ml-3">
           <Logo/>
         </div>

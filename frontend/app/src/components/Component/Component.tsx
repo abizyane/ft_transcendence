@@ -3,7 +3,7 @@ import Marshmellow from "../../../public/marshmello.svg";
 // import Tournement from "../../../public/BgTournement.svg";
 import "../../app/globals.css";
 import Link from "next/link";
-import DoughnutChart from "../Charts/winrate";
+import DoughnutChart from "../Charts/Winrate";
 
 const Component = () => {
   return (
