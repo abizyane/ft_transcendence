@@ -12,14 +12,14 @@ const Dashboard = () => {
       <div className="flex flex-1  lg:w-full px-1 overflow-hidden justify-center items-center">
         <div className="flex-1 w-full flex flex-col items-center justify-center mb-14 mt-2 relative">
           <div className="flex flex-col lg:flex-row w-full space-y-4 lg:space-y-0 lg:space-x-4">
-            <div className="bg-gray-800 rounded-xl lg:w-2/4 lg:border border-gray-600 mb-4 lg:mb-0">
+            <div className="bg-gray-800/60 rounded-xl lg:w-2/4 lg:border border-violet-primary mb-4 lg:mb-0">
               <Component />
             </div>
-            <div className="bg-gray-800 rounded-xl flex-1 border border-gray-600">
+            <div className="bg-gray-800/60 rounded-xl flex-1 border border-violet-primary">
               <p className="m-2 text-white text-2xl p-4 font-extrabold w-full">
                 Experience Performance
               </p>
-              <div className=" w-[99%] justify-center items-center  ">
+              <div className=" w-[99%] justify-center items-center">
 
                   <Linechart />
               </div>
@@ -27,12 +27,12 @@ const Dashboard = () => {
           </div>
           <div className="flex flex-col lg:flex-row w-full space-y-4 lg:space-y-0 lg:space-x-4">
             <div className="mt-8 w-full lg:mt-4 lg:w-1/3 lg:flex lg:flex-col overflow-hidden">
-              <div className="bg-gray-800 rounded-xl border border-gray-600 flex flex-col flex-1 mb-4">
+              <div className="bg-gray-800/60 rounded-xl border border-violet-primary flex flex-col flex-1 mb-4">
                 <div className="m-2 flex justify-between items-center">
                   <p className="m-2 text-white text-2xl font-extrabold">
                     History
                   </p>
-                  <div className="m-2 p-2 border border-white backdrop-blur-lg bg-opacity-30 bg-white rounded-xl">
+                  <div className="m-2 p-2 border-2 border-violet-primary backdrop-blur-lg rounded-xl hover:bg-violet-primary">
                     <p className="text-white">View All</p>
                   </div>
                 </div>
@@ -41,7 +41,7 @@ const Dashboard = () => {
                     {[1, 2, 3].map((_, index) => (
                       <div
                         key={index}
-                        className="flex flex-row items-center justify-between bg-gray-700 p-2 rounded-[34px]  border border-gray-600"
+                        className="flex flex-row items-center justify-between bg-gray-800 p-2 rounded-[34px]  border border-violet-primary"
                       >
                         <div className="flex items-center space-x-0 sm:space-x-2">
                           <img
@@ -75,16 +75,16 @@ const Dashboard = () => {
               </div>
             </div>
             <div className="mt-4 w-full lg:w-1/3 ">
-              <div className="bg-gray-800 rounded-xl border border-gray-600 mb-4 mt-4 lg:mt-4">
-                <div className="m-2 flex justify-between items-center">
+              <div className="bg-gray-800/60 rounded-xl border border-violet-primary mb-4 mt-4 lg:mt-4">
+                <div className="m-2 flex justify-between items-center ">
                   <p className="m-2 text-white text-2xl font-extrabold">
                     Top Players
                   </p>
-                  <div className="m-2 p-2 border border-white backdrop-blur-lg bg-opacity-30 bg-white rounded-xl">
+                  <div className="m-2 p-2 border border-violet-primary backdrop-blur-lg bg-opacity-30  hover:bg-violet-primary rounded-xl">
                     <p className="text-white">View All</p>
                   </div>
                 </div>
-                <div className="flex items-center justify-between m-3 golden rounded-[34px] pl-2 py-2 pr-5 border border-gray-600">
+                <div className="flex items-center justify-between m-3 golden rounded-[34px] pl-2 py-2 pr-5 border border-violet-primary">
                   <div className="flex items-center space-x-4">
                     <img
                       src="/Profil.jpg"
@@ -106,7 +106,7 @@ const Dashboard = () => {
                     />
                   </div>
                 </div>
-                <div className="flex items-center justify-between m-3 silver rounded-[34px] pl-2 py-2 pr-5 border border-gray-600">
+                <div className="flex items-center justify-between m-3 silver rounded-[34px] pl-2 py-2 pr-5 border border-violet-primary">
                   <div className="flex items-center space-x-4">
                     <img
                       src="/Profil.jpg"
@@ -128,7 +128,7 @@ const Dashboard = () => {
                     />
                   </div>
                 </div>
-                <div className="flex items-center justify-between m-3 bronze rounded-[34px] pl-2 py-2 pr-5 border border-gray-600">
+                <div className="flex items-center justify-between m-3 bronze rounded-[34px] pl-2 py-2 pr-5 border border-violet-primary">
                   <div className="flex items-center space-x-4">
                     <img
                       src="/Profil.jpg"
@@ -153,16 +153,16 @@ const Dashboard = () => {
               </div>
             </div>
             <div className="mt-4 w-full lg:w-1/3">
-              <div className="bg-gray-800 rounded-xl border border-gray-600 mb-4 lg:mt-4">
+              <div className="bg-gray-800/60 rounded-xl border border-violet-primary mb-4 lg:mt-4">
                 <div className="m-2 flex justify-between items-center">
                   <p className="m-2 text-white text-2xl font-extrabold">
                     Friends
                   </p>
-                  <div className="m-2 p-2 border border-white backdrop-blur-lg bg-opacity-30 bg-white rounded-xl">
+                  <div className="m-2 p-2 border border-violet-primary backdrop-blur-lg hover:bg-violet-primary rounded-xl">
                     <p className="text-white">View All</p>
                   </div>
                 </div>
-                <div className="flex items-center justify-between m-3 rounded-[34px] pl-2 py-2 pr-5 border border-gray-600">
+                <div className="flex items-center justify-between m-3 rounded-[34px] pl-2 py-2 pr-5 border border-violet-primary">
                   <div className="flex items-center space-x-4">
                     <img
                       src="/Profil.jpg"
@@ -189,7 +189,7 @@ const Dashboard = () => {
                   </div>
                 </div>
 
-                <div className="flex items-center justify-between m-3  rounded-[34px] pl-2 py-2 pr-5 border border-gray-600">
+                <div className="flex items-center justify-between m-3  rounded-[34px] pl-2 py-2 pr-5 border border-violet-primary">
                   <div className="flex items-center space-x-4">
                     <img
                       src="/Profil.jpg"
@@ -216,7 +216,7 @@ const Dashboard = () => {
                   </div>
                 </div>
 
-                <div className="flex items-center justify-between m-3 rounded-[34px] pl-2 py-2 pr-5 border border-gray-600">
+                <div className="flex items-center justify-between m-3 rounded-[34px] pl-2 py-2 pr-5 border border-violet-primary">
                   <div className="flex items-center space-x-4">
                     <img
                       src="/Profil.jpg"

@@ -8,8 +8,7 @@ export default function Home() {
     <div className=" overflow-hidden">
         <Logo />
     </div>
-    <div className="flex-1 flex justify-center items-center overflow-hidden">
-
+    <div className="flex-1 flex justify-center items-center overflow-hidden ">
       <Landingpage />
     </div>
     </div>

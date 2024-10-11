@@ -35,7 +35,7 @@ const Registration = () => {
         },
         body: JSON.stringify(data),
       });
-
+      const router =useRouter();
       if (response.ok) {
         setSuccessMessage('Registration successful! Redirecting...');
         setTimeout(() => {
@@ -54,7 +54,7 @@ const Registration = () => {
 
   return (
     
-    <div className="flex flex-col  items-center justify-center bg-gray-800 bg-opacity-60 p-6 rounded-xl shadow-lg ">
+    <div className="font-mont p-6 backdrop-blur-lg bg-gray-800/60  rounded-xl shadow-lg max-w-sm w-full">
       {successMessage && (
         <div className="text-green-500 text-center mb-4">{successMessage}</div>
       )}
@@ -106,34 +106,34 @@ const Registration = () => {
             {errors.confirmpassword && <p className="text-red-500">{errors.confirmpassword.message}</p>}
           </div>
         </div>
-        <div>
+        <div className="flex justify-center items-center">
           <button
             type="submit"
-            className="relative flex justify-center w-full px-4 py-2 text-sm font-medium text-white bg-violet-primary rounded-xl"
+            className="purple_button bg-violet-primary py-2 px-4 rounded-md text-white"
           >
             Sign up
           </button>
         </div>
-        <div className="text-center text-white mt-4">
-          or continue with
+        <div className="text-center text-sm text-white mt-4">
+          Or continue with
         </div>
         <div className="w-full flex justify-center mt-4">
-          <button
-            type="button"
-            className="relative flex justify-center px-10 py-2 font-medium bg-white rounded-full"
-          >
-            <Image
-              src="https://res.cloudinary.com/dwxvnezhn/image/upload/f_auto,q_auto/v1/pics/hxangc1kyhtibnepmygf"
-              alt="42 Logo"
-              className="w-7 h-7"
-              width={28}
-              height={28}
-            />
-          </button>
+        <button
+  type="button"
+  className="relative flex justify-center items-center w-12 h-12 bg-white rounded-full p-1"
+>
+  <img
+    src="https://res.cloudinary.com/dwxvnezhn/image/upload/f_auto,q_auto/v1/pics/hxangc1kyhtibnepmygf"
+    alt="42 Logo"
+    className="w-8 h-8 rounded-full"
+    width={24}
+    height={24}
+  />
+</button>
         </div>
         <div className="text-center text-white mt-4">
           Already have an account?&nbsp;
-          <Link href="/auth/login" className="hover:opacity-70">
+          <Link href="/auth/login" className="text-sm underline hover:opacity-70">
             Login
           </Link>
         </div>

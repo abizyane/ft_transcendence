@@ -6,7 +6,7 @@ const Landingpage = () => {
     <>
       <div className="font-mont text-center flex flex-col space-y-6 m-4 p-10 items-center overflow-hidden justify-center w-full ">
         <h1 className="text-4xl font-bold text-white">ASTRO PONG</h1>
-        <p className=" text-white">
+        <p className=" text-white lg:text-wrap">
           Astro Pong is the ultimate destination for pong enthusiasts looking to
           showcase their skills and compete against the best. This website
           offers a thrilling platform for players to participate in exciting

@@ -34,7 +34,7 @@ const Component = () => {
         <p className="text-base lg:text-2xl font-bold text-white text-center">Ahallali</p>
       </div>
       <div className="p-2 rounded-xl border h-full border-violet-primary mr-2">
-      <div className="relative w-full h-full flex flex-col items-center justify-center bg-gray-800 rounded-xl">
+      <div className="relative w-full h-full flex flex-col items-center justify-center bg-gray-800/20 rounded-xl">
         <p className="text-white font-mont text-xs m-1">Win Rate</p> 
         <div className="relative w-full h-full flex items-center justify-center">
           <DoughnutChart />
