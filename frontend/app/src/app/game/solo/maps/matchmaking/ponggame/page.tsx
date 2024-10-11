@@ -1,5 +1,5 @@
 import Image from "next/image";
-import Mars from "../../../../../../../../public/Mars.jpeg";
+import Mars from "../../../../../../../public/Mars.jpeg";
 import VS from "../../../../../../../../public/VS.jpeg";
 import Canvas from "@/components/Canva/page";
 const users = [
@@ -19,9 +19,9 @@ const users = [
 
 const Page = () => {
   return (
-    <div className="min-w-[320px] w-full h-screen flex flex-col items-center justify-between p-2  lg:p-10">
-      <div className="w-full max-w-full h-screen border-violet-primary backdrop-blur-lg border-2 p-2 rounded-lg flex flex-col">
-        <div className="flex justify-between items-center w-full bg-transparent p-2 rounded-lg mb-4">
+    <div className="min-w-[320px] w-full h-full flex flex-col items-center justify-between p-2  ">
+      <div className="w-full max-w-full h-full border-violet-primary backdrop-blur-lg border-2 p-2 rounded-lg flex flex-col mb-24 lg:mb-0">
+        <div className="flex justify-between items-center w-full bg-transparent p-2 rounded-lg mb-2">
           <div className="flex items-center space-x-2 bg-gray-700 p-1  lg:p-3 rounded-full w-36  lg:w-1/3 lg:h-14  justify-center lg:justify-start">
             <Image src={Mars} alt="First User" width={30} height={30} className="rounded-full " />
             <div className="text-white">
@@ -51,7 +51,7 @@ const Page = () => {
             opacity: 0.7,
           }}
         >
-          <div className=" opacity-25 rounded-lg"/>
+          <div className=" opacity-25 rounded-lg w-full h-full"/>
 
                     <Canvas></Canvas>
         </div>
