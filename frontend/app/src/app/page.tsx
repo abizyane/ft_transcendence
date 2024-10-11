@@ -5,7 +5,7 @@ export default function Home() {
     <>
     <div className="flex flex-col  min-h-screen">
 
-    <div className=" overflow-hidden">
+    <div className=" overflow-hidden bg-red-500">
         <Logo />
     </div>
     <div className="flex-1 flex justify-center items-center overflow-hidden ">
