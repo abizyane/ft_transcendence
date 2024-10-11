@@ -1,5 +1,5 @@
 import Mars from "../../../../../../../public/Mars.jpeg";
-import VS from "../../../../../../../public/VS.jpeg";
+import VS from "../../../../../../public/VS.jpeg";
 import Link from "next/link";
 
 // Sample users data
