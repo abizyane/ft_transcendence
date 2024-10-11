@@ -10,7 +10,7 @@ const Page = () => {
 
   return (
     <>
-      <div className="bg-gray-800 bg-opacity-60 rounded-xl flex flex-col gap-4 border-[1px] border-violet-primary w-fit  h-fit justify-center items-center md:flex-row mb-24 lg:mb-0">
+      <div className=" rounded-xl flex flex-col gap-4  w-fit  h-fit justify-center items-center md:flex-row mb-24 lg:mb-0">
         
         <div
           onMouseEnter={() => setHoveredIndex(0)}

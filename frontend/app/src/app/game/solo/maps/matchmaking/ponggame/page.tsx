@@ -43,7 +43,7 @@ const Page = () => {
           </div>
         </div>
         <div
-          className="flex-grow w-full h-full flex items-center justify-center border-4 border-white rounded-lg relative"
+          className="flex-grow w-full h-full flex items-center justify-center border-4 bg-fixed border-white rounded-lg relative"
           style={{
             backgroundImage: "url('/Mars.jpeg')", 
             backgroundSize: "cover",
@@ -51,9 +51,8 @@ const Page = () => {
             opacity: 0.7,
           }}
         >
-          <div className=" opacity-25 rounded-lg w-full h-full"/>
 
-                    <Canvas></Canvas>
+                    {/* <Canvas></Canvas> */}
         </div>
       </div>
       </div>

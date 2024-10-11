@@ -10,7 +10,7 @@ const ChooseGalaxy = () => {
 
   return (
     <>
-      <div className="bg-custom-gradient border-2 border-violet-primary h-[80%] gap-4 rounded-xl p-2 w-full flex flex-col items-center ">
+      <div className="h-[80%] gap-4 rounded-xl p-2 w-full flex flex-col items-center ">
         <h1 className="w-full text-white text-center font-bold md:text-2xl lg:text-3xl mb-4 lg:mb-0">
           CHOOSE YOUR GALAXY
         </h1>

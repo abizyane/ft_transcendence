@@ -9,7 +9,7 @@ import battleIcon from "@iconify-icons/mdi/sword-fight";
 const Dashboard = () => {
   return (
     <>
-      <div className="flex flex-1  lg:w-full px-1 overflow-hidden">
+      <div className="flex flex-1  lg:w-full px-1 overflow-hidden justify-center items-center">
         <div className="flex-1 w-full flex flex-col items-center justify-center mb-14 mt-2 relative">
           <div className="flex flex-col lg:flex-row w-full space-y-4 lg:space-y-0 lg:space-x-4">
             <div className="bg-gray-800 rounded-xl lg:w-2/4 lg:border border-gray-600 mb-4 lg:mb-0">

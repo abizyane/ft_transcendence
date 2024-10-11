@@ -22,7 +22,7 @@ const users = [
 
 const Page = () => {
   return (
-    <div className="bg-custom-gradient border-[1px] border-violet-primary flex flex-col lg:flex-row gap-4   lg:gap-24 items-center justify-center lg:w-fit h-fit ">
+    <div className=" flex flex-col lg:flex-row gap-4   lg:gap-24 items-center justify-center lg:w-fit h-fit ">
       <div className="bg-[rgba(145,145,145,0.23)] p-4 rounded-lg flex flex-col items-center lg:min-h-[500px] lg:min-w-[300px]  md:min-h-[300px] md:min-w-[300px] m-2">
         <img
           src={users[0].profilePic}

@@ -50,7 +50,7 @@ export default function  Sidebar() {
             className={`w-7 h-7 ${iconClass('friends')}`}
           />
         </Link>
-        <Link href="/rank" onClick={() => handleIconClick('rank')}>
+        <Link href="/ranking" onClick={() => handleIconClick('rank')}>
           <Image
             src={rank}
             alt="rank"
