@@ -9,6 +9,7 @@ import {
   Tooltip,
   Legend,
   ChartData,
+  Filler,
   ChartOptions,
 } from "chart.js";
 
@@ -18,6 +19,7 @@ ChartJS.register(
   CategoryScale,
   LinearScale,
   Tooltip,
+  Filler,
   Legend
 );
 

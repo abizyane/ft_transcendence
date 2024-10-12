@@ -49,7 +49,7 @@ const config: Config = {
       },
     },
     animation: {
-      'fade-in-letter': 'fadeInLetter 0.05s ease-in-out forwards', // Short duration for each letter
+      'fade-in-letter': 'fadeInLetter 0.08s ease-in-out forwards', 
     },
   },
   },
