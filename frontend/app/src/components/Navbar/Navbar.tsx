@@ -57,12 +57,12 @@ const Navbar = () => {
     <>
       <nav className=" backdrop-blur-md  border-gray-800 flex justify-between right-0 top-0 h-16  md:w-full">
         <div className="z-50 ml-3">
-          <Logo/>
+          <Logo />
         </div>
         <div className="flex justify-end md:justify-between md:pl-10 items-center w-full">
-          <div className="hidden bg-black rounded-xl  w-[20%] md:w-[260px] md:h-10 border-[0.5px] md:flex">
+          <div className="hidden bg-gray-800/60 rounded-xl  w-[20%] md:w-[260px] md:h-10  md:flex">
             <svg
-              className="w-6 h-6 text-gray-500 m-2"
+              className="w-6 h-6 text-white m-2"
               fill="none"
               stroke="currentColor"
               viewBox="0 0 24 24"
@@ -78,93 +78,96 @@ const Navbar = () => {
             <input
               type="text"
               placeholder="Search"
-              className="w-full bg-transparent placeholder-gray-500 focus:outline-none"
+              className="w-full bg-transparent placeholder-white focus:outline-none"
             />
           </div>
           <div className="md:justify-end md:p-1">
 
-          {/* Notification Icon */}
-          <div className="flex space-x-4 md:justify-end">
-            <div className="relative" ref={notificationsRef}>
-              <div
-                className="bg-black rounded-md w-9 h-9  md:h-12 md:w-12 flex justify-center items-center"
-                onClick={toggleNotificationsDropdown}
-              >
-                <Icon
-                  icon={notifications}
-                  style={{ fontSize: "28px", color: "gray" }}
-                  className="w-7 hover:cursor-pointer"
-                />
-              </div>
-              {isNotificationsOpen && (
-                <div className="absolute right-0 mt-2 w-48 bg-black text-white rounded-md shadow-lg">
-                  <ul>
-                    <li className="p-2 hover:bg-gray-200 cursor-pointer border border-white">
-                      Notification 1
-                    </li>
-                    <li className="p-2 hover:bg-gray-200 cursor-pointer border border-white">
-                      Notification 2
-                    </li>
-                    <li className="p-2 hover:bg-gray-200 cursor-pointer border border-white">
-                      Notification 3
-                    </li>
-                  </ul>
+            {/* Notification Icon */}
+            <div className="flex space-x-4 md:justify-end">
+              <div className="relative" ref={notificationsRef}>
+                <div
+                  className="bg-gray-800/90 rounded-xl w-9 h-9  md:h-12 md:w-12 flex justify-center items-center"
+                  onClick={toggleNotificationsDropdown}
+                >
+                  <Icon
+                    icon={notifications}
+                    style={{ fontSize: "28px", color: "white" }}
+                    className="w-7 hover:cursor-pointer"
+                  />
                 </div>
-              )}
-            </div>
-              
-          {/* option Icon phone */}
-            <div className="bg-black rounded-md w-12 h-12 flex justify-center items-center md:hidden">
-              <Image
-                src={bar}
-                alt="option-bar"
-                className="w-9 h-9"
-                width={36}
-                height={36}
-              />
-            </div>
+                {isNotificationsOpen && (
+                  <div className="absolute right-0 mt-2 w-48 bg-black text-white rounded-md shadow-lg">
+                    <ul>
+                      <li className="p-2 hover:bg-gray-200 cursor-pointer border border-white">
+                        Notification 1
+                      </li>
+                      <li className="p-2 hover:bg-gray-200 cursor-pointer border border-white">
+                        Notification 2
+                      </li>
+                      <li className="p-2 hover:bg-gray-200 cursor-pointer border border-white">
+                        Notification 3
+                      </li>
+                    </ul>
+                  </div>
+                )}
+              </div>
 
-          {/* Settings Icon */}
-            <div className="hidden md:block relative" ref={settingsRef}>
-              <div
-                className="hidden bg-black rounded-md w-9 h-9 md:h-12 md:w-12 md:flex justify-center items-center"
-                onClick={toggleSettingsDropdown}
-              >
-                <Icon
-                  icon={settings}
-                  style={{ fontSize: "28px", color: "gray" }}
-                  className="w-7 hover:cursor-pointer"
+              {/* option Icon phone */}
+              <div className="bg-black rounded-xl w-12 h-12 flex justify-center items-center md:hidden">
+                <Image
+                  src={bar}
+                  alt="option-bar"
+                  className="w-9 h-9"
+                  width={36}
+                  height={36}
                 />
               </div>
-              {isSettingsOpen && (
-                <div className="absolute right-0 mt-2 w-48 bg-black text-white rounded-md shadow-lg">
-                  <ul>
-                    <li className="p-2 hover:bg-gray-200 cursor-pointer border border-white">
-                      Settings 1
-                    </li>
-                    <li className="p-2 hover:bg-gray-200 cursor-pointer border border-white">
-                      Settings 2
-                    </li>
-                    <li className="p-2 hover:bg-gray-200 cursor-pointer border border-white">
-                      Settings 3
-                    </li>
-                  </ul>
+
+              {/* Settings Icon */}
+              <div className="hidden md:block relative" ref={settingsRef}>
+                <div
+                  className="hidden bg-gray-800/90 rounded-xl w-9 h-9 md:h-12 md:w-12 md:flex justify-center items-center"
+                  onClick={toggleSettingsDropdown}
+                >
+                  <Icon
+                    icon={settings}
+                    style={{ fontSize: "28px", color: "white" }}
+                    className="w-7 hover:cursor-pointer"
+                  />
                 </div>
-              )}
+                {isSettingsOpen && (
+                  <div className="absolute right-0 mt-2 w-48 bg-black text-white rounded-md shadow-lg">
+                    <ul>
+                      <li className="p-2 hover:bg-gray-200 cursor-pointer border border-white">
+                        Settings 1
+                      </li>
+                      <li className="p-2 hover:bg-gray-200 cursor-pointer border border-white">
+                        Settings 2
+                      </li>
+                      <li className="p-2 hover:bg-gray-200 cursor-pointer border border-white">
+                        Settings 3
+                      </li>
+                    </ul>
+                  </div>
+                )}
+              </div>
+              <div className="flex items-center">
+  <div className="relative w-12 h-12">
+    {/* Dot positioned behind the profile picture, with larger size */}
+    <span className="h-3 w-3 bg-green-500 absolute bottom-0 right-1  rounded-full z-0" />
+    <img src="/Profil.jpg" alt="User Profile" className="object-cover w-full h-full rounded-full" />
+  </div>
+  <div className="ml-3">
+    <span className="text-white">Name</span>
+  </div>
+</div>
+
+
+
             </div>
-        <div className=" hidden md:block relative">
-            <img src="/Profil.jpg" alt="User Profile"   width="72" height="60"  />
-        </div>
-        <div className=" hidden md:block flex-col  items-center">
-          <span className="text-white hidden md:block">Name</span>
-          <div className="hidden md:flex md:items-center">
-            <span className="ml-4 text-white hidden md:block">online</span>
-            <span className="h-2 w-2 bg-green-500 absolute rounded-full hidden md:block" />
           </div>
         </div>
-          </div>
-        </div>
-            </div>
 
       </nav>
     </>

@@ -2,8 +2,8 @@ import React from 'react'
 
 const page = () => {
   return (
-<div className="w-full min-h-1 bg-custom-gradient border-2 rounded-xl border-violet-primary mb-24 lg:mb-0 ">
-    <div className="p-4 w-full h-full bg-custom-gradient rounded-lg backdrop-blur-3xl border-violet-primary border-2 overflow-y-scroll ">
+<div className="w-full min-h-1 rounded-xl  mb-24 lg:mb-0 ">
+    <div className="p-4 w-full h-full rounded-lg bg-gray-800/60 overflow-y-scroll ">
         <div className="flex w-full  text-center p-2rounded-t-lg">
             <div className="w-1/5 h-14  border-gray-500 flex items-center justify-center text-white text-xs md:text-base lg:text-xl md:font-bold">Position</div>
             <div className="w-1/5 h-14  border-gray-500 flex items-center justify-center text-white text-xs md:text-base lg:text-xl md:font-bold">Image</div>

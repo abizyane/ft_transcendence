@@ -27,20 +27,16 @@ const Page = () => {
 
   return (
     <div className="w-full flex flex-col items-center  h-full">
-      {/* Responsive Container */}
-      <div className="bg-custom-gradient bg-opacity-60 rounded-xl flex flex-col md:flex-row md:flex-wrap gap-6 border-[1px] border-violet-primary w-full justify-center items-center p-4 h-full mb-24 lg:mb-0">
-        {/* Invite A Friend Card */}
+      <div className="rounded-xl flex flex-col md:flex-row md:flex-wrap gap-6  w-full justify-center items-center p-4 h-full mb-24 lg:mb-0">
         <div
-          // onMouseEnter={() => setHoveredIndex(0)}
-          // onMouseLeave={() => setHoveredIndex(null)}
-          className={`flex  flex-col w-[70%] md:w-[40%] md:h-[40%] xl:w-[20%]  xl:h-[90%]  rounded-2xl border-4 m-2 border-violet-primary overflow-hidden transform transition-transform duration-300 ${hoveredIndex === 0 ? 'scale-105' : hoveredIndex === null ? 'scale-100' : 'blur-sm'}`}
+          className={`flex  flex-col w-[70%] md:w-[40%] md:h-[40%] xl:w-[20%]  xl:h-[90%]  rounded-2xl border-4 m-2 border-violet-primary overflow-hidden transform transition-transform duration-300 `}
         >
           <Link href="dashboard/game/solo">
             <div className=" w-full h-48   overflow-hidden">
               {friends.map((friend) => (
                 <div
                   key={friend.id}
-                  className="flex items-center justify-between p-1 m-1 rounded-lg border-[1px] bg-gray-600 border-violet-primary"
+                  className="flex items-center justify-between p-1 m-1 rounded-lg border-[1px] bg-gray-600/40 border-violet-primary"
                 >
                   <img
                     src={friend.profilePic}
@@ -70,18 +66,18 @@ const Page = () => {
 
         {/* VS AI Card */}
         <div
-  onMouseEnter={() => setHoveredIndex(1)}
-  onMouseLeave={() => setHoveredIndex(null)}
-  className={`w-[70%] md:w-[40%] xl:w-[20%] h-[22%] md:h-[40%] xl:h-[90%] m-2 flex flex-col rounded-2xl border-4 border-violet-primary overflow-hidden transform transition-transform duration-300 ${hoveredIndex === 1 ? 'scale-105' : hoveredIndex === null ? 'scale-100' : 'blur-sm'}`}
->
-  <Link href="solo/maps" className='h-full'>
-    <div className="h-full w-full bg-cover bg-center" style={{ backgroundImage: `url(${Vsbot.src})`, backgroundSize: 'cover', backgroundPosition: 'center' }}>
-      <div className="absolute bottom-0 left-0 right-0 bg-black/50 text-center text-lg md:text-xl lg:text-2xl font-bold text-white flex items-center justify-center">
-        VS AI
-      </div>
-    </div>
-  </Link>
-</div>
+          onMouseEnter={() => setHoveredIndex(1)}
+          onMouseLeave={() => setHoveredIndex(null)}
+          className={`w-[70%] md:w-[40%] xl:w-[20%] h-[22%] md:h-[40%] xl:h-[90%] m-2 flex flex-col rounded-2xl border-4 border-violet-primary overflow-hidden transform transition-transform duration-300 ${hoveredIndex === 1 ? 'scale-105' : hoveredIndex === null ? 'scale-100' : 'blur-sm'}`}
+        >
+          <Link href="solo/maps" className='h-full'>
+            <div className="h-full w-full bg-cover bg-center" style={{ backgroundImage: `url(${Vsbot.src})`, backgroundSize: 'cover', backgroundPosition: 'center' }}>
+              <div className="absolute bottom-0 left-0 right-0 bg-black/50 text-center text-lg md:text-xl lg:text-2xl font-bold text-white flex items-center justify-center">
+                VS AI
+              </div>
+            </div>
+          </Link>
+        </div>
 
 
         {/* Local Game Card */}

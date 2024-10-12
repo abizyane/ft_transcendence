@@ -7,7 +7,7 @@ const Page = () => {
     <>
      <div className="hidden lg:block h-full w-full">
       <main className="w-full h-full">
-        <div className="flex flex-col  h-full border-l border-gray-800 justify-center items-center ">
+        <div className="flex flex-col  h-full border-l border-gray-800/60 justify-center items-center ">
         <p className="p-4 text-center text-wrap text-xl text-gray-400">
     Click On A Chat <br /> Or Create New One
 </p>
