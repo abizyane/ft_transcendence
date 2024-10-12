@@ -42,6 +42,15 @@ const config: Config = {
     fontSize: {
       '2xs': '0.625rem', // Example for extra small text
     },
+    keyframes: {
+      fadeInLetter: {
+        '0%': { opacity: '0' },
+        '100%': { opacity: '1' },
+      },
+    },
+    animation: {
+      'fade-in-letter': 'fadeInLetter 0.05s ease-in-out forwards', // Short duration for each letter
+    },
   },
   },
   plugins: [],

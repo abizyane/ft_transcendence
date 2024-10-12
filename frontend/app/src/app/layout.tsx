@@ -14,7 +14,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className="w-full h-screen overflow-hidden relative bg-black">
+      <body className="w-full relative bg-black">
         <video
           autoPlay
           loop
