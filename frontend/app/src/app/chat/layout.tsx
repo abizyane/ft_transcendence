@@ -91,13 +91,13 @@ export default function Chat({ children }: ChatLayoutProps) {
 
         {/* Main content area */}
         <div className="w-full flex justify-center items-center overflow-hidden">
-          <div className="w-full h-max lg:h-fit flex flex-col justify-center items-center p-2 overflow-hidden">
-            <div className="backdrop-blur-md w-full text-gray-200 rounded-xl border-2 border-violet-primary flex">
-              <div className="w-full lg:w-96 backdrop-blur-md h-fit">
+          <div className="w-full h-max lg:h-fit flex  flex-col justify-center items-center p-2 overflow-hidden">
+            <div className="bg-gray-800/60 w-full  text-gray-200 rounded-xl border-2 border-violet-primary flex">
+              <div className="w-full lg:w-96 backdrop-blur-md h-fit rounded-xl">
                 <section className="w-full">
-                  <div className="header p-4 flex justify-between items-center w-full">
+                  <div className="header p-4  rounded-xl flex justify-between items-center w-full">
                     <p className="text-md font-bold">Messages</p>
-                    <div className="rounded-full hover:bg-gray-700 bg-gray-800 w-10 h-10 flex justify-center items-center">
+                    <div className="rounded-full hover:bg-gray-700 bg-gray-800/60 w-10 h-10 flex justify-center items-center">
                       <button className="text-sm">New</button>
                     </div>
                   </div>

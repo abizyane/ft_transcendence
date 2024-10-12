@@ -60,27 +60,28 @@ const Navbar = () => {
           <Logo />
         </div>
         <div className="flex justify-end md:justify-between md:pl-10 items-center w-full">
-          <div className="hidden bg-gray-800/60 rounded-xl  w-[20%] md:w-[260px] md:h-10  md:flex">
-            <svg
-              className="w-6 h-6 text-white m-2"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-              xmlns="http://www.w3.org/2000/svg"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth="2"
-                d="M21 21l-4.35-4.35m1.1-5.65a7.5 7.5 0 11-15 0 7.5 7.5 0 0115 0z"
-              ></path>
-            </svg>
-            <input
-              type="text"
-              placeholder="Search"
-              className="w-full bg-transparent placeholder-white focus:outline-none"
-            />
-          </div>
+        <div className="search-box p-4 flex-none">
+                    <form>
+                      <div className="relative">
+                        <label>
+                          <input
+                            className="rounded-full py-2 pr-6 pl-10 w-full border border-gray-800 focus:border-gray-700 bg-gray-800 focus:bg-gray-900 focus:outline-none text-gray-200 focus:shadow-md transition duration-300 ease-in"
+                            type="text"
+                            value=""
+                            placeholder="Search"
+                          />
+                          <span className="absolute top-0 left-0 mt-2 ml-3 inline-block">
+                            <svg viewBox="0 0 24 24" className="w-6 h-6">
+                              <path
+                                fill="#bbb"
+                                d="M16.32 14.9l5.39 5.4a1 1 0 0 1-1.42 1.4l-5.38-5.38a8 8 0 1 1 1.41-1.41zM10 16a6 6 0 1 0 0-12 6 6 0 0 0 0 12z"
+                              />
+                            </svg>
+                          </span>
+                        </label>
+                      </div>
+                    </form>
+                  </div>
           <div className="md:justify-end md:p-1">
 
             {/* Notification Icon */}
