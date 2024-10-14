@@ -12,6 +12,15 @@ class RoomAbstract(ABC):
     @abstractmethod
     def players_count(self):
         pass
+
+    @abstractmethod
+    def is_empty(self):
+        pass
+
+    @abstractmethod
+    def is_ready(self):
+        pass
+
     pass
 
 class RoomIsFull(Exception):
@@ -30,21 +39,26 @@ class Room(RoomAbstract):
         self.games = []
         self.ready = False
 
-    def add_player(self, Player):
+    def add_player(self, Player) -> None:
         if self.ready :
-            raise RoomIsFull;
-        self.players.append(Player);
-        if self.players_count() == self.size:
+            raise RoomIsFull
+        self.players.append(Player)
+        if self.players_count() == self.size :
             self.ready = True
 
-    def remover_player(self, Player):
+    def remover_player(self, Player) -> None:
         self.players.remove(Player)
         if (self.players_count() == 0):
             raise RoomIsEmpty;
 
-    def players_count(self):
+    def players_count(self) -> int:
         return len(self.players)
 
+    def is_ready(self) -> bool:
+        return (self.player_count() == self.size)
+
+    def is_empty(self) -> bool:
+        return (self.players_count() <= 0)
     
 
 

@@ -6,16 +6,25 @@ RoomType = Enum('RoomType', ['TWO', 'FOUR', 'EIGHT'])
 
 class AbstractRoomManager(ABC):
     @abstractmethod
-    def find_room(self):
+    def get_room(self):
         pass
 
     @abstractmethod    
-    def create_room(self, type):
+    def create_room(self, _type):
         pass
 
     @abstractmethod    
     def remove_room(self):
         pass
+
+    @abstractmethod
+    def is_empty(self, _id):
+        pass
+
+    @abstactmethod
+    def is_ready(self, _id)
+        pass
+
 
     
 class RoomManager(AbstractRoomManager):
@@ -33,8 +42,14 @@ class RoomManager(AbstractRoomManager):
         self.rooms.append(new_room)
         pass
 
-    def get_room(self, id) -> Room:
-        return self.rooms[id]
+    def get_room(self, _id) -> Room:
+        return self.rooms[_id]
 
-    def find
-       
+    def remove_room(self, _id) -> Room:
+        return self.rooms.pop(_id)
+
+    def is_empty(self, _id) -> bool:
+        return self.rooms[_id].is_empty()
+
+    def is_ready(self, _id) -> bool:
+        return self.rooms[_id].is_ready()
