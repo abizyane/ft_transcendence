@@ -21,35 +21,41 @@ class AbstractRoomManager(ABC):
     def is_empty(self, _id):
         pass
 
-    @abstactmethod
-    def is_ready(self, _id)
+    @abstractmethod
+    def is_ready(self, _id):
         pass
-
 
     
 class RoomManager(AbstractRoomManager):
     def __init__(self):
         self.rooms = []
 
+    #Builder Call
     def generate_room(self, _type) -> Room :
-        match value:
-            case 1:
-                return TwoPlayersRoom()
-
-    def create_room(self, _type) -> None:
-        value = RoomType[_type].value
-        new_room = generate_room(_type);
+        value:int = RoomType[_type].value
+        if value == 1:
+            return TwoPlayersRoom()
+        elif value == 2:
+            return FourPlayersRoom()
+        else:
+            raise ValueError("No such a type")
+    
+    #Room LifeTime
+    def create_room(self, _type) -> Room:
+        new_room = self.generate_room(_type);
         self.rooms.append(new_room)
-        pass
-
-    def get_room(self, _id) -> Room:
-        return self.rooms[_id]
+        return new_room
 
     def remove_room(self, _id) -> Room:
         return self.rooms.pop(_id)
 
+    #Room State
     def is_empty(self, _id) -> bool:
         return self.rooms[_id].is_empty()
 
     def is_ready(self, _id) -> bool:
         return self.rooms[_id].is_ready()
+
+    #Other Methods
+    def get_room(self, _id) -> Room:
+        return self.rooms[_id]

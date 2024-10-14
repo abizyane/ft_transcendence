@@ -1,4 +1,4 @@
-import ABC, abstractmethod from abc
+from abc import ABC, abstractmethod 
 
 class RoomAbstract(ABC):
     @abstractmethod
@@ -46,16 +46,16 @@ class Room(RoomAbstract):
         if self.players_count() == self.size :
             self.ready = True
 
-    def remover_player(self, Player) -> None:
+    def remove_player(self, Player) -> None:
         self.players.remove(Player)
         if (self.players_count() == 0):
             raise RoomIsEmpty;
 
     def players_count(self) -> int:
         return len(self.players)
-
+    
     def is_ready(self) -> bool:
-        return (self.player_count() == self.size)
+        return (self.players_count() == self.size)
 
     def is_empty(self) -> bool:
         return (self.players_count() <= 0)
@@ -63,13 +63,9 @@ class Room(RoomAbstract):
 
 
 class TwoPlayersRoom(Room):
-    def __init__(self, size=2):
-        self.super(size=size)
+    def __init__(self):
+        super().__init__(size=2)
 
 class FourPlayersRoom(Room):
-    def __init__(self, size=4):
-        self.super(size=size)
-
-
-
-
+    def __init__(self):
+        super().__init__(size=4)
