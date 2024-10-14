@@ -5,6 +5,7 @@ from rest_framework.permissions import IsAuthenticated
 from ...serializers.UserSerializer import UserSerializer
 from ...models.UserModel import User
 import jwt, datetime
+from rest_framework import generics  
 
 class LoginView(APIView):
     def post(self, request):
@@ -28,3 +29,8 @@ class LoginView(APIView):
         }
         response.set_cookie(key='jwt', value=token, httponly=True)
         return response
+
+class UserListView(generics.ListAPIView):
+    queryset = User.objects.all()  # Fetch all users
+    serializer_class = UserSerializer  # Specify the serializer class to use
+

@@ -5,8 +5,13 @@ import Linechart from "@/components/Charts/Linechart";
 import { Icon } from "@iconify/react";
 import chatIcon from "@iconify-icons/mdi/chat-processing";
 import battleIcon from "@iconify-icons/mdi/sword-fight";
-
+import data from "@/app/data/Dashboarddata.json";
 const Dashboard = () => {
+
+  const user = data.user;
+  const values = user.charts.lineChart.data;
+  const gameHistory = user.history;
+  // const game = gameHistory
   return (
     <>
       <div className="flex flex-1  lg:w-full px-1 overflow-hidden justify-center items-center">
@@ -20,8 +25,7 @@ const Dashboard = () => {
                 Experience Performance
               </p>
               <div className=" w-[99%] justify-center items-center">
-
-                  <Linechart />
+                  <Linechart data={values}/>
               </div>
             </div>
           </div>
@@ -38,38 +42,82 @@ const Dashboard = () => {
                 </div>
                 <div className="p-1 sm:p-2 flex-1 overflow-auto">
                   <div className="flex flex-col space-y-2">
-                    {[1, 2, 3].map((_, index) => (
-                      <div
-                        key={index}
-                        className="flex flex-row items-center justify-between bg-gray-800 p-2 rounded-[34px]  border border-violet-primary"
-                      >
-                        <div className="flex items-center space-x-0 sm:space-x-2">
-                          <img
-                            src="/Profil.jpg"
-                            alt="User Image"
-                            className="w-8 h-8 lg:w-12 lg:h-12 rounded-full"
-                          />
-                          <div className="flex flex-col">
-                            <p className="font-bold text-white text-xs">Name</p>
-                            <p className="text-xs text-gray-400">@username</p>
-                          </div>
-                        </div>
-                        <p className="font-semibold text-white text-center">
-                          4:5
-                        </p>
-                        <div className="flex items-center space-x-0 sm:space-x-2">
-                          <div className="flex flex-col items-center">
-                            <p className="font-bold text-white text-xs">Name</p>
-                            <p className="text-xs text-gray-400">@username</p>
-                          </div>
-                          <img
-                            src="/Profil.jpg"
-                            alt="User Image"
-                            className="w-8 h-8 lg:w-12 lg:h-12 rounded-full"
-                          />
-                        </div>
-                      </div>
-                    ))}
+                  {gameHistory.map((game) => (
+  <div
+    key={game.gameId}
+    className="flex flex-row items-center justify-between bg-gray-800 p-2 rounded-[34px] border border-violet-primary"
+  >
+    {game.inviter === "user" ? (
+      <>
+        {/* User (Invitee) on the left */}
+        <div className="flex items-center space-x-2 flex-1">
+          <img
+            src={user.pic}
+            alt={`${user.name} Image`}
+            className="w-8 h-8 lg:w-12 lg:h-12 rounded-full"
+          />
+          <div className="flex flex-col">
+            <p className="font-bold text-white text-xs">{user.name}</p>
+            <p className="text-xs text-gray-400">@{user.username}</p>
+          </div>
+        </div>
+
+        {/* Score */}
+        <p className="font-semibold text-white text-center w-20 mx-4"> {/* Adjust width if necessary */}
+          {game.score.user}:{game.score.opponent}
+        </p>
+
+        {/* Opponent (Inviter) on the right */}
+        <div className="flex items-center space-x-2 flex-1 justify-end">
+          <div className="flex flex-col items-end">
+            <p className="font-bold text-white text-xs">{game.opponent.name}</p>
+            <p className="text-xs text-gray-400">@{game.opponent.username}</p>
+          </div>
+          <img
+            src={game.opponent.picture}
+            alt={`${game.opponent.name} Image`}
+            className="w-8 h-8 lg:w-12 lg:h-12 rounded-full"
+          />
+        </div>
+      </>
+    ) : (
+      <>
+        {/* Opponent (Invitee) on the left */}
+        <div className="flex items-center space-x-2 flex-1">
+          <img
+            src={game.opponent.picture}
+            alt={`${game.opponent.name} Image`}
+            className="w-8 h-8 lg:w-12 lg:h-12 rounded-full"
+          />
+          <div className="flex flex-col">
+            <p className="font-bold text-white text-xs">{game.opponent.name}</p>
+            <p className="text-xs text-gray-400">@{game.opponent.username}</p>
+          </div>
+        </div>
+
+        {/* Score */}
+        <p className="font-semibold text-white text-center w-20 mx-4"> {/* Adjust width if necessary */}
+          {game.score.user}:{game.score.opponent}
+        </p>
+
+        {/* User (Inviter) on the right */}
+        <div className="flex items-center space-x-2 flex-1 justify-end">
+          <div className="flex flex-col items-end">
+            <p className="font-bold text-white text-xs">{user.name}</p>
+            <p className="text-xs text-gray-400">@{user.username}</p>
+          </div>
+          <img
+            src={user.pic}
+            alt={`${user.name} Image`}
+            className="w-8 h-8 lg:w-12 lg:h-12 rounded-full"
+          />
+        </div>
+      </>
+    )}
+  </div>
+))}
+
+
                   </div>
                 </div>
               </div>

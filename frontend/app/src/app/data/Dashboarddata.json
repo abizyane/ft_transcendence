@@ -1,0 +1,90 @@
+{
+    "user": {
+      "name" : "mohamed",
+      "username": "mel-houd",
+      "pic": "/Profil.jpg",
+      "xp": 3100,
+      "charts": {
+        "winRate": {
+          "totalGames": 100,
+          "wins": 75
+        },
+        "lineChart": {
+          "data": [100, 0, 90, 40, 80, 35, 40]
+        }
+      },
+    "history": [
+  {
+    "gameId": 1,
+    "date": "2024-10-12",
+    "result": "win",
+    "score": {
+      "user": 9,
+      "opponent": 7
+    },
+    "opponent": {
+      "username": "abizyane",
+      "name": "Achraf",
+      "picture": "https://randomuser.me/api/portraits/men/1.jpg"
+    },
+    "inviter": "user"
+  },
+  {
+    "gameId": 2,
+    "date": "2024-10-11",
+    "result": "loss",
+    "score": {
+      "user": 9,
+      "opponent": 0
+    },
+    "opponent": {
+      "username": "morpho",
+      "name": "ismail",
+      "picture": "https://randomuser.me/api/portraits/women/1.jpg"
+    },
+    "inviter": "opponent"
+  },
+  {
+    "gameId": 3,
+    "date": "2024-10-10",
+    "result": "win",
+    "score": {
+      "user": 9,
+      "opponent": 8
+    },
+    "opponent": {
+      "username": "Strategy",
+      "name": "Michael",
+      "picture": "https://randomuser.me/api/portraits/women/3.jpg"
+    },
+    "inviter": "user"
+  }
+],
+
+      "friends": [
+        {
+          "username": "FriendOne",
+          "pic": "/images/profile2.png",
+          "level": 20
+        },
+        {
+          "username": "FriendTwo",
+          "pic": "/images/profile3.png",
+          "level": 22
+        }
+      ],
+      "topPlayers": [
+        {
+          "username": "TopPlayerOne",
+          "pic": "/images/top1.png",
+          "level": 50
+        },
+        {
+          "username": "TopPlayerTwo",
+          "pic": "/images/top2.png",
+          "level": 48
+        }
+      ]
+    }
+  }
+  

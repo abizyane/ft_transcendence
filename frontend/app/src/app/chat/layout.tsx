@@ -1,6 +1,6 @@
 "use client";
 
-import React, { ReactNode, useState } from "react";
+import React, { ReactNode, useEffect, useState } from "react";
 import "../globals.css";
 import Sidebar from "@/components/Sidebar/Sidebar";
 import Navbar from "@/components/Navbar/Navbar";
@@ -10,63 +10,51 @@ interface ChatLayoutProps {
   children: ReactNode;
 }
 
-const users = [
-  {
-    id: 1,
-    name: "Angelina Jolie",
-    img: "https://randomuser.me/api/portraits/women/61.jpg",
-    lastMessage: "Ok, see you at the subway in a bit.",
-    time: "Just now",
-  },
-  {
-    id: 2,
-    name: "Tony Stark",
-    img: "https://randomuser.me/api/portraits/men/97.jpg",
-    lastMessage: "I'll bring the suit.",
-    time: "5 minutes ago",
-  },
-  {
-    id: 3,
-    name: "Scarlett Johan",
-    img: "https://randomuser.me/api/portraits/women/33.jpg",
-    lastMessage: "Let's meet at the cafe.",
-    time: "10 minutes ago",
-  },
-  {
-    id: 4,
-    name: "John Snow",
-    img: "https://randomuser.me/api/portraits/men/12.jpg",
-    lastMessage: "You missed a call John.",
-    time: "4h",
-  },
-  {
-    id: 5,
-    name: "Sunny Leone",
-    img: "https://randomuser.me/api/portraits/women/87.jpg",
-    lastMessage: "Ah, it was an awesome one night stand.",
-    time: "1 Feb",
-  },
-  {
-    id: 6,
-    name: "Bruce Lee",
-    img: "https://randomuser.me/api/portraits/men/45.jpg",
-    lastMessage: "You are a great human being.",
-    time: "23 Jan",
-  },
-  {
-    id: 7,
-    name: "TailwindCSS Group",
-    img: "https://randomuser.me/api/portraits/men/22.jpg",
-    lastMessage: "Adam: Hurray, Version 2 is out now!!.",
-    time: "23 Jan",
-  },
-];
+interface User {
+  id: number;
+  name: string;
+  img: string;
+  lastMessage: string;
+  time: string;
+}
 
 export default function Chat({ children }: ChatLayoutProps) {
+  const [users, setUsers] = useState<User[]>([]);
   const [isSliderOpen, setIsSliderOpen] = useState(false);
-  const [selectedUser, setSelectedUser] = useState(null);
+  const [selectedUser, setSelectedUser] = useState<User | null>(null);
 
-  const openSlider = (user) => {
+  const fetchConversation = async () => {
+    try {
+      const response = await fetch(`http://localhost:8000/chat/conversations`);
+      if (!response.ok) {
+        throw new Error('Network response was not ok');
+      }
+      const data = await response.json();
+      setUsers(()=> {
+        return data?.results.map((User:any) => {
+          return {
+            id: User.id,
+            name: User.sender.username,
+            img: User.sender.img,
+            lastMessage: User.message,
+            time: User.timestamp,
+          };
+        }
+        );
+      });
+      console.log(data?.results[0]);
+      return (data?.results);
+    } catch (error) {
+      console.error('Fetch error:', error);
+      // Optionally set an error state to show to the user
+    }
+  };
+
+  useEffect(() => {
+    fetchConversation();
+  }, []);
+
+  const openSlider = (user: User) => {
     setSelectedUser(user);
     setIsSliderOpen(true);
   };
@@ -126,15 +114,17 @@ export default function Chat({ children }: ChatLayoutProps) {
                   </div>
 
                   {/* Online User Items */}
-                  <div className="story-section flex flex-row p-2 overflow-auto">
-                    <div className="active-users flex flex-row overflow-auto">
-                      {users.slice(0, 3).map((user) => (
+                  <div className="flex flex-row p-2 overflow-auto">
+                    <div className="flex flex-row overflow-auto">
+                      {users && users?.map((user) => (
                         <Link
-                          key={user.id}
+                          key={`chat-${user.id}`}
                           href={`/chat/${user.id}`}
                           className="text-sm text-center mr-4 relative"
                         >
+
                           <div className="relative">
+                          
                             <img
                               className="shadow-md rounded-full w-20 h-20 object-cover"
                               src={user.img}
@@ -143,17 +133,16 @@ export default function Chat({ children }: ChatLayoutProps) {
                             <span className="absolute bottom-1 right-1 w-4 h-4 bg-green-500 border-2 border-white rounded-full"></span>
                           </div>
                           <p>{user.name}</p>
-                        </Link>
+                         </Link>
                       ))}
                     </div>
                   </div>
                 </section>
 
-                <div className="contacts p-2 flex-1 md:w-full overflow-y-scroll">
-                  {users.map((user) => (
-                    <Link key={user.id} href={`/chat/${user.id}`}>
+                <div className="p-2 flex-1 md:w-full overflow-y-scroll">
+                  {users && users.map((user) => (
+                    <Link key={`message-${user.id}`} href={`/chat/${user.id}`}>
                       <div
-                        key={user.id}
                         onClick={() => openSlider(user)}
                         className="flex justify-between items-center p-3 hover:bg-gray-800 rounded-lg cursor-pointer"
                       >
