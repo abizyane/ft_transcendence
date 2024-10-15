@@ -47,6 +47,7 @@ const LoginForm = () => {
         const jwt = responseData.jwt;
         localStorage.setItem("jwt", jwt);
         console.log("Login successful");
+        console.log(responseData);
         router.push("/dashboard");
       } else {
         const errorData = await response.json();
