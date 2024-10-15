@@ -5,7 +5,7 @@ import "../globals.css";
 import Sidebar from "@/components/Sidebar/Sidebar";
 import Navbar from "@/components/Navbar/Navbar";
 import Link from "next/link";
-
+import {formatDistanceToNow } from 'date-fns'
 interface ChatLayoutProps {
   children: ReactNode;
 }
@@ -13,6 +13,7 @@ interface ChatLayoutProps {
 interface User {
   id: number;
   name: string;
+  messageid: number | undefined;
   img: string;
   lastMessage: string;
   time: string;
@@ -22,6 +23,9 @@ export default function Chat({ children }: ChatLayoutProps) {
   const [users, setUsers] = useState<User[]>([]);
   const [isSliderOpen, setIsSliderOpen] = useState(false);
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
+  
+  // Assuming you have the current user's ID
+  const currentUserId = 1; // Replace this with the actual current user's ID
 
   const fetchConversation = async () => {
     try {
@@ -30,23 +34,22 @@ export default function Chat({ children }: ChatLayoutProps) {
         throw new Error('Network response was not ok');
       }
       const data = await response.json();
-      setUsers(()=> {
-        return data?.results.map((User:any) => {
+      setUsers(() => {
+        return data?.results.map((User: any) => {
           return {
             id: User.id,
+            messageid: User.messageid,
             name: User.sender.username,
-            img: User.sender.img,
+            img: User.sender.profile_pic,
             lastMessage: User.message,
-            time: User.timestamp,
+            time:formatDistanceToNow(new Date(User.timestamp), { addSuffix: true })
           };
-        }
-        );
+        });
       });
       console.log(data?.results[0]);
       return (data?.results);
     } catch (error) {
       console.error('Fetch error:', error);
-      // Optionally set an error state to show to the user
     }
   };
 
@@ -64,6 +67,7 @@ export default function Chat({ children }: ChatLayoutProps) {
     setSelectedUser(null);
   };
 
+
   return (
     <div className="w-full min-h-screen flex flex-col justify-start items-start">
       <div className="w-full h-16">
@@ -78,10 +82,10 @@ export default function Chat({ children }: ChatLayoutProps) {
         </div>
 
         {/* Main content area */}
-        <div className="w-full flex justify-center items-center overflow-hidden">
-          <div className="w-full h-max lg:h-fit flex  flex-col justify-center items-center p-2 overflow-hidden">
-            <div className="bg-gray-800/60 w-full  text-gray-200 rounded-xl border-2 border-violet-primary flex">
-              <div className="w-full lg:w-96 backdrop-blur-md h-fit rounded-xl">
+        <div className="w-full flex justify-center items-center ">
+          <div className="w-full h-max lg:h-fit flex  flex-col justify-center items-center p-2">
+            <div className=" bg-gray-800/60 h-[1000px]  w-full  text-gray-200 rounded-xl border-2 border-violet-primary flex">
+              <div className="w-full lg:w-96 backdrop-blur-md  rounded-xl">
                 <section className="w-full">
                   <div className="header p-4  rounded-xl flex justify-between items-center w-full">
                     <p className="text-md font-bold">Messages</p>
@@ -127,7 +131,7 @@ export default function Chat({ children }: ChatLayoutProps) {
                           
                             <img
                               className="shadow-md rounded-full w-20 h-20 object-cover"
-                              src={user.img}
+                              src={"http://localhost:8000"+ user.img}
                               alt={user.name}
                             />
                             <span className="absolute bottom-1 right-1 w-4 h-4 bg-green-500 border-2 border-white rounded-full"></span>
@@ -139,7 +143,7 @@ export default function Chat({ children }: ChatLayoutProps) {
                   </div>
                 </section>
 
-                <div className="p-2 flex-1 md:w-full overflow-y-scroll">
+                <div className="p-2 flex-1 md:w-full h-[700px] overflow-y-scroll">
                   {users && users.map((user) => (
                     <Link key={`message-${user.id}`} href={`/chat/${user.id}`}>
                       <div
@@ -149,7 +153,7 @@ export default function Chat({ children }: ChatLayoutProps) {
                         <div className="w-16 h-16 flex-shrink-0">
                           <img
                             className="shadow-md rounded-full w-full h-full object-cover"
-                            src={user.img}
+                            src={"http://localhost:8000"+ user.img}
                             alt={user.name}
                           />
                         </div>
