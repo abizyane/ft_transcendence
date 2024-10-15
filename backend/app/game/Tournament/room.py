@@ -39,12 +39,13 @@ class Room(RoomAbstract):
         self.games = []
         self.ready = False
 
-    def add_player(self, Player) -> None:
+    def add_player(self, Player) -> Room:
         if self.ready :
             raise RoomIsFull
         self.players.append(Player)
         if self.players_count() == self.size :
             self.ready = True
+        return self
 
     def remove_player(self, Player) -> None:
         self.players.remove(Player)
