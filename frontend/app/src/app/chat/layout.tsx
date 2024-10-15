@@ -84,8 +84,12 @@ export default function Chat({ children }: ChatLayoutProps) {
       <section className="w-full">
         <div className="header p-4  rounded-xl flex justify-between items-center w-full">
           <p className="text-md font-bold">Messages</p>
-          <div className="rounded-full hover:bg-gray-700 bg-gray-800/60 w-10 h-10 flex justify-center items-center">
-            <button className="text-sm">New</button>
+          <div className="rounded-full hover:bg-gray-700 bg-violet-primary w-10 h-10 flex justify-center items-center">
+            <button className="text-sm">
+            <svg xmlns="http://www.w3.org/2000/svg" width="3em" height="3em" viewBox="0 0 32 32">
+            <path fill="#ffffff" d="M16 3C8.832 3 3 8.832 3 16s5.832 13 13 13s13-5.832 13-13S23.168 3 16 3m0 2c6.087 0 11 4.913 11 11s-4.913 11-11 11S5 22.087 5 16S9.913 5 16 5m-1 5v5h-5v2h5v5h2v-5h5v-2h-5v-5z" />
+          </svg>
+          </button>
           </div>
         </div>
 

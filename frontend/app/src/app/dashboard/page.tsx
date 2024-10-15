@@ -19,10 +19,10 @@ const Dashboard = () => {
       <div className="flex flex-1  lg:w-full px-1 overflow-hidden justify-center items-center">
         <div className="flex-1 w-full flex flex-col items-center justify-center mb-14 mt-2 relative">
           <div className="flex flex-col lg:flex-row w-full space-y-4 lg:space-y-0 lg:space-x-4">
-            <div className="bg-gray-800/60 rounded-xl lg:w-2/4 lg:border border-violet-primary mb-4 lg:mb-0">
+            <div className="bg-gray-800/60 backdrop-blur-sm rounded-xl lg:w-2/4 lg:border border-violet-primary mb-4 lg:mb-0">
               <UserInfo />
             </div>
-            <div className="bg-gray-800/60 rounded-xl flex-1 border border-violet-primary">
+            <div className="bg-gray-800/60 backdrop-blur-sm  rounded-xl flex-1 border border-violet-primary">
               <p className="m-2 text-white text-2xl p-4 font-extrabold w-full">
                 Experience Performance
               </p>

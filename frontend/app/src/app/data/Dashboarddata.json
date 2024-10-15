@@ -1,7 +1,7 @@
 {
   "user": {
     "name": "mohamed",
-    "username": "zarda",
+    "username": "momayaz",
     "pic": "/Profil.jpg",
     "xp": 3100,
     "charts": {
@@ -85,7 +85,7 @@
     ],
     "friends": [
       {
-        "username": "FriendOne",
+        "username": "Jafy",
         "pic": "https://picsum.photos/id/1015/200/200", 
         "xp": 2000
       },
