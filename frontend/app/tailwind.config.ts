@@ -36,7 +36,7 @@ const config: Config = {
       'phone': 'calc(100% - 112px)',
     },
     height: {
-      'desktop': 'calc(100% - 112px)',
+      'desktop': 'calc(100vh - 112px)',
       'phone': 'calc(100% - 112px)',
     },
     fontSize: {

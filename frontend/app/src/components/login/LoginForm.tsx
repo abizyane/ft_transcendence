@@ -58,7 +58,7 @@ const LoginForm = () => {
   };
 
   return (
-    <div className="w-full h-screen flex flex-col items-center justify-center p-4 overflow-hidden">
+    <div className="w-full flex flex-col items-center justify-center p-4 overflow-hidden">
       {errorMessage && (
         <div className="w-full max-w-md bg-red-500 text-white text-center py-2 mb-4 rounded-md">
           {errorMessage}
