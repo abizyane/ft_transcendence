@@ -23,9 +23,6 @@ export default function Chat({ children }: ChatLayoutProps) {
   const [users, setUsers] = useState<User[]>([]);
   const [isSliderOpen, setIsSliderOpen] = useState(false);
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
-  
-  // Assuming you have the current user's ID
-  const currentUserId = 1; // Replace this with the actual current user's ID
 
   const fetchConversation = async () => {
     try {
@@ -52,7 +49,7 @@ export default function Chat({ children }: ChatLayoutProps) {
       console.error('Fetch error:', error);
     }
   };
-
+  console.log("userslength"   ,users.length);
   useEffect(() => {
     fetchConversation();
   }, []);
@@ -69,22 +66,22 @@ export default function Chat({ children }: ChatLayoutProps) {
 
 
   return (
-    <div className="w-full min-h-screen flex flex-col justify-start items-start">
+    <div className="w-full  min-h-screen flex flex-col justify-start items-start overflow-hidden">
       <div className="w-full h-16">
         <Navbar />
       </div>
 
       {/* Main content area */}
-      <div className="w-full flex lg:flex-row justify-center items-center flex-col-reverse flex-grow overflow-hidden">
+      <div className="w-full flex lg:flex-row justify-center items-center flex-col-reverse flex-grow ">
         {/* Sidebar section */}
         <div className="lg:h-screen fixed lg:static bottom-0 lg:w-24 w-full z-50 lg:z-0">
           <Sidebar />
         </div>
 
         {/* Main content area */}
-        <div className="w-full flex justify-center items-center ">
+        <div className="w-full flex justify-center items-center overflow-hidden">
           <div className="w-full h-max lg:h-fit flex  flex-col justify-center items-center p-2">
-            <div className=" bg-gray-800/60 h-[1000px]  w-full  text-gray-200 rounded-xl border-2 border-violet-primary flex">
+            <div className=" bg-gray-800/60 h-[1100px]  w-full  text-gray-200 rounded-xl border-2 border-violet-primary flex">
               <div className="w-full lg:w-96 backdrop-blur-md  rounded-xl">
                 <section className="w-full">
                   <div className="header p-4  rounded-xl flex justify-between items-center w-full">
@@ -122,7 +119,7 @@ export default function Chat({ children }: ChatLayoutProps) {
                     <div className="flex flex-row overflow-auto">
                       {users && users?.map((user) => (
                         <Link
-                          key={`chat-${user.id}`}
+                          // key={`chat-${user.id}`}
                           href={`/chat/${user.id}`}
                           className="text-sm text-center mr-4 relative"
                         >
@@ -142,10 +139,10 @@ export default function Chat({ children }: ChatLayoutProps) {
                     </div>
                   </div>
                 </section>
-
-                <div className="p-2 flex-1 md:w-full h-[700px] overflow-y-scroll">
+                {/* href={`/chat/${user.id}` */}
+                <div className="p-2 flex-1 md:w-full h-[820px] overflow-y-scroll">
                   {users && users.map((user) => (
-                    <Link key={`message-${user.id}`} href={`/chat/${user.id}`}>
+                    <Link key={`message-${user.id}` } href='#'  >
                       <div
                         onClick={() => openSlider(user)}
                         className="flex justify-between items-center p-3 hover:bg-gray-800 rounded-lg cursor-pointer"
@@ -161,7 +158,7 @@ export default function Chat({ children }: ChatLayoutProps) {
                           <p className="font-bold">{user.name}</p>
                           <div className="flex justify-between items-center text-sm text-gray-600">
                             <p className="truncate">{user.lastMessage}</p>
-                            <p className="ml-2 text-white-primary whitespace-nowrap">
+                            <p className="ml-4 text-white-primary whitespace-nowrap">
                               {user.time}
                             </p>
                           </div>

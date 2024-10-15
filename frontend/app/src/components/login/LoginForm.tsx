@@ -58,13 +58,13 @@ const LoginForm = () => {
   };
 
   return (
-    <div className="w-full min-h-screen flex flex-col items-center justify-center p-4">
+    <div className="w-full h-screen flex flex-col items-center justify-center p-4 overflow-hidden">
       {errorMessage && (
         <div className="w-full max-w-md bg-red-500 text-white text-center py-2 mb-4 rounded-md">
           {errorMessage}
         </div>
       )}
-      <div className="font-mont p-6 backdrop-blur-lg bg-gray-800/60  rounded-xl shadow-lg max-w-sm w-full">
+      <div className="font-mont p-6 backdrop-blur-lg bg-gray-800/60  rounded-xl shadow-lg max-w-sm w-full  overflow-hidden">
         <h2 className="text-3xl font-bold text-white mb-4">Login</h2>
         <form className="mt-8 space-y-6" onSubmit={handleSubmit(onSubmit)}>
           <div className="rounded-md shadow-sm">
