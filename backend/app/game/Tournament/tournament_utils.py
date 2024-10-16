@@ -29,7 +29,6 @@ class AbstractRoomManager(ABC):
 class RoomManager(AbstractRoomManager):
     def __init__(self):
         self.rooms = []
-
     #Builder Call
     def generate_room(self, _type) -> Room :
         value:int = RoomType[_type].value
@@ -59,3 +58,6 @@ class RoomManager(AbstractRoomManager):
     #Other Methods
     def get_room(self, _id) -> Room:
         return self.rooms[_id]
+
+    def get_available_rooms(_type:str):
+        return (lambda room : room.ready, self.rooms)
