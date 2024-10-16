@@ -6,7 +6,8 @@ from rest_framework_simplejwt.tokens import RefreshToken
 from django.contrib.auth import get_user_model
 from django.conf import settings
 from rest_framework.decorators import api_view, permission_classes
-
+from rest_framework import generics
+from ...serializers.UserSerializer import UserSerializer
 User = get_user_model()
 
 @permission_classes([AllowAny])
@@ -34,3 +35,6 @@ class LoginView(APIView):
         response.set_cookie(key='jwt', value=str(refresh.access_token), httponly=True)
 
         return response
+class UserListView(generics.ListAPIView):
+    queryset = User.objects.all()  # Fetch all users
+    serializer_class = UserSerializer  # Specify the serializer class to use
