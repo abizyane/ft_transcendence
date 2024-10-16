@@ -25,7 +25,7 @@ const UserChatPage = () => {
     <div className="h-full">
       <main className="flex-grow flex flex-row min-h-full">
         <section className="flex flex-col flex-auto border-l border-gray-800">
-          <div className="chat-header px-6 py-4 flex  bg-gray-800   rounded-tr-xl flex-row flex-none justify-between items-center shadow">
+          <div className="chat-header px-6 py-4 flex  bg-gray-800/60   rounded-tl-xl flex-row flex-none justify-between items-center shadow">
             <div className="flex">
               <div className="w-12 h-12 mr-4 relative flex flex-shrink-0">
                 <img

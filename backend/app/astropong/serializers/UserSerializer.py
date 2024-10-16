@@ -23,3 +23,4 @@ class UserSerializer(serializers.ModelSerializer):
         if obj.profile_pic:
             return request.build_absolute_uri(obj.profile_pic.url)
         return None
+

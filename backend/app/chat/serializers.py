@@ -5,7 +5,7 @@ from astropong.models.UserModel import User, Relationship
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = ['username', 'profile_pic', 'is_online']
+        fields = ['id','username', 'profile_pic', 'is_online']
 
 class MessageSerializer(serializers.ModelSerializer):
     class Meta:

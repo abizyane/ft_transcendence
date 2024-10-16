@@ -62,7 +62,7 @@ fclean: clean
 	@echo "${C_RED}Full cleaning...${C_RESET}"
 	@rm -rf ./frontend/app/node_modules
 	@rm -rf ./frontend/app/.next
-	@rm -rf ./frontend/app/package-lock.json
+	#@rm -rf ./frontend/app/package-lock.json
 	@find ./backend/app/ -name 'migrations' -type d -depth -exec rm -rf {} \;
 	@find ./backend/app -name '__pycache__' -type d -depth -exec rm -rf {} \;
 	@docker system prune -af --volumes > /dev/null 2>&1

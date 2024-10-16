@@ -12,7 +12,7 @@ class User(AbstractUser):
     friends = models.ManyToManyField('self', through='Relationship', symmetrical=False, related_name='friends_of')
     
     USERNAME_FIELD = 'email'
-    REQUIRED_FIELDS = []
+    REQUIRED_FIELDS = ['username']
 
 
 class Relationship(models.Model):

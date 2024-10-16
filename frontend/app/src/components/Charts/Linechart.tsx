@@ -9,6 +9,7 @@ import {
   Tooltip,
   Legend,
   ChartData,
+  Filler,
   ChartOptions,
 } from "chart.js";
 
@@ -18,16 +19,20 @@ ChartJS.register(
   CategoryScale,
   LinearScale,
   Tooltip,
+  Filler,
   Legend
 );
+interface LineChartProps {
+  data: number[];
+}
 
-const LineChart: React.FC = () => {
-  const data: ChartData<"line", number[]> = {
-    labels: ["January", "February", "March", "April", "May", "June", "July"], // Example labels
+const LineChart: React.FC<LineChartProps> = ({data}) => {
+  const ChartData: ChartData<"line", number[]> = {
+    labels: ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"],
     datasets: [
       {
-        label: "Monthly Sales",
-        data: [10, 20, 15, 25, 30, 20, 35], // Example data
+        label: "Days Experience",
+        data: data, // Example data
         borderColor: "#8A2BE2",
         backgroundColor: "rgba(138, 43, 226, 0.2)",
         fill: true,
@@ -67,7 +72,7 @@ const LineChart: React.FC = () => {
 
   return (
     <div className=" w-full p-1 h-60  lg:h-[20vh] xl:h-[30vh]">
-      <Line data={data} options={options} style={{width:"100%",height:"100%"}} />
+      <Line data={ChartData} options={options} style={{width:"100%",height:"100%"}} />
       &nbsp;
     </div>
   );

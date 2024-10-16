@@ -1,72 +1,64 @@
 "use client";
 
-import React, { ReactNode, useState } from "react";
+import React, { ReactNode, useEffect, useState } from "react";
 import "../globals.css";
 import Sidebar from "@/components/Sidebar/Sidebar";
 import Navbar from "@/components/Navbar/Navbar";
 import Link from "next/link";
-
+import { formatDistanceToNow } from "date-fns";
 interface ChatLayoutProps {
   children: ReactNode;
 }
 
-const users = [
-  {
-    id: 1,
-    name: "Angelina Jolie",
-    img: "https://randomuser.me/api/portraits/women/61.jpg",
-    lastMessage: "Ok, see you at the subway in a bit.",
-    time: "Just now",
-  },
-  {
-    id: 2,
-    name: "Tony Stark",
-    img: "https://randomuser.me/api/portraits/men/97.jpg",
-    lastMessage: "I'll bring the suit.",
-    time: "5 minutes ago",
-  },
-  {
-    id: 3,
-    name: "Scarlett Johan",
-    img: "https://randomuser.me/api/portraits/women/33.jpg",
-    lastMessage: "Let's meet at the cafe.",
-    time: "10 minutes ago",
-  },
-  {
-    id: 4,
-    name: "John Snow",
-    img: "https://randomuser.me/api/portraits/men/12.jpg",
-    lastMessage: "You missed a call John.",
-    time: "4h",
-  },
-  {
-    id: 5,
-    name: "Sunny Leone",
-    img: "https://randomuser.me/api/portraits/women/87.jpg",
-    lastMessage: "Ah, it was an awesome one night stand.",
-    time: "1 Feb",
-  },
-  {
-    id: 6,
-    name: "Bruce Lee",
-    img: "https://randomuser.me/api/portraits/men/45.jpg",
-    lastMessage: "You are a great human being.",
-    time: "23 Jan",
-  },
-  {
-    id: 7,
-    name: "TailwindCSS Group",
-    img: "https://randomuser.me/api/portraits/men/22.jpg",
-    lastMessage: "Adam: Hurray, Version 2 is out now!!.",
-    time: "23 Jan",
-  },
-];
+interface User {
+  user_id:number
+  sender_id: number;
+  Sender_username: string;
+  messageid: number | undefined;
+  Sender_img: string;
+  lastMessage: string;
+  time: string;
+}
 
 export default function Chat({ children }: ChatLayoutProps) {
+  const [users, setUsers] = useState<User[]>([]);
   const [isSliderOpen, setIsSliderOpen] = useState(false);
-  const [selectedUser, setSelectedUser] = useState(null);
+  const [selectedUser, setSelectedUser] = useState<User | null>(null);
 
-  const openSlider = (user) => {
+  const fetchConversation = async () => {
+    try {
+      const response = await fetch(`http://localhost:8000/chat/conversations`);
+      if (!response.ok) {
+        throw new Error("Network response was not ok");
+      }
+      const data = await response.json();
+      setUsers(() => {
+        return data?.results.map((User: any) => {
+          return {
+            user_id: User.receiver.id,
+            sender_id: User.sender.id,
+            messageid: User.messageid,
+            Sender_username: User.sender.username,
+            Sender_img: User.sender.profile_pic,
+            lastMessage: User.message,
+            time: formatDistanceToNow(new Date(User.timestamp), {
+              addSuffix: true,
+            }),
+          };
+        });
+      });
+      console.log(data?.results[0]);
+      return data?.results;
+    } catch (error) {
+      console.error("Fetch error:", error);
+    }
+  };
+  console.log("userslength", users.length);
+  useEffect(() => {
+    fetchConversation();
+  }, []);
+
+  const openSlider = (user: User) => {
     setSelectedUser(user);
     setIsSliderOpen(true);
   };
@@ -76,29 +68,41 @@ export default function Chat({ children }: ChatLayoutProps) {
     setSelectedUser(null);
   };
 
+  const currentUserId = 2;
   return (
-    <div className="w-full min-h-screen flex flex-col justify-start items-start">
-      <div className="w-full h-16">
+    <div className="w-full min-h-screen flex flex-col justify-start items-start ">
+      <div className="w-full">
         <Navbar />
       </div>
 
       {/* Main content area */}
-      <div className="w-full flex lg:flex-row justify-center items-center flex-col-reverse flex-grow overflow-hidden">
+      <div className="w-full flex lg:flex-row h-full  flex-col-reverse flex-grow ">
         {/* Sidebar section */}
-        <div className="lg:h-screen fixed lg:static bottom-0 lg:w-24 w-full z-50 lg:z-0">
+        <div className="lg:w-24 fixed lg:static bottom-0 left-0  w-full z-50 lg:z-0">
           <Sidebar />
         </div>
-
-        {/* Main content area */}
-        <div className="w-full flex justify-center items-center overflow-hidden">
-          <div className="w-full h-max lg:h-fit flex flex-col justify-center items-center p-2 overflow-hidden">
-            <div className="backdrop-blur-md w-full text-gray-200 rounded-xl border-2 border-violet-primary flex">
-              <div className="w-full lg:w-96 backdrop-blur-md h-fit">
+        <div className="w-full  h-full ">
+          test
+          <div className="w-full  h-full lg:h-full flex flex-col justify-center items-center p-2 ">
+            <div className=" bg-gray-800/60 h-[1100px]  w-full  text-gray-200 rounded-xl border-2 border-violet-primary flex">
+              <div className="w-full lg:w-96 backdrop-blur-md  rounded-xl">
                 <section className="w-full">
-                  <div className="header p-4 flex justify-between items-center w-full">
+                  <div className="header p-4  rounded-xl flex justify-between items-center w-full">
                     <p className="text-md font-bold">Messages</p>
-                    <div className="rounded-full hover:bg-gray-700 bg-gray-800 w-10 h-10 flex justify-center items-center">
-                      <button className="text-sm">New</button>
+                    <div className="rounded-full hover:bg-gray-700 bg-violet-primary w-10 h-10 flex justify-center items-center">
+                      <button className="text-sm">
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          width="3em"
+                          height="3em"
+                          viewBox="0 0 32 32"
+                        >
+                          <path
+                            fill="#ffffff"
+                            d="M16 3C8.832 3 3 8.832 3 16s5.832 13 13 13s13-5.832 13-13S23.168 3 16 3m0 2c6.087 0 11 4.913 11 11s-4.913 11-11 11S5 22.087 5 16S9.913 5 16 5m-1 5v5h-5v2h5v5h2v-5h5v-2h-5v-5z"
+                          />
+                        </svg>
+                      </button>
                     </div>
                   </div>
 
@@ -109,7 +113,7 @@ export default function Chat({ children }: ChatLayoutProps) {
                           <input
                             className="rounded-full py-2 pr-6 pl-10 w-full border border-gray-800 focus:border-gray-700 bg-gray-800 focus:bg-gray-900 focus:outline-none text-gray-200 focus:shadow-md transition duration-300 ease-in"
                             type="text"
-                            value=""
+                            defaultValue=""
                             placeholder="Search Messages"
                           />
                           <span className="absolute top-0 left-0 mt-2 ml-3 inline-block">
@@ -126,56 +130,59 @@ export default function Chat({ children }: ChatLayoutProps) {
                   </div>
 
                   {/* Online User Items */}
-                  <div className="story-section flex flex-row p-2 overflow-auto">
-                    <div className="active-users flex flex-row overflow-auto">
-                      {users.slice(0, 3).map((user) => (
-                        <Link
-                          key={user.id}
-                          href={`/chat/${user.id}`}
-                          className="text-sm text-center mr-4 relative"
+                  {/* <div className="flex flex-row p-2 overflow-auto">
+                    <div className="flex flex-row overflow-auto">
+                      {users &&
+                        users?.map((user) => (
+                          <Link
+                            // key={`chat-${user.id}`}
+                            href={`/chat/${user.id}`}
+                            className="text-sm text-center mr-4 relative"
+                          >
+                            <div className="relative">
+                              <img
+                                className="shadow-md rounded-full w-20 h-20 object-cover"
+                                src={"http://localhost:8000" + user.img}
+                                alt={user.name}
+                              />
+                              <span className="absolute bottom-1 right-1 w-4 h-4 bg-green-500 border-2 border-white rounded-full"></span>
+                            </div>
+                            <p>{user.name}</p>
+                          </Link>
+                        ))}
+                    </div>
+                  </div> */}
+                </section>
+                {/* href={`/chat/${user.id}` */}
+                  {/* // <Link key={`message-${user.id}`} href="#"> */}
+                  {/* // </Link> */}
+                <div className="p-2 flex-1 md:w-full h-[820px] overflow-y-scroll">
+                  {users &&
+                    users
+                    .filter((user) => user.user_id  || user.sender_id === currentUserId)
+                    .map((user) =>  (
+                        <div
+                          onClick={() => openSlider(user)}
+                          className="flex justify-between items-center p-3 hover:bg-gray-800 rounded-lg cursor-pointer"
                         >
-                          <div className="relative">
+                          <div className="w-16 h-16 flex-shrink-0">
                             <img
-                              className="shadow-md rounded-full w-20 h-20 object-cover"
-                              src={user.img}
+                              className="shadow-md rounded-full w-full h-full object-cover"
+                              src={"http://localhost:8000" + user.img}
                               alt={user.name}
                             />
-                            <span className="absolute bottom-1 right-1 w-4 h-4 bg-green-500 border-2 border-white rounded-full"></span>
                           </div>
-                          <p>{user.name}</p>
-                        </Link>
-                      ))}
-                    </div>
-                  </div>
-                </section>
-
-                <div className="contacts p-2 flex-1 md:w-full overflow-y-scroll">
-                  {users.map((user) => (
-                    <Link key={user.id} href={`/chat/${user.id}`}>
-                      <div
-                        key={user.id}
-                        onClick={() => openSlider(user)}
-                        className="flex justify-between items-center p-3 hover:bg-gray-800 rounded-lg cursor-pointer"
-                      >
-                        <div className="w-16 h-16 flex-shrink-0">
-                          <img
-                            className="shadow-md rounded-full w-full h-full object-cover"
-                            src={user.img}
-                            alt={user.name}
-                          />
-                        </div>
-                        <div className="flex-auto min-w-0 ml-4 mr-6">
-                          <p className="font-bold">{user.name}</p>
-                          <div className="flex justify-between items-center text-sm text-gray-600">
-                            <p className="truncate">{user.lastMessage}</p>
-                            <p className="ml-2 text-white-primary whitespace-nowrap">
-                              {user.time}
-                            </p>
+                          <div className="flex-auto min-w-0 ml-4 mr-6">
+                            <p className="font-bold">{user.name}</p>
+                            <div className="flex justify-between items-center text-sm text-gray-600">
+                              <p className="truncate">{user.lastMessage}</p>
+                              <p className="ml-4 text-white-primary whitespace-nowrap">
+                                {user.time}
+                              </p>
+                            </div>
                           </div>
                         </div>
-                      </div>
-                    </Link>
-                  ))}
+                    ))}
                 </div>
 
                 {/* Slide Component */}

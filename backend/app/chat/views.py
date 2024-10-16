@@ -8,7 +8,7 @@ from rest_framework.pagination import PageNumberPagination
 from .serializers import MessageSerializer, ConversationSerializer, ChatRoomSerializer
 
 class ConversationsPageNumberPagination(PageNumberPagination):
-    page_size = 7
+    page_size = 10
 
 class ConversationsView(views.APIView):
     def get(self, request):

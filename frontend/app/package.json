@@ -15,7 +15,7 @@
     "@iconify/icons-tabler": "^1.2.95",
     "@iconify/react": "^5.0.1",
     "chart.js": "^4.4.4",
-    "formik": "^2.4.6",
+    "date-fns": "^4.1.0",
     "js-cookie": "^3.0.5",
     "next": "latest",
     "react": "^18.3.1",
@@ -26,13 +26,13 @@
     "zod": "^3.23.8"
   },
   "devDependencies": {
-    "@types/node": "22.7.4",
+    "@types/node": "22.7.5",
     "@types/react": "18.3.11",
     "@types/react-dom": "^18",
     "eslint": "^8",
-    "eslint-config-next": "14.2.3",
+    "eslint-config-next": "^14.2.3",
     "postcss": "^8",
     "tailwindcss": "^3.4.1",
-    "typescript": "5.6.2"
+    "typescript": "5.6.3"
   }
 }

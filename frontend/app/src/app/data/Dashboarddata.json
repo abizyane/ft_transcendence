@@ -1,0 +1,141 @@
+{
+  "user": {
+    "name": "mohamed",
+    "username": "momayaz",
+    "pic": "/Profil.jpg",
+    "xp": 3100,
+    "charts": {
+      "winRate": {
+        "totalGames": 100,
+        "wins": 75
+      },
+      "lineChart": {
+        "data": [
+          100,
+          0,
+          90,
+          40,
+          80,
+          35,
+          40
+        ]
+      }
+    },
+    "history": [
+      {
+        "gameId": 1,
+        "date": "2024-10-11",
+        "result": "loss",
+        "score": {
+          "user": 9,
+          "opponent": 0
+        },
+        "opponent": {
+          "username": "lkhwinza",
+          "name": "fatiha",
+          "picture": "https://randomuser.me/api/portraits/women/1.jpg"
+        },
+        "inviter": "opponent"
+      },
+      {
+        "gameId": 2,
+        "date": "2024-10-11",
+        "result": "loss",
+        "score": {
+          "user": 9,
+          "opponent": 0
+        },
+        "opponent": {
+          "username": "morpholllll",
+          "name": "ismail",
+          "picture": "https://randomuser.me/api/portraits/women/1.jpg"
+        },
+        "inviter": "opponent"
+      },
+      {
+        "gameId": 3,
+        "date": "2024-10-10",
+        "result": "win",
+        "score": {
+          "user": 9,
+          "opponent": 8
+        },
+        "opponent": {
+          "username": "friwiha",
+          "name": "sanaa",
+          "picture": "https://randomuser.me/api/portraits/women/3.jpg"
+        },
+        "inviter": "user"
+      },
+      {
+        "gameId": 4,
+        "date": "2024-10-10",
+        "result": "win",
+        "score": {
+          "user": 9,
+          "opponent": 8
+        },
+        "opponent": {
+          "username": "Mitmita",
+          "name": "Mouna",
+          "picture": "https://randomuser.me/api/portraits/women/3.jpg"
+        },
+        "inviter": "user"
+      }
+    ],
+    "friends": [
+      {
+        "username": "Jafy",
+        "pic": "https://picsum.photos/id/1015/200/200", 
+        "xp": 2000
+      },
+      {
+        "username": "FriendTwo",
+        "pic": "https://picsum.photos/id/1016/200/200", 
+        "xp": 2500
+      },
+      {
+        "username": "FriendThree",
+        "pic": "https://picsum.photos/id/1018/200/200", 
+        "xp": 1800
+      },
+      {
+        "username": "FriendFour",
+        "pic": "https://picsum.photos/id/1019/200/200", 
+        "xp": 3000
+      }
+    ],
+    "topPlayers": [
+      {
+        "firstName": "John",
+        "lastName": "Doe",
+        "pic": "https://randomuser.me/api/portraits/men/1.jpg",
+        "xp": 5000
+      },
+      {
+        "firstName": "Jane",
+        "lastName": "Smith",
+        "pic": "https://randomuser.me/api/portraits/women/1.jpg",
+        "xp": 4800
+      },
+      {
+        "firstName": "Alice",
+        "lastName": "Johnson",
+        "pic": "https://randomuser.me/api/portraits/women/2.jpg",
+        "xp": 5800
+      },
+      {
+        "firstName": "Bob",
+        "lastName": "Brown",
+        "pic": "https://randomuser.me/api/portraits/men/2.jpg",
+        "xp": 4600
+      },
+      {
+        "firstName": "Charlie",
+        "lastName": "Davis",
+        "pic": "https://randomuser.me/api/portraits/men/3.jpg",
+        "xp": 4500
+      }
+    ]
+  }
+}
