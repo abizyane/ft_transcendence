@@ -4,6 +4,7 @@ from .views.auth.register import RegisterView
 from .views.auth.login import LoginView
 from .views.auth.logout import LogoutView
 from .views.auth.OAuth import OAuth, OAuthCallback
+from .views.auth.auth_user import UserView
 
 urlpatterns = [
     path('register', RegisterView.as_view()),
@@ -11,4 +12,6 @@ urlpatterns = [
     path('logout', LogoutView.as_view()),
     path('42OAuth', OAuth.as_view()),
     path('42OAuth/callback', OAuthCallback.as_view()),
+    path('user', UserView.as_view()),
+
 ]
