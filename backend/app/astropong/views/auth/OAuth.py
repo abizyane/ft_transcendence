@@ -3,12 +3,21 @@ from django.http import HttpResponseRedirect
 from urllib.parse import urlencode
 from rest_framework.response import Response
 import requests
+from django.contrib.auth import get_user_model
+from rest_framework.decorators import api_view, permission_classes
+from rest_framework.permissions import AllowAny
+from ...serializers.UserSerializer import UserSerializer
+from rest_framework import status
+from rest_framework_simplejwt.tokens import RefreshToken
+User = get_user_model()
+
+@permission_classes([AllowAny])
 class OAuth(APIView):
     AUTH_URL = "https://api.intra.42.fr/oauth/authorize"
     TOKEN_URL = "https://api.intra.42.fr/oauth/token"
     REDIRECT_URI = "http://localhost:3000/auth/OAuth"
     CLIENT_ID = "u-s4t2ud-e86add016b6a41e208d53d0c011abdc53a93f6e1ba65ba9605a37be5a8997a17"
-    CLIENT_SECRET="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"
+    CLIENT_SECRET="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"
     def get(self, request, *args, **kwargs):
         payload = {
             'client_id': self.CLIENT_ID,
@@ -18,16 +27,72 @@ class OAuth(APIView):
         }
         query_params = urlencode(payload)
         return HttpResponseRedirect(f"{self.AUTH_URL}?{query_params}")
+
+@permission_classes([AllowAny])
 class OAuthCallback(APIView):
+    def getUserInfo(self,access_token):
+        return None
+
     def getToken(self,code):
         payload = {
-            'grant_type': 'client_credentials',
+            'grant_type': 'authorization_code',
             'client_id': OAuth.CLIENT_ID,
             'client_secret': OAuth.CLIENT_SECRET,
             'code': code,
+            "redirect_uri": OAuth.REDIRECT_URI
         }
         response = requests.post(OAuth.TOKEN_URL, data=payload)
         print(response.json())
-        return response.json()
+        if response.status_code != 200:
+            return Response("Invalid request", status=status.HTTP_401_UNAUTHORIZED)
+        resp = response.json()
+        access_token = resp['access_token']
+        return self.getUser(access_token, code)
+    
+    def is_email_existing(self, email):
+        return User.objects.filter(email=email).exists()
+
+    def createUserInfo(self, user, code):
+        try:
+            serializer = UserSerializer(data={
+                'email': user['email'],
+                'username': user['login'],
+                'first_name': user['first_name'],
+                'last_name': user['last_name'],
+                'password' : code
+            })
+            serializer.is_valid(raise_exception=True)
+            serializer.save()
+            return self.loginUser(serializer.data)
+        except Exception as e:
+            return Response({'error': str(e)}, status=status.HTTP_401_UNAUTHORIZED)
+    
+    def loginUser(self, user):
+        refresh = RefreshToken.for_user(user)
+        response = Response({
+            'refresh': str(refresh),
+            'access': str(refresh.access_token),
+        })
+        response.set_cookie(key='jwt', value=str(refresh.access_token), httponly=True)
+        return response
+
+    def getUser(self, access_token, code):
+        resp = requests.get("https://api.intra.42.fr/v2/me"
+                            , headers={'Authorization': f"Bearer {access_token}"})
+        if resp.status_code == 200:
+            user = resp.json()
+            if self.is_email_existing(user['email']):
+                user = User.objects.filter(email=user['email']).get()
+                return self.loginUser(user)
+            else:
+                return self.createUserInfo(user, code)    
+        else:
+            return Response({'error': "An error has occured"}, status=status.HTTP_401_UNAUTHORIZED)
+        
+
     def get(self, request, *args, **kwargs):
-        return Response("Hello World")
+        code = request.GET.get('code')
+        if code:
+            return self.getToken(code)
+        else:
+            return Response("Invalid request", status=status.HTTP_401_UNAUTHORIZED)
