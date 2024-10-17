@@ -7,6 +7,7 @@ import { z } from 'zod';
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { handleRegistrationSubmit } from "@/services/auth";
 
 const formSchema = z.object({
   username: z.string().min(4, 'Username must be at least 4 characters'),
@@ -18,45 +19,28 @@ const formSchema = z.object({
   path: ['confirmpassword'],
 });
 
-type FormData = z.infer<typeof formSchema>;
+export type registerFormData = z.infer<typeof formSchema>;
 
 const Registration = () => {
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
-  const { register, handleSubmit, formState: { errors } } = useForm<FormData>({
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  
+  const { register, handleSubmit, formState: { errors } } = useForm<registerFormData>({
     resolver: zodResolver(formSchema),
   });
+  
+  const router = useRouter();
 
-  const onSubmit = async (data: FormData) => {
-    try {
-      const response = await fetch('http://localhost:8000/api/register', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(data),
-      });
-      const router =useRouter();
-      if (response.ok) {
-        setSuccessMessage('Registration successful! Redirecting...');
-        setTimeout(() => {
-          if (typeof window !== 'undefined') {
-            router.push('/auth/login');
-          }
-        }, 2000); // Delay for success message to be shown
-      } else {
-        const errorData = await response.json();
-        console.error('Error:', errorData.message);
-      }
-    } catch (error) {
-      console.error('An unexpected error occurred:', error);
-    }
+  const onSubmit = (data: registerFormData) => {
+    handleRegistrationSubmit(data, setSuccessMessage, setErrorMessage, router);
   };
-
   return (
-    
-    <div className="font-mont p-6 backdrop-blur-lg bg-gray-800/60  rounded-xl shadow-lg max-w-sm w-full">
+    <div className="font-mont p-6 backdrop-blur-lg bg-gray-800/60 rounded-xl shadow-lg max-w-sm w-full">
       {successMessage && (
         <div className="text-green-500 text-center mb-4">{successMessage}</div>
+      )}
+      {errorMessage && (
+        <div className="text-red-500 text-center mb-4">{errorMessage}</div>
       )}
       <h2 className="text-3xl font-bold text-white mb-4">Registration</h2>
       <form className="space-y-4 w-full" onSubmit={handleSubmit(onSubmit)}>

@@ -17,12 +17,12 @@ export default function Canvas (){
             if (Connected.current == false)
                 socketRef.current =  new WebSocket('ws://'+ window.location.hostname+':8000/ws/game/1/')
             socketRef.current.onopen = e => {
-                console.log(e.data)
+        
                 Connected.current = true
             }
             
             socketRef.current.onclose = e=>{
-                console.log('closed')
+        
                 Connected.current = false
             }
             

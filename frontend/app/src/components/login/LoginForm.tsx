@@ -7,8 +7,8 @@ import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import { handleLogin } from "@/services/auth";
 
-const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
 const formSchema = z.object({
   email: z.string().email("Invalid email address"),
@@ -21,6 +21,8 @@ const formSchema = z.object({
 type FormData = z.infer<typeof formSchema>;
 
 const LoginForm = () => {
+
+  const [successMessage, setSuccessMessage] = useState<string | null>(null);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const {
     register,
@@ -29,45 +31,27 @@ const LoginForm = () => {
   } = useForm<FormData>({
     resolver: zodResolver(formSchema),
   });
-  
-  const router = useRouter(); 
 
-  const onSubmit = async (data: FormData) => {
-    try {
-      const response = await fetch("http://localhost:8000/api/login", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(data),
-      });
-      console.log(response);
-      if (response.ok) {
-        const responseData = await response.json();
-        const jwt = responseData.jwt;
-        localStorage.setItem("jwt", jwt);
-        console.log("Login successful");
-        console.log(responseData);
-        router.push("/dashboard");
-      } else {
-        const errorData = await response.json();
-        setErrorMessage("Invalid email or password");
-      }
-    } catch (error) {
-      console.error("An unexpected error occurred:", error);
-    }
+  const router = useRouter();
+
+  const onSubmit = async (data: { email: string; password: string }) => {
+    const formData = new FormData();
+    formData.append('email', data.email);
+    formData.append('password', data.password);
+    await handleLogin(formData,setSuccessMessage,  setErrorMessage, router);
   };
 
   return (
-    <div className="w-full flex flex-col items-center justify-center p-4 overflow-hidden">
-      {errorMessage && (
-        <div className="w-full max-w-md bg-red-500 text-white text-center py-2 mb-4 rounded-md">
-          {errorMessage}
-        </div>
+    <div className="font-mont p-6 backdrop-blur-lg bg-gray-800/60 rounded-xl shadow-lg max-w-sm w-full">
+      {successMessage && (
+        <div className="text-green-500 text-center mb-4">{successMessage}</div>
       )}
-      <div className="font-mont p-6 backdrop-blur-lg bg-gray-800/60  rounded-xl shadow-lg max-w-sm w-full  overflow-hidden">
+      {errorMessage && (
+        <div className="text-red-500 text-center mb-4">{errorMessage}</div>
+      )}
+    {/* <div className="font-mont p-6 backdrop-blur-lg bg-gray-800/60  rounded-xl shadow-lg max-w-sm w-full  overflow-hidden"> */}
         <h2 className="text-3xl font-bold text-white mb-4">Login</h2>
-        <form className="mt-8 space-y-6" onSubmit={handleSubmit(onSubmit)}>
+        <form className="mt-8 space-y-6" autoComplete="off" onSubmit={handleSubmit(onSubmit)}>
           <div className="rounded-md shadow-sm">
             <div>
               <label htmlFor="email-address" className="sr-only">Email address</label>
@@ -88,11 +72,11 @@ const LoginForm = () => {
               )}
             </div>
             <div className="pt-6">
-              <label htmlFor="password" className="sr-only">Password</label>
+              <label  htmlFor="password" className="sr-only">Password</label>
               <input
-                id="password"
-                type="password"
-                autoComplete="current-password"
+                id="userPassword"
+                type="password" 
+                autoComplete="new-password"
                 {...register("password")}
                 className={`relative block w-full px-3 py-2 text-gray-900 placeholder-gray-500 bg-gray-200 rounded-xl border ${
                   errors.password ? "border-red-500" : "border-gray-300"
@@ -139,7 +123,6 @@ const LoginForm = () => {
           </Link>
         </div>
       </div>
-    </div>
   );
 };
 

@@ -47,13 +47,11 @@ export default function Chat({ children }: ChatLayoutProps) {
           };
         });
       });
-      console.log(data?.results[0]);
       return data?.results;
     } catch (error) {
       console.error("Fetch error:", error);
     }
   };
-  console.log("userslength", users.length);
   useEffect(() => {
     fetchConversation();
   }, []);
