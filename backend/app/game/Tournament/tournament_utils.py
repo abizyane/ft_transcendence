@@ -1,6 +1,7 @@
 from abc import ABC,abstractmethod
 from room import *
 from enum import Enum
+from roomlister import RoomLister
 
 RoomType = Enum('RoomType', ['TWO', 'FOUR', 'EIGHT'])
 
@@ -61,3 +62,32 @@ class RoomManager(AbstractRoomManager):
 
     def get_available_rooms(_type:str):
         return (lambda room : room.ready, self.rooms)
+
+
+class RoomListManager(RoomManager):
+    RoomTypes = {
+        "TWO": "TwoPlayersRoom",
+        "FOUR": "FourPlayersRoom"
+    }
+    def __init__(self):
+        super().__init__()
+        self.not_ready = RoomLister()
+        self.ready = RoomLister()
+ 
+    def create_room(self, _type):
+        new_room = super().create_room(_type)
+        self.not_ready.append(new_room)
+        return new_room
+    
+    def remove_ready(self, room:Room):
+        self.ready.remove(room)
+    
+    def get_not_ready(self, _type):
+        not_ready = self.not_ready.get_list_type(RoomListManager.RoomTypes[_type])
+        return not_ready
+
+    def remove_not_ready(self, room:Room):
+        self.not_ready.remove(room)
+
+    def switch_to_ready(self, room:Room):
+        self.ready.append(self.not_ready.remove(room))

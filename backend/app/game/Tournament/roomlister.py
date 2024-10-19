@@ -42,3 +42,10 @@ class RoomLister():
                 result += f'{attr}: {str(getattr(self, attr))}\n'
         result = result[:-1]
         return result
+    
+    def get_list_type(self, _type) -> list:
+        attr_name = _type.lower()
+        if not hasattr(self, attr_name) :
+            return []
+        _list = getattr(self, attr_name)
+        return _list
