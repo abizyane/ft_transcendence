@@ -249,4 +249,4 @@ class GameConsumer(AsyncWebsocketConsumer) :
 
     class NoGameInQueue(Exception):
         pass
-    
+ 

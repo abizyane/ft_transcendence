@@ -83,6 +83,7 @@ class RoomListManager(RoomManager):
         self.ready.remove(room)
     
     def get_not_ready(self, _type):
+        "ret [] if empty"
         not_ready = self.not_ready.get_list_type(RoomListManager.RoomTypes[_type])
         return not_ready
 

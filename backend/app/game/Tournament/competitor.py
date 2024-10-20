@@ -1,20 +1,23 @@
-from tournament_utils import *
+from room_manager import *
 from abc import ABC, abstractmethod
 
 class AbstractCompetitor(ABC):
     @abstractmethod
-    def join_room(self):
+    def join_room(self, room:Room):
         pass
 
     @abstractmethod
-    def exit_room(self):
+    def exit_room(self, room:Room):
         pass
 
-    
+    @abstractmethod
+    def room_request(self, rm:AbstractRoomManager):
+        pass   
 
 class Competitor(AbstractCompetitor):
     def __init__(self, name):
-        self.name = Name
+        self.name = name
+        self.room:Room = None
         self._type = ''
     """
         Comptitor should ask manager for Type of Tournament He wanna join
@@ -33,5 +36,8 @@ class Competitor(AbstractCompetitor):
     def room_request(self, rm:AbstractRoomManager) -> Room:
         if not self._type :
             raise ValueError("Type Not Defined")
-        #check if room_type available
-        
+        self.room = rm.get_not_ready(self._type)
+        if not self.room :
+            self.room = rm.create_room(self._type)
+            return self.room
+        return self.room[0]
