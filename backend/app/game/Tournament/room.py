@@ -23,13 +23,11 @@ class RoomAbstract(ABC):
 
     pass
 
-class RoomIsFull(Exception):
-    def __init__(self):
-        self.super(message="Room Is Full")
+
 
 class RoomIsEmpty(Exception):
     def __init__(self):
-        self.super(message="Room Is Empty")
+        super().__init__(message="Room Is Empty")
 
 class Room(RoomAbstract):
     def __init__(self, size):
@@ -42,7 +40,7 @@ class Room(RoomAbstract):
 
     def add_player(self, Player) -> RoomAbstract :
         if self.ready :
-            raise RoomIsFull
+            raise Room.RoomIsFull
         self.players.append(Player)
         if self.players_count() == self.size :
             self.ready = True
@@ -62,6 +60,9 @@ class Room(RoomAbstract):
     def is_empty(self) -> bool:
         return (self.players_count() <= 0)
     
+    class RoomIsFull(Exception):
+        def __init__(self, message="Room Is Full"):
+            super().__init__(message)
 
 
 class TwoPlayersRoom(Room):

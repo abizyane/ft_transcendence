@@ -17,12 +17,14 @@ class TournamentConsumer(AsyncWebsocketConsumer):
         await self.channel_layer.group_add((self.room.name), self.channel_name)
         await self.channel_layer.group_send(self.room.name, {
             "type" : "joined.competitor.data",
-            "competitor" : self.competitor.__dict__['name']
+            "competitor" : self.competitor.__dict__['name'],
+            "currentsize" : str(self.room.players_count()),
         })
 
     async def joined_competitor_data(self, event):
         await self.send(text_data=json.dumps({
-            "msg" : event['competitor']
+            "msg" : event['competitor'],
+            "size" : event['currentsize'],
         }))
 
     async def disconnect(self):
@@ -41,3 +43,5 @@ class TournamentConsumer(AsyncWebsocketConsumer):
         competitor.set_competition_type("TWO")
         self.room = competitor.room_request(TournamentConsumer.rm)
         competitor.join_room(self.room)
+        if self.room.is_ready():
+            TournamentConsumer.rm.switch_to_ready(self.room)
