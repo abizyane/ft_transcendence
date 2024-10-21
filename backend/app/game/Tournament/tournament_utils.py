@@ -1,7 +1,7 @@
 from abc import ABC,abstractmethod
-from room import *
+from .room import *
 from enum import Enum
-from roomlister import RoomLister
+from .roomlister import RoomLister
 
 RoomType = Enum('RoomType', ['TWO', 'FOUR', 'EIGHT'])
 
@@ -100,4 +100,4 @@ class RoomListManager(RoomManager):
         self.ready.append(self.not_ready.remove(room))
 
     def naming_room(self, room:Room):
-        room.name =  f'room_{RoomTypes[ RM_TYPE[room.size] ].{RoomListManager._id}}'
+        room.name =  f'room_{RoomListManager.RoomTypes[ RoomListManager.RM_TYPE[room.size] ]}.{RoomListManager._id}'

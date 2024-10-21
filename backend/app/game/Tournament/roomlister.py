@@ -1,5 +1,5 @@
 from abc import ABC, abstractmethod 
-from room import Room
+from .room import Room
 from functools import singledispatchmethod
 
 class RoomLister():

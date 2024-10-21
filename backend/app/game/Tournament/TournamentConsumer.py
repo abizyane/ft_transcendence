@@ -1,28 +1,31 @@
-from channel.generic.websocket import AsyncWebsocketConsumer
-from tournament_utils import RoomListManager
+from channels.generic.websocket import AsyncWebsocketConsumer
+from .tournament_utils import RoomListManager
+from .competitor import Competitor
+import json
 
 class TournamentConsumer(AsyncWebsocketConsumer):
     rm = RoomListManager()
     rooms = {}
     _id = 0
-    def connect(self):
+    async def connect(self):
         #get_user_info
         await self.accept()
-        self.competiror = Competitor(self.channel_name)
+        self.competitor = Competitor(self.channel_name)
         self.room = None
         self.access_competition(self.competitor);
-        await self.channel_layer.group_add(self.channel_name, self.room.name)
+        print(type(self.room.name))
+        await self.channel_layer.group_add((self.room.name), self.channel_name)
         await self.channel_layer.group_send(self.room.name, {
             "type" : "joined.competitor.data",
-            "competitor" : self.competitor
+            "competitor" : self.competitor.__dict__['name']
         })
 
-    async def joined_player_data(self, event):
-        self.send(text_data=json.dumps({
-            "msg" : event[competitor].__dict__
+    async def joined_competitor_data(self, event):
+        await self.send(text_data=json.dumps({
+            "msg" : event['competitor']
         }))
 
-    def disconnect(self):
+    async def disconnect(self):
         if self.room:
             if self.room.isready():
                 #set other player to winner
@@ -35,6 +38,6 @@ class TournamentConsumer(AsyncWebsocketConsumer):
         #self.channel_layer.group_discard(self.group_name, self.channel_name)
 
     def access_competition(self, competitor:Competitor) -> None :
-        # competitor.set_competition_type()
+        competitor.set_competition_type("TWO")
         self.room = competitor.room_request(TournamentConsumer.rm)
         competitor.join_room(self.room)

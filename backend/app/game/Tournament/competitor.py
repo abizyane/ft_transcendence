@@ -1,4 +1,5 @@
-from room_manager import *
+from .tournament_utils import AbstractRoomManager
+from .room import Room
 from abc import ABC, abstractmethod
 
 class AbstractCompetitor(ABC):
@@ -30,7 +31,7 @@ class Competitor(AbstractCompetitor):
     def exit_room(self, room:Room) -> None:
         room.remove_player(self)
 
-    def set_compition_type(self, _type:str):
+    def set_competition_type(self, _type:str):
         self._type = _type
 
     def room_request(self, rm:AbstractRoomManager) -> Room:
