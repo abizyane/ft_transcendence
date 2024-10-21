@@ -69,6 +69,11 @@ class RoomListManager(RoomManager):
         "TWO": "TwoPlayersRoom",
         "FOUR": "FourPlayersRoom"
     }
+    RM_TYPE = {
+        2: "TWO",
+        4: "FOUR"
+    }
+    _id = 0
     def __init__(self):
         super().__init__()
         self.not_ready = RoomLister()
@@ -77,6 +82,7 @@ class RoomListManager(RoomManager):
     def create_room(self, _type):
         new_room = super().create_room(_type)
         self.not_ready.append(new_room)
+        self.naming_room(new_room)
         return new_room
     
     def remove_ready(self, room:Room):
@@ -92,3 +98,6 @@ class RoomListManager(RoomManager):
 
     def switch_to_ready(self, room:Room):
         self.ready.append(self.not_ready.remove(room))
+
+    def naming_room(self, room:Room):
+        room.name =  f'room_{RoomTypes[ RM_TYPE[room.size] ].{RoomListManager._id}}'

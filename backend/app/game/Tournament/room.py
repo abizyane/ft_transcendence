@@ -34,6 +34,7 @@ class RoomIsEmpty(Exception):
 class Room(RoomAbstract):
     def __init__(self, size):
         self.size = size
+        self.name = ''
         self.players = []
         self.spectators = []
         self.games = []

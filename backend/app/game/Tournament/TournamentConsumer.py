@@ -1,37 +1,40 @@
 from channel.generic.websocket import AsyncWebsocketConsumer
-from tournament_utils import RoomManager
+from tournament_utils import RoomListManager
 
 class TournamentConsumer(AsyncWebsocketConsumer):
-    room_manager = RoomManager()
+    rm = RoomListManager()
+    rooms = {}
+    _id = 0
     def connect(self):
         #get_user_info
-        self.accept()
-        self.room = self.find_room()
-        await self.join_group()
-        if (self.room.is_ready()):
-            self.channel_layer.group_send(self.group_name, {
-                'type' : 'set_lobby_ready',
-                'message_content': f'{self.group_name} ready',
-                'message': 'ready'
-            })
-        
-
-    def find_room(self):
-        result = None
-        for room in TournamentConsumer.rooms_tracking :
-            if not room.is_ready()
-                result = room
-        if not result:
-            result = Room
-            TournamentConsumer.rooms_tracking.append(result)
-        return result
-
-    async def join_group(self):
-        self.group_name = f'room_{self.room.id}'
-        await self.channel_layer.group_add(self.channel_layer, self.group_name)
-
-    async def set_lobby_ready(self, event):
-        self.send(self.channel_name,{
-            'type': 'inform',
-            'message' : 'ready'
+        await self.accept()
+        self.competiror = Competitor(self.channel_name)
+        self.room = None
+        self.access_competition(self.competitor);
+        await self.channel_layer.group_add(self.channel_name, self.room.name)
+        await self.channel_layer.group_send(self.room.name, {
+            "type" : "joined.competitor.data",
+            "competitor" : self.competitor
         })
+
+    async def joined_player_data(self, event):
+        self.send(text_data=json.dumps({
+            "msg" : event[competitor].__dict__
+        }))
+
+    def disconnect(self):
+        if self.room:
+            if self.room.isready():
+                #set other player to winner
+                pass
+            else :
+                try:
+                    self.competitor.exit_room(self.room)
+                except RoomIsEmpty:
+                    rm.remove_not_ready(self.room)
+        #self.channel_layer.group_discard(self.group_name, self.channel_name)
+
+    def access_competition(self, competitor:Competitor) -> None :
+        # competitor.set_competition_type()
+        self.room = competitor.room_request(TournamentConsumer.rm)
+        competitor.join_room(self.room)
