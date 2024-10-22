@@ -10,7 +10,7 @@ class RoomAbstract(ABC):
         pass
 
     @abstractmethod
-    def players_count(self):
+    def competitors_count(self):
         pass
 
     @abstractmethod
@@ -27,7 +27,7 @@ class Room(RoomAbstract):
     def __init__(self, size):
         self.size = size
         self.name = ''
-        self.players = []
+        self.competitors = []
         self.spectators = []
         self.games = []
         self.ready = False
@@ -35,24 +35,24 @@ class Room(RoomAbstract):
     def add_player(self, Player) -> RoomAbstract :
         if self.ready :
             raise Room.RoomIsFull
-        self.players.append(Player)
-        if self.players_count() == self.size :
+        self.competitors.append(Player)
+        if self.competitors_count() == self.size :
             self.ready = True
         return self
 
     def remove_player(self, Player) -> None:
-        self.players.remove(Player)
-        if (self.players_count() == 0):
+        self.competitors.remove(Player)
+        if (self.competitors_count() == 0):
             raise RoomIsEmpty;
 
-    def players_count(self) -> int:
-        return len(self.players)
+    def competitors_count(self) -> int:
+        return len(self.competitors)
     
     def is_ready(self) -> bool:
-        return (self.players_count() == self.size)
+        return (self.competitors_count() == self.size)
 
     def is_empty(self) -> bool:
-        return (self.players_count() <= 0)
+        return (self.competitors_count() <= 0)
     
     class RoomIsFull(Exception):
         def __init__(self, message="Room Is Full"):

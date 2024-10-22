@@ -12,17 +12,19 @@ class TournamentConsumer(AsyncWebsocketConsumer):
         await self.accept()
         self.competitor = Competitor(self.channel_name)
         self.room = None
+        self.holder = None
         self.access_competition(self.competitor);
         print(type(self.room.name))
         await self.channel_layer.group_add((self.room.name), self.channel_name)
         await self.channel_layer.group_send(self.room.name, {
             "type" : "joined.competitor.data",
             "competitor" : self.competitor.__dict__['name'],
-            "currentsize" : str(self.room.players_count()),
+            "currentsize" : str(self.room.competitors_count()),
         })
         if self.room.is_ready():
-            TournamentConsumer.rm.switch_to_ready(self.room) 
-            
+            TournamentConsumer.rm.switch_to_ready(self.room)
+            competitors_gen = iter(self.room.competitors)
+            self.holder = MatchTreeBuilder.build_tree(MatchHolder(), 0, competitors_gen)
 
     async def joined_competitor_data(self, event):
         await self.send(text_data=json.dumps({
