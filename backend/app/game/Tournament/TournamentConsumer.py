@@ -20,6 +20,9 @@ class TournamentConsumer(AsyncWebsocketConsumer):
             "competitor" : self.competitor.__dict__['name'],
             "currentsize" : str(self.room.players_count()),
         })
+        if self.room.is_ready():
+            TournamentConsumer.rm.switch_to_ready(self.room) 
+            
 
     async def joined_competitor_data(self, event):
         await self.send(text_data=json.dumps({
@@ -37,11 +40,10 @@ class TournamentConsumer(AsyncWebsocketConsumer):
                     self.competitor.exit_room(self.room)
                 except RoomIsEmpty:
                     rm.remove_not_ready(self.room)
-        #self.channel_layer.group_discard(self.group_name, self.channel_name)
+        self.channel_layer.group_discard(self.room.name, self.channel_name)
 
     def access_competition(self, competitor:Competitor) -> None :
         competitor.set_competition_type("TWO")
         self.room = competitor.room_request(TournamentConsumer.rm)
         competitor.join_room(self.room)
-        if self.room.is_ready():
-            TournamentConsumer.rm.switch_to_ready(self.room)
+        

@@ -23,12 +23,6 @@ class RoomAbstract(ABC):
 
     pass
 
-
-
-class RoomIsEmpty(Exception):
-    def __init__(self):
-        super().__init__(message="Room Is Empty")
-
 class Room(RoomAbstract):
     def __init__(self, size):
         self.size = size
@@ -64,6 +58,9 @@ class Room(RoomAbstract):
         def __init__(self, message="Room Is Full"):
             super().__init__(message)
 
+   class RoomIsEmpty(Exception):
+        def __init__(self,message="Room Is Empty" ):
+            super().__init__(message) 
 
 class TwoPlayersRoom(Room):
     def __init__(self):
