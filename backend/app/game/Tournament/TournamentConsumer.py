@@ -2,6 +2,7 @@ from channels.generic.websocket import AsyncWebsocketConsumer
 from .tournament_utils import RoomListManager
 from .competitor import Competitor
 import json
+from matchHolder import MatchTreeBuilder, MatchHolder, PlayerHolder
 
 class TournamentConsumer(AsyncWebsocketConsumer):
     rm = RoomListManager()
@@ -40,8 +41,8 @@ class TournamentConsumer(AsyncWebsocketConsumer):
             else :
                 try:
                     self.competitor.exit_room(self.room)
-                except RoomIsEmpty:
-                    rm.remove_not_ready(self.room)
+                except self.RoomIsEmpty:
+                    TournamentConsumer.rm.remove_not_ready(self.room)
         self.channel_layer.group_discard(self.room.name, self.channel_name)
 
     def access_competition(self, competitor:Competitor) -> None :

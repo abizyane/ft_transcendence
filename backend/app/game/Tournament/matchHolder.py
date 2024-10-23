@@ -14,6 +14,7 @@ class MatchHolder(Holder):
         self.left: Holder = None
         self.right: Holder = None
         self.back:Holder = None
+        self.index = 0
         self.lvl = 0
     pass
 
@@ -22,6 +23,7 @@ class PlayerHolder(Holder):
         self.competitor = competitor
         self.back:Holder = None
         self.lvl = 0
+        self.index = 0
     pass
 
 class MatchTreeBuilder(AbstractMatchBuilder):
@@ -29,16 +31,17 @@ class MatchTreeBuilder(AbstractMatchBuilder):
     #     self.room = match
 
     @staticmethod
-    def build_tree(self, holder:Holder ,lvl:int, competitor_generator):
+    def build_tree(self, holder:Holder, index:int ,lvl:int, competitor_generator):
         if (2 ** lvl == self.holder.size) :
             holder.build_leafs(lvl, competitor_generator)
             return
         holder.lvl = lvl
+        holder.index = index
         holder.left = MatchHolder()
         holder.right = MatchHolder()
         holder.right.back = holder.left.back = holder
-        build_tree(holder.left, lvl + 1, competitor_generator)
-        build_tree(holder.right, lvl + 1, competitor_generator)
+        self.build_tree(holder.left, index + 1, lvl + 1, competitor_generator)
+        self.build_tree(holder.right, index + 2, lvl + 1, competitor_generator)
         return holder
 
     def build_leaf(self, composite, lvl, competitor_gen) -> None:
@@ -48,4 +51,13 @@ class MatchTreeBuilder(AbstractMatchBuilder):
         composite.right.lvl = lvl
         composite.right.back = composite.left.back = composite
         pass
+
+    def visualize_tree(self, holder:Holder, lvl) -> None:
+        if (2 ** lvl) >= self.holder.size :
+            return
+        print(f"{holder.lvl * '\t'}h:{holder.index}")
+        self.visualize_tree(holder.left)
+        self.visualize_tree(holder.right)
+        pass
+        
 

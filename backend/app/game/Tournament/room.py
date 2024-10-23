@@ -53,14 +53,21 @@ class Room(RoomAbstract):
 
     def is_empty(self) -> bool:
         return (self.competitors_count() <= 0)
+
+    def get_data(self) :
+        return {
+            "id": self._id,
+            "competitors" : {competitor.name : competitor.get_data() for competitor in self.competitors},
+             
+        }
     
     class RoomIsFull(Exception):
         def __init__(self, message="Room Is Full"):
             super().__init__(message)
 
-   class RoomIsEmpty(Exception):
+    class RoomIsEmpty(Exception):
         def __init__(self,message="Room Is Empty" ):
-            super().__init__(message) 
+            super().__init__(message)
 
 class TwoPlayersRoom(Room):
     def __init__(self):

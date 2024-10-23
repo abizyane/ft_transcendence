@@ -20,6 +20,7 @@ class Competitor(AbstractCompetitor):
         self.name = name
         self.room:Room = None
         self._type = ''
+        self._state = None
     """
         Comptitor should ask manager for Type of Tournament He wanna join
         1/2, 1/4, 1/8 , manager will search for type of room if available
@@ -42,3 +43,6 @@ class Competitor(AbstractCompetitor):
             self.room = rm.create_room(self._type)
             return self.room
         return self.room[0]
+    
+    def get_data(self):
+        return self.__dict__
