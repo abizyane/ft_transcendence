@@ -17,6 +17,10 @@ class MatchHolder(Holder):
         self.size = 2
         self.index = 0
         self.lvl = 0
+        
+    def is_read(self):
+        return isinstance(self.left, PlayerHolder) and isinstance(self.right, PlayerHolder)
+    
     pass
 
 class PlayerHolder(Holder):
@@ -27,6 +31,15 @@ class PlayerHolder(Holder):
         self.right: Holder = None
         self.lvl = 0
         self.index = 0
+    
+    def upgrade(self):
+        match = self.back
+        tmp = match.back
+        if tmp:
+            if tmp.left == match:
+                tmp.left = self
+            else:
+                tmp.right = self
     pass
 
 class MatchTreeBuilder(AbstractMatchBuilder):
@@ -68,4 +81,37 @@ class MatchTreeBuilder(AbstractMatchBuilder):
         MatchTreeBuilder.visualize_tree(holder.right, lvl + 1,size)
         pass
         
+class AbstractTournamentManager(ABC):
+    def update_tree(self):
+        pass
+    
+    def upgrade_winner(self):
+        pass
+    
+    def set_tournament_winner(self):
+        pass
+    
+    def is_match_ready(self):
+        pass
+    
+    def set_winner_lvl(self):
+        pass
+    
+class TournamentManager(AbstractTournamentManager):
+    def __init__(self, match_root):
+        self.match_holder = match_root
+    
+    def get_winner(self, competitors):
+        winners = []
+        for competitor in competitors:
+            if competitor.won:
+                winners.append(competitor)
+        return winners
 
+    def update_tree(self, competitors):
+        winners = self.get_winners(competitors)
+        for winner in winners:
+            winner.upgrade()
+            winner.won = False
+            winner.lvl -= 1
+        
