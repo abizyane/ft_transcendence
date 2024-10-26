@@ -2,6 +2,7 @@ import { any } from "zod";
 import { getUserData } from "./user";
 import { useRouter } from "next/router";
 import { registerFormData } from "@/components/Registration/Registration";
+import { cookies } from "next/headers";
 // login
 export const handleLogin = async (
     data: FormData,
@@ -16,15 +17,23 @@ export const handleLogin = async (
       });
   
       if (response.ok) {
+        // const { setUser } = useUser();
         const responseData = await response.json();
         const jwt = responseData.access;
-        localStorage.setItem('jwt', jwt);
-        const usersData =await getUserData(); 
+        const refresh = responseData.refresh;
+        localStorage.setItem("jwt",jwt);
+        // const expireDate = new Date();
+        // expireDate.setMinutes(expireDate.getMinutes() + 60);
+        // document.cookie = `access_token=${jwt}`;
+        document.cookie = `refresh_token=${refresh}`;
+        const usersData =await getUserData();
+        console.log(usersData);
+        // setUser(usersData);
         setErrorMessage(null);
         setSuccessMessage('Login successful.');
-
         router.push('/dashboard');
-      } else {
+      }
+      else {
         const errorData = await response.json();
         setErrorMessage('Invalid email or password');
       }
@@ -38,7 +47,6 @@ export const handleLogin = async (
 // services/registrationSubmit.ts
 
 // registrationHandler.ts
- // Adjust the path as necessary
  export const handleRegistrationSubmit = async (
     data: registerFormData,
     setSuccessMessage: React.Dispatch<React.SetStateAction<string | null>>,

@@ -29,7 +29,7 @@ const percentage = calculateWinRate(wins, totalGames);
           src={user.pic}
           alt="User Profile"
           width={144}
-          height={128}
+          height={144}
           className="w-full h-auto rounded-2xl"
         />
       </div>
