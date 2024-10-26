@@ -3,6 +3,7 @@ from .tournament_utils import RoomListManager
 from .competitor import Competitor
 import json
 from .matchHolder import MatchTreeBuilder, MatchHolder, PlayerHolder
+import asyncio
 
 class TournamentConsumer(AsyncWebsocketConsumer):
     rm = RoomListManager()
@@ -11,10 +12,9 @@ class TournamentConsumer(AsyncWebsocketConsumer):
     async def connect(self):
         #get_user_info
         await self.accept()
-        self.competitor = Competitor(self.channel_name)
+        self.competitor = PlayerHolder(Competitor(self.channel_name))
         self._type = self.scope['url_route']['kwargs']['competition_type']
         self.room = None
-        self.holder = None
         self.access_competition(self.competitor);
         print(type(self.room.name))
         await self.channel_layer.group_add((self.room.name), self.channel_name)
@@ -25,10 +25,18 @@ class TournamentConsumer(AsyncWebsocketConsumer):
         })
         if self.room.is_ready():
             TournamentConsumer.rm.switch_to_ready(self.room)
-            competitors_gen = iter(self.room.competitors)
-            self.holder = MatchTreeBuilder.build_tree(MatchHolder(),0, 1, competitors_gen)
-            # MatchTreeBuilder.visualize_tree(holder=self.holder, lvl=0, size=2);
-            print(self.holder.left.lvl)
+            competitors_gen = iter(self.rooms.competitors)
+            self.room.holder = MatchTreeBuilder.build_tree(MatchHolder(),0, 1, competitors_gen)
+            MatchTreeBuilder.visualize_tree(holder=self.room.holder, lvl=0, size=2)
+            self.match = self.competitor.back
+            self.channel_layer.group_add(self.room.name+"m:"+self.match.index, self.channel_name)
+            self.match.game = Game(self.match.index)
+            self.task = asyncio.create_task()
+            # check each leaf and leaf +1 back room set match to ready
+            # add player[i] and i + 1 to group name `self.room.name+Match_index`
+            # in match holder constuct game , constract players for Competitors
+            # create a task to run loop
+             
 
     async def joined_competitor_data(self, event):
         await self.send(text_data=json.dumps({

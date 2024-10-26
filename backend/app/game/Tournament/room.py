@@ -28,8 +28,7 @@ class Room(RoomAbstract):
         self.size = size
         self.name = ''
         self.competitors = []
-        self.spectators = []
-        self.games = []
+        self.holder = None
         self.ready = False
 
     def add_player(self, Player) -> RoomAbstract :
@@ -43,7 +42,7 @@ class Room(RoomAbstract):
     def remove_player(self, Player) -> None:
         self.competitors.remove(Player)
         if (self.competitors_count() == 0):
-            raise RoomIsEmpty;
+            raise Room.RoomIsEmpty;
 
     def competitors_count(self) -> int:
         return len(self.competitors)
