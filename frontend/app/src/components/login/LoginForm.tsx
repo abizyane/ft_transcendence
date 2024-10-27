@@ -42,7 +42,7 @@ const LoginForm = () => {
   };
 
   return (
-    <div className="font-mont p-6 backdrop-blur-lg bg-gray-800/60 rounded-xl shadow-lg max-w-sm w-full">
+    <div className="font-mont p-6 backdrop-blur-lg bg-gray-800/30 rounded-xl shadow-lg max-w-sm w-full">
       {successMessage && (
         <div className="text-green-500 text-center mb-4">{successMessage}</div>
       )}

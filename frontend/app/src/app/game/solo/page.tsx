@@ -3,7 +3,7 @@ import { useState } from 'react';
 import Vsbot from "../../../../public/vsbot.jpg";
 import Localgame from "../../../../public/localgame.jpg";
 import Random from "../../../../public/random.jpg";
-import battleIcon from "@iconify-icons/mdi/sword-fight";
+// import battleIcon from "@iconify-icons/mdi/sword-fight";
 import { Icon } from "@iconify/react";
 import Link from "next/link";
 

@@ -1,7 +1,7 @@
 import { Icon } from "@iconify/react";
-import chatIcon from "@iconify-icons/mdi/chat-processing";
-import battleIcon from "@iconify-icons/mdi/sword-fight";
-import userData from '../../app/data/Dashboarddata.json'; // Import the JSON data
+// import chatIcon from "@iconify-icons/mdi/chat-processing";
+// import battleIcon from "@iconify-icons/mdi/sword-fight";
+import userData from '../../app/data/Dashboarddata.json'; 
 
 interface Friend {
     username: string;
@@ -52,10 +52,10 @@ const Friends = () => {
                             </div>
                             <div className="flex items-center space-x-2">
                                 <div className="bg-black rounded-full p-2">
-                                    <Icon icon={chatIcon} className="w-6 h-6 text-white" />
+                                    {/* <Icon icon={chatIcon} className="w-6 h-6 text-white" /> */}
                                 </div>
                                 <div className="bg-black rounded-full p-2">
-                                    <Icon icon={battleIcon} className="w-6 h-6 text-red-800" />
+                                    {/* <Icon icon={battleIcon} className="w-6 h-6 text-red-800" /> */}
                                 </div>
                             </div>
                         </div>
