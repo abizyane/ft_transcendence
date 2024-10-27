@@ -28,6 +28,7 @@ class Room(RoomAbstract):
         self.size = size
         self.name = ''
         self.competitors = []
+        self.p_holders = []
         self.holder = None
         self.ready = False
 

@@ -17,6 +17,7 @@ class MatchHolder(Holder):
         self.size = 2
         self.index = 0
         self.lvl = 0
+        self.game = None
         
     def is_read(self):
         return isinstance(self.left, PlayerHolder) and isinstance(self.right, PlayerHolder)
@@ -25,7 +26,7 @@ class MatchHolder(Holder):
 
 class PlayerHolder(Holder):
     def __init__(self, competitor):
-        # self.competitor = competitor
+        self.competitor = competitor
         self.back:Holder = None
         self.left: Holder = None
         self.right: Holder = None
@@ -50,7 +51,6 @@ class MatchTreeBuilder(AbstractMatchBuilder):
         holder.lvl = lvl
         holder.index = index
         if isinstance(holder, PlayerHolder) :
-            MatchTreeBuilder.leafs.append(holder)
             return holder
         holder.left = MatchHolder() if (2 ** lvl < size) else next(competitor_generator)
         holder.right = MatchHolder() if (2 ** lvl < size) else next(competitor_generator)
@@ -81,7 +81,7 @@ class MatchTreeBuilder(AbstractMatchBuilder):
     
     @staticmethod
     def visualize_tree(holder:Holder, lvl, size) -> None:
-        print(f"{holder.lvl * '\t'}{'m' if isinstance(holder, MatchHolder) else 'p'}:{holder.index}")
+        print("%s%s:%s" % (holder.lvl, ('m' if isinstance(holder, MatchHolder) else 'p'), holder.index))
         if (2 ** lvl) >= size :
             return
         MatchTreeBuilder.visualize_tree(holder.left, lvl + 1,size)
