@@ -41,6 +41,8 @@ class PlayerHolder(Holder):
                 tmp.left = self
             else:
                 tmp.right = self
+        else:
+            raise ValueError("You Cant Upgrade AnyMore")
     pass
 
 class MatchTreeBuilder(AbstractMatchBuilder):
