@@ -17,11 +17,19 @@ class MatchHolder(Holder):
         self.size = 2
         self.index = 0
         self.lvl = 0
+        self.state = 'NONE'
         self.game = None
         
-    def is_read(self):
+    def is_ready(self):
         return isinstance(self.left, PlayerHolder) and isinstance(self.right, PlayerHolder)
     
+    def get_players(self):
+        if not self.is_ready() :
+            raise ValueError("Cant Get Room Players")
+        return {
+            self.left.get_name() : self.left.paddle,
+            self.right.get_name() : self.right.paddle
+        }
     pass
 
 class PlayerHolder(Holder):
@@ -30,6 +38,7 @@ class PlayerHolder(Holder):
         self.back:Holder = None
         self.left: Holder = None
         self.right: Holder = None
+        self.paddle = None
         self.lvl = 0
         self.index = 0
     
@@ -41,8 +50,15 @@ class PlayerHolder(Holder):
                 tmp.left = self
             else:
                 tmp.right = self
+            self.lvl = match.lvl
         else:
             raise ValueError("You Cant Upgrade AnyMore")
+
+    def get_paddle_data(self):
+        return self.paddle.data() #paddle is Player class for Now
+    
+    def get_name(self):
+        return self.competitor.name
     pass
 
 class MatchTreeBuilder(AbstractMatchBuilder):
@@ -106,21 +122,21 @@ class AbstractTournamentManager(ABC):
     def set_winner_lvl(self):
         pass
     
-class TournamentManager(AbstractTournamentManager):
-    def __init__(self, match_root):
-        self.match_holder = match_root
+# class TournamentManager(AbstractTournamentManager):
+#     def __init__(self, match_root):
+#         self.match_holder = match_root
     
-    def get_winner(self, competitors):
-        winners = []
-        for competitor in competitors:
-            if competitor.won:
-                winners.append(competitor)
-        return winners
+#     def get_winner(self, competitors):
+#         winners = []
+#         for competitor in competitors:
+#             if competitor.won:
+#                 winners.append(competitor)
+#         return winners
 
-    def update_tree(self, competitors):
-        winners = self.get_winners(competitors)
-        for winner in winners:
-            winner.upgrade()
-            winner.won = False
-            winner.lvl -= 1
+#     def update_tree(self, competitors):
+#         winners = self.get_winners(competitors)
+#         for winner in winners:
+#             winner.upgrade()
+#             winner.won = False
+#             winner.lvl -= 1
         

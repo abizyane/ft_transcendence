@@ -1,5 +1,5 @@
 from abc import ABC, abstractmethod 
-
+from .tournament import Tournament
 class RoomAbstract(ABC):
     @abstractmethod
     def add_player(self, Player):
@@ -28,9 +28,9 @@ class Room(RoomAbstract):
         self.size = size
         self.name = ''
         self.competitors = []
-        self.p_holders = []
         self.holder = None
         self.ready = False
+        self.tournament = Tournament()
 
     def add_player(self, Player) -> RoomAbstract :
         if self.ready :
