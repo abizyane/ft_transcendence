@@ -1,5 +1,5 @@
 import data from "@/app/data/Dashboarddata.json";
-
+import Link from "next/link";
 interface User {
     name: string;
     username: string;
@@ -26,7 +26,7 @@ interface User {
   
   interface HistoryProps {
     data: {
-      user: User & { history: Game[] }; // Extend User to include history
+      user: User & { history: Game[] }; 
     };
   }
 
@@ -38,7 +38,6 @@ const history = () => {
         key={game.gameId}
         className="flex flex-row items-center justify-between bg-gray-800/70 p-2 rounded-[34px] border border-violet-primary"
       >
-        {/* Invitee on the left */}
         <div className="flex items-center space-x-2 flex-1">
           <img
             src={isUserInviter ? user.pic : game.opponent.picture}
@@ -54,13 +53,9 @@ const history = () => {
             </p>
           </div>
         </div>
-  
-        {/* Score */}
         <p className="font-semibold text-white text-center w-20 mx-4">
           {game.score.user}:{game.score.opponent}
-        </p>
-  
-        {/* Opponent on the right */}
+        </p>  
         <div className="flex items-center space-x-2 flex-1 justify-end">
           <div className="flex flex-col items-end">
             <p className="font-bold text-white text-xs">
@@ -85,9 +80,11 @@ const history = () => {
           <div className="bg-gray-800/60 rounded-xl border border-violet-primary flex flex-col flex-1 ">
             <div className="m-2 flex justify-between items-center">
               <p className="m-2 text-white text-2xl font-extrabold">History</p>
+              <Link href="/history">
               <div className="m-2 p-2 border-2 border-violet-primary backdrop-blur-lg rounded-xl hover:bg-violet-primary">
                 <p className="text-white">View All</p>
               </div>
+              </Link>
             </div>
   
             <div className="p-1 sm:p-2 flex-1 overflow-auto">

@@ -1,6 +1,5 @@
 import { Icon } from "@iconify/react";
-// import chatIcon from "@iconify-icons/mdi/chat-processing";
-// import battleIcon from "@iconify-icons/mdi/sword-fight";
+import Link from "next/link";
 import userData from '../../app/data/Dashboarddata.json'; 
 
 interface Friend {
@@ -19,12 +18,13 @@ const Friends = () => {
                     <p className="m-2 text-white text-2xl font-extrabold">
                         Friends
                     </p>
+                    <Link href="/friends">
                     <div className="m-2 p-2 border border-violet-primary backdrop-blur-lg hover:bg-violet-primary rounded-xl">
                         <p className="text-white">View All</p>
                     </div>
+                    </Link>
                 </div>
 
-                {/* Check the length of friendsData */}
                 {friendsData.length === 0 ? (
                      <div className="w-full h-full flex justify-center items-center">
                      <p className="text-xl text-white-primary font-bold">
