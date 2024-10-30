@@ -18,6 +18,8 @@ class TournamentConsumer(AsyncWebsocketConsumer):
         self.p_holder = PlayerHolder(Competitor(self.channel_name))
         self._type = self.scope['url_route']['kwargs']['competition_type']
         self.room = None
+        self.match = None
+        self.match_name = ''
         self.access_competition(self.p_holder.competitor);
         self.room.tournament.p_holders[self.channel_name] = self.p_holder
         await self.channel_layer.group_add((self.room.name), self.channel_name)
@@ -32,15 +34,8 @@ class TournamentConsumer(AsyncWebsocketConsumer):
             self.room.holder = MatchTreeBuilder.build_tree(MatchHolder(),0, 1, competitors_gen, self.room.size)
             MatchTreeBuilder.visualize_tree(holder=self.room.holder, lvl=0, size=self.room.size)
             await self.channel_layer.group_send(self.room.name, {
-                "type" : "init.game"
+                "type" : "init.game",
             })
-            
-                # self.match.game = Game(self.match.index)
-            # self.task = asyncio.create_task()
-            # check each leaf and leaf +1 back room set match to ready
-            # add player[i] and i + 1 to group name `self.room.name+Match_index`
-            # in match holder constuct game , constract players for Competitors
-            # create a task to run loop
              
     async def init_game(self, event):
         self.match = self.room.tournament.get_player_match(self.channel_name)
@@ -51,23 +46,38 @@ class TournamentConsumer(AsyncWebsocketConsumer):
             self.p_holder.paddle = Player(channel_name=self.channel_name, id=self.p_holder.index ,game=self.match.game)  
             opponent = self.room.tournament.get_player_opponent(self.channel_name)
             opponent.paddle = Player(channel_name=opponent.get_name(), id=opponent.index, game=self.match.game)
+            self.match.game.blue = self.p_holder.paddle
+            self.match.game.red = opponent.paddle
             self.match.game.players = self.match.get_players()
+            await self.channel_layer.group_send(self.match_name,{
+                'type' : 'init.match',
+                'msg' : self.match_name
+            })
         self.game = self.match.game
-        await self.channel_layer.group_send(self.match_name,{
-            'type' : 'init.match',
-            'msg' : str(TournamentConsumer.i)
-        })
 
     async def init_match(self, event):
         self.p_holder.paddle = Player(channel_name=self.channel_name, id=self.p_holder.index ,game=self.game)  
-        self.game.players[self.channel_name] = self.p_holder.paddle
         await self.send(text_data=json.dumps(
             {
-                'm': str(self.game.players)
+                'ss' : 'ss',
+                'm': event['msg']
             }
-                
         )
         )
+        task = asyncio.create_task(self.game_loop())
+
+    async def game_loop(self):
+        while(1):
+            self.game.update()
+            await self.channel_layer.group_send(self.match_name, {
+                'type' : 'send.pos'
+            })
+            await asyncio.sleep(0.3)
+
+    async def send_pos(self, event):
+        await self.send(text_data=json.dumps({
+            'ball': f'{self.game.ball.posX} {self.game.ball.posY}'
+        }))
     
     async def joined_competitor_data(self, event):
         await self.send(text_data=json.dumps({

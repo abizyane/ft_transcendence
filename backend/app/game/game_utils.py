@@ -113,8 +113,8 @@ class Game:
     
     def update(self):
         self.ball.update()
-        self.players[0].update()
-        self.players[1].update()
+        self.red.update(self)
+        self.blue.update(self)
         
     def update_status(self):
         scores = [player.score for player in  self.players]
