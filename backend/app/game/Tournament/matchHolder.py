@@ -59,6 +59,18 @@ class PlayerHolder(Holder):
     
     def get_name(self):
         return self.competitor.name
+    
+    def paddle_command(self, _cmd):
+        if _cmd == "keyW_up":
+            self.paddle.isW = True
+        elif _cmd == "keyW_down":
+            self.paddle.isW = False
+        elif _cmd == "keyS_up":
+            self.paddle.isW = True
+        elif _cmd == "keyS_down":
+            self.paddle.isW = False
+    def is_won(self):
+        return self.paddle.win_state == 'WIN'
     pass
 
 class MatchTreeBuilder(AbstractMatchBuilder):

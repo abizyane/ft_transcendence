@@ -119,7 +119,7 @@ class Game:
     def update_status(self):
         scores = [player.score for player in  self.players]
         if 10 in scores:
-            self.status = 0
+            self.status = 1
     def set_winner(self):
         for player in self.players:
             if player.score == 10:
