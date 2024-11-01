@@ -30,6 +30,9 @@ class MatchHolder(Holder):
             self.left.get_name() : self.left.paddle,
             self.right.get_name() : self.right.paddle
         }
+
+    def get_opponent(self, p_holder):
+        return self.left if p_holder == self.right else self.right
     pass
 
 class PlayerHolder(Holder):

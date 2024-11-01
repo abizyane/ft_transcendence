@@ -85,6 +85,7 @@ class Game:
         self.ball = Ball(self)
         self.blue = None
         self.red = None
+        self.max_score = 2
 
     def is_full(self):
         if len(self.players) == 2:
@@ -117,12 +118,12 @@ class Game:
         self.blue.update(self)
         
     def update_status(self):
-        scores = [player.score for player in  self.players]
-        if 10 in scores:
+        scores = [player.score for player in  self.players.values()]
+        if self.max_score in scores:
             self.status = 1
     def set_winner(self):
-        for player in self.players:
-            if player.score == 10:
+        for player in self.players.values():
+            if player.score == self.max_score:
                 player.win_state = "WIN"
             else:
                 player.win_state = "LOSE"
