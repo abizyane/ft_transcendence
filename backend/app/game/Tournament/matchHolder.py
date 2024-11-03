@@ -54,6 +54,7 @@ class PlayerHolder(Holder):
             else:
                 tmp.right = self
             self.lvl = match.lvl
+            self.back = tmp
         else:
             raise ValueError("You Cant Upgrade AnyMore")
 

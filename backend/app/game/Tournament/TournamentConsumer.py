@@ -51,20 +51,13 @@ class TournamentConsumer(AsyncWebsocketConsumer):
             self.p_holder.paddle.color = 'blue'
             opponent.paddle.color = 'red'
             self.match.game.set_players_color()
-        self.game = self.match.game
-        await self.channel_layer.group_send(self.match_name,{
-            'type' : 'init.match',
-            'msg' : self.match_name
-        })
+            await self.channel_layer.group_send(self.match_name,{
+                'type' : 'init.match',
+                'msg' : self.match_name
+            })
 
     async def init_match(self, event):
-        await self.send(text_data=json.dumps(
-            {
-                'ss' : 'ss',
-                'm': event['msg']
-            }
-        )
-        )
+        self.game = self.match.game
         self.task = asyncio.create_task(self.game_loop())
         self.task
         # self.finalize_match()
@@ -73,14 +66,15 @@ class TournamentConsumer(AsyncWebsocketConsumer):
         while not self.game.status:
             self.game.update()
             self.game.update_status()
-            await asyncio.sleep(1/60)
             await self.channel_layer.group_send(self.match_name, {
                 'type' : 'send.pos'
             })
+            await asyncio.sleep(1/60)
         self.game.status = 1
-        await self.channel_layer.group_send(self.match_name,{
-            'type': 'finalize.match'
-        })
+        await self.finalize_match(event=None)
+        # await self.channel_layer.group_send(self.match_name,{
+        #     'type': 'finalize.match'
+        # })
     
     """
         -   set loser , set winner
@@ -90,13 +84,11 @@ class TournamentConsumer(AsyncWebsocketConsumer):
         -   check if actual match winner if its ready if its not automatticaly next winner will check it 
     """
     async def finalize_match(self, event):
-        print(self.game.status)
         if not self.game.status == 1 :
             return
-        if self.task:
-            self.task.cancel()
-        await self.channel_layer.group_discard(self.match_name, self.channel_name)
         self.match.game.set_winner()
+        prev_match_name  = self.match_name
+
         if self.p_holder.is_won():
             await self.send(text_data=json.dumps({
                 'msg': 'You Won'
@@ -104,17 +96,14 @@ class TournamentConsumer(AsyncWebsocketConsumer):
             self.p_holder.upgrade() # if err mean he won
             self.match = self.room.tournament.get_player_match(self.channel_name)
             self.match_name = str(f'{self.room.name}m_{self.match.index}')
-            self.channel_layer.group_add(self.match_name, self.channel_name)
+            await self.channel_layer.group_add(self.match_name, self.channel_name)
             if self.p_holder.back.is_ready():
-                await self.send(text_data=json.dumps({
-                    'msg' : 'ready',
-                    'msg' : f'{self.match_name}'
-                }))
-                # await self.channel_layer.group_send(self.match_name, {
-                #     'type': 'init.game'
-                # })
+                await self.channel_layer.group_send(self.match_name, {
+                    'type' : 'newgame.request'
+                })
+                await self.chanel_layer.group_discard(prev_match_name, self.channel_name)
             else :
-                self.send(text_data=json.dumps({
+                await self.send(text_data=json.dumps({
                     'msg': f'wait for {self.match_name} to strat'
                 }))
         else:
@@ -123,9 +112,22 @@ class TournamentConsumer(AsyncWebsocketConsumer):
             }))
                 
                 
-            
+    async def newgame_request(self, event):
+        await self.send(text_data=json.dumps({
+            'debuf' : f'{self.match_name}'
+        }))
+        for i in range(1,4):
+            await self.send(json.dumps({
+                'timer': str(i)
+            })) 
+            await asyncio.sleep(1)
+        await self.channel_layer.group_send(self.match_name, {
+            'type' : 'init.game'
+        })
 
     async def send_pos(self, event):
+        if not self.match.is_ready() or not self.match.game or self.match.game.status == 1:
+            return
         await self.send(text_data=json.dumps({
             'ball': f'{self.game.ball.posX} {self.game.ball.posY}',
             'score': f'{self.p_holder.paddle.score}',
