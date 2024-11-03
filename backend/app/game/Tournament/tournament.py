@@ -20,6 +20,6 @@ class Tournament():
 
     def get_player_opponent(self, player_name):
         match = self.get_player_match(player_name)
-        return match.left if self == match.right else match.right
+        return match.right if self.get_player(player_name) == match.left else match.left
     # def get_match_name(self, match):
     #     return str(f'{self.room.name}m_{self.match.index}')
