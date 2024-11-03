@@ -5,20 +5,19 @@ from astropong.models.UserModel import User, Relationship
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = ['id','username', 'profile_pic', 'is_online']
+        fields = ['id', 'username', 'profile_pic', 'is_online']
+
+class MessageUserSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ['username']
 
 class MessageSerializer(serializers.ModelSerializer):
+    sender = MessageUserSerializer(read_only=True)
+    receiver = MessageUserSerializer(read_only=True)
     class Meta:
         model = Message
-        fields = ['message_id','message', 'timestamp', 'seen']
-
-class ConversationSerializer(serializers.ModelSerializer):
-    sender = UserSerializer(read_only=True)
-    receiver = UserSerializer(read_only=True)
-
-    class Meta:
-        model = Message
-        fields = ['message_id','message', 'timestamp', 'seen', 'sender', 'receiver']
+        fields = ['message_id', 'sender', 'receiver', 'message', 'timestamp', 'seen']
 
 class ChatRoomSerializer(serializers.Serializer):
     sender = UserSerializer(read_only=True)
@@ -27,3 +26,11 @@ class ChatRoomSerializer(serializers.Serializer):
 
     class Meta:
         fields = ['sender', 'receiver', 'messages']
+
+class ConversationSerializer(serializers.ModelSerializer):
+    sender = UserSerializer(read_only=True)
+    receiver = UserSerializer(read_only=True)
+
+    class Meta:
+        model = Message
+        fields = ['message_id','message', 'timestamp', 'seen', 'sender', 'receiver']
