@@ -15,7 +15,7 @@ User = get_user_model()
 class OAuth(APIView):
     AUTH_URL = "https://api.intra.42.fr/oauth/authorize"
     TOKEN_URL = "https://api.intra.42.fr/oauth/token"
-    REDIRECT_URI = "http://localhost:3000/auth/OAuth"
+    REDIRECT_URI = "http://localhost:3000/auth/oauth"
     CLIENT_ID = "u-s4t2ud-e86add016b6a41e208d53d0c011abdc53a93f6e1ba65ba9605a37be5a8997a17"
     CLIENT_SECRET="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"
     def get(self, request, *args, **kwargs):
@@ -70,10 +70,9 @@ class OAuthCallback(APIView):
     def loginUser(self, user):
         refresh = RefreshToken.for_user(user)
         response = Response({
-            'refresh': str(refresh),
             'access': str(refresh.access_token),
         })
-        response.set_cookie(key='jwt', value=str(refresh.access_token), httponly=True)
+        response.set_cookie(key='jwt', value=str(refresh), httponly=True,secure=True)
         return response
 
     def getUser(self, access_token, code):

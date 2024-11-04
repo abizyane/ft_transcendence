@@ -10,7 +10,8 @@ class JWTAuthenticationMiddleware:
         self.get_response = get_response
 
     def __call__(self, request):
-        token = request.COOKIES.get('jwt') or request.headers.get('Authorization')
+        # token = request.COOKIES.get('jwt') or request.headers.get('Authorization')
+        token = request.headers.get('Authorization')
         if token and token.startswith("Bearer "):
             token = token.split("Bearer ")[1]
         if token:
