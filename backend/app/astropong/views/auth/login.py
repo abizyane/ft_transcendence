@@ -12,8 +12,6 @@ User = get_user_model()
 
 @permission_classes([AllowAny])
 class LoginView(APIView):
-    def post(self, request):
-        permission_classes = [AllowAny]
 
     def post(self, request):
         email = request.data.get('email')
@@ -28,11 +26,10 @@ class LoginView(APIView):
 
         refresh = RefreshToken.for_user(user)
         response = Response({
-            'refresh': str(refresh),
             'access': str(refresh.access_token),
         })
 
-        response.set_cookie(key='jwt', value=str(refresh.access_token), httponly=True)
+        response.set_cookie(key='jwt', value=str(refresh), httponly=True, secure=True)
 
         return response
 class UserListView(generics.ListAPIView):
