@@ -1,0 +1,150 @@
+[
+    {   
+        "model" : "astropong.User",
+        "pk": 1,
+        "fields": {
+            "username" : "taha",
+            "email" : "taha@gmail.com",
+            "password": "password123"
+        }
+    },
+    {   
+        "model" : "astropong.User",
+        "pk": 2,
+        "fields": {
+            "username" : "ahmed",
+            "email" : "ahmed@gmail.com",
+            "password": "password123"
+        }
+    },
+    {   
+        "model" : "astropong.User",
+        "pk": 3,
+        "fields": {
+            "username" : "marouane",
+            "email" : "marouane@gmail.com",
+            "password": "password123"
+        }
+    },
+    {   
+        "model" : "astropong.User",
+        "pk": 4,
+        "fields": {
+            "username" : "ashraf",
+            "email" : "ashra3@gmail.com",
+            "password": "password123"
+        }
+    },
+
+
+    {   
+        "model" : "game.Profile",
+        "pk": 1,
+        "fields": {
+            "user_id" : 1,
+            "level" : 0,
+            "xp": 0
+        }
+    },
+    {   
+        "model" : "game.Profile",
+        "pk": 2,
+        "fields": {
+            "user_id" : 2,
+            "level" : 0,
+            "xp": 0
+        }
+    },
+    {   
+        "model" : "game.Profile",
+        "pk": 3,
+        "fields": {
+            "user_id" : 3,
+            "level" : 0,
+            "xp": 0
+        }
+    },
+    {   
+        "model" : "game.Profile",
+        "pk": 4,
+        "fields": {
+            "user_id" : 4,
+            "level" : 0,
+            "xp": 0
+        }
+    },
+
+
+    {
+        "model":"game.GameModel",
+        "pk":1,
+        "fields":{
+            "player_1": 1,
+            "player_2": 2
+        }
+    },
+    {
+        "model":"game.GameModel",
+        "pk":2,
+        "fields":{
+            "player_1": 1,
+            "player_2": 3
+        }
+    },
+    {
+        "model":"game.GameModel",
+        "pk":3,
+        "fields":{
+            "player_1": 3,
+            "player_2": 2
+        }
+    },
+    {
+        "model":"game.GameModel",
+        "pk":4,
+        "fields":{
+            "player_1": 4,
+            "player_2": 2
+        }
+    },
+
+
+
+
+    {
+        "model":"game.Scores",
+        "pk":1,
+        "fields":{
+            "game_id":1,
+            "score_1": 10,
+            "score_2": 2
+        }
+    },
+    {
+        "model":"game.Scores",
+        "pk":2,
+        "fields":{
+            "game_id":2,
+            "score_1": 3,
+            "score_2": 10
+        }
+    },
+    {
+        "model":"game.Scores",
+        "pk":3,
+        "fields":{
+            "game_id":3,
+            "score_1": 3,
+            "score_2": 2
+        }
+    },
+    {
+        "model":"game.Scores",
+        "pk":4,
+        "fields":{
+            "game_id":4,
+            "score_1": 3,
+            "score_2": 2
+        }
+    }
+]

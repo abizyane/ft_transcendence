@@ -1,5 +1,6 @@
 from rest_framework import serializers
 from ..models.UserModel import User
+from game.models import Profile
 
 class UserSerializer(serializers.ModelSerializer):
     profile_pic_url = serializers.SerializerMethodField()
@@ -17,6 +18,8 @@ class UserSerializer(serializers.ModelSerializer):
         if password is not None:
             instance.set_password(password)
         instance.save()
+        p = Profile.objects.create(user_id=instance, level=0,xp=0)
+        p.save()
         return instance
     def get_profile_pic_url(self, obj):
         request = self.context.get('request')

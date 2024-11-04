@@ -17,7 +17,7 @@
     "date-fns": "^4.1.0",
     "formik": "^2.4.6",
     "js-cookie": "^3.0.5",
-    "next": "latest",
+    "next": "^14.2.8",
     "react": "latest",
     "react-chartjs-2": "^5.2.0",
     "react-dom": "latest",

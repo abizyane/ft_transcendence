@@ -46,6 +46,7 @@ INSTALLED_APPS = [
     'astropong',
     'channels',
     'chat',
+    'game',
     'notification',
 ]
 
@@ -148,10 +149,10 @@ REST_FRAMEWORK = {
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': os.getenv('POSTGRES_DB', 'postgres'),
-        'USER': os.getenv('POSTGRES_USER', 'postgres'),
-        'PASSWORD': os.getenv('POSTGRES_PASSWORD', 'postgres'),
-        'HOST': os.getenv('POSTGRES_HOST', 'postgres-db'),
-        'PORT': os.getenv('POSTGRES_PORT', 5432),
+        'NAME': 'mydb',
+        'USER': 'tahaexo',
+        'PASSWORD': 'secret',
+        'HOST': 'localhost',
+        'PORT': '5432',
     }
 }

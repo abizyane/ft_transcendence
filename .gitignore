@@ -24,6 +24,7 @@ db.sqlite3
 media/
 .venv
 venv
+migrations
 
 # React
 out/
