@@ -102,9 +102,10 @@ const LoginForm = () => {
         </form>
         <div className="text-center text-sm text-white mt-4">Or continue with</div>
         <div className="w-full flex justify-center mt-4">
-        <button
+        <a
   type="button"
   className="relative flex justify-center items-center w-12 h-12 bg-white rounded-full p-1"
+  href="http://localhost:8000/api/42OAuth"
 >
   <img
     src="https://res.cloudinary.com/dwxvnezhn/image/upload/f_auto,q_auto/v1/pics/hxangc1kyhtibnepmygf"
@@ -113,7 +114,7 @@ const LoginForm = () => {
     width={24}
     height={24}
   />
-</button>
+</a>
 </div>
         <div className="text-center text-white mt-4">
           Don't have an account yet?&nbsp;
