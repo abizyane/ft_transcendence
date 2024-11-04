@@ -50,10 +50,6 @@ const Page = () => {
                     </span>
                   </div>
                   <button className="bg-black/50 rounded-full p-1">
-                    <Icon
-                      icon={battleIcon}
-                      className="w-4 h-4 text-red-500"
-                    />
                   </button>
                 </div>
               ))}

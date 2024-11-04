@@ -23,7 +23,7 @@ MEDIA_URL = "/media/"
 # See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-%bqq!eb^hc2*i6ime4#b7p4vwik#b=yzjil61ifm0f#*j5yfov'
+SECRET_KEY = os.getenv('DJANGO_KEY','django-insecure-%bqq!eb^hc2*i6ime4#b7p4vwik#b=yzjil61ifm0f#*j5yfov')
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -149,10 +149,10 @@ REST_FRAMEWORK = {
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': 'mydb',
-        'USER': 'tahaexo',
-        'PASSWORD': 'secret',
-        'HOST': 'localhost',
-        'PORT': '5432',
+        'NAME': os.getenv('POSTGRES_DB', 'postgres'),
+        'USER': os.getenv('POSTGRES_USER', 'postgres'),
+        'PASSWORD': os.getenv('POSTGRES_PASSWORD', 'postgres'),
+        'HOST': os.getenv('POSTGRES_HOST', 'postgres-db'),
+        'PORT': os.getenv('POSTGRES_PORT', 5432),
     }
 }

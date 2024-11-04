@@ -30,7 +30,7 @@ application = ProtocolTypeRouter(
             AuthMiddlewareStack(
                 URLRouter(
                     chat_routing +
-                    notifications_routing+
+                    notifications_routing +
                     game_routing
                 )
             )
