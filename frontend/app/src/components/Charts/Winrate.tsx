@@ -32,7 +32,7 @@ const DoughnutChart: React.FC<DoughnutChartProps>  = ({winpercentage}) => {
   };
 
   return (
-    <div className="w-[99%] h-[99%]">
+    <div className="w-[99%] h-[90%]">
       <div className="absolute z-50 w-full h-full flex justify-center items-center">
         <p className="text-white font-mont sm:font-bold text-xs pt-2">
         {winpercentage}%

@@ -29,7 +29,7 @@ export default function Chat({ children }: ChatLayoutProps) {
     try {
       const response = await fetch(`http://localhost:8000/chat/conversations`);
       if (!response.ok) {
-        throw new Error("Network response was not ok");
+        console.error('Fetch error:', error);
       }
       const data = await response.json();
       setUsers(() => {
@@ -80,7 +80,6 @@ export default function Chat({ children }: ChatLayoutProps) {
           <Sidebar />
         </div>
         <div className="w-full  h-full ">
-          test
           <div className="w-full  h-full lg:h-full flex flex-col justify-center items-center p-2 ">
             <div className=" bg-gray-800/60 h-[1100px]  w-full  text-gray-200 rounded-xl border-2 border-violet-primary flex">
               <div className="w-full lg:w-96 backdrop-blur-md  rounded-xl">

@@ -17,18 +17,8 @@ export const handleLogin = async (
       });
   
       if (response.ok) {
-        // const { setUser } = useUser();
         const responseData = await response.json();
-        const jwt = responseData.access;
-        const refresh = responseData.refresh;
-        localStorage.setItem("jwt",jwt);
-        // const expireDate = new Date();
-        // expireDate.setMinutes(expireDate.getMinutes() + 60);
-        // document.cookie = `access_token=${jwt}`;
-        document.cookie = `refresh_token=${refresh}`;
-        const usersData =await getUserData();
-        console.log(usersData);
-        // setUser(usersData);
+        console.log(responseData);
         setErrorMessage(null);
         setSuccessMessage('Login successful.');
         router.push('/dashboard');

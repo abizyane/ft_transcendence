@@ -71,8 +71,8 @@ const LineChart: React.FC<LineChartProps> = ({data}) => {
   };
 
   return (
-    <div className=" w-full p-1 h-60  lg:h-[20vh] xl:h-[30vh]">
-      <Line data={ChartData} options={options} style={{width:"100%",height:"100%"}} />
+    <div className=" w-full p-1 h-56  lg:h-[18vh] xl:h-[22vh] 2xl:h-[30vh]">
+      <Line data={ChartData} options={options} style={{width:"99%",height:"99%"}} />
       &nbsp;
     </div>
   );

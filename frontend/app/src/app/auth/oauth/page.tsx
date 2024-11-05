@@ -9,7 +9,7 @@ const OAuthPage = () => {
     const searchParams = useSearchParams();
   
     useEffect(() => {
-      if (!searchParams) return; 
+      if (!searchParams || typeof searchParams.toString !== "function") return; 
   
       const queryParams = searchParams.toString();
       const backendUrl = 'http://localhost:8000/api/42OAuth/callback';
@@ -22,8 +22,6 @@ const OAuthPage = () => {
   
           if (response.status === 200) {
             const data = await response.json();
-            // Cookies.set('access_token', data.access, { expires: 1 }); // Expires in 1 day
-            // Cookies.set('refresh_token', data.refresh, { expires: 7 }); // Expires in 7 days
   
             router.push('/dashboard');
           } else {
