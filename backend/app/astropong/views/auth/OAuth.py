@@ -69,10 +69,9 @@ class OAuthCallback(APIView):
     
     def loginUser(self, user):
         refresh = RefreshToken.for_user(user)
-        response = Response({
-            'access': str(refresh.access_token),
-        })
-        response.set_cookie(key='jwt', value=str(refresh), httponly=True,secure=True)
+        response = Response(UserSerializer(user).data)
+        response.set_cookie(key='refresh', value=str(refresh), httponly=True, secure=True)
+        response.set_cookie(key='access', value=str(refresh.access_token), httponly=True, secure=True)
         return response
 
     def getUser(self, access_token, code):

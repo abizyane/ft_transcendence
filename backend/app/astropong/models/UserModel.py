@@ -1,5 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import AbstractUser
+from django.core.exceptions import ValidationError
 
 # Create your models here.
 
@@ -14,6 +15,48 @@ class User(AbstractUser):
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = ['username']
 
+    def add_friend(self, friend):
+        relationship, created = Relationship.objects.get_or_create(
+            user1=self,
+            user2=friend,
+            defaults={'status': Relationship.Status.FRIEND}
+        )
+
+        if not created:
+            if relationship.status != Relationship.Status.BLOCKED:
+                relationship.status = Relationship.Status.FRIEND
+                relationship.save()
+            else:
+                raise ValidationError("You cannot add a blocked user as a friend.")
+
+    def block_friend(self, friend):
+        try:
+            relationship = Relationship.objects.get(
+                user1=self,
+                user2=friend
+            )
+            relationship.status = Relationship.Status.BLOCKED
+            relationship.save()
+        except Relationship.DoesNotExist:
+            relationship = Relationship.objects.create(
+                user1=self,
+                user2=friend,
+                status=Relationship.Status.BLOCKED
+            )
+
+    def unblock_friend(self, friend):
+        try:
+            relationship = Relationship.objects.get(
+                user1=self,
+                user2=friend
+            )
+            if relationship.status == Relationship.Status.BLOCKED:
+                relationship.status = Relationship.Status.UNKNOWN
+                relationship.save()
+            else:
+                raise ValidationError("You can only unblock a blocked friend.")
+        except Relationship.DoesNotExist:
+            raise ValidationError("You cannot unblock a friend you don't have a relationship with.")
 
 class Relationship(models.Model):
     class Status(models.TextChoices):
