@@ -8,6 +8,7 @@ from django.conf import settings
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework import generics
 from ...serializers.UserSerializer import UserSerializer
+
 User = get_user_model()
 
 @permission_classes([AllowAny])
@@ -25,13 +26,12 @@ class LoginView(APIView):
             raise AuthenticationFailed("Password is incorrect!")
 
         refresh = RefreshToken.for_user(user)
-        response = Response({
-            'access': str(refresh.access_token),
-        })
-
-        response.set_cookie(key='jwt', value=str(refresh), httponly=True, secure=True)
+        response = Response(UserSerializer(user).data)
+        response.set_cookie(key='refresh', value=str(refresh), httponly=True, secure=True)
+        response.set_cookie(key='access', value=str(refresh.access_token), httponly=True, secure=True)
 
         return response
+    
 class UserListView(generics.ListAPIView):
     queryset = User.objects.all()  # Fetch all users
     serializer_class = UserSerializer  # Specify the serializer class to use
