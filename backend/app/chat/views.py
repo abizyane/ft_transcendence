@@ -17,7 +17,7 @@ class ConversationsView(generics.ListAPIView):
     serializer_class = ConversationSerializer
     pagination_class = ConversationsPageNumberPagination
 
-    authentication_classes = [authentication.TokenAuthentication]
+    # authentication_classes = [authentication.TokenAuthentication]
 
 # class ConversationsView(views.APIView):
 #     def get(self, request):
@@ -74,7 +74,7 @@ class ChatRoomView(generics.ListAPIView):
     serializer_class = ChatRoomSerializer
     pagination_class = MessagesPageNumberPagination
 
-    authentication_classes = [authentication.TokenAuthentication]
+    # authentication_classes = [authentication.TokenAuthentication]
     def get_queryset(self):
         l_user_name = self.kwargs['l_user']
         r_user_name = self.kwargs['r_user']
@@ -110,5 +110,5 @@ class OnlineUsersView(generics.ListAPIView):
     serializer_class = UserSerializer
     pagination_class = OnlineUsersPageNumberPagination
 
-    authentication_classes = [authentication.TokenAuthentication]
+    # authentication_classes = [authentication.TokenAuthentication]
     

@@ -23,18 +23,16 @@ const Component = () => {
     return (wins / totalGames) * 100;
 }
 const percentage = calculateWinRate(wins, totalGames);
-console.log(user.profile_pic_url);
-const prfile_dzb = user.profile_pic_url;
   return (
     <>
 <div className="h-full w-full border-[1px] border-violet-primary rounded-xl p-2">
   <div className="flex gap-2">
     <div className="flex-shrink-0 w-3/5">
-      <div className="mb-4 max-w-full">
+      <div className="mb-4 max-w-full aspect-square max-h-[600px] mx-auto">
             <img
             src={user.profile_pic_url}
             alt="User Profile"
-            className="w-full xl:max-w-[550px] h-auto rounded-2xl"
+            className="w-full h-auto object-cover rounded-2xl"
           />
       </div>
       <div className="flex flex-col border-[2px] border-violet-primary rounded-xl m-1 h-auto p-2 ">
@@ -57,8 +55,8 @@ const prfile_dzb = user.profile_pic_url;
       </div>
       <div className="p-2 rounded-xl border h-full border-violet-primary mr-2">
       <div className="relative w-full h-full flex flex-col items-center justify-center bg-gray-800/20 rounded-xl">
-        <p className="text-white font-mont text-xs m-1">Win Rate</p> 
-        <div className="relative w-full h-full flex items-center justify-center">
+        <p className="text-white font-mont xl:font-bold xl:text-lg text-xs m-1">Win Rate</p> 
+        <div className="relative w-full h-[30%] flex items-center justify-center">
           <DoughnutChart winpercentage={percentage}/>
         </div>
       </div>
