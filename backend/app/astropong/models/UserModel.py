@@ -8,7 +8,7 @@ class User(AbstractUser):
     username = models.CharField(max_length=100,unique=True)
     email = models.CharField(max_length=100,unique=True)
     password = models.CharField(max_length=255)
-    profile_pic = models.ImageField(blank=True, null=True)
+    profile_pic = models.CharField(max_length=500, null=True)
     is_online = models.BooleanField(default=False)
     friends = models.ManyToManyField('self', through='Relationship', symmetrical=False, related_name='friends_of')
     

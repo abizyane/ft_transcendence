@@ -26,7 +26,8 @@ class LoginView(APIView):
             raise AuthenticationFailed("Password is incorrect!")
 
         refresh = RefreshToken.for_user(user)
-        response = Response(UserSerializer(user).data)
+        user_data = UserSerializer(user, context={'request': request}).data
+        response = Response(user_data)
         response.set_cookie(key='refresh', value=str(refresh), httponly=True, secure=True)
         response.set_cookie(key='access', value=str(refresh.access_token), httponly=True, secure=True)
 

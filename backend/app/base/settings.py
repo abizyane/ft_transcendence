@@ -16,8 +16,8 @@ from datetime import timedelta
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
-MEDIA_ROOT = BASE_DIR/"pictures"
-MEDIA_URL = "/media/"
+MEDIA_URL = "/pictures/"
+MEDIA_ROOT = os.path.join(BASE_DIR, 'pictures')
 
 
 # Quick-start development settings - unsuitable for production

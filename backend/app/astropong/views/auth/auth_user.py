@@ -11,6 +11,6 @@ class UserView(APIView):
 
     def get(self, request):
         if request.user and request.user.is_authenticated:
-            return Response(UserSerializer(request.user).data)
+            return Response(UserSerializer(request.user, context={'request': request}).data)
         else:
             return Response({'error': 'No user is connected'}, status=401)
