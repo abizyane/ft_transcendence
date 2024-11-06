@@ -1,4 +1,5 @@
 "use client";
+import React from "react";
 import { useEffect, useState } from "react";
 import UserInfo from "@/components/dashboardcomponents/userinfo";
 import Linechart from "@/components/Charts/Linechart";

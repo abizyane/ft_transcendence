@@ -1,5 +1,5 @@
 import React from "react";
-import solo from "../../../public/solo.jpeg";
+import solo from "../../../../public/solo.jpeg";
 
 const friends = () => {
   return (

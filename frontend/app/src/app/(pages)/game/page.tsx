@@ -1,7 +1,7 @@
 'use client';
 import { useState } from 'react';
-import solo from "../../../public/solo.jpeg";
-import multiplayers from "../../../public/multiplayers.jpeg";
+import solo from "../../../../public/solo.jpeg";
+import multiplayers from "../../../../public/multiplayers.jpeg";
 import Link from "next/link";
 
 const Page = () => {

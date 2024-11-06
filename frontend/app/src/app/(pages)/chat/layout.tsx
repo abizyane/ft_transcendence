@@ -1,7 +1,7 @@
 "use client";
 
 import React, { ReactNode, useEffect, useState } from "react";
-import "../globals.css";
+import "../../globals.css";
 import Sidebar from "@/components/Sidebar/Sidebar";
 import Navbar from "@/components/Navbar/Navbar";
 import Link from "next/link";
@@ -69,16 +69,10 @@ export default function Chat({ children }: ChatLayoutProps) {
   const currentUserId = 2;
   return (
     <div className="w-full min-h-screen flex flex-col justify-start items-start ">
-      <div className="w-full">
-        <Navbar />
-      </div>
 
       {/* Main content area */}
       <div className="w-full flex lg:flex-row h-full  flex-col-reverse flex-grow ">
         {/* Sidebar section */}
-        <div className="lg:w-24 fixed lg:static bottom-0 left-0  w-full z-50 lg:z-0">
-          <Sidebar />
-        </div>
         <div className="w-full  h-full ">
           <div className="w-full  h-full lg:h-full flex flex-col justify-center items-center p-2 ">
             <div className=" bg-gray-800/60 h-[1100px]  w-full  text-gray-200 rounded-xl border-2 border-violet-primary flex">
