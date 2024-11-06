@@ -17,7 +17,7 @@ class OAuth(APIView):
     TOKEN_URL = "https://api.intra.42.fr/oauth/token"
     REDIRECT_URI = "http://localhost:3000/auth/oauth"
     CLIENT_ID = "u-s4t2ud-e86add016b6a41e208d53d0c011abdc53a93f6e1ba65ba9605a37be5a8997a17"
-    CLIENT_SECRET="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"
+    CLIENT_SECRET="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"
     def get(self, request, *args, **kwargs):
         payload = {
             'client_id': self.CLIENT_ID,
@@ -54,24 +54,35 @@ class OAuthCallback(APIView):
 
     def createUserInfo(self, user, code):
         try:
+            print("image ; ", user['image']['versions']['small'])
             serializer = UserSerializer(data={
                 'email': user['email'],
                 'username': user['login'],
                 'first_name': user['first_name'],
                 'last_name': user['last_name'],
+                'profile_pic': user['image']['versions']['small'],
                 'password' : code
             })
             serializer.is_valid(raise_exception=True)
             serializer.save()
-            return self.loginUser(serializer.data)
+            return self.loginUser(serializer.instance)
         except Exception as e:
+            print("Error", str(e))
             return Response({'error': str(e)}, status=status.HTTP_401_UNAUTHORIZED)
     
-    def loginUser(self, user):
-        refresh = RefreshToken.for_user(user)
-        response = Response(UserSerializer(user).data)
+    def loginUser(self, user_instance):
+        print(user_instance)
+
+        refresh = RefreshToken.for_user(user_instance)
+        user_data = UserSerializer(user_instance).data
+        
+        print("Serialized data:", user_data)
+        print("User model instance:", user_instance) 
+        response = Response(user_data)
+        
         response.set_cookie(key='refresh', value=str(refresh), httponly=True, secure=True)
         response.set_cookie(key='access', value=str(refresh.access_token), httponly=True, secure=True)
+        
         return response
 
     def getUser(self, access_token, code):

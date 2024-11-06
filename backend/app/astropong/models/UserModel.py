@@ -8,7 +8,7 @@ class User(AbstractUser):
     username = models.CharField(max_length=100,unique=True)
     email = models.CharField(max_length=100,unique=True)
     password = models.CharField(max_length=255)
-    profile_pic = models.ImageField(blank=True, null=True)
+    profile_pic = models.CharField(max_length=500, null=True)
     is_online = models.BooleanField(default=False)
     friends = models.ManyToManyField('self', through='Relationship', symmetrical=False, related_name='friends_of')
     
@@ -19,16 +19,40 @@ class User(AbstractUser):
         relationship, created = Relationship.objects.get_or_create(
             user1=self,
             user2=friend,
-            defaults={'status': Relationship.Status.FRIEND}
+            defaults={'status': Relationship.Status.FRIENDREQUEST}
         )
 
         if not created:
-            if relationship.status != Relationship.Status.BLOCKED:
-                relationship.status = Relationship.Status.FRIEND
+            if relationship.status == Relationship.Status.FRIENDREQUEST:
+                raise ValidationError("You already sent a friend request to this user.")
+            elif relationship.status != Relationship.Status.BLOCKED:
+                relationship.status = Relationship.Status.FRIENDREQUEST
                 relationship.save()
             else:
                 raise ValidationError("You cannot add a blocked user as a friend.")
 
+    def accept_friend_request(self, friend):
+        try:
+            relationship = Relationship.objects.get(
+                user1=friend,
+                user2=self,
+                status=Relationship.Status.FRIENDREQUEST
+            )
+            relationship.status = Relationship.Status.FRIENDS
+            relationship.save()
+        except Relationship.DoesNotExist:
+            raise ValidationError("No friend request from this user.")
+
+    def refuse_friend_request(self, friend):
+        try:
+            relationship = Relationship.objects.get(
+                user1=friend,
+                user2=self,
+                status=Relationship.Status.FRIENDREQUEST
+            )
+            relationship.delete()
+        except Relationship.DoesNotExist:
+            raise ValidationError("No friend request from this user.")
     def block_friend(self, friend):
         try:
             relationship = Relationship.objects.get(
@@ -62,6 +86,7 @@ class Relationship(models.Model):
     class Status(models.TextChoices):
         BLOCKED = 'BL', 'Blocked'
         FRIEND = 'FR', 'Friend'
+        FRIENDREQUEST = 'FRREQ', 'Friend Request'
         UNKNOWN = 'UN', 'Unknown'
 
     relationship_id = models.AutoField(primary_key=True)
