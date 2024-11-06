@@ -92,7 +92,7 @@ class Relationship(models.Model):
     relationship_id = models.AutoField(primary_key=True)
     user1 = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, related_name='relationships_as_user1')
     user2 = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, related_name='relationships_as_user2')
-    status = models.CharField(max_length=2, choices=Status.choices, default=Status.UNKNOWN)
+    status = models.CharField(max_length=5, choices=Status.choices, default=Status.UNKNOWN)
 
     def __str__(self):
         return str(self.user1) + " - " + str(self.user2) + ": " + self.status
