@@ -27,7 +27,7 @@ const Dashboard = () => {
               <p className="m-2 text-white text-2xl p-4 font-extrabold w-full">
                 Experience Performance
               </p>
-              <div className=" w-[99%] justify-center items-center">
+              <div className=" w-[90%] h-[90%] justify-center items-center">
                 <Linechart data={values} />
               </div>
             </div>

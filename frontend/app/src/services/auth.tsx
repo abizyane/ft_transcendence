@@ -14,8 +14,9 @@ export const handleLogin = async (
       const response = await fetch('http://localhost:8000/api/login', {
         method: 'POST',
         body: data,
+        credentials: 'include',
+
       });
-  
       if (response.ok) {
         const responseData = await response.json();
         console.log(responseData);

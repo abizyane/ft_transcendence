@@ -12,12 +12,13 @@ const OAuthPage = () => {
       if (!searchParams || typeof searchParams.toString !== "function") return; 
   
       const queryParams = searchParams.toString();
-      const backendUrl = 'http://localhost:8000/api/42OAuth/callback';
+      const backendUrl = 'http://localhost:8000/api/42OAuth/callback' ;
   
       const verifyOAuth = async () => {
         try {
           const response = await fetch(`${backendUrl}?${queryParams}`, {
             method: 'GET',
+            credentials: 'include',
           });
   
           if (response.status === 200) {

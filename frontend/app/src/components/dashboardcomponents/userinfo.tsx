@@ -4,36 +4,40 @@ import "../../app/globals.css";
 import Link from "next/link";
 import DoughnutChart from "../Charts/Winrate";
 import data from"@/app/data/Dashboarddata.json";
-
+import {useUser} from "@/services/context/usercontext";
 
 const Component = () => {
-  const {user} =data;
-  const totalXP = user.xp;
+
+  const {user} =useUser();
+  if (!user)
+      return null;
+  const totalXP = 2200;
   const maxXPPerLevel = 1000;
-  const level = Math.floor(totalXP / maxXPPerLevel); 
+  const level = Math.floor(totalXP / maxXPPerLevel);
   const remainingXP = (totalXP % maxXPPerLevel)/10;
-  const { wins, totalGames } = user.charts.winRate;
- 
+  const  wins= 100;
+  const  totalGames= 200;
+
   function calculateWinRate(wins :number, totalGames :number) {
-    if (totalGames === 0) return 0; 
+    if (totalGames === 0) return 0;
     return (wins / totalGames) * 100;
 }
 const percentage = calculateWinRate(wins, totalGames);
+console.log(user.profile_pic_url);
+const prfile_dzb = user.profile_pic_url;
   return (
     <>
 <div className="h-full w-full border-[1px] border-violet-primary rounded-xl p-2">
   <div className="flex gap-2">
     <div className="flex-shrink-0 w-3/5">
-      <div className="mb-4">
-        <Image
-          src={user.pic}
-          alt="User Profile"
-          width={144}
-          height={144}
-          className="w-full h-auto rounded-2xl"
-        />
+      <div className="mb-4 max-w-full">
+            <img
+            src={user.profile_pic_url}
+            alt="User Profile"
+            className="w-full xl:max-w-[550px] h-auto rounded-2xl"
+          />
       </div>
-      <div className="flex flex-col border-[2px] border-violet-primary rounded-xl m-1 h-auto p-2">
+      <div className="flex flex-col border-[2px] border-violet-primary rounded-xl m-1 h-auto p-2 ">
         <p className="text-white font-semibold text-xs justify-start flex">Level {level}</p>
         <div className="flex items-center h-2 w-5/6 rounded-xl bg-white">
                 <div
