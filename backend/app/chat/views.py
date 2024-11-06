@@ -6,6 +6,7 @@ from rest_framework.pagination import PageNumberPagination
 from .models import Message
 from astropong.models.UserModel import User, Relationship
 from .serializers import ConversationSerializer, ChatRoomSerializer, UserSerializer
+from rest_framework.permissions import IsAuthenticated
 
 class ConversationsPageNumberPagination(PageNumberPagination):
     page_size = 7
@@ -17,7 +18,7 @@ class ConversationsView(generics.ListAPIView):
     serializer_class = ConversationSerializer
     pagination_class = ConversationsPageNumberPagination
 
-    # authentication_classes = [authentication.TokenAuthentication]
+    permission_classes = [IsAuthenticated]
 
 # class ConversationsView(views.APIView):
 #     def get(self, request):
@@ -74,7 +75,7 @@ class ChatRoomView(generics.ListAPIView):
     serializer_class = ChatRoomSerializer
     pagination_class = MessagesPageNumberPagination
 
-    # authentication_classes = [authentication.TokenAuthentication]
+    permission_classes = [IsAuthenticated]
     def get_queryset(self):
         l_user_name = self.kwargs['l_user']
         r_user_name = self.kwargs['r_user']
@@ -110,5 +111,5 @@ class OnlineUsersView(generics.ListAPIView):
     serializer_class = UserSerializer
     pagination_class = OnlineUsersPageNumberPagination
 
-    # authentication_classes = [authentication.TokenAuthentication]
+    permission_classes = [IsAuthenticated]
     
