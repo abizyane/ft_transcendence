@@ -8,7 +8,16 @@ import settings from "@iconify/icons-icon-park-solid/setting";
 import { useUser } from "@/services/context/usercontext";
 import { useEffect, useRef, useState } from "react";
 import Logo from "../Logo/Logo";
-
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+  DropdownMenuShortcut,
+} from "@/components/ui/dropdown-menu";
+import { Settings, LogOut } from "lucide-react";
 //function to check if notif or settings clicked
 
 const Navbar = () => {
@@ -17,7 +26,6 @@ const Navbar = () => {
     // Optional: Handle the case where user data isn't available
     return null;
   }
-
 
   return (
     <>
@@ -51,6 +59,7 @@ const Navbar = () => {
               </div>
             </form>
           </div>
+
           <div className="md:justify-end md:p-1">
             <div className=" hidden lg:flex items-center">
               <div className="lg:relative w-12 h-12">
@@ -61,8 +70,23 @@ const Navbar = () => {
                   className="object-cover w-full h-full rounded-full"
                 />
               </div>
-              <div className="ml-3 hidden lg:block">
-                <span className="text-white">{user.username}</span>
+              <div className="mx-4 hidden lg:block">
+                <DropdownMenu>
+                  <DropdownMenuTrigger className=" text-white">
+                    {user.username}
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent className="m-4 bg-gray-800/60 border-violet-primary">
+                    <DropdownMenuItem >
+                      <Settings className=" text-white" />
+                      <span className=" text-white">Settings</span>
+                    </DropdownMenuItem>
+                    <DropdownMenuSeparator className="bg-black" />
+                    <DropdownMenuItem>
+                      <LogOut className=" text-white" />
+                      <span className=" text-white">Log out</span>
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
               </div>
             </div>
           </div>
