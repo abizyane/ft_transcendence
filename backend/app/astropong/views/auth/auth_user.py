@@ -24,7 +24,7 @@ class UsersView(APIView):
             return Response({'error': 'Username is required'}, status=400)
         try:
             users = User.objects.filter(username__icontains=username)
-            return Response(UserSerializer(users, many=True).data)
+            return Response(UserSerializer(users, many=True, context={'request': request,}).data)
         except User.DoesNotExist:
             return Response([], status=200)
         
