@@ -21,8 +21,9 @@ class ConversationsView(generics.ListAPIView):
     # authentication_classes = [authentication.TokenAuthentication]
     # permission_classes = [IsAuthenticated]
 
-    def get_queryset(self, current_user):
+    def get_queryset(self):
         try:
+            current_user = self.request.user.username
             user = User.objects.get(username=current_user)
         except User.DoesNotExist:
             raise NotFound("User not found.")
@@ -32,8 +33,7 @@ class ConversationsView(generics.ListAPIView):
     def list(self, request, *args, **kwargs):
         if not request.user.is_authenticated:
             return Response({'error': 'You must be authenticated to access this resource.'}, status=401)
-        current_user = request.user.username
-        super().queryset = self.get_queryset(current_user)
+        self.queryset = self.get_queryset()
 
         return super().list(request, *args, **kwargs)
  
