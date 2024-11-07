@@ -38,7 +38,7 @@ class User(AbstractUser):
                 user2=self,
                 status=Relationship.Status.FRIENDREQUEST
             )
-            relationship.status = Relationship.Status.FRIENDS
+            relationship.status = Relationship.Status.FRIEND
             relationship.save()
         except Relationship.DoesNotExist:
             raise ValidationError("No friend request from this user.")
