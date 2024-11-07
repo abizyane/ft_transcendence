@@ -89,7 +89,7 @@ const UserChatPage = ({ user }) => {
                 <button
                   type="button"
                   onClick={handleSendMessage}
-                  className="absolute top-1/2 transform -translate-y-1/2 right-4 flex flex-shrink-0 focus:outline-none text-violet-primary hover:text-blue-700 px-4 py-1"
+                  className="absolute top-1/2 transform -translate-y-1/2 right-4 flex flex-shrink-0 focus:outline-none text-violet-primary  px-4 py-1"
                 >
                   Send
                 </button>

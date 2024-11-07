@@ -8,6 +8,9 @@ import settings from "@iconify/icons-icon-park-solid/setting";
 import { useUser } from "@/services/context/usercontext";
 import { useEffect, useRef, useState } from "react";
 import Logo from "../Logo/Logo";
+import { Settings, LogOut } from "lucide-react";
+import { handleLogout } from "@/services/auth";
+import { useRouter } from "next/navigation";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -17,15 +20,16 @@ import {
   DropdownMenuTrigger,
   DropdownMenuShortcut,
 } from "@/components/ui/dropdown-menu";
-import { Settings, LogOut } from "lucide-react";
 //function to check if notif or settings clicked
 
 const Navbar = () => {
+  const router = useRouter();
   const { user } = useUser();
   if (!user) {
     // Optional: Handle the case where user data isn't available
     return null;
   }
+
 
   return (
     <>
@@ -81,7 +85,7 @@ const Navbar = () => {
                       <span className=" text-white">Settings</span>
                     </DropdownMenuItem>
                     <DropdownMenuSeparator className="bg-black" />
-                    <DropdownMenuItem>
+                    <DropdownMenuItem onClick={()=>handleLogout(router)}>
                       <LogOut className=" text-white" />
                       <span className=" text-white">Log out</span>
                     </DropdownMenuItem>

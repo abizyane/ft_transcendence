@@ -1,10 +1,9 @@
 import { any } from "zod";
 import { getUserData } from "./user";
-import { useRouter } from "next/router";
+import { useRouter } from "next/navigation";
 import { registerFormData } from "@/components/Registration/Registration";
 import { cookies } from "next/headers";
-// login
-import { NextRouter } from 'next/router'
+
 
 export const handleLogin = async (
   data: FormData,
@@ -24,7 +23,7 @@ export const handleLogin = async (
       console.log(responseData);
       setErrorMessage(null);
       setSuccessMessage('Login successful.');
-      router.replace('/dashboard');
+      router.push('/dashboard');
     } else {
       const errorData = await response.json();
       setErrorMessage(() => 'Invalid email or password');
@@ -75,5 +74,29 @@ export const handleLogin = async (
   } catch (error) {
     console.error('An unexpected error occurred:', error);
     setErrorMessage('An unexpected error occurred. Please try again later.');
+  }
+};
+
+
+
+export const handleLogout = async (
+  router: NextRouter
+) => {
+  try {
+    const response = await fetch('http://localhost:8000/api/logout', {
+      method: 'POST',
+      credentials: 'include',
+    });
+   
+    if (response.ok) {
+      const responseData = await response.json();
+      console.log(responseData);
+      router.push('/auth/login');
+    } else {
+      const errorData = await response.json();
+      console.log(errorData);
+    }
+  } catch (error) {
+    console.log(error);
   }
 };
