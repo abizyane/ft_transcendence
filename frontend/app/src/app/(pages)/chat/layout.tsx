@@ -81,7 +81,7 @@ export default function Chat({ children }: ChatLayoutProps) {
         {/* Sidebar section */}
         <div className="w-full  h-full ">
           <div className="w-full  h-full lg:h-full flex flex-col justify-center items-center p-2 ">
-            <div className=" bg-gray-800/60 h-[1100px]  w-full  text-gray-200 rounded-xl border-2 border-violet-primary flex">
+            <div className=" bg-gray-800/60 h-[800px]  w-full  text-gray-200 rounded-xl border-2 border-violet-primary flex">
               <div className="w-full lg:w-96 backdrop-blur-md  rounded-xl">
                 <section className="w-full">
                   <div className="header p-4  rounded-xl flex justify-between items-center w-full">
@@ -152,7 +152,7 @@ export default function Chat({ children }: ChatLayoutProps) {
                 </section>
                    {/* <Link key={`message-${user.id}`} href="">
                   </Link> */}
-               <div className="p-2 flex-1 md:w-full h-[820px] overflow-y-scroll">
+               <div className="p-2 flex-1 md:w-full h-[600px] overflow-y-scroll">
       {users &&
         users
           .filter((user) => user.user_id || user.sender_id === currentUserId)

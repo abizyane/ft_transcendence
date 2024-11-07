@@ -20,8 +20,8 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
             <Sidebar />
           </div>
 
-          <div className="w-full">
-            <div className="w-full h-full lg:h-full flex flex-col justify-center items-center p-2">
+          <div className="w-full -z-10">
+            <div className="w-full h-full lg:h-full flex flex-col justify-center items-center p-2 z-20">
               {children}
             </div>
           </div>
