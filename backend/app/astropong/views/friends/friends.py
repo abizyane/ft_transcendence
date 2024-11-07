@@ -1,7 +1,7 @@
 from django.core.exceptions import ValidationError
 from django.db import models
 from ...models.UserModel import Relationship
-from ...serializers.UserSerializer import FriendSerializer
+from ...serializers.UserSerializer import FriendSerializer, UserSerializer
 from rest_framework.views import APIView
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.response import Response
@@ -22,27 +22,74 @@ class AddFriendView(APIView):
                 request.user.add_friend(friend)
                 return Response({"message": "Friend added successfully."}, status=status.HTTP_200_OK)
             except ValidationError as e:
-                return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+                return Response({"error": e}, status=status.HTTP_400_BAD_REQUEST)
         
+        except User.DoesNotExist:
+            return Response({
+                "error": "User not found"
+            }, status=404)
+        
+class AcceptFriendRequestView(APIView):
+    def post(self,request):
+        friendId = request.data.get('friend_id')
+        if friendId is None:
+            return Response({"error": "Friend id is required"}, status=status.HTTP_400_BAD_REQUEST)
+        try:
+            friend = User.objects.get(id=friendId)
+            try:
+                request.user.accept_friend_request(friend)
+                return Response({"message": "Friend request accepted."}, status=status.HTTP_200_OK)
+            except ValidationError as e:
+                return Response({"error": e}, status=status.HTTP_400_BAD_REQUEST)
+        except User.DoesNotExist:
+            return Response({
+                "error": "User not found"
+            }, status=404)
+class RejectFriendRequestView(APIView):
+    def post(self,request):
+        friendId = request.data.get('friend_id')
+        if friendId is None:
+            return Response({"error": "Friend id is required"}, status=status.HTTP_400_BAD_REQUEST)
+        try:
+            friend = User.objects.get(id=friendId)
+            try:
+                request.user.refuse_friend_request(friend)
+                return Response({"message": "Friend request accepted."}, status=status.HTTP_200_OK)
+            except ValidationError as e:
+                return Response({"error": e}, status=status.HTTP_400_BAD_REQUEST)
         except User.DoesNotExist:
             return Response({
                 "error": "User not found"
             }, status=404)
     
 class ListFriendView(APIView):
-    def get(self, request):
-        try:
-            user = request.user
-            relations = Relationship.objects.filter((models.Q(user1=user) | models.Q(user2=user)) & models.Q(status=Relationship.Status.FRIEND))
-            friends = []
-            for relation in relations:
-                if relation.user1 == user:
-                    friends.append(relation.user2)
-                else:
-                    friends.append(relation.user1)
-            serializer = FriendSerializer(friends, many=True, context={'request': request})
-            return Response(serializer.data)
-        except User.DoesNotExist:
-            return Response({
-                "error": "User not found"
-            }, status=404)
+    def get(self, request, relationship_type=None):
+        user = request.user
+        friends_with_relationship = []
+        
+        if relationship_type == 'friends':
+            relations = Relationship.objects.filter(
+                (models.Q(user1=user) | models.Q(user2=user)) &
+                models.Q(status=Relationship.Status.FRIEND)
+            )
+        elif relationship_type == 'friend_requests':
+            relations = Relationship.objects.filter(
+                (models.Q(user1=user) | models.Q(user2=user)) &
+                models.Q(status=Relationship.Status.FRIENDREQUEST)
+            )
+        else: 
+            relations = Relationship.objects.filter(
+                (models.Q(user1=user) | models.Q(user2=user)) &
+                (models.Q(status=Relationship.Status.FRIEND) | models.Q(status=Relationship.Status.FRIENDREQUEST))
+            )
+
+        for relation in relations:
+            friend = relation.user2 if relation.user1 == user else relation.user1
+            friends_with_relationship.append((friend, relation.status)) 
+
+        serializer = FriendSerializer(
+            [friend for friend, _ in friends_with_relationship],
+            many=True,
+            context={'request': request, 'relationships': friends_with_relationship}
+        )
+        return Response(serializer.data)

@@ -4,9 +4,9 @@ from .views.auth.register import RegisterView
 from .views.auth.login import LoginView ,UserListView
 from .views.auth.logout import LogoutView
 from .views.auth.OAuth import OAuth, OAuthCallback
-from .views.auth.auth_user import UserView
+from .views.auth.auth_user import UserView, UsersView
 from .views.auth.refresh import RefreshTokenView
-from .views.friends.friends import AddFriendView, ListFriendView
+from .views.friends.friends import AddFriendView, ListFriendView, AcceptFriendRequestView, RejectFriendRequestView
 
 urlpatterns = [
     path('register', RegisterView.as_view()),
@@ -17,7 +17,13 @@ urlpatterns = [
     path('user', UserView.as_view()),
     path('refresh', RefreshTokenView.as_view()),
     path('users', UserListView.as_view(), name='user_list'),
-    path('list_friends', ListFriendView.as_view(), name='list_friends'),
+    path('searchuser', UsersView.as_view(), name='user_list'),
+
+    path('friends/<str:relationship_type>/', ListFriendView.as_view(), name='list_friends_by_type'),
+    path('friends/', ListFriendView.as_view(), name='list_all_friends'),
     path('add_friend', AddFriendView.as_view(), name='add_friend'),
+    path('accept_friend', AcceptFriendRequestView.as_view(), name='accept_friend'),
+    path('reject_friend', RejectFriendRequestView.as_view(), name='reject_friend'),
+
 ]
 
