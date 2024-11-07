@@ -21,6 +21,7 @@ class TournamentConsumer(AsyncWebsocketConsumer):
         self.match = None
         self.match_name = ''
         self.task = None
+        self.state = ''
         self.access_competition(self.p_holder.competitor);
         self.room.tournament.p_holders[self.channel_name] = self.p_holder
         await self.channel_layer.group_add((self.room.name), self.channel_name)
@@ -59,8 +60,6 @@ class TournamentConsumer(AsyncWebsocketConsumer):
     async def init_match(self, event):
         self.game = self.match.game
         self.task = asyncio.create_task(self.game_loop())
-        self.task
-        # self.finalize_match()
 
     async def game_loop(self):
         while not self.game.status:
@@ -71,10 +70,8 @@ class TournamentConsumer(AsyncWebsocketConsumer):
             })
             await asyncio.sleep(1/60)
         self.game.status = 1
+        print(self.match.state)
         await self.finalize_match(event=None)
-        # await self.channel_layer.group_send(self.match_name,{
-        #     'type': 'finalize.match'
-        # })
     
     """
         -   set loser , set winner
@@ -86,7 +83,9 @@ class TournamentConsumer(AsyncWebsocketConsumer):
     async def finalize_match(self, event):
         if not self.game.status == 1 :
             return
-        self.match.game.set_winner()
+        if not self.match.state == "LEAVE" :
+            print(self.match.state)
+            self.match.game.set_winner()
         prev_match_name  = self.match_name
 
         if self.p_holder.is_won():
@@ -101,7 +100,7 @@ class TournamentConsumer(AsyncWebsocketConsumer):
                 await self.channel_layer.group_send(self.match_name, {
                     'type' : 'newgame.request'
                 })
-                await self.chanel_layer.group_discard(prev_match_name, self.channel_name)
+                await self.channel_layer.group_discard(prev_match_name, self.channel_name)
             else :
                 await self.send(text_data=json.dumps({
                     'msg': f'wait for {self.match_name} to strat'
@@ -146,14 +145,9 @@ class TournamentConsumer(AsyncWebsocketConsumer):
             if self.room.is_ready():
                 #set other player to winner
                 if self.match.is_ready():
-                    self.match.game.state = 1
-                    self.room.tournament.get_player_opponent(self.channel_name).win_state = "WIN"
-                    self.channel_layer.group_send(self.match_name,{
-                        'type' : 'left.game',
-                        'msg' : f'{self.p_holder.get_name()} left the game'
-                    })
-                    await self.channel_layer.group_send(self.match_name,{
-                        'type': 'finalize.match'
+                    await self.channel_layer.group_send(self.match_name, {
+                        'type' : 'leave.state',
+                        'player' : f'{self.channel_name}'
                     })
                 pass
             else :
@@ -162,7 +156,7 @@ class TournamentConsumer(AsyncWebsocketConsumer):
                     del self.room.tournament.p_holders[self.channel_name]
                 except self.RoomIsEmpty:
                     TournamentConsumer.rm.remove_not_ready(self.room)
-        self.channel_layer.group_discard(self.room.name, self.channel_name)
+        await self.channel_layer.group_discard(self.room.name, self.channel_name)
 
     def access_competition(self, competitor:Competitor) -> None :
         competitor.set_competition_type(self._type)
@@ -173,4 +167,9 @@ class TournamentConsumer(AsyncWebsocketConsumer):
         recv_data = json.loads(text_data)
         if self.p_holder.paddle :
             self.p_holder.paddle_command(recv_data['command'])
-        
+    
+    async def leave_state(self, event):
+        self.match.state = "LEAVE"
+        self.p_holder.paddle.win_state = "WIN"
+        await self.send(text_data=json.dumps({'msg' : f'{event["player"]} is left'}))
+        self.game.status = 1

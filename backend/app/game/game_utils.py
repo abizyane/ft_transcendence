@@ -121,14 +121,13 @@ class Game:
         scores = [player.score for player in  self.players.values()]
         if self.max_score in scores:
             self.status = 1
+
     def set_winner(self):
         for player in self.players.values():
             if player.score == self.max_score:
                 player.win_state = "WIN"
             else:
-                player.win_state = "LOSE"
-            
-       
+                player.win_state = "LOSE" 
         
     class RoomIsFull(Exception):
         def __init__(self):
