@@ -35,7 +35,6 @@ const ChooseGalaxy = () => {
             </Link>
           </div>
 
-          {/* Repeat similar cards as needed */}
           <div
             onMouseEnter={() => setHoveredIndex(1)}
             onMouseLeave={() => setHoveredIndex(null)}

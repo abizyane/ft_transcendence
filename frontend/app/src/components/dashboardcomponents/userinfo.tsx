@@ -28,7 +28,7 @@ const percentage = calculateWinRate(wins, totalGames);
 <div className="h-full w-full border-[1px] border-violet-primary rounded-xl p-2">
   <div className="flex gap-2">
     <div className="flex-shrink-0 w-3/5">
-      <div className="mb-4 max-w-full aspect-square max-h-[600px] mx-auto">
+      <div className="mb-4 max-w-full aspect-square max-h-[300px] mx-auto">
             <img
             src={user.profile_pic_url}
             alt="User Profile"
@@ -37,7 +37,7 @@ const percentage = calculateWinRate(wins, totalGames);
       </div>
       <div className="flex flex-col border-[2px] border-violet-primary rounded-xl m-1 h-auto p-2 ">
         <p className="text-white font-semibold text-xs justify-start flex">Level {level}</p>
-        <div className="flex items-center h-2 w-5/6 rounded-xl bg-white">
+        <div className="flex items-center h-2 w-full rounded-xl bg-white">
                 <div
                   className="bg-violet-primary h-2 rounded-xl"
                   style={{ width: `${remainingXP}%` }}
@@ -55,8 +55,8 @@ const percentage = calculateWinRate(wins, totalGames);
       </div>
       <div className="p-2 rounded-xl border h-full border-violet-primary mr-2">
       <div className="relative w-full h-full flex flex-col items-center justify-center bg-gray-800/20 rounded-xl">
-        <p className="text-white font-mont xl:font-bold xl:text-lg text-xs m-1">Win Rate</p> 
-        <div className="relative w-full h-[30%] flex items-center justify-center">
+        <p className="text-white font-mont xl:font-bold xl:text-lg text-xs m-1">Win Rate</p>
+        <div className="relative w-full h-full flex items-center justify-center">
           <DoughnutChart winpercentage={percentage}/>
         </div>
       </div>

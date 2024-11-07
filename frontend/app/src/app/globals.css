@@ -59,3 +59,12 @@ backdrop-filter: blur(25px);
 .rainbow-border {
   animation: rainbow-border 5s linear infinite;
 }
+
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}

@@ -1,4 +1,3 @@
-# middleware.py
 from django.utils.deprecation import MiddlewareMixin
 from django.conf import settings
 from rest_framework_simplejwt.tokens import AccessToken, RefreshToken

@@ -6,6 +6,7 @@ import Sidebar from "@/components/Sidebar/Sidebar";
 import Navbar from "@/components/Navbar/Navbar";
 import Link from "next/link";
 import { formatDistanceToNow } from "date-fns";
+import { useRouter } from "next/router";
 interface ChatLayoutProps {
   children: ReactNode;
 }
@@ -27,7 +28,9 @@ export default function Chat({ children }: ChatLayoutProps) {
 
   const fetchConversation = async () => {
     try {
-      const response = await fetch(`http://localhost:8000/chat/conversations`);
+      const response = await fetch(`http://localhost:8000/chat/conversations`,{
+        credentials: 'include',
+      });
       if (!response.ok) {
         console.error('Fetch error:', error);
       }
@@ -66,6 +69,9 @@ export default function Chat({ children }: ChatLayoutProps) {
     setSelectedUser(null);
   };
 
+    const openChat = (user) => {
+      router.push(`/chat/${user.user_id || user.sender_id}`)
+    }
   const currentUserId = 2;
   return (
     <div className="w-full min-h-screen flex flex-col justify-start items-start ">
@@ -144,37 +150,39 @@ export default function Chat({ children }: ChatLayoutProps) {
                     </div>
                   </div> */}
                 </section>
-                {/* href={`/chat/${user.id}` */}
-                  {/* // <Link key={`message-${user.id}`} href="#"> */}
-                  {/* // </Link> */}
-                <div className="p-2 flex-1 md:w-full h-[820px] overflow-y-scroll">
-                  {users &&
-                    users
-                    .filter((user) => user.user_id  || user.sender_id === currentUserId)
-                    .map((user) =>  (
-                        <div
-                          onClick={() => openSlider(user)}
-                          className="flex justify-between items-center p-3 hover:bg-gray-800 rounded-lg cursor-pointer"
-                        >
-                          <div className="w-16 h-16 flex-shrink-0">
-                            <img
-                              className="shadow-md rounded-full w-full h-full object-cover"
-                              src={"http://localhost:8000" + user.img}
-                              alt={user.name}
-                            />
-                          </div>
-                          <div className="flex-auto min-w-0 ml-4 mr-6">
-                            <p className="font-bold">{user.name}</p>
-                            <div className="flex justify-between items-center text-sm text-gray-600">
-                              <p className="truncate">{user.lastMessage}</p>
-                              <p className="ml-4 text-white-primary whitespace-nowrap">
-                                {user.time}
-                              </p>
-                            </div>
-                          </div>
-                        </div>
-                    ))}
+                   {/* <Link key={`message-${user.id}`} href="">
+                  </Link> */}
+               <div className="p-2 flex-1 md:w-full h-[820px] overflow-y-scroll">
+      {users &&
+        users
+          .filter((user) => user.user_id || user.sender_id === currentUserId)
+          .map((user, i) => (
+            <Link 
+              key={`message-${i}`}
+              href={`/chat/${user.user_id || user.sender_id}`}
+              passHref
+            >
+              <div className="flex justify-between items-center p-3 hover:bg-gray-800 rounded-lg cursor-pointer">
+                <div className="w-16 h-16 flex-shrink-0">
+                  <img
+                    className="shadow-md rounded-full w-full h-full object-cover"
+                    src={user.Sender_img}
+                    alt={user.name}
+                  />
                 </div>
+                <div className="flex-auto min-w-0 ml-4 mr-6">
+                  <p className="font-bold">{user.name}</p>
+                  <div className="flex justify-between items-center text-sm text-gray-600">
+                    <p className="truncate">{user.lastMessage}</p>
+                    <p className="ml-4 text-white-primary whitespace-nowrap">
+                      {user.time}
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </Link>
+          ))}
+    </div>
 
                 {/* Slide Component */}
                 <div

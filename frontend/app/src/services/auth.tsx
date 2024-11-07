@@ -4,34 +4,35 @@ import { useRouter } from "next/router";
 import { registerFormData } from "@/components/Registration/Registration";
 import { cookies } from "next/headers";
 // login
-export const handleLogin = async (
-    data: FormData,
-    setSuccessMessage: React.Dispatch<React.SetStateAction<string | null>>,
-    setErrorMessage: React.Dispatch<string | null>,
-    router: any
-  ) => {
-    try {
-      const response = await fetch('http://localhost:8000/api/login', {
-        method: 'POST',
-        body: data,
-        credentials: 'include',
+import { NextRouter } from 'next/router'
 
-      });
-      if (response.ok) {
-        const responseData = await response.json();
-        console.log(responseData);
-        setErrorMessage(null);
-        setSuccessMessage('Login successful.');
-        router.push('/dashboard');
-      }
-      else {
-        const errorData = await response.json();
-        setErrorMessage('Invalid email or password');
-      }
-    } catch (error) {
-      setErrorMessage('An unexpected error occurred. Please try again.');
+export const handleLogin = async (
+  data: FormData,
+  setSuccessMessage: React.Dispatch<React.SetStateAction<string | null>>,
+  setErrorMessage: React.Dispatch<React.SetStateAction<string | null>>,
+  router: NextRouter
+) => {
+  try {
+    const response = await fetch('http://localhost:8000/api/login', {
+      method: 'POST',
+      body: data,
+      credentials: 'include',
+    });
+
+    if (response.ok) {
+      const responseData = await response.json();
+      console.log(responseData);
+      setErrorMessage(null);
+      setSuccessMessage('Login successful.');
+      router.replace('/dashboard');
+    } else {
+      const errorData = await response.json();
+      setErrorMessage(() => 'Invalid email or password');
     }
-  };
+  } catch (error) {
+    setErrorMessage(() => 'An unexpected error occurred. Please try again.');
+  }
+};
 
 
 // register
