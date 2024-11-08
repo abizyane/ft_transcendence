@@ -14,6 +14,21 @@ class UserView(APIView):
             return Response(UserSerializer(request.user, context={'request': request}).data)
         else:
             return Response({'error': 'No user is connected'}, status=401)
+        
+class ChangePasswordView(APIView):
+    permission_classes = [IsAuthenticated]
+    def post(self, request):
+        user = request.user
+        new_password = request.data.get('new_password')
+        if new_password is None:
+            return Response({'error': 'New password is required'}, status=400)
+        elif len(new_password) < 8:
+            return Response({'error': 'Password must be at least 8 characters long'}, status=400)
+        elif new_password == request.user.username:
+            return Response({'error': 'Password cannot be the same as username'}, status=400)
+        user.set_password(new_password)
+        user.save()
+        return Response({'message': 'Password changed successfully'}, status=200)
 
 class UsersView(APIView):
     permission_classes = [IsAuthenticated]
