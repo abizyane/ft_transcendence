@@ -6,7 +6,6 @@ import { Switch } from "@/components/ui/switch"
 import {useUser} from "@/services/context/usercontext";
 
 const SettingsPage = () => {
-  // Track the active tab
    
   const [activeTab, setActiveTab] = useState<'profile' | 'game'>('profile');
 
@@ -61,7 +60,6 @@ const ProfileSettings = () => {
     console.log("Form Data:", data);
     console.log("Profile Image:", profileImage);
     console.log("2FA Enabled:", is2FAEnabled);
-    // Handle form submission here (e.g., send data to your backend)
   };
 
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -93,7 +91,6 @@ const ProfileSettings = () => {
 
 </div>
 
-{/* Hidden File Input */}
 <input
   type="file"
   id="fileInput"
@@ -103,7 +100,6 @@ const ProfileSettings = () => {
 />
 
 
-          {/* Hidden File Input */}
           <input
             type="file"
             id="fileInput"
@@ -151,7 +147,6 @@ const ProfileSettings = () => {
               <div className="mt-4 text-center lg:text-left">
                 <p className="font-semibold">Scan this QR code to enable 2FA:</p>
                 <div className="flex justify-center lg:justify-start mt-2">
-                  {/* Replace with your QR code URL */}
                   <img src="/path-to-your-qr-code.png" alt="2FA QR Code" className="w-32 h-32" />
                 </div>
               </div>
@@ -183,7 +178,6 @@ const GameSettings = () => (
   <div>
     <h2 className="text-xl font-semibold mb-2">Game Settings</h2>
     <p>Adjust your game preferences here.</p>
-    {/* Add fields for game-specific settings */}
   </div>
 );
 
