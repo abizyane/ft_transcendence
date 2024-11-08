@@ -13,7 +13,7 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
   return (
     <UserProvider>
       <div className="w-full min-h-screen flex flex-col justify-start items-start">
-        <div className="w-full"><Navbar /></div>
+        <div className="absolute w-full z-50"><Navbar /></div>
 
         <div className="w-full flex lg:flex-row flex-grow">
           <div className="lg:w-24 fixed bottom-0 lg:static w-full z-20 lg:z-0">

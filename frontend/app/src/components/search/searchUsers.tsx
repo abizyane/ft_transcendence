@@ -87,7 +87,7 @@ const searchUsers = () =>{
                       onKeyUp={handleSearchKeyUp}
                     />
                     {isOpen && searchQuery.trim() && (
-              <div className="absolute top-full left-0 w-full bg-gray-800 mt-2 rounded-md shadow-lg max-h-64 z-50 overflow-y-auto no-scrollbar">
+              <div className="absolute top-full left-0 w-full bg-gray-800 mt-2 rounded-md shadow-lg max-h-64 overflow-y-auto no-scrollbar">
                 <h2 className="bg-gray-800 text-center text-white text-xl">Users</h2>
                 <hr className="border-violet-primary" />
                 {loading ? (
