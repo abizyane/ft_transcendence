@@ -61,6 +61,30 @@ class RejectFriendRequestView(APIView):
             return Response({
                 "error": "User not found"
             }, status=404)
+        
+class FriendsOfView(APIView):
+    def get(self, request, user_id):
+        try:
+            user = User.objects.get(id=user_id)
+            relations = Relationship.objects.filter(
+                (models.Q(user1=user) | models.Q(user2=user)) &
+                (models.Q(status=Relationship.Status.FRIEND))
+            )
+            friends_with_relationship = []
+            for relation in relations:
+                friend = relation.user2 if relation.user1 == user else relation.user1
+                friends_with_relationship.append((friend, relation.status)) 
+
+            serializer = FriendSerializer(
+                [friend for friend, _ in friends_with_relationship],
+                many=True,
+                context={'request': request, 'relationships': friends_with_relationship}
+            )
+            return Response(serializer.data)
+        except User.DoesNotExist:
+            return Response({
+                "error": "User not found"
+            }, status=404)
     
 class ListFriendView(APIView):
     def get(self, request, relationship_type=None):
