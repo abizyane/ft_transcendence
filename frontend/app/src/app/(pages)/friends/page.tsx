@@ -1,4 +1,5 @@
-import React from "react";
+'use client'
+import React, { useEffect,useState } from "react";
 import solo from "../../../../public/solo.jpeg";
 import { IoChatbubbleEllipsesOutline } from "react-icons/io5";
 import { IoChatbubbleEllipsesSharp } from "react-icons/io5";
@@ -6,27 +7,60 @@ import { FaTableTennisPaddleBall } from "react-icons/fa6";
 import { FaCircleCheck } from "react-icons/fa6";
 import { IoCloseCircle } from "react-icons/io5";
 import { CgUnblock } from "react-icons/cg";
+import data from '@/app/data/Dashboarddata.json';
+import {User} from "../../../services/context/usercontext"
+
+
 const friends = () => {
+  const [friends, setFriends] = useState<User[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const showfriendlist = async () =>{
+      try{
+        const response = await fetch ('http://localhost:8000/api/friends',{
+          method: 'GET',
+          credentials: 'include',
+        })
+        if (response.ok){
+          const responsedata = await response.json();
+          console.log(responsedata);
+          // setFriends(()=>{
+          //   return friends
+          // });
+          setFriends(responsedata);
+        }else{
+          const error=await response.json()
+          console.log("failed to fetch");
+        }
+        }catch (error){
+          console.log("catched error")
+        };
+
+      }
+      showfriendlist();
+  },[]);
+
   return (
-    <div className=" w-full  p-2 mb-24 lg:mb-0 lg:h-full">
-      <h1 className="text-white text-center w-full text-xl font-bold mb-4 mt-2 ">
+    <div className=" w-full  p-2 mb-24 lg:mt-9 lg:h-full">
+      <h1 className="text-white text-center w-full text-xl lg:text-3xl font-bold mb-4 mt-2 ">
         Friends List
       </h1>
-      <div className="bg-gray-800/65 rounded-xl border w-full border-violet-primary grid grid-cols-1 lg:grid-cols-2 gap-4   h-[300px] lg:h-[600px] overflow-y-auto no-scrollbar p-4">
-        {[...Array(30)].map((_, index) => (
+      <div className="bg-gray-800/65 rounded-xl border w-full border-violet-primary grid grid-cols-1 lg:grid-cols-2 gap-4   h-[250px] lg:h-[600px] overflow-y-auto no-scrollbar p-4">
+        {friends.map((friend, index) => (
           <div
             key={index}
-            className="flex items-center bg-gray-700/70 hover:bg-gray-600 transition-shadow border border-gray-600 rounded-lg p-4 shadow-lg hover:shadow-2xl"
+            className="flex justify-center items-center bg-gray-700/70 h-[90px] hover:bg-gray-600 transition-shadow border border-gray-600 rounded-lg p-4 shadow-lg hover:shadow-2xl"
           >
             <div className="h-14 w-14 rounded-full overflow-hidden">
               <img
-                src={solo.src}
+                src={friend.profile_pic_url}
                 alt="mode solo"
                 className="w-full h-full object-cover"
               />
             </div>
             <div className="flex flex-col justify-center ml-4">
-              <span className="text-md font-semibold text-white">Name</span>
+              <span className="text-md font-semibold text-white">{friend.username}</span>
               <span className="text-sm text-gray-400">@username</span>
             </div>
             <div className="ml-auto flex space-x-4">

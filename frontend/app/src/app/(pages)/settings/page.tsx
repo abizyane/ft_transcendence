@@ -68,7 +68,7 @@ const ProfileSettings = () => {
       setProfileImage(file);
     }
   };
-  console.log(user)
+
   return (
     <div>
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">

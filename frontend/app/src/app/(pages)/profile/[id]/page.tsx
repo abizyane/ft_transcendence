@@ -25,10 +25,9 @@ const page = () => {
     const [error, setError] = useState<string | null>(null);
     useEffect(() => {
     if (currentuser?.id === userId)
-      {
-        
-        setUser(currentuser);
-      }
+    {
+      setUser(currentuser);
+    }
     else
     {
       setLoading(true);

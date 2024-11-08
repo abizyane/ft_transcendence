@@ -20,7 +20,6 @@ type UserInfoProps = {
 
 const UserInfo: React.FC<UserInfoProps> = ({ user }) => {
 
-  console.log(user);
   // const [iscurruser , setUser] = useState<true | false>(false);
   const curruser=useUser();
   // if (user.id === curruser)
@@ -61,7 +60,7 @@ const UserInfo: React.FC<UserInfoProps> = ({ user }) => {
             </div>
     </div>
     <div className="flex flex-col w-2/5">
-      {curruser.user.id  === user.id ?
+      {curruser.id  === user.id ?
         (<div className="border-[2px] border-violet-primary rounded-3xl h-auto p-1 mb-2 mr-2">
         <h1 className="text-base mr-2 lg:text-2xl font-bold text-violet-primary text-center">Welcome!</h1>
         <p className="text-base lg:text-2xl font-bold text-white text-center">{user.username}</p>
