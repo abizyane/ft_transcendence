@@ -7,6 +7,8 @@ import notifications from "@iconify/icons-tabler/bell-filled";
 import settings from "@iconify/icons-icon-park-solid/setting";
 import Logo from "../Logo/Logo";
 import { Settings, LogOut } from "lucide-react";
+import { handleLogout } from "@/services/auth";
+import { useRouter } from "next/navigation";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -24,6 +26,7 @@ import { useUser } from "@/services/context/usercontext";
 
 const Navbar = () => {
 
+  const router = useRouter();
   const { user } = useUser();
   
   if (!user) {
@@ -32,14 +35,12 @@ const Navbar = () => {
   return (
     <>
       <nav className=" backdrop-blur-md  border-gray-800 flex justify-between right-0 top-0 h-16  md:w-full">
-        <div className="z-50 ml-3">
+        <div className=" ml-3">
           <Logo />
         </div>
         <div className="flex justify-end md:justify-between md:pl-10 items-center w-full">
           <div className="mt-3 p-4 flex-none">
-            <form>
               <Searchusers/>
-            </form>
           </div>
 
           <div className="md:justify-end md:p-1">

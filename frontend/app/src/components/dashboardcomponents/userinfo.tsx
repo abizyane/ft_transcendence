@@ -1,28 +1,33 @@
-import Image from "next/image";
-import Marshmellow from "../../../public/marshmello.svg";
-import "../../app/globals.css";
-import Link from "next/link";
+import React, { useEffect, useState } from "react";
 import DoughnutChart from "../Charts/Winrate";
-import data from"@/app/data/Dashboarddata.json";
-import {useUser} from "@/services/context/usercontext";
+import Image from "next/image";
 
-const Component = () => {
+type User = {
+  name: string;
+  profile_pic_url?: string;
+  totalXP: number;
+  wins: number;
+  totalGames: number;
+};
 
-  const {user} =useUser();
-  if (!user)
-      return null;
-  const totalXP = 2200;
+type UserInfoProps = {
+  user: User;
+};
+
+const UserInfo: React.FC<UserInfoProps> = ({ user }) => {
+
+  console.log(user);
+
+  const { username, profile_pic_url, totalXP, wins, totalGames } = user;
   const maxXPPerLevel = 1000;
   const level = Math.floor(totalXP / maxXPPerLevel);
-  const remainingXP = (totalXP % maxXPPerLevel)/10;
-  const  wins= 100;
-  const  totalGames= 200;
+  const remainingXP = ((totalXP % maxXPPerLevel) / maxXPPerLevel) * 100;
 
-  function calculateWinRate(wins :number, totalGames :number) {
-    if (totalGames === 0) return 0;
-    return (wins / totalGames) * 100;
-}
-const percentage = calculateWinRate(wins, totalGames);
+  const calculateWinRate = (wins: number, totalGames: number) => {
+    return totalGames === 0 ? 0 : (wins / totalGames) * 100;
+  };
+  const winRatePercentage = calculateWinRate(wins, totalGames);
+
   return (
     <>
 <div className="h-full w-full border-[1px] border-violet-primary rounded-xl p-2">
@@ -57,23 +62,17 @@ const percentage = calculateWinRate(wins, totalGames);
       <div className="relative w-full h-full flex flex-col items-center justify-center bg-gray-800/20 rounded-xl">
         <p className="text-white font-mont xl:font-bold xl:text-lg text-xs m-1">Win Rate</p>
         <div className="relative w-full h-full flex items-center justify-center">
-          <DoughnutChart winpercentage={percentage}/>
+          <DoughnutChart winpercentage={winRatePercentage}/>
         </div>
       </div>
       </div>
     </div>
-    
-    
-    
   </div>
-</div>
- 
-
-     
+  </div>
     </>
 
   );
 };
 
 
-export default Component;
+export default UserInfo;

@@ -23,7 +23,7 @@ export const handleLogin = async (
       console.log(responseData);
       setErrorMessage(null);
       setSuccessMessage('Login successful.');
-      router.push('/dashboard');
+      router.push(`/profile/${responseData.id}`);
     } else {
       const errorData = await response.json();
       setErrorMessage(() => 'Invalid email or password');

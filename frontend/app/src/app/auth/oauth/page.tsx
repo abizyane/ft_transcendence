@@ -24,7 +24,7 @@ const OAuthPage = () => {
           if (response.status === 200) {
             const data = await response.json();
   
-            router.push('/dashboard');
+            router.push(`/profile/${data.id}`);
           } else {
             const errorData = await response.json();
             router.push(`/login?error=${encodeURIComponent(errorData.message)}`);

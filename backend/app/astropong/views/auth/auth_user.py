@@ -15,6 +15,19 @@ class UserView(APIView):
         else:
             return Response({'error': 'No user is connected'}, status=401)
 
+class UserIdView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request):
+        iduser = request.data.get('id')
+        if iduser is None:
+            return Response({'error': 'IdUser is required'}, status=400)
+        try:
+            user = User.objects.filter(id=iduser).first()
+            return Response(UserSerializer(user, context={'request': request,}).data)
+        except User.DoesNotExist:
+            return Response({'error': 'User doesnt exist'}, status=404)
+
 class UsersView(APIView):
     permission_classes = [IsAuthenticated]
 

@@ -1,9 +1,7 @@
 import React from 'react'
-import { useUser } from "@/services/context/usercontext";
 import { useEffect, useRef, useState } from "react";
 
-import { handleLogout } from "@/services/auth";
-import { useRouter } from "next/navigation";
+import Link from 'next/link';
 
 const searchUsers = () =>{
     const [searchQuery, setSearchQuery] = useState("");
@@ -11,22 +9,15 @@ const searchUsers = () =>{
     const [loading, setLoading] = useState(false);
     const [isOpen, setIsOpen] = useState(false);
     // Debounce function
+    let timer;
     const debounce = (func, delay) => {
-      let timer;
       return (...args) => {
         clearTimeout(timer);
         timer = setTimeout(() => func(...args), delay);
       };
     };
   
-    const searchRef = useRef(null);
-  
-    const handleClickOutside = (e) => {
-      if (searchRef.current && !searchRef.current.contains(e.target)) {
-        setIsOpen(false);
-      }
-    };
-  
+    
     useEffect(() => {
       document.addEventListener("mousedown", handleClickOutside);
       return () => {
@@ -44,11 +35,11 @@ const searchUsers = () =>{
           credentials: "include",
           body: JSON.stringify({ username: query }),
         });
-  
+        
         if (!response.ok) {
           throw new Error("Error fetching data");
         }
-  
+        
         const data = await response.json();
         console.log(data);
         setUsers(data);
@@ -58,29 +49,33 @@ const searchUsers = () =>{
         setLoading(false);
       }
     };
-  
-    const debouncedSearch = debounce(fetchUsers, 500);
+    
+    const debouncedSearch = debounce(fetchUsers, 2000);
     const handleSearchKeyUp = (e) => {
       const query = e.target.value;
       setSearchQuery(query);
       debouncedSearch(query); 
       setIsOpen(true);
     };
-  
+    
     useEffect(() => {
-      if (!searchQuery.trim()) {
-        setUsers([]);
+      if (isOpen) {
+        document.addEventListener("mousedown", handleClickOutside);
+      } else {
+        document.removeEventListener("mousedown", handleClickOutside);
+      }
+      
+      // Cleanup in case the component unmounts
+      return () => document.removeEventListener("mousedown", handleClickOutside);
+    }, [isOpen]);
+    const searchRef = useRef(null);
+  
+    const handleClickOutside = (e) => {
+      if (searchRef.current && !searchRef.current.contains(e.target)) {
         setIsOpen(false);
       }
-    }, [searchQuery]);
-  
-    const router = useRouter();
-    const { user } = useUser();
-  
-    if (!user) {
-      return null;
-    }
-  return (
+    };
+    return (
       <div   ref={searchRef} className="relative  ">
                 <label>
                   <div className="w-full">
@@ -92,27 +87,26 @@ const searchUsers = () =>{
                       onKeyUp={handleSearchKeyUp}
                     />
                     {isOpen && searchQuery.trim() && (
-              <div className="absolute top-full left-0 w-full bg-gray-800 mt-2 rounded-md shadow-lg z-50 max-h-64 overflow-y-auto no-scrollbar">
+              <div className="absolute top-full left-0 w-full bg-gray-800 mt-2 rounded-md shadow-lg max-h-64 z-50 overflow-y-auto no-scrollbar">
                 <h2 className="bg-gray-800 text-center text-white text-xl">Users</h2>
                 <hr className="border-violet-primary" />
                 {loading ? (
                   <div className="p-2 text-white text-center">Loading...</div>
-                ) : users.length > 0 ? (
-                  users.map((user) => (
-                    <div
-                      key={user.id}
-                      className="flex items-center p-2 hover:bg-gray-100 cursor-pointer space-x-4"
-                    >
-                      <img
-                        src={user.profile_pic_url || "default-image-url.jpg"}
-                        alt={`${user.username}'s profile`}
-                        className="w-10 h-10 rounded-full object-cover"
-                      />
-                      <p className="text-sm font-medium text-white">{user.username}</p>
-                    </div>
-                  ))
-                ) : (
-                  <div className="p-2 text-white text-center">
+                ) :users.length > 0 ? (
+                    users.map((user) => (
+                      <Link href={`/profile/${user.id}`} key={user.id}>
+                        <div className="flex items-center p-2 hover:bg-gray-100 cursor-pointer space-x-4">
+                          <img
+                            src={user.profile_pic_url || "default-image-url.jpg"}
+                            alt={`${user.username}'s profile`}
+                            className="w-10 h-10 rounded-full object-cover"
+                          />
+                          <p className="text-sm font-medium text-white">{user.username}</p>
+                        </div>
+                      </Link>
+                    ))
+                  ) : (
+                  <div className="p-2 text-white text-center ">
                     <p>No users found</p>
                   </div>
                 )}
