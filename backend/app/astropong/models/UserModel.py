@@ -55,6 +55,16 @@ class User(AbstractUser):
                 userWhoRequest=self,
                 status=Relationship.Status.FRIENDREQUEST
             )
+    
+    def remove_friend(self, friend):
+        try:
+            relationship = Relationship.objects.filter((models.Q(user1=self) & models.Q(user2=friend))
+                | (models.Q(user1=friend) & models.Q(user2=self)) & models.Q(status=Relationship.Status.FRIEND)).first()
+            if relationship is None:
+                raise Relationship.DoesNotExist
+            relationship.delete()
+        except Relationship.DoesNotExist:
+            raise ValidationError("You cannot remove a friend you don't have a relationship with")
 
     def accept_friend_request(self, friend):
         try:

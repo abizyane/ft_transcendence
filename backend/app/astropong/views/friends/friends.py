@@ -34,7 +34,24 @@ class AddFriendView(APIView):
             return Response({
                 "error": "User not found"
             }, status=404)
-        
+
+class RemoveFriendView(APIView):
+    def post(self,request):
+        friendId = request.data.get('friend_id')
+        if friendId is None:
+            return Response({"error": "Friend id is required"}, status=status.HTTP_400_BAD_REQUEST)
+        try:
+            friend = User.objects.get(id=friendId)
+            try:
+                request.user.remove_friend(friend)
+                return Response({"message": "Friend removed."}, status=status.HTTP_200_OK)
+            except ValidationError as e:
+                return Response({"error": e}, status=status.HTTP_400_BAD_REQUEST)
+        except User.DoesNotExist:
+            return Response({
+                "error": "User not found"
+            }, status=404)
+
 class AcceptFriendRequestView(APIView):
     def post(self,request):
         friendId = request.data.get('friend_id')
