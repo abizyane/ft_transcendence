@@ -8,6 +8,10 @@ from rest_framework.response import Response
 from django.contrib.auth import get_user_model
 from rest_framework import status
 
+from chat.serializers import UserSerializer as MinUserSerializer
+from rest_framework import generics
+from rest_framework.exceptions import NotAuthenticated, NotFound
+# from rest_framework.pagination import PageNumberPagination
 
 User = get_user_model()
 
@@ -99,7 +103,28 @@ class UnblockFriendView(APIView):
             return Response({
                 "error": "User not found"
             }, status=404)
+
+
+# class BlockedUsersPageNumberPagination(PageNumberPagination):
+#     page_size = 50
+
+class BlockedUsersList(generics.ListAPIView):
+    serializer_class = MinUserSerializer
+    # pagination_class = BlockedUsersPageNumberPagination
+
+    def get_queryset(self):
+        if not self.request.user.is_authenticated:
+            raise NotAuthenticated("You must be authenticated to access this resource.")
+        try:
+            user = User.objects.get(username=self.request.user.username)
+        except User.DoesNotExist:
+            raise NotFound("User not found.")
         
+        relations = Relationship.objects.filter(models.Q(user1=user) | models.Q(user2=user), status=Relationship.Status.BLOCKED)
+        blocked_users = [relation.user2 if relation.user1 == user else relation.user1 for relation in relations]
+    
+        return blocked_users
+    
 class FriendsOfView(APIView):
     def get(self, request, user_id):
         try:

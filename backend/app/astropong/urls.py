@@ -6,7 +6,7 @@ from .views.auth.logout import LogoutView
 from .views.auth.OAuth import OAuth, OAuthCallback
 from .views.auth.auth_user import UserView, UsersView, ChangePasswordView, UserIdView, UploadProfilePicView
 from .views.auth.refresh import RefreshTokenView
-from .views.friends.friends import AddFriendView, ListFriendView, AcceptFriendRequestView, RejectFriendRequestView,FriendsOfView, BlockFriendView,UnblockFriendView
+from .views.friends.friends import AddFriendView, ListFriendView, AcceptFriendRequestView, RejectFriendRequestView,FriendsOfView, BlockFriendView,UnblockFriendView, BlockedUsersList
 
 urlpatterns = [
     path('register', RegisterView.as_view()),
@@ -23,6 +23,8 @@ urlpatterns = [
     path('searchuser', UsersView.as_view(), name='user_list'),
     path('block', BlockFriendView.as_view(), name='block'),
     path('unblock', UnblockFriendView.as_view(), name='unblock'),
+
+    path('blocked/', BlockedUsersList.as_view(), name='list_blocked'),
 
     path('friends/<str:relationship_type>/', ListFriendView.as_view(), name='list_friends_by_type'),
     path('friends/', ListFriendView.as_view(), name='list_all_friends'),
