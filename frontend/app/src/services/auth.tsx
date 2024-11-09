@@ -20,7 +20,6 @@ export const handleLogin = async (
 
     if (response.ok) {
       const responseData = await response.json();
-      console.log(responseData);
       setErrorMessage(null);
       setSuccessMessage('Login successful.');
       router.push(`/profile/${responseData.id}`);
@@ -90,7 +89,6 @@ export const handleLogout = async (
    
     if (response.ok) {
       const responseData = await response.json();
-      console.log(responseData);
       router.push('/auth/login');
     } else {
       const errorData = await response.json();

@@ -41,7 +41,6 @@ const searchUsers = () =>{
         }
         
         const data = await response.json();
-        console.log(data);
         setUsers(data);
       } catch (error) {
         console.log("Error fetching users:", error);

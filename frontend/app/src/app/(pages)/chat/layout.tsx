@@ -7,17 +7,17 @@ import Navbar from "@/components/Navbar/Navbar";
 import Link from "next/link";
 import { formatDistanceToNow } from "date-fns";
 import { useRouter } from "next/router";
+import { FiPlusCircle } from "react-icons/fi";
+import { FaSearch } from "react-icons/fa";
 interface ChatLayoutProps {
   children: ReactNode;
 }
 
 interface User {
-  user_id:number
-  sender_id: number;
-  Sender_username: string;
-  messageid: number | undefined;
-  Sender_img: string;
-  lastMessage: string;
+  id:number;
+  username: string;
+  profile_pic: string;
+  message: string;
   time: string;
 }
 
@@ -35,15 +35,14 @@ export default function Chat({ children }: ChatLayoutProps) {
         console.error('Fetch error:', error);
       }
       const data = await response.json();
+      console.log(data.results);
       setUsers(() => {
         return data?.results.map((User: any) => {
           return {
-            user_id: User.receiver.id,
-            sender_id: User.sender.id,
-            messageid: User.messageid,
-            Sender_username: User.sender.username,
-            Sender_img: User.sender.profile_pic,
-            lastMessage: User.message,
+            id:User.id,
+            username: User.username,
+            profile_pic: User.profile_pic,
+            message: User.message,
             time: formatDistanceToNow(new Date(User.timestamp), {
               addSuffix: true,
             }),
@@ -52,7 +51,7 @@ export default function Chat({ children }: ChatLayoutProps) {
       });
       return data?.results;
     } catch (error) {
-      console.error("Fetch error:", error);
+      console.log("Fetch error:", error);
     }
   };
   useEffect(() => {
@@ -70,35 +69,22 @@ export default function Chat({ children }: ChatLayoutProps) {
   };
 
     const openChat = (user) => {
-      router.push(`/chat/${user.user_id || user.sender_id}`)
+      router.push(`/chat/${user.id}`)
     }
   const currentUserId = 2;
   return (
-    <div className="w-full min-h-screen flex flex-col justify-start items-start ">
-
-      {/* Main content area */}
-      <div className="w-full flex lg:flex-row h-full  flex-col-reverse flex-grow ">
-        {/* Sidebar section */}
+    <div className="w-full flex flex-col justify-start items-start ">
+      <div className="w-full flex lg:flex-row h-full  flex-col-reverse">
         <div className="w-full  h-full ">
           <div className="w-full  h-full lg:h-full flex flex-col justify-center items-center p-2 ">
-            <div className=" bg-gray-800/60 h-[800px]  w-full  text-gray-200 rounded-xl border-2 border-violet-primary flex">
+            <div className=" bg-gray-800/60 h-[800px]  w-1/2  text-gray-200 rounded-xl border-2 border-violet-primary flex">
               <div className="w-full lg:w-96 backdrop-blur-md  rounded-xl">
                 <section className="w-full">
                   <div className="header p-4  rounded-xl flex justify-between items-center w-full">
                     <p className="text-md font-bold">Messages</p>
-                    <div className="rounded-full hover:bg-gray-700 bg-violet-primary w-10 h-10 flex justify-center items-center">
+                    <div className="rounded-full  bg-violet-primary w-10 h-10 flex justify-center items-center">
                       <button className="text-sm">
-                        <svg
-                          xmlns="http://www.w3.org/2000/svg"
-                          width="3em"
-                          height="3em"
-                          viewBox="0 0 32 32"
-                        >
-                          <path
-                            fill="#ffffff"
-                            d="M16 3C8.832 3 3 8.832 3 16s5.832 13 13 13s13-5.832 13-13S23.168 3 16 3m0 2c6.087 0 11 4.913 11 11s-4.913 11-11 11S5 22.087 5 16S9.913 5 16 5m-1 5v5h-5v2h5v5h2v-5h5v-2h-5v-5z"
-                          />
-                        </svg>
+                      <FiPlusCircle className="w-8 h-8 rounded-full hover:text-gray-700" />
                       </button>
                     </div>
                   </div>
@@ -113,13 +99,8 @@ export default function Chat({ children }: ChatLayoutProps) {
                             defaultValue=""
                             placeholder="Search Messages"
                           />
-                          <span className="absolute top-0 left-0 mt-2 ml-3 inline-block">
-                            <svg viewBox="0 0 24 24" className="w-6 h-6">
-                              <path
-                                fill="#bbb"
-                                d="M16.32 14.9l5.39 5.4a1 1 0 0 1-1.42 1.4l-5.38-5.38a8 8 0 1 1 1.41-1.41zM10 16a6 6 0 1 0 0-12 6 6 0 0 0 0 12z"
-                              />
-                            </svg>
+                          <span className="absolute top-0 left-0 mt-3 ml-3 inline-block">
+                            <FaSearch className="w-5 h-5 text-gray-400"/>
                           </span>
                         </label>
                       </div>
@@ -153,27 +134,25 @@ export default function Chat({ children }: ChatLayoutProps) {
                    {/* <Link key={`message-${user.id}`} href="">
                   </Link> */}
                <div className="p-2 flex-1 md:w-full h-[600px] overflow-y-scroll">
-      {users &&
-        users
-          .filter((user) => user.user_id || user.sender_id === currentUserId)
+      {users
           .map((user, i) => (
             <Link 
-              key={`message-${i}`}
-              href={`/chat/${user.user_id || user.sender_id}`}
+              key={`message-${user.id}`}
+              href={`/chat/${user.id}`}
               passHref
             >
               <div className="flex justify-between items-center p-3 hover:bg-gray-800 rounded-lg cursor-pointer">
                 <div className="w-16 h-16 flex-shrink-0">
                   <img
                     className="shadow-md rounded-full w-full h-full object-cover"
-                    src={user.Sender_img}
-                    alt={user.name}
+                    src={user.profile_pic}
+                    alt={user.username}
                   />
                 </div>
                 <div className="flex-auto min-w-0 ml-4 mr-6">
-                  <p className="font-bold">{user.name}</p>
+                  <p className="font-bold">{user.username}</p>
                   <div className="flex justify-between items-center text-sm text-gray-600">
-                    <p className="truncate">{user.lastMessage}</p>
+                    <p className="truncate">{user.message}</p>
                     <p className="ml-4 text-white-primary whitespace-nowrap">
                       {user.time}
                     </p>
@@ -185,46 +164,6 @@ export default function Chat({ children }: ChatLayoutProps) {
     </div>
 
                 {/* Slide Component */}
-                <div
-                  className={`lg:hidden fixed top-0 right-0 h-full w-full bg-gray-800 rounded-xl backdrop-blur-3xl transition-transform transform ${
-                    isSliderOpen ? "translate-x-0" : "translate-x-full"
-                  }`}
-                >
-                  <div className="flex justify-start  p-4 border-b">
-                    <button
-                      onClick={closeSlider}
-                      className="text-gray-600 hover:text-black"
-                    >
-                      Close
-                    </button>
-                    <div className="flex flex-col text-center w-full">
-                      <h2 className="pl-2 text-lg font-semibold">
-                        {selectedUser?.name}
-                      </h2>
-                      <p>Active 1h ago</p>
-                    </div>
-                  </div>
-                  <div className="flex-1 overflow-y-auto p-4">
-                    {/* Messages go here */}
-                  </div>
-                  <div className="chat-footer w-full fixed bottom-0 left-0 rounded-xl p-4 bg-gray-800 border-t border-gray-700">
-                    <div className="relative">
-                      <label className="flex items-center w-full">
-                        <input
-                          className="rounded-full py-2 pl-3 pr-20 w-full border border-gray-800 focus:border-gray-700 bg-gray-800  focus:bg-gray-900 focus:outline-none text-gray-200 focus:shadow-md"
-                          type="text"
-                          placeholder="Write your message"
-                        />
-                        <button
-                          type="button"
-                          className="absolute top-1/2 transform -translate-y-1/2 right-4 focus:outline-none text-violet-primary hover:text-blue-700 px-4 py-1"
-                        >
-                          Send
-                        </button>
-                      </label>
-                    </div>
-                  </div>
-                </div>
               </div>
               <div className="flex-1 hidden lg:block">{children}</div>
             </div>
@@ -234,3 +173,43 @@ export default function Chat({ children }: ChatLayoutProps) {
     </div>
   );
 }
+                // <div
+                //   className={`lg:hidden fixed top-0 right-0 h-full w-full bg-gray-800 rounded-xl backdrop-blur-3xl transition-transform transform ${
+                //     isSliderOpen ? "translate-x-0" : "translate-x-full"
+                //   }`}
+                // >
+                //   <div className="flex justify-start  p-4 border-b">
+                //     <button
+                //       onClick={closeSlider}
+                //       className="text-gray-600 hover:text-black"
+                //     >
+                //       Close
+                //     </button>
+                //     <div className="flex flex-col text-center w-full">
+                //       <h2 className="pl-2 text-lg font-semibold">
+                //         {selectedUser?.name}
+                //       </h2>
+                //       <p>Active 1h ago</p>
+                //     </div>
+                //   </div>
+                //   <div className="flex-1 overflow-y-auto p-4">
+                //     {/* Messages go here */}
+                //   </div>
+                //   <div className="chat-footer w-full fixed bottom-0 left-0 rounded-xl p-4 bg-gray-800 border-t border-gray-700">
+                //     <div className="relative">
+                //       <label className="flex items-center w-full">
+                //         <input
+                //           className="rounded-full py-2 pl-3 pr-20 w-full border border-gray-800 focus:border-gray-700 bg-gray-800  focus:bg-gray-900 focus:outline-none text-gray-200 focus:shadow-md"
+                //           type="text"
+                //           placeholder="Write your message"
+                //         />
+                //         <button
+                //           type="button"
+                //           className="absolute top-1/2 transform -translate-y-1/2 right-4 focus:outline-none text-violet-primary hover:text-blue-700 px-4 py-1"
+                //         >
+                //           Send
+                //         </button>
+                //       </label>
+                //     </div>
+                //   </div>
+                // </div>

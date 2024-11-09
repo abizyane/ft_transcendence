@@ -20,10 +20,10 @@ type UserInfoProps = {
 
 const UserInfo: React.FC<UserInfoProps> = ({ user }) => {
 
-  // const [iscurruser , setUser] = useState<true | false>(false);
-  const curruser=useUser();
-  // if (user.id === curruser)
-  
+  console.log(user.id);
+  const { user:currentuser } = useUser();
+  // console.log(currentuser.id);
+
   const { username, profile_pic_url, xp,wins,totalGames} = user;
   const maxXPPerLevel = 1000;
   const level = Math.floor(user.xp / maxXPPerLevel);
@@ -60,7 +60,7 @@ const UserInfo: React.FC<UserInfoProps> = ({ user }) => {
             </div>
     </div>
     <div className="flex flex-col w-2/5">
-      {curruser.id  === user.id ?
+      {currentuser?.id  === user?.id ?
         (<div className="border-[2px] border-violet-primary rounded-3xl h-auto p-1 mb-2 mr-2">
         <h1 className="text-base mr-2 lg:text-2xl font-bold text-violet-primary text-center">Welcome!</h1>
         <p className="text-base lg:text-2xl font-bold text-white text-center">{user.username}</p>
@@ -75,7 +75,6 @@ const UserInfo: React.FC<UserInfoProps> = ({ user }) => {
               <ImBlocked className="text-xl" />
             </button>
           </div>
-          
           )
       }
       <div className="p-2 rounded-xl border h-full border-violet-primary mr-2">

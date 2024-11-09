@@ -9,45 +9,31 @@ import { IoCloseCircle } from "react-icons/io5";
 import { CgUnblock } from "react-icons/cg";
 import data from '@/app/data/Dashboarddata.json';
 import {User} from "../../../services/context/usercontext"
+import { useFriends } from "@/services/friends";
+import { useFriendRequests } from "@/services/friendrequest";
+import { useBlockedFriends } from "@/services/blockedfriends";
 
 
 const friends = () => {
-  const [friends, setFriends] = useState<User[]>([]);
-  const [loading, setLoading] = useState(true);
+  const { friends, loading, error } = useFriends();
+  const { requests, reqloading, reqerror } = useFriendRequests();
+  const { blocked, blkloading, blkerror } = useBlockedFriends();
+  
+  if (loading ||reqloading || blkloading ) {
+    return <div>Loading...</div>;
+  }
 
-  useEffect(() => {
-    const showfriendlist = async () =>{
-      try{
-        const response = await fetch ('http://localhost:8000/api/friends',{
-          method: 'GET',
-          credentials: 'include',
-        })
-        if (response.ok){
-          const responsedata = await response.json();
-          console.log(responsedata);
-          // setFriends(()=>{
-          //   return friends
-          // });
-          setFriends(responsedata);
-        }else{
-          const error=await response.json()
-          console.log("failed to fetch");
-        }
-        }catch (error){
-          console.log("catched error")
-        };
-
-      }
-      showfriendlist();
-  },[]);
+  if (error || reqerror || blkerror) {
+    return <div className="text-red-500">{error}</div>;
+  }
 
   return (
-    <div className=" w-full  p-2 mb-24 lg:mt-9 lg:h-full">
+    <div className=" w-full lg:max-w-[1200px] p-2 mb-24  lg:h-full ">
       <h1 className="text-white text-center w-full text-xl lg:text-3xl font-bold mb-4 mt-2 ">
         Friends List
       </h1>
-      <div className="bg-gray-800/65 rounded-xl border w-full border-violet-primary grid grid-cols-1 lg:grid-cols-2 gap-4   h-[250px] lg:h-[600px] overflow-y-auto no-scrollbar p-4">
-        {friends.map((friend, index) => (
+      <div className="bg-gray-800/65 rounded-xl border w-full border-violet-primary grid grid-cols-1 lg:grid-cols-2 gap-4   h-[230px] lg:h-[600px] overflow-y-auto no-scrollbar p-4">
+        {friends?.map((friend, index) => (
           <div
             key={index}
             className="flex justify-center items-center bg-gray-700/70 h-[90px] hover:bg-gray-600 transition-shadow border border-gray-600 rounded-lg p-4 shadow-lg hover:shadow-2xl"
@@ -61,7 +47,6 @@ const friends = () => {
             </div>
             <div className="flex flex-col justify-center ml-4">
               <span className="text-md font-semibold text-white">{friend.username}</span>
-              <span className="text-sm text-gray-400">@username</span>
             </div>
             <div className="ml-auto flex space-x-4">
               <button
@@ -71,7 +56,7 @@ const friends = () => {
                 <IoChatbubbleEllipsesSharp className="w-6 h-6  text-blue-600 hover:text-blue-900" />
               </button>
               <button
-                aria-label="Settings"
+                aria-label="invite"
                 className="hover:text-red-500 text-white transition-colors"
               >
                 <FaTableTennisPaddleBall className="w-6 h-6  text-red-600 hover:text-red-900" />
@@ -86,22 +71,21 @@ const friends = () => {
       <h1 className="text-white text-center w-full text-xl font-bold mb-4 mt-2 ">
         Request List
       </h1>
-      <div className="bg-gray-800/65 rounded-xl border w-full border-violet-primary grid grid-cols-1 gap-4   h-[300px] overflow-y-auto no-scrollbar p-4">
-        {[...Array(30)].map((_, index) => (
+      <div className="bg-gray-800/65 rounded-xl border w-full border-violet-primary grid grid-cols-1 gap-4   h-[250px] overflow-y-auto no-scrollbar p-4">
+        {requests?.map((request, index) => (
           <div
           key={index}
-          className="flex items-center bg-gray-700/70 hover:bg-gray-600 transition-shadow border border-gray-600 rounded-lg p-4 shadow-lg hover:shadow-2xl"
+          className="flex items-center h-[90px] bg-gray-700/70 hover:bg-gray-600 transition-shadow border border-gray-600 rounded-lg p-4 shadow-lg hover:shadow-2xl"
           >
             <div className="h-14 w-14 rounded-full overflow-hidden">
               <img
-                src={solo.src}
+                src={request.profile_pic_url}
                 alt="mode solo"
                 className="w-full h-full object-cover"
                 />
             </div>
             <div className="flex flex-col justify-center ml-4">
-              <span className="text-md font-semibold text-white">Name</span>
-              <span className="text-sm text-gray-400">@username</span>
+              <span className="text-md font-semibold text-white">{request.username}</span>
             </div>
             <div className="ml-auto flex space-x-4">
               <button
@@ -126,22 +110,21 @@ const friends = () => {
       <h1 className="text-white text-center w-full text-xl font-bold mb-4 mt-2 ">
         Blocked List
       </h1>
-      <div className="bg-gray-800/65 rounded-xl border w-full border-violet-primary grid grid-cols-1  gap-4   h-[300px] overflow-y-auto no-scrollbar p-4">
-        {[...Array(30)].map((_, index) => (
+      <div className="bg-gray-800/65 rounded-xl border w-full border-violet-primary grid grid-cols-1  gap-4   h-[250px] overflow-y-auto no-scrollbar p-4">
+        {blocked?.map((block, index) => (
           <div
           key={index}
-          className="flex items-center bg-gray-700/70 hover:bg-gray-600 transition-shadow border border-gray-600 rounded-lg p-4 shadow-lg hover:shadow-2xl"
+          className="flex items-center  h-[90px] bg-gray-700/70 hover:bg-gray-600 transition-shadow border border-gray-600 rounded-lg p-4 shadow-lg hover:shadow-2xl"
           >
             <div className="h-14 w-14 rounded-full overflow-hidden">
               <img
-                src={solo.src}
+                src={block.profile_pic}
                 alt="mode solo"
                 className="w-full h-full object-cover"
                 />
             </div>
             <div className="flex flex-col justify-center ml-4">
-              <span className="text-md font-semibold text-white">Name</span>
-              <span className="text-sm text-gray-400">@username</span>
+              <span className="text-md font-semibold text-white">{block.username}</span>
             </div>
             <div className="ml-auto flex space-x-4">
               <button

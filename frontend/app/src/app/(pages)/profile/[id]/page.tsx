@@ -55,7 +55,7 @@ const page = () => {
   if (error) return <p>Error: {error}</p>;
   if (!user) return null;
   return (
-    <div className="flex flex-1  w-full px-1 overflow-hidden justify-center items-center">
+    <div className="mt-10 lg:mt-0 flex flex-1  w-full px-1 overflow-hidden justify-center items-center">
     <div className="flex-1 w-full flex flex-col items-center justify-center mb-14 mt-2 relative">
       <div className="flex flex-col lg:flex-row w-full space-y-4 lg:space-y-0 lg:space-x-4">
         <div className="bg-gray-800/60 backdrop-blur-sm rounded-xl lg:w-2/4 lg:border border-violet-primary mb-4 lg:mb-0">
@@ -73,7 +73,7 @@ const page = () => {
       <div className="flex flex-col lg:flex-row w-full space-y-4 lg:space-y-0 lg:space-x-4">
         <History />
         <TopPlayers />
-        <Friends/>
+        <Friends user={user}/>
       </div>
     </div>
   </div>

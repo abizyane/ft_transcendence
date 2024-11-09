@@ -26,7 +26,7 @@ interface User {
   
   interface HistoryProps {
     data: {
-      user: User & { history: Game[] }; 
+      user: User & { history: Game[] };
     };
   }
 
