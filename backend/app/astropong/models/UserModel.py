@@ -76,6 +76,8 @@ class User(AbstractUser):
         
     def block_friend(self, friend):
         try:
+            if self == friend:
+                raise ValidationError("You cannot block yourself.")
             relationship = Relationship.objects.filter(
                 (models.Q(user1=self) & models.Q(user2=friend)) | (models.Q(user1=friend) & models.Q(user2=self))
             ).first()
