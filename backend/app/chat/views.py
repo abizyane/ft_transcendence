@@ -30,15 +30,24 @@ class ConversationsView(generics.ListAPIView):
         
         messages = Message.objects.filter(Q(sender=user) | Q(receiver=user)).order_by('-timestamp')
 
-        conversations = groupby(messages, key=lambda message: tuple(sorted([message.sender.username, message.receiver.username])))
+        # conversations = groupby(messages, key=lambda message: tuple(sorted([message.sender.username, message.receiver.username])))
 
-        last_messages = []
-        for conversation in conversations:
-            last_messages.append(max(conversation, key=lambda message: message.timestamp))
+        last_messages = {}
 
-        last_messages.sort(key=lambda message: message.timestamp, reverse=True)
+        for message in messages:
+            user_pair = tuple(sorted([message.sender.username, message.receiver.username]))
+            if user_pair not in last_messages:
+                last_messages[user_pair] = message
 
-        return last_messages
+        return list(last_messages.values())
+
+        # last_messages = []
+        # for conversation in conversations:
+        #     last_messages.append(max(conversation, key=lambda message: message.timestamp))
+
+        # # last_messages.sort(key=lambda message: message.timestamp, reverse=True)
+
+        # return last_messages
 
 
 class ChatRoomView(generics.ListAPIView):
