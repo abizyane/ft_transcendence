@@ -2,9 +2,10 @@ import React, { useEffect, useState } from "react";
 import DoughnutChart from "../Charts/Winrate";
 import Image from "next/image";
 import { useUser } from "@/services/context/usercontext";
-import { MdPersonAddAlt1 } from "react-icons/md";
+import { MdOutlinePersonAddAlt1, MdPersonAddAlt1 } from "react-icons/md";
 import { MdPersonAddDisabled } from "react-icons/md";
-import { ImBlocked } from "react-icons/im";
+import { ImBlocked, ImEyeBlocked } from "react-icons/im";
+import { IoIosRemoveCircleOutline } from "react-icons/io";
 
 type User = {
   name: string;
@@ -12,6 +13,7 @@ type User = {
   totalXP: number;
   wins: number;
   totalGames: number;
+  relationship:string
 };
 
 type UserInfoProps = {
@@ -110,23 +112,57 @@ const UserInfo: React.FC<UserInfoProps> = ({ user }) => {
             </div>
     </div>
     <div className="flex flex-col w-2/5">
-      {currentuser?.id  === user?.id ?
-        (<div className="border-[2px] border-violet-primary rounded-3xl h-auto p-1 mb-2 mr-2">
-        <h1 className="text-base mr-2 lg:text-2xl font-bold text-violet-primary text-center">Welcome!</h1>
-        <p className="text-base lg:text-2xl font-bold text-white text-center">{user.username}</p>
-      </div>
-          ) :
-          (
-            <div className="border-2 border-violet-primary rounded-3xl p-4 mb-2 mr-2 bg-gray-800 flex flex-col md:flex-row items-center space-y-2 md:space-y-0 md:space-x-2">
-            <button className="px-4 py-2 flex items-center justify-center bg-green-900 text-white rounded-lg hover:bg-green-950 transition duration-200 w-full md:w-1/2 lg:w-1/2">
-              <MdPersonAddAlt1 className="text-xl" onClick={handleAddFriend}/>
-            </button>
-            <button className="px-4 py-2 flex items-center justify-center bg-red-900 text-white rounded-lg hover:bg-red-950 transition duration-200 w-full md:w-1/2 lg:w-1/2">
-              <ImBlocked className="text-xl" onClick={handleBlockFriend}/>
-            </button>
-          </div>
-          )
-      }
+    {currentuser?.id === user?.id ? (
+  <div className="border-[2px] border-violet-primary rounded-3xl h-auto p-1 mb-2 mr-2">
+    <h1 className="text-base mr-2 lg:text-2xl font-bold text-violet-primary text-center">Welcome!</h1>
+    <p className="text-base lg:text-2xl font-bold text-white text-center">{user.username}</p>
+  </div>
+) : user.relationship === 'Friend' ? (
+  <div className="border-2 border-violet-primary rounded-3xl p-4 mb-2 mr-2 bg-gray-800 flex flex-col md:flex-row items-center space-y-2 md:space-y-0 md:space-x-2">
+    <button className="px-4 py-2 flex items-center justify-center bg-red-900 text-white rounded-lg hover:bg-red-950 transition duration-200 w-full md:w-1/2 lg:w-1/2" >
+      <IoIosRemoveCircleOutline className="text-xl" />
+      Remove Friend
+    </button>
+    <button className="px-4 py-2 flex items-center justify-center bg-red-900 text-white rounded-lg hover:bg-red-950 transition duration-200 w-full md:w-1/2 lg:w-1/2" >
+      <ImBlocked className="text-xl" />
+      Block
+    </button>
+  </div>
+) : user.relationship === 'Friend Request' && user?.id !== currentuser?.id ? (
+  <div className="border-2 border-violet-primary rounded-3xl p-4 mb-2 mr-2 bg-gray-800 flex flex-col md:flex-row items-center space-y-2 md:space-y-0 md:space-x-2">
+    <button className="px-4 py-2 flex items-center justify-center bg-green-900 text-white rounded-lg hover:bg-green-950 transition duration-200 w-full md:w-1/2 lg:w-1/2" >
+      <MdOutlinePersonAddAlt1 className="text-xl" />
+      Accept
+    </button>
+    <button className="px-4 py-2 flex items-center justify-center bg-red-900 text-white rounded-lg hover:bg-red-950 transition duration-200 w-full md:w-1/2 lg:w-1/2" >
+      <ImEyeBlocked className="text-xl" />
+      Reject
+    </button>
+  </div>
+) : user.relationship === 'Friend Request' && user?.id === currentuser?.id ? (
+  <div className="border-2 border-violet-primary rounded-3xl p-4 mb-2 mr-2 bg-gray-800 flex flex-col md:flex-row items-center space-y-2 md:space-y-0 md:space-x-2">
+    <button className="px-4 py-2 flex items-center justify-center bg-green-900 text-white rounded-lg hover:bg-green-950 transition duration-200 w-full md:w-1/2 lg:w-1/2" >
+      <MdOutlinePersonAddAlt1 className="text-xl" />
+      Panding
+    </button>
+    {/* <button className="px-4 py-2 flex items-center justify-center bg-red-900 text-white rounded-lg hover:bg-red-950 transition duration-200 w-full md:w-1/2 lg:w-1/2" >
+      <ImEyeBlocked className="text-xl" />
+      Reject
+    </button> */}
+  </div>
+ ):(
+  <div className="border-2 border-violet-primary rounded-3xl p-4 mb-2 mr-2 bg-gray-800 flex flex-col md:flex-row items-center space-y-2 md:space-y-0 md:space-x-2">
+    <button className="px-4 py-2 flex items-center justify-center bg-green-900 text-white rounded-lg hover:bg-green-950 transition duration-200 w-full md:w-1/2 lg:w-1/2" >
+      <MdPersonAddAlt1 className="text-xl" />
+      Add Friend
+    </button>
+    <button className="px-4 py-2 flex items-center justify-center bg-red-900 text-white rounded-lg hover:bg-red-950 transition duration-200 w-full md:w-1/2 lg:w-1/2">
+      <ImBlocked className="text-xl" />
+      Block
+    </button>
+  </div>
+)}
+
       <div className="p-2 rounded-xl border h-full border-violet-primary mr-2">
       <div className="relative w-full h-full flex flex-col items-center justify-center bg-gray-800/20 rounded-xl">
         <p className="text-white font-mont xl:font-bold xl:text-lg text-xs m-1">Win Rate</p>

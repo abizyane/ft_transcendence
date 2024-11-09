@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 
 interface Friend {
+  id:number
   username: string;
   profile_pic_url: string;
   xp: number;

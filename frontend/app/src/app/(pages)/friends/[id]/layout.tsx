@@ -122,11 +122,11 @@ const friends = () => {
       <h1 className="text-white text-center w-full text-xl lg:text-3xl font-bold mb-4 mt-2 ">
         Friends List
       </h1>
-      <div className="bg-gray-800/65 rounded-xl border w-full border-violet-primary flex flex-wrap gap-4 h-[230px] lg:h-[600px] overflow-y-auto no-scrollbar p-4">
+      <div className="bg-gray-800/65 rounded-xl border w-full border-violet-primary grid grid-cols-1 lg:grid-cols-2 gap-4 h-[230px] lg:h-[600px] overflow-y-auto no-scrollbar p-4">
         {friends?.map((friend, index) => (
           <div
             key={index}
-            className="flex justify-center items-center bg-gray-700/70 h-[90px] w-[48%] hover:bg-gray-600 transition-shadow border border-gray-600 rounded-lg p-4 shadow-lg hover:shadow-2xl"
+            className="flex justify-center items-center bg-gray-700/70 h-[90px] hover:bg-gray-600 transition-shadow border border-gray-600 rounded-lg p-4 shadow-lg hover:shadow-2xl"
           >
             <div className="h-14 w-14 rounded-full overflow-hidden">
               <img

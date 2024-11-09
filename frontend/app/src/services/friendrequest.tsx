@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 
 interface FriendRequest {
+  id:number;
   username: string;
   pic: string;
   xp: number;
