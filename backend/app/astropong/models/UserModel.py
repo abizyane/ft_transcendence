@@ -3,6 +3,7 @@ from django.contrib.auth.models import AbstractUser
 from django.core.exceptions import ValidationError
 from django.db import models
 
+
 # Create your models here.
 
 class User(AbstractUser):
@@ -16,15 +17,12 @@ class User(AbstractUser):
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = ['username']
 
-
     def get_relations(self, userid, friendid):
         relationship = Relationship.objects.filter(
             (models.Q(user1=userid) & models.Q(user2=friendid)) | (models.Q(user1=friendid) & models.Q(user2=userid))
         )
         relationship = relationship.first()
         return relationship
-
-
     def add_friend(self, friend):
         if self == friend:
             raise ValidationError("You cannot add yourself as a friend.")

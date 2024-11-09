@@ -2,13 +2,14 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.exceptions import AuthenticationFailed
 from rest_framework.permissions import IsAuthenticated
-from ...serializers.UserSerializer import UserSerializer
-from ...models.UserModel import User
+from ...serializers.UserSerializer import FriendSerializer, UserSerializer
+from ...models.UserModel import User, Relationship
 import jwt, datetime
 from django.conf import settings
 from rest_framework import serializers
 from django.core.files.storage import default_storage
 from django.core.files.base import ContentFile
+from django.db import models
 import os
 from rest_framework.parsers import MultiPartParser, FormParser
 
@@ -45,8 +46,28 @@ class UserIdView(APIView):
         if iduser is None:
             return Response({'error': 'IdUser is required'}, status=400)
         try:
+            try:
+                relation = Relationship.objects.filter(
+                    (models.Q(user1=request.user.id) & models.Q(user2=iduser)) | (models.Q(user1=iduser) & models.Q(user2=request.user.id))
+                ).first()
+                if relation is not None:
+                    if relation.status == Relationship.Status.BLOCKED:
+                        return Response({'error': 'You cannot see this user'}, status=403)
+            except Relationship.DoesNotExist:
+                pass
             user = User.objects.filter(id=iduser).first()
-            return Response(UserSerializer(user, context={'request': request,}).data)
+
+            query = models.Q(user1=user, user2=request.user) | models.Q(user1=request.user, user2=user)
+
+            relation = Relationship.objects.filter(query).first()
+
+            # if not relation:
+            #     relation = Relationship.objects.create(
+            #         user1=user,
+            #         user2=request.user,
+            #         status=Relationship.Status.UNKNOWN
+            #     )
+            return Response(FriendSerializer(user, context={'request': request, 'relationships': relation}).data)
         except User.DoesNotExist:
             return Response({'error': 'User doesnt exist'}, status=404)
 

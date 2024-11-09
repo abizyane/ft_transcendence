@@ -174,8 +174,6 @@ class ListFriendView(APIView):
 
         for relation in relations:
             friend = relation.user2 if relation.user1 == user else relation.user1
-            # if relationship_type == 'friend_requests' and relation.user1 == user:
-            #     pass
             if friend == user:
                 pass
             friends_with_relationship.append((friend, relation.status, relation.user1)) 

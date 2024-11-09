@@ -73,16 +73,28 @@ class FriendSerializer(serializers.ModelSerializer):
         return default_image_url
 
     def get_relationship(self, obj):
-        # Find the relationship status for the current user in context
         relationships = self.context.get('relationships', [])
-        for friend, status, _ in relationships:
-            if friend == obj:
-                return Relationship.Status(status).label
-        return "Unknown"
+        if isinstance(relationships, list):
+            print("is array", type(relationships))
+            for friend, status, _ in relationships:
+                if friend == obj:
+                    return Relationship.Status(status).label
+            return "Unknown"
+        elif isinstance(relationships, Relationship):
+            if relationships.user1 == obj or relationships.user2 == obj:
+                return relationships.get_status_display()
+        elif relationships is None:
+            return "Unknown"
+
     def get_sender_id(self, obj):
         relationships = self.context.get('relationships', [])
-        for friend, status, user in relationships:
-            if friend == obj:
-                return user.id
+        if isinstance(relationships, list):
+            for friend, _, sender in relationships:
+                if friend == obj:
+                    return sender.id
+            return None
+        elif isinstance(relationships, Relationship):
+                return relationships.user1.id
+            
     def get_xp(self, obj):
         return obj.profile.xp if hasattr(obj, 'profile') else 0
