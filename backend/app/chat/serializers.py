@@ -37,7 +37,7 @@ class ChatRoomSerializer(serializers.Serializer):
 
     def to_representation(self, instance):
         return {
-            'user': instance.sender if instance.sender.username != self.request.user.username else instance.receiver,
+            'user': instance.sender if instance.sender.username != self.context['request'].user.username else instance.receiver,
             'messages': instance.messages,
         }
     class Meta:
@@ -49,8 +49,8 @@ class ConversationSerializer(serializers.ModelSerializer):
 
     def to_representation(self, instance):
         return {
-            'username': instance.sender.username if instance.sender.username != self.request.user.username else instance.receiver.username,
-            'profile_pic': instance.sender.profile_pic if instance.sender.username != self.request.user.username else instance.receiver.profile_pic,
+            'username': instance.sender.username if instance.sender.username != self.context['request'].user.username else instance.receiver.username,
+            'profile_pic': instance.sender.profile_pic if instance.sender.username != self.context['request'].user.username else instance.receiver.profile_pic,
             'message': instance.message,
             'timestamp': instance.timestamp,
             'seen': instance.seen
