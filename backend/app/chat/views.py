@@ -36,6 +36,8 @@ class ConversationsView(generics.ListAPIView):
             if user_pair not in latest_messages:
                 latest_messages[user_pair] = message
         
+        latest_messages = dict(sorted(latest_messages.items(), key=lambda message: message[1].timestamp, reverse=True))
+        
         return list(latest_messages.values())
 
 class ChatRoomView(generics.ListAPIView):
