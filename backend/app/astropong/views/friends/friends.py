@@ -62,6 +62,40 @@ class RejectFriendRequestView(APIView):
                 "error": "User not found"
             }, status=404)
         
+class BlockFriendView(APIView):
+    def post(self,request):
+        friendId = request.data.get('user_id')
+        if friendId is None:
+            return Response({"error": "User id is required"}, status=status.HTTP_400_BAD_REQUEST)
+        try:
+            friend = User.objects.get(id=friendId)
+            try:
+                request.user.block_friend(friend)
+                return Response({"message": "User blocked."}, status=status.HTTP_200_OK)
+            except ValidationError as e:
+                return Response({"error": e}, status=status.HTTP_400_BAD_REQUEST)
+        except User.DoesNotExist:
+            return Response({
+                "error": "User not found"
+            }, status=404)
+        
+class UnblockFriendView(APIView):
+    def post(self,request):
+        friendId = request.data.get('user_id')
+        if friendId is None:
+            return Response({"error": "User id is required"}, status=status.HTTP_400_BAD_REQUEST)
+        try:
+            friend = User.objects.get(id=friendId)
+            try:
+                request.user.unblock_friend(friend)
+                return Response({"message": "User unblocked."}, status=status.HTTP_200_OK)
+            except ValidationError as e:
+                return Response({"error": e}, status=status.HTTP_400_BAD_REQUEST)
+        except User.DoesNotExist:
+            return Response({
+                "error": "User not found"
+            }, status=404)
+        
 class FriendsOfView(APIView):
     def get(self, request, user_id):
         try:
