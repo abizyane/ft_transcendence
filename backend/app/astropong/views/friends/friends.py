@@ -163,7 +163,7 @@ class ListFriendView(APIView):
             )
         elif relationship_type == 'friend_requests':
             relations = Relationship.objects.filter(
-                (models.Q(user1=user) | models.Q(user2=user)) &
+                (models.Q(user2=user)) &
                 models.Q(status=Relationship.Status.FRIENDREQUEST)
             )
         else: 
@@ -174,8 +174,8 @@ class ListFriendView(APIView):
 
         for relation in relations:
             friend = relation.user2 if relation.user1 == user else relation.user1
-            if relationship_type == 'friend_requests' and relation.user1 == user:
-                pass
+            # if relationship_type == 'friend_requests' and relation.user1 == user:
+            #     pass
             if friend == user:
                 pass
             friends_with_relationship.append((friend, relation.status, relation.user1)) 
