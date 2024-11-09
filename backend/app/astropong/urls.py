@@ -24,7 +24,7 @@ urlpatterns = [
     path('block', BlockFriendView.as_view(), name='block'),
     path('unblock', UnblockFriendView.as_view(), name='unblock'),
 
-    path('blocked/', BlockedUsersList.as_view(), name='list_blocked'),
+    path('blocked', BlockedUsersList.as_view(), name='list_blocked'),
 
     path('friends/<str:relationship_type>/', ListFriendView.as_view(), name='list_friends_by_type'),
     path('friends/', ListFriendView.as_view(), name='list_all_friends'),

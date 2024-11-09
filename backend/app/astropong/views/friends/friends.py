@@ -120,7 +120,7 @@ class BlockedUsersList(generics.ListAPIView):
         except User.DoesNotExist:
             raise NotFound("User not found.")
         
-        relations = Relationship.objects.filter(models.Q(user1=user) | models.Q(user2=user), status=Relationship.Status.BLOCKED)
+        relations = Relationship.objects.filter((models.Q(user1=user) | models.Q(user2=user)) & models.Q(userWhoBlocked=user), status=Relationship.Status.BLOCKED)
         blocked_users = [relation.user2 if relation.user1 == user else relation.user1 for relation in relations]
     
         return blocked_users
