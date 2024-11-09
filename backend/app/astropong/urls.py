@@ -4,7 +4,7 @@ from .views.auth.register import RegisterView
 from .views.auth.login import LoginView ,UserListView
 from .views.auth.logout import LogoutView
 from .views.auth.OAuth import OAuth, OAuthCallback
-from .views.auth.auth_user import UserView, UsersView, ChangePasswordView, UploadProfilePicView
+from .views.auth.auth_user import UserView, UsersView, ChangePasswordView, UserIdView, UploadProfilePicView
 from .views.auth.refresh import RefreshTokenView
 from .views.friends.friends import AddFriendView, ListFriendView, AcceptFriendRequestView, RejectFriendRequestView,FriendsOfView, BlockFriendView,UnblockFriendView
 
@@ -19,6 +19,7 @@ urlpatterns = [
     path('users', UserListView.as_view(), name='user_list'),
     path('upload_image', UploadProfilePicView.as_view(), name='change_password'),
     path('changepassword', ChangePasswordView.as_view(), name='change_password'),
+    path('userid', UserIdView.as_view(), name='user_id'),
     path('searchuser', UsersView.as_view(), name='user_list'),
     path('block', BlockFriendView.as_view(), name='block'),
     path('unblock', UnblockFriendView.as_view(), name='unblock'),

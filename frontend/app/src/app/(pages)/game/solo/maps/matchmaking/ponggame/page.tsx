@@ -1,5 +1,5 @@
 import Image from "next/image";
-import Mars from "../../../../../../../public/Mars.jpeg";
+import Mars from "../../../../../../../../public/Mars.jpeg";
 import VS from "../../../../../../../../public/VS.jpeg";
 import Canvas from "@/components/Canva/page";
 const users = [

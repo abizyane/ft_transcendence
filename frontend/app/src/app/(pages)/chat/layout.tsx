@@ -1,11 +1,12 @@
 "use client";
 
 import React, { ReactNode, useEffect, useState } from "react";
-import "../globals.css";
+import "../../globals.css";
 import Sidebar from "@/components/Sidebar/Sidebar";
 import Navbar from "@/components/Navbar/Navbar";
 import Link from "next/link";
 import { formatDistanceToNow } from "date-fns";
+import { useRouter } from "next/router";
 interface ChatLayoutProps {
   children: ReactNode;
 }
@@ -27,9 +28,11 @@ export default function Chat({ children }: ChatLayoutProps) {
 
   const fetchConversation = async () => {
     try {
-      const response = await fetch(`http://localhost:8000/chat/conversations`);
+      const response = await fetch(`http://localhost:8000/chat/conversations`,{
+        credentials: 'include',
+      });
       if (!response.ok) {
-        throw new Error("Network response was not ok");
+        console.error('Fetch error:', error);
       }
       const data = await response.json();
       setUsers(() => {
@@ -66,23 +69,19 @@ export default function Chat({ children }: ChatLayoutProps) {
     setSelectedUser(null);
   };
 
+    const openChat = (user) => {
+      router.push(`/chat/${user.user_id || user.sender_id}`)
+    }
   const currentUserId = 2;
   return (
     <div className="w-full min-h-screen flex flex-col justify-start items-start ">
-      <div className="w-full">
-        <Navbar />
-      </div>
 
       {/* Main content area */}
       <div className="w-full flex lg:flex-row h-full  flex-col-reverse flex-grow ">
         {/* Sidebar section */}
-        <div className="lg:w-24 fixed lg:static bottom-0 left-0  w-full z-50 lg:z-0">
-          <Sidebar />
-        </div>
         <div className="w-full  h-full ">
-          test
           <div className="w-full  h-full lg:h-full flex flex-col justify-center items-center p-2 ">
-            <div className=" bg-gray-800/60 h-[1100px]  w-full  text-gray-200 rounded-xl border-2 border-violet-primary flex">
+            <div className=" bg-gray-800/60 h-[800px]  w-full  text-gray-200 rounded-xl border-2 border-violet-primary flex">
               <div className="w-full lg:w-96 backdrop-blur-md  rounded-xl">
                 <section className="w-full">
                   <div className="header p-4  rounded-xl flex justify-between items-center w-full">
@@ -151,37 +150,39 @@ export default function Chat({ children }: ChatLayoutProps) {
                     </div>
                   </div> */}
                 </section>
-                {/* href={`/chat/${user.id}` */}
-                  {/* // <Link key={`message-${user.id}`} href="#"> */}
-                  {/* // </Link> */}
-                <div className="p-2 flex-1 md:w-full h-[820px] overflow-y-scroll">
-                  {users &&
-                    users
-                    .filter((user) => user.user_id  || user.sender_id === currentUserId)
-                    .map((user) =>  (
-                        <div
-                          onClick={() => openSlider(user)}
-                          className="flex justify-between items-center p-3 hover:bg-gray-800 rounded-lg cursor-pointer"
-                        >
-                          <div className="w-16 h-16 flex-shrink-0">
-                            <img
-                              className="shadow-md rounded-full w-full h-full object-cover"
-                              src={"http://localhost:8000" + user.img}
-                              alt={user.name}
-                            />
-                          </div>
-                          <div className="flex-auto min-w-0 ml-4 mr-6">
-                            <p className="font-bold">{user.name}</p>
-                            <div className="flex justify-between items-center text-sm text-gray-600">
-                              <p className="truncate">{user.lastMessage}</p>
-                              <p className="ml-4 text-white-primary whitespace-nowrap">
-                                {user.time}
-                              </p>
-                            </div>
-                          </div>
-                        </div>
-                    ))}
+                   {/* <Link key={`message-${user.id}`} href="">
+                  </Link> */}
+               <div className="p-2 flex-1 md:w-full h-[600px] overflow-y-scroll">
+      {users &&
+        users
+          .filter((user) => user.user_id || user.sender_id === currentUserId)
+          .map((user, i) => (
+            <Link 
+              key={`message-${i}`}
+              href={`/chat/${user.user_id || user.sender_id}`}
+              passHref
+            >
+              <div className="flex justify-between items-center p-3 hover:bg-gray-800 rounded-lg cursor-pointer">
+                <div className="w-16 h-16 flex-shrink-0">
+                  <img
+                    className="shadow-md rounded-full w-full h-full object-cover"
+                    src={user.Sender_img}
+                    alt={user.name}
+                  />
                 </div>
+                <div className="flex-auto min-w-0 ml-4 mr-6">
+                  <p className="font-bold">{user.name}</p>
+                  <div className="flex justify-between items-center text-sm text-gray-600">
+                    <p className="truncate">{user.lastMessage}</p>
+                    <p className="ml-4 text-white-primary whitespace-nowrap">
+                      {user.time}
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </Link>
+          ))}
+    </div>
 
                 {/* Slide Component */}
                 <div

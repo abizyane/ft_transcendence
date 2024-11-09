@@ -1,5 +1,5 @@
 import React from 'react';
-import Profil from "../../../public/Profil.jpg";
+import Profil from "../../../../public/Profil.jpg";
 
 const players = [
   { rank: 1, name: "Alice Johnson", username: "@alicej", totalGames: 120, score: 9800 },

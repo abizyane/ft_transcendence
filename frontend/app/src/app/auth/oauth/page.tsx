@@ -9,23 +9,22 @@ const OAuthPage = () => {
     const searchParams = useSearchParams();
   
     useEffect(() => {
-      if (!searchParams) return; 
+      if (!searchParams || typeof searchParams.toString !== "function") return; 
   
       const queryParams = searchParams.toString();
-      const backendUrl = 'http://localhost:8000/api/42OAuth/callback';
+      const backendUrl = 'http://localhost:8000/api/42OAuth/callback' ;
   
       const verifyOAuth = async () => {
         try {
           const response = await fetch(`${backendUrl}?${queryParams}`, {
             method: 'GET',
+            credentials: 'include',
           });
   
           if (response.status === 200) {
             const data = await response.json();
-            // Cookies.set('access_token', data.access, { expires: 1 }); // Expires in 1 day
-            // Cookies.set('refresh_token', data.refresh, { expires: 7 }); // Expires in 7 days
   
-            router.push('/dashboard');
+            router.push(`/profile/${data.id}`);
           } else {
             const errorData = await response.json();
             router.push(`/login?error=${encodeURIComponent(errorData.message)}`);

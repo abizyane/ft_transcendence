@@ -1,8 +1,8 @@
 'use client';
 import { useState } from 'react';
-import Mars from "../../../../../public/Mars.jpeg";
-import Earth from "../../../../../public/Earth.jpeg";
-import Jupiter from "../../../../../public/Jupiter.jpeg";
+import Mars from "../../../../../../public/Mars.jpeg";
+import Earth from "../../../../../../public/Earth.jpeg";
+import Jupiter from "../../../../../../public/Jupiter.jpeg";
 import Link from "next/link";
 
 const ChooseGalaxy = () => {
@@ -35,7 +35,6 @@ const ChooseGalaxy = () => {
             </Link>
           </div>
 
-          {/* Repeat similar cards as needed */}
           <div
             onMouseEnter={() => setHoveredIndex(1)}
             onMouseLeave={() => setHoveredIndex(null)}

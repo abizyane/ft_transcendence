@@ -34,5 +34,5 @@ class LoginView(APIView):
         return response
     
 class UserListView(generics.ListAPIView):
-    queryset = User.objects.all()  # Fetch all users
-    serializer_class = UserSerializer  # Specify the serializer class to use
+    queryset = User.objects.all()  
+    serializer_class = UserSerializer  
