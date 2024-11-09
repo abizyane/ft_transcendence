@@ -136,10 +136,12 @@ class FriendsOfView(APIView):
             friends_with_relationship = []
             for relation in relations:
                 friend = relation.user2 if relation.user1 == user else relation.user1
-                friends_with_relationship.append((friend, relation.status)) 
+                if friend == user:
+                    pass
+                friends_with_relationship.append((friend, relation.status, relation.user1)) 
 
             serializer = FriendSerializer(
-                [friend for friend, _ in friends_with_relationship],
+                [friend for friend, _,_ in friends_with_relationship],
                 many=True,
                 context={'request': request, 'relationships': friends_with_relationship}
             )
