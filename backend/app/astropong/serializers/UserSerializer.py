@@ -56,11 +56,12 @@ class FriendSerializer(serializers.ModelSerializer):
     profile_pic_url = serializers.SerializerMethodField()
     is_online = serializers.BooleanField()
     relationship = serializers.SerializerMethodField()
+    sender_id = serializers.SerializerMethodField()
     xp = serializers.SerializerMethodField()
 
     class Meta:
         model = User
-        fields = ['id', 'username', 'email', 'profile_pic_url', 'is_online', 'relationship', 'xp']
+        fields = ['id', 'username', 'email', 'profile_pic_url', 'is_online', 'relationship','sender_id', 'xp']
 
     def get_profile_pic_url(self, obj):
         request = self.context.get('request')
@@ -74,9 +75,14 @@ class FriendSerializer(serializers.ModelSerializer):
     def get_relationship(self, obj):
         # Find the relationship status for the current user in context
         relationships = self.context.get('relationships', [])
-        for friend, status in relationships:
+        for friend, status, _ in relationships:
             if friend == obj:
                 return Relationship.Status(status).label
         return "Unknown"
+    def get_sender_id(self, obj):
+        relationships = self.context.get('relationships', [])
+        for friend, status, user in relationships:
+            if friend == obj:
+                return user.id
     def get_xp(self, obj):
         return obj.profile.xp if hasattr(obj, 'profile') else 0
