@@ -1,16 +1,24 @@
 from rest_framework import serializers
 from .models import Message
 from astropong.models.UserModel import User, Relationship
+from urllib.parse import urljoin
+from django.conf import settings
 
 class UserSerializer(serializers.ModelSerializer):
+    profile_pic = serializers.SerializerMethodField()
+
     class Meta:
         model = User
         fields = ['id', 'username', 'profile_pic']
 
-class MessageUserSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = User
-        fields = ['username']
+    def get_profile_pic(self, obj):
+        request = self.context.get('request')
+        if request is None:
+            return None
+        default_image_url = urljoin(request.build_absolute_uri(settings.MEDIA_URL), "Profil.jpg")
+        if obj.profile_pic:
+            return request.build_absolute_uri(obj.profile_pic)
+        return default_image_url
 
 class MessageSerializer(serializers.ModelSerializer):
     sender = UserSerializer(read_only=True)
@@ -58,5 +66,4 @@ class ConversationSerializer(serializers.ModelSerializer):
         }
     class Meta:
         model = Message
-        # list_serializer_class = ConversationsListSerializer
         fields = ['message_id','message', 'timestamp', 'seen', 'sender', 'receiver']
