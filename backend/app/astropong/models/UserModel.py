@@ -1,6 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import AbstractUser
 from django.core.exceptions import ValidationError
+from django.db import models
 
 # Create your models here.
 
@@ -15,24 +16,43 @@ class User(AbstractUser):
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = ['username']
 
-    def add_friend(self, friend):
-        relationship, created = Relationship.objects.get_or_create(
-            user1=self,
-            user2=friend,
-            defaults={'status': Relationship.Status.FRIENDREQUEST}
-        )
 
-        if not created:
-            if relationship.status == Relationship.Status.FRIENDREQUEST:
-                raise ValidationError("You already sent a friend request to this user.")
-            elif relationship.status != Relationship.Status.BLOCKED:
-                relationship.status = Relationship.Status.FRIENDREQUEST
-                relationship.save()
+    def get_relations(self, userid, friendid):
+        relationship = Relationship.objects.filter(
+            (models.Q(user1=userid) & models.Q(user2=friendid)) | (models.Q(user1=friendid) & models.Q(user2=userid))
+        )
+        relationship = relationship.first()
+        return relationship
+
+
+    def add_friend(self, friend):
+        if self == friend:
+            raise ValidationError("You cannot add yourself as a friend.")
+        try:
+            relationship = self.get_relations(self.id, friend.id)
+            if (relationship is not None):
+                if relationship.status == Relationship.Status.FRIENDREQUEST:
+                    if (relationship.user1 == self):
+                        raise ValidationError("You already sent a friend request to this user.")
+                    else:
+                        raise ValidationError("You already received a friend request from this user.")
+                elif relationship.status != Relationship.Status.BLOCKED:
+                    relationship.status = Relationship.Status.FRIENDREQUEST
+                    relationship.save()
+                else:
+                    raise ValidationError("You cannot add a blocked user as a friend.")
             else:
-                raise ValidationError("You cannot add a blocked user as a friend.")
+                raise Relationship.DoesNotExist
+        except Relationship.DoesNotExist:
+            relationship = Relationship.objects.create(
+                user1=self,
+                user2=friend,
+                status=Relationship.Status.FRIENDREQUEST
+            )
 
     def accept_friend_request(self, friend):
         try:
+
             relationship = Relationship.objects.get(
                 user1=friend,
                 user2=self,
@@ -53,12 +73,12 @@ class User(AbstractUser):
             relationship.delete()
         except Relationship.DoesNotExist:
             raise ValidationError("No friend request from this user.")
+        
     def block_friend(self, friend):
         try:
-            relationship = Relationship.objects.get(
-                user1=self,
-                user2=friend
-            )
+            relationship = Relationship.objects.filter(
+                (models.Q(user1=self) & models.Q(user2=friend)) | (models.Q(user1=friend) & models.Q(user2=self))
+            ).first()
             relationship.status = Relationship.Status.BLOCKED
             relationship.save()
         except Relationship.DoesNotExist:
@@ -70,10 +90,8 @@ class User(AbstractUser):
 
     def unblock_friend(self, friend):
         try:
-            relationship = Relationship.objects.get(
-                user1=self,
-                user2=friend
-            )
+            relationship = Relationship.objects.filter(
+                (models.Q(user1=self) & models.Q(user2=friend)) | (models.Q(user1=friend) & models.Q(user2=self))).first()
             if relationship.status == Relationship.Status.BLOCKED:
                 relationship.status = Relationship.Status.UNKNOWN
                 relationship.save()

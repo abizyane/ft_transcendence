@@ -17,6 +17,8 @@ class AddFriendView(APIView):
         if friendId is None:
             return Response({"error": "Friend id is required"}, status=status.HTTP_400_BAD_REQUEST)
         try:
+            if (request.user.id == friendId):
+                return Response({"error": "You cannot add yourself as a friend."}, status=status.HTTP_400_BAD_REQUEST)
             friend = User.objects.get(id=friendId)
             try:
                 request.user.add_friend(friend)
@@ -68,6 +70,8 @@ class BlockFriendView(APIView):
         if friendId is None:
             return Response({"error": "User id is required"}, status=status.HTTP_400_BAD_REQUEST)
         try:
+            if (request.user.id == friendId):
+                return Response({"error": "You cannot block yourself."}, status=status.HTTP_400_BAD_REQUEST)
             friend = User.objects.get(id=friendId)
             try:
                 request.user.block_friend(friend)
@@ -143,10 +147,12 @@ class ListFriendView(APIView):
 
         for relation in relations:
             friend = relation.user2 if relation.user1 == user else relation.user1
-            friends_with_relationship.append((friend, relation.status)) 
+            if friend == user:
+                pass
+            friends_with_relationship.append((friend, relation.status, relation.user1)) 
 
         serializer = FriendSerializer(
-            [friend for friend, _ in friends_with_relationship],
+            [friend for friend, _, _ in friends_with_relationship],
             many=True,
             context={'request': request, 'relationships': friends_with_relationship}
         )
