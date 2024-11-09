@@ -20,20 +20,70 @@ type UserInfoProps = {
 
 const UserInfo: React.FC<UserInfoProps> = ({ user }) => {
 
-  console.log(user.id);
-  const { user:currentuser } = useUser();
-  // console.log(currentuser.id);
 
+
+  const { user:currentuser } = useUser();
   const { username, profile_pic_url, xp,wins,totalGames} = user;
   const maxXPPerLevel = 1000;
   const level = Math.floor(user.xp / maxXPPerLevel);
   const remainingXP = ((user.xp % maxXPPerLevel) / maxXPPerLevel) * 100;
-
   const calculateWinRate = (wins: number, totalGames: number) => {
     return totalGames === 0 ? 0 : (wins / totalGames) * 100;
   };
   const winRatePercentage = calculateWinRate(wins, totalGames);
-
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const handleAddFriend = async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      const response = await fetch('http://localhost:8000/api/add_friend', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          friend_id: user.id,
+        }),
+        credentials: 'include',
+      });
+      if (response.ok) {
+        const data = await response.json();
+        console.log('Friend added successfully:', data);
+      } else {
+        const errorData = await response.json();
+        console.log('Failed to add friend:', errorData);
+      }
+    } catch (error) {
+      console.log('Error during the request:', error);
+    }
+  }
+  const handleBlockFriend = async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      const response = await fetch('http://localhost:8000/api/block', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          user_id: user.id,
+        }),
+        credentials: 'include',
+      });
+      if (response.ok) {
+        const data = await response.json();
+        console.log('Friend blocked successfully:', data);
+      } else {
+        const errorData = await response.json();
+        console.log('Failed to block friend:', errorData);
+      }
+    } catch (error) {
+      console.log('Error during the request:', error);
+    }
+  }
+  
   return (
     <>
 <div className="h-full w-full border-[1px] border-violet-primary rounded-xl p-2">
@@ -68,11 +118,11 @@ const UserInfo: React.FC<UserInfoProps> = ({ user }) => {
           ) :
           (
             <div className="border-2 border-violet-primary rounded-3xl p-4 mb-2 mr-2 bg-gray-800 flex flex-col md:flex-row items-center space-y-2 md:space-y-0 md:space-x-2">
-            <button className="px-4 py-2 flex items-center justify-center bg-blue-900 text-white rounded-lg hover:bg-violet-600 transition duration-200 w-full md:w-1/2 lg:w-1/2">
-              <MdPersonAddAlt1 className="text-xl" />
+            <button className="px-4 py-2 flex items-center justify-center bg-green-900 text-white rounded-lg hover:bg-green-950 transition duration-200 w-full md:w-1/2 lg:w-1/2">
+              <MdPersonAddAlt1 className="text-xl" onClick={handleAddFriend}/>
             </button>
-            <button className="px-4 py-2 flex items-center justify-center bg-red-900 text-white rounded-lg hover:bg-violet-600 transition duration-200 w-full md:w-1/2 lg:w-1/2">
-              <ImBlocked className="text-xl" />
+            <button className="px-4 py-2 flex items-center justify-center bg-red-900 text-white rounded-lg hover:bg-red-950 transition duration-200 w-full md:w-1/2 lg:w-1/2">
+              <ImBlocked className="text-xl" onClick={handleBlockFriend}/>
             </button>
           </div>
           )

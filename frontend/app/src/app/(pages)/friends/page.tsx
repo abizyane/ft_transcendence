@@ -12,19 +12,51 @@ import {User} from "../../../services/context/usercontext"
 import { useFriends } from "@/services/friends";
 import { useFriendRequests } from "@/services/friendrequest";
 import { useBlockedFriends } from "@/services/blockedfriends";
+import { fetchFriends } from '../../../services/friends';
 
 
 const friends = () => {
-  const { friends, loading, error } = useFriends();
-  const { requests, reqloading, reqerror } = useFriendRequests();
-  const { blocked, blkloading, blkerror } = useBlockedFriends();
+  const { friends, loading, error ,fetchFriends } = useFriends();
+  const { requests, reqloading, reqerror,fetchRequests } = useFriendRequests();
+  const { blocked, blkloading, blkerror,fetchBlocked } = useBlockedFriends();
+  const [ unblkloading, setUnblkloading] = useState(false);
+  const [ unblkerror, setUnblkerror] = useState(false);
   
-  if (loading ||reqloading || blkloading ) {
+  if (loading ||reqloading || blkloading || unblkloading) {
     return <div>Loading...</div>;
   }
 
-  if (error || reqerror || blkerror) {
+  if (error || reqerror || blkerror || unblkerror) {
     return <div className="text-red-500">{error}</div>;
+  }
+  const handleUnblockFriend = async (friendId:number) => {
+    setUnblkloading(true);
+    setUnblkerror(null);
+    try {
+      const response = await fetch('http://localhost:8000/api/unblock', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          user_id: friendId,
+        }),
+        credentials: 'include',
+      });
+      if (response.ok) {
+        const data = await response.json();
+        console.log('Friend unblocked successfully:', data);
+      } else {
+        const errorData = await response.json();
+        console.log('Failed to unblock friend:', errorData);
+      }
+    } catch (error) {
+      console.log('Error during the request:', error);
+    }
+    fetchFriends();
+    fetchRequests();
+    fetchBlocked();
+    setUnblkloading(false);
   }
 
   return (
@@ -134,6 +166,7 @@ const friends = () => {
                 <CgUnblock
                   className="w-6 h-6  text-white hover:text-black"
                   aria-label="unblock"
+                  onClick={()=>handleUnblockFriend(block.id)}
                   />
               </button>
               <span className="absolute bottom-full mb-1 hidden group-hover:block text-sm text-white bg-gray-700 rounded-md px-2 py-1">

@@ -30,10 +30,7 @@ class ConversationsView(generics.ListAPIView):
         
         messages = Message.objects.filter(Q(sender=user) | Q(receiver=user)).order_by('-timestamp')
 
-        # conversations = groupby(messages, key=lambda message: tuple(sorted([message.sender.username, message.receiver.username])))
-
-        last_messages = {}
-
+        latest_messages = {}
         for message in messages:
             user_pair = tuple(sorted([message.sender.username, message.receiver.username]))
             if user_pair not in latest_messages:

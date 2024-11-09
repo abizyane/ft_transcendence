@@ -9,7 +9,6 @@ import { useFriendsof } from "@/services/friendsof";
 
 const Friends = ({user}) => {
   const { friends, loading, error } = useFriendsof(user);
-
   if (loading) {
     return <div>Loading...</div>;
   }
@@ -17,6 +16,7 @@ const Friends = ({user}) => {
   if (error) {
     return <div className="text-red-500">{error}</div>;
   }
+
   return (
     <div className=" w-full py-4 lg:w-1/3">
       <div className="bg-gray-800/60 rounded-xl border h-full border-violet-primary mb-4 ">

@@ -11,30 +11,29 @@ export const useFriendRequests = () => {
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
-    const fetchRequests = async () => {
-      try {
-        const response = await fetch('http://localhost:8000/api/friends/friend_requests', {
-          method: 'GET',
-          credentials: 'include',
-        });
+  const fetchRequests = async () => {
+    try {
+      const response = await fetch('http://localhost:8000/api/friends/friend_requests', {
+        method: 'GET',
+        credentials: 'include',
+      });
 
-        if (response.ok) {
-          const responseData = await response.json();
-          setRequests(responseData);
-        } else {
-          const errorData = await response.json();
-          setError('Failed to load friend requests');
-        }
-      } catch (error) {
-        setError('Error fetching friend requests');
-      } finally {
-        setLoading(false);
+      if (response.ok) {
+        const responseData = await response.json();
+        setRequests(responseData);
+      } else {
+        const errorData = await response.json();
+        setError('Failed to load friend requests');
       }
-    };
-
+    } catch (error) {
+      setError('Error fetching friend requests');
+    } finally {
+      setLoading(false);
+    }
+  };
+  useEffect(() => {
     fetchRequests();
   }, []);
 
-  return { requests, loading, error };
+  return { requests, loading, error,fetchRequests };
 };
