@@ -30,16 +30,13 @@ class ConversationsView(generics.ListAPIView):
         
         messages = Message.objects.filter(Q(sender=user) | Q(receiver=user)).order_by('-timestamp')
 
-        conversations = groupby(messages, key=lambda message: tuple(sorted([message.sender.username, message.receiver.username])))
-
-        last_messages = []
-        for conversation in conversations:
-            last_messages.append(max(conversation, key=lambda message: message.timestamp))
-
-        last_messages.sort(key=lambda message: message.timestamp, reverse=True)
-
-        return last_messages
-
+        latest_messages = {}
+        for message in messages:
+            user_pair = tuple(sorted([message.sender.username, message.receiver.username]))
+            if user_pair not in latest_messages:
+                latest_messages[user_pair] = message
+        
+        return list(latest_messages.values())
 
 class ChatRoomView(generics.ListAPIView):
     serializer_class = ChatRoomSerializer
@@ -74,3 +71,4 @@ class OnlineUsersView(generics.ListAPIView):
         if not request.user.is_authenticated:
             return Response({'error': 'You must be authenticated to access this resource.'}, status=401)
         return super().list(request, *args, **kwargs)
+    
