@@ -49,6 +49,7 @@ class ConversationSerializer(serializers.ModelSerializer):
 
     def to_representation(self, instance):
         return {
+            'id': instance.sender.id if instance.sender.id != self.context['request'].user.id else instance.receiver.id,
             'username': instance.sender.username if instance.sender.username != self.context['request'].user.username else instance.receiver.username,
             'profile_pic': instance.sender.profile_pic if instance.sender.username != self.context['request'].user.username else instance.receiver.profile_pic,
             'message': instance.message,
@@ -58,4 +59,4 @@ class ConversationSerializer(serializers.ModelSerializer):
     class Meta:
         model = Message
         # list_serializer_class = ConversationsListSerializer
-        fields = ['message', 'timestamp', 'seen', 'sender', 'receiver']
+        fields = ['message_id','message', 'timestamp', 'seen', 'sender', 'receiver']

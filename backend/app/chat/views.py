@@ -83,3 +83,4 @@ class OnlineUsersView(generics.ListAPIView):
         if not request.user.is_authenticated:
             return Response({'error': 'You must be authenticated to access this resource.'}, status=401)
         return super().list(request, *args, **kwargs)
+    
