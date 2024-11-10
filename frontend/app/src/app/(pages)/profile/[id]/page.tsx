@@ -42,9 +42,12 @@ const page = () => {
       }
       )
         .then((response) => {
-          if (!response.ok) throw new Error("User not found");
-          return response.json();
-        })
+         if (response.status === 403) {
+          console.log("You can't access this profile");
+        } else  if (!response.ok) {
+            console.log('Response not ok:', response.status);
+            throw new Error("User not found");
+          }})
         .then((data: User) => setUser(data))
         .catch((err) => setError(err.message))
         .finally(() => setLoading(false));

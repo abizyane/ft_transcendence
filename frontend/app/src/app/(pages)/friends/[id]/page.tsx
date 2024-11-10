@@ -20,6 +20,7 @@ import { useParams } from "next/navigation";
 import { useUser } from "@/services/context/usercontext";
 import { request } from "http";
 import Loader from '../../../../components/loader/loader';
+import Link from "next/link";
 
 const Friends = () => {
   const param = useParams();
@@ -165,6 +166,8 @@ const Friends = () => {
         className={`bg-gray-800/65 rounded-xl border w-full p-4 border-violet-primary ${listHeight} grid grid-cols-1 lg:grid-cols-2 gap-4  overflow-y-auto no-scrollbar p-41`}
       >
         {friends?.map((friend, index) => (
+           <Link href={`/profile/${friend.id}`} key={friend.id}>
+
           <div
             key={index}
             className="flex justify-center items-center bg-gray-700/70 h-[90px] w-full hover:bg-gray-600 transition-shadow border border-gray-600 rounded-lg p-4 shadow-lg hover:shadow-2xl"
@@ -206,13 +209,14 @@ const Friends = () => {
                   <DropdownMenuSeparator className="bg-black" />
                   <DropdownMenuItem
                     onClick={() => handleblockFriend(friend.id)}
-                  >
+                    >
                     <span className="text-white">Block</span>
                   </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
             </div>
           </div>
+        </Link>
         ))}
       </div>
 
@@ -228,6 +232,8 @@ const Friends = () => {
               </h1>
               <div className="bg-gray-800/65 rounded-xl border w-full border-violet-primary grid grid-cols-1 gap-4   h-[250px] overflow-y-auto no-scrollbar p-4">
                 {requests?.map((request, index) => (
+                   <Link href={`/profile/${request.id}`} key={request.id}>
+
                   <div
                     key={index}
                     className="flex items-center h-[90px] bg-gray-700/70 hover:bg-gray-600 transition-shadow border border-gray-600 rounded-lg p-4 shadow-lg hover:shadow-2xl"
@@ -270,6 +276,7 @@ const Friends = () => {
                       )}
                     </div>
                   </div>
+                </Link>
                 ))}
               </div>
             </div>
@@ -279,7 +286,9 @@ const Friends = () => {
               </h1>
               <div className="bg-gray-800/65 rounded-xl border w-full border-violet-primary grid grid-cols-1  gap-4   h-[250px] overflow-y-auto no-scrollbar p-4">
                 {blocked?.map((block, index) => (
-                  <div
+                 <Link href={`/profile/${block.id}`} key={block.id}>
+
+                 <div
                     key={index}
                     className="flex items-center  h-[90px] bg-gray-700/70 hover:bg-gray-600 transition-shadow border border-gray-600 rounded-lg p-4 shadow-lg hover:shadow-2xl"
                   >
@@ -311,6 +320,7 @@ const Friends = () => {
                       </span>
                     </div>
                   </div>
+                </Link>
                 ))}
               </div>
             </div>
