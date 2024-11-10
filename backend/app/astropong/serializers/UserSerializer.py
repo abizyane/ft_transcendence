@@ -76,9 +76,9 @@ class FriendSerializer(serializers.ModelSerializer):
         relationships = self.context.get('relationships', [])
         if isinstance(relationships, list):
             print("is array", type(relationships))
-            for friend, status, _ in relationships:
+            for friend, relation in relationships:
                 if friend == obj:
-                    return Relationship.Status(status).label
+                    return Relationship.Status(relation.status).label
             return "Unknown"
         elif isinstance(relationships, Relationship):
             if relationships.user1 == obj or relationships.user2 == obj:
@@ -89,12 +89,12 @@ class FriendSerializer(serializers.ModelSerializer):
     def get_sender_id(self, obj):
         relationships = self.context.get('relationships', [])
         if isinstance(relationships, list):
-            for friend, _, sender in relationships:
-                if friend == obj:
-                    return sender.id
+            for friend, relation in relationships:
+                if friend == obj and relation.userWhoRequest is not None:
+                    return relation.userWhoRequest.id
             return None
-        elif isinstance(relationships, Relationship):
-                return relationships.user1.id
+        elif isinstance(relationships, Relationship) and relation.userWhoRequest is not None:
+                return relationships.userWhoRequest.id
             
     def get_xp(self, obj):
         return obj.profile.xp if hasattr(obj, 'profile') else 0
