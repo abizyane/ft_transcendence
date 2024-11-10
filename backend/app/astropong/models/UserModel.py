@@ -71,11 +71,12 @@ class User(AbstractUser):
     def accept_friend_request(self, friend):
         try:
 
-            relationship = Relationship.objects.get(
-                user1=friend,
-                user2=self,
-                status=Relationship.Status.FRIENDREQUEST
-            )
+            relationship = Relationship.objects.filter(
+                ((models.Q(user1=friend) & models.Q(user2=self))|(models.Q(user2=friend) & models.Q(user1=self)))
+                 & models.Q(status=Relationship.Status.FRIENDREQUEST)
+            ).first()
+            if relationship is None:
+                raise Relationship.DoesNotExist
             relationship.status = Relationship.Status.FRIEND
             relationship.save()
         except Relationship.DoesNotExist:
@@ -83,11 +84,12 @@ class User(AbstractUser):
 
     def refuse_friend_request(self, friend):
         try:
-            relationship = Relationship.objects.get(
-                user1=friend,
-                user2=self,
-                status=Relationship.Status.FRIENDREQUEST
-            )
+            relationship = Relationship.objects.filter(
+                ((models.Q(user1=friend) & models.Q(user2=self))|(models.Q(user2=friend) & models.Q(user1=self)))
+                 & models.Q(status=Relationship.Status.FRIENDREQUEST)
+            ).first()
+            if relationship is None:
+                raise Relationship.DoesNotExist
             relationship.delete()
         except Relationship.DoesNotExist:
             raise ValidationError("No friend request from this user.")

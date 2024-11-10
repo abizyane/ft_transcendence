@@ -27,7 +27,7 @@ class AddFriendView(APIView):
             friend = User.objects.get(id=friendId)
             try:
                 request.user.add_friend(friend)
-                return Response({"message": "Friend added successfully."}, status=status.HTTP_200_OK)
+                return Response({"message": "Friend request sent successfully."}, status=status.HTTP_200_OK)
             except ValidationError as e:
                 return Response({"error": e}, status=status.HTTP_400_BAD_REQUEST)
         

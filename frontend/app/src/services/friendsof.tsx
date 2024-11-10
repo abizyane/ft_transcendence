@@ -40,3 +40,4 @@ export const useFriendsof = (user:User) => {
     }, []);
     return { friends, loading, error,fetchFriendsof };
   };
+  export default useFriendsof;
