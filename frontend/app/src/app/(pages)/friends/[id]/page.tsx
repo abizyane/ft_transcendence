@@ -164,14 +164,14 @@ const Friends = () => {
 
       <div
         className={`bg-gray-800/65 rounded-xl border w-full p-4 border-violet-primary ${listHeight} grid grid-cols-1 lg:grid-cols-2 gap-4  overflow-y-auto no-scrollbar p-41`}
-      >
+        >
         {friends?.map((friend, index) => (
-           <Link href={`/profile/${friend.id}`} key={friend.id}>
-
+          
           <div
             key={index}
             className="flex justify-center items-center bg-gray-700/70 h-[90px] w-full hover:bg-gray-600 transition-shadow border border-gray-600 rounded-lg p-4 shadow-lg hover:shadow-2xl"
           >
+          <Link className="flex items-center " href={`/profile/${friend.id}`} key={friend.id}>
             <div className="h-14 w-14 rounded-full overflow-hidden">
               <img
                 src={friend.profile_pic_url}
@@ -184,6 +184,7 @@ const Friends = () => {
                 {friend.username}
               </span>
             </div>
+          </Link>
             <div className="ml-auto flex space-x-2 lg:space-x-4">
               <button
                 aria-label="Chat"
@@ -203,7 +204,7 @@ const Friends = () => {
                 </DropdownMenuTrigger>
                 <DropdownMenuContent className="mr-14 lg:mr-32 bg-gray-800/60 border-violet-primary">
                   <DropdownMenuItem
-                   onClick={() => handleRemoveFriend(friend.id)}>
+                   onClick={() => { handleRemoveFriend(friend.id)}}>
                     <span className="text-white">Unfriend</span>
                   </DropdownMenuItem>
                   <DropdownMenuSeparator className="bg-black" />
@@ -216,7 +217,6 @@ const Friends = () => {
               </DropdownMenu>
             </div>
           </div>
-        </Link>
         ))}
       </div>
 
@@ -232,13 +232,12 @@ const Friends = () => {
               </h1>
               <div className="bg-gray-800/65 rounded-xl border w-full border-violet-primary grid grid-cols-1 gap-4   h-[250px] overflow-y-auto no-scrollbar p-4">
                 {requests?.map((request, index) => (
-                   <Link href={`/profile/${request.id}`} key={request.id}>
-
                   <div
                     key={index}
                     className="flex items-center h-[90px] bg-gray-700/70 hover:bg-gray-600 transition-shadow border border-gray-600 rounded-lg p-4 shadow-lg hover:shadow-2xl"
                   >
-                    <div className="h-14 w-14 rounded-full overflow-hidden">
+                   <Link className="flex items-center" href={`/profile/${request.id}`} key={request.id}>
+                    <div className="h-14 w-14 rounded-full overflow-hidden ">
                       <img
                         src={request.profile_pic_url}
                         alt="mode solo"
@@ -250,6 +249,7 @@ const Friends = () => {
                         {request.username}
                       </span>
                     </div>
+                    </Link>
                     <div className="ml-auto flex space-x-4">
                       {/* Check if the current user is the sender */}
                       {request.sender_id === currentUser.id ? (
@@ -276,7 +276,6 @@ const Friends = () => {
                       )}
                     </div>
                   </div>
-                </Link>
                 ))}
               </div>
             </div>
@@ -286,24 +285,24 @@ const Friends = () => {
               </h1>
               <div className="bg-gray-800/65 rounded-xl border w-full border-violet-primary grid grid-cols-1  gap-4   h-[250px] overflow-y-auto no-scrollbar p-4">
                 {blocked?.map((block, index) => (
-                 <Link href={`/profile/${block.id}`} key={block.id}>
-
-                 <div
+                  <div
                     key={index}
                     className="flex items-center  h-[90px] bg-gray-700/70 hover:bg-gray-600 transition-shadow border border-gray-600 rounded-lg p-4 shadow-lg hover:shadow-2xl"
                   >
+                  <Link  className="flex items-center" href={`/profile/${block.id}`} key={block.id}>
                     <div className="h-14 w-14 rounded-full overflow-hidden">
                       <img
                         src={block.profile_pic}
                         alt="mode solo"
                         className="w-full h-full object-cover"
-                      />
+                        />
                     </div>
                     <div className="flex flex-col justify-center ml-4">
                       <span className="text-md font-semibold text-white">
                         {block.username}
                       </span>
                     </div>
+                    </Link>
                     <div className="ml-auto flex space-x-4">
                       <button
                         className=" text-white transition-colors"
@@ -320,7 +319,6 @@ const Friends = () => {
                       </span>
                     </div>
                   </div>
-                </Link>
                 ))}
               </div>
             </div>

@@ -16,47 +16,45 @@ const values = user.charts.lineChart.data;
 const gameHistory = user.history;
 
 
-const page = () => {
-    const param = useParams();
-    const userId= param.id;
-    const { user:currentuser} = useUser();
-    const [user, setUser] = useState<User | null>(null);
-    const [loading, setLoading] = useState(false);
-    const [error, setError] = useState<string | null>(null);
-    useEffect(() => {
-    if (currentuser?.id === userId)
-    {
-      setUser(currentuser);
-    }
-    else
-    {
+const Page = () => {
+  const { id: userId } = useParams();
+  const { user: currentUser, userloading } = useUser();
+  const [user, setUser] = useState<User | null>(null);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (!userId) return;
+    if (currentUser?.id === userId) {
+      setUser(currentUser);
+    } else {
       setLoading(true);
       setError(null);
-      fetch(`http://localhost:8000/api/userid`,{
-      method : 'POST',
-      body : JSON.stringify({id : userId}),
-      headers :{
-       'content-type' : 'application/json',
-      },
-      credentials : 'include',
-      }
-      )
+      fetch(`http://localhost:8000/api/userid`, {
+        method: 'POST',
+        body: JSON.stringify({ id: userId }),
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        credentials: 'include',
+      })
         .then((response) => {
-         if (response.status === 403) {
-          console.log("You can't access this profile");
-        } else  if (!response.ok) {
-            console.log('Response not ok:', response.status);
+          if (!response.ok) {
+            console.log("Response not ok:", response.status);
             throw new Error("User not found");
-          }})
+          }
+          return response.json();
+        })
         .then((data: User) => setUser(data))
         .catch((err) => setError(err.message))
         .finally(() => setLoading(false));
     }
-  }, [userId, currentuser]);
+  }, [userId, currentUser]);
 
+  if (userloading) return <p className="text-white">Loading...</p>;
   if (loading) return <p>Loading...</p>;
   if (error) return <p>Error: {error}</p>;
-  if (!user) return null;
+  if (!user) return <p>No user found.</p>;
   return (
     <div className="mt-10 lg:mt-0 flex flex-1  w-full px-1 overflow-hidden justify-center items-center">
     <div className="flex-1 w-full flex flex-col items-center justify-center mb-14 mt-2 relative">
@@ -83,4 +81,4 @@ const page = () => {
   )
 }
 
-export default page
+export default Page
