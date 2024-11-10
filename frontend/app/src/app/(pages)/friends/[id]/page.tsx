@@ -110,6 +110,25 @@ const Friends = () => {
       if (response.ok) {
         fetchFriendsof();
         fetchRequests();
+        fetchBlocked();
+      }
+    } catch (error) {
+      console.log("Error accepting friend:", error);
+    }
+  };
+  // // Accept friend
+  const handleRemoveFriend = async (friendId) => {
+    try {
+      const response = await fetch("http://localhost:8000/api/remove_friend", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ friend_id: friendId }),
+        credentials: "include",
+      });
+      if (response.ok) {
+        fetchFriendsof();
+        fetchRequests();
+        fetchBlocked();
       }
     } catch (error) {
       console.log("Error accepting friend:", error);
@@ -180,7 +199,8 @@ const Friends = () => {
                   <FaEllipsisV />
                 </DropdownMenuTrigger>
                 <DropdownMenuContent className="mr-14 lg:mr-32 bg-gray-800/60 border-violet-primary">
-                  <DropdownMenuItem>
+                  <DropdownMenuItem
+                   onClick={() => handleRemoveFriend(friend.id)}>
                     <span className="text-white">Unfriend</span>
                   </DropdownMenuItem>
                   <DropdownMenuSeparator className="bg-black" />
@@ -229,7 +249,7 @@ const Friends = () => {
                       {request.sender_id === currentUser.id ? (
                         <span className="text-white font-black tracking-[1.5px]">
                           Pending
-                        </span> // Display "Pending" if the current user is the sender
+                        </span>
                       ) : (
                         <>
                           <button

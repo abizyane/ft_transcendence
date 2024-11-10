@@ -93,7 +93,7 @@ class FriendSerializer(serializers.ModelSerializer):
                 if friend == obj and relation.userWhoRequest is not None:
                     return relation.userWhoRequest.id
             return None
-        elif isinstance(relationships, Relationship) and relation.userWhoRequest is not None:
+        elif isinstance(relationships, Relationship) and relationships.userWhoRequest is not None:
                 return relationships.userWhoRequest.id
             
     def get_xp(self, obj):
