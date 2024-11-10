@@ -1,6 +1,6 @@
 from rest_framework import serializers
 from .models import Message
-from astropong.models.UserModel import User, Relationship
+from astropong.models.UserModel import User
 from urllib.parse import urljoin
 from django.conf import settings
 
@@ -34,22 +34,18 @@ class MessageSerializer(serializers.ModelSerializer):
             'seen': instance.seen
         }
 
-    class Meta:
-        model = Message
-        fields = ['message_id', 'sender', 'receiver', 'message', 'timestamp', 'seen']
-
 class ChatRoomSerializer(serializers.Serializer):
-    sender = UserSerializer(read_only=True)
-    receiver = UserSerializer(read_only=True)
-    messages = MessageSerializer(many=True)
+    messages = serializers.SerializerMethodField()
+
+    def get_messages(self, obj):
+        return MessageSerializer(obj['messages'], many=True, context=self.context).data
 
     def to_representation(self, instance):
+        user = instance['receiver'] if instance['sender'].username == self.context['request'].user.username else instance['sender']
         return {
-            'user': instance.sender if instance.sender.username != self.context['request'].user.username else instance.receiver,
-            'messages': instance.messages,
+            'user': UserSerializer(user, context=self.context).data,
+            'messages': self.get_messages(instance),
         }
-    class Meta:
-        fields = ['sender', 'receiver', 'messages']
 
 class ConversationSerializer(serializers.ModelSerializer):
     sender = UserSerializer(read_only=True)
@@ -64,6 +60,3 @@ class ConversationSerializer(serializers.ModelSerializer):
             'timestamp': instance.timestamp,
             'seen': instance.seen
         }
-    class Meta:
-        model = Message
-        fields = ['message_id','message', 'timestamp', 'seen', 'sender', 'receiver']

@@ -27,7 +27,7 @@ class Command(BaseCommand):
                 timestamp=timestamp,
                 seen=seen_status,
             )
-            self.stdout.write(f'Created message from {sender} to {receiver}')
+            self.stdout.write(f'Created message from {sender.username} to {receiver.username}')
 
     def get_random_user_pair(self, users):
         """ Select a random pair of users (sender, receiver) without repeats. """

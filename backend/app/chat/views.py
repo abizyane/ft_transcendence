@@ -1,12 +1,10 @@
 from django.db.models import Q
 from rest_framework.response import Response
-from rest_framework.exceptions import NotAuthenticated
-from rest_framework.exceptions import NotFound
+from rest_framework.exceptions import NotAuthenticated, NotFound
 from rest_framework.pagination import PageNumberPagination
 from .models import Message
 from astropong.models.UserModel import User, Relationship
 from .serializers import ConversationSerializer, ChatRoomSerializer, UserSerializer
-from itertools import groupby
 from rest_framework import generics
 
 class ConversationsPageNumberPagination(PageNumberPagination):
@@ -60,6 +58,21 @@ class ChatRoomView(generics.ListAPIView):
 
         return Message.objects.filter(Q(sender=currentuser, receiver=otheruser) | Q(sender=otheruser, receiver=currentuser)).order_by('-timestamp')
 
+    def list(self, request, *args, **kwargs):
+        messages = self.get_queryset()
+        paginator = self.pagination_class()
+        paginated_messages = paginator.paginate_queryset(messages, request)
+        username = self.kwargs['username']
+        user = User.objects.get(username=username)
+
+        chat_data = {
+            'sender': request.user,
+            'receiver': user,
+            'messages': paginated_messages,
+        }
+
+        serializer = self.get_serializer(instance=chat_data)
+        return Response(serializer.data)
 
 class OnlineUsersPageNumberPagination(PageNumberPagination):
     page_size = 5
