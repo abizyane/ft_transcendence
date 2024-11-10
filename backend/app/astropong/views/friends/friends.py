@@ -15,7 +15,6 @@ from rest_framework.exceptions import NotAuthenticated, NotFound
 
 User = get_user_model()
 
-
 class AddFriendView(APIView):
     def post(self, request):
         friendId = request.data.get('friend_id')
@@ -35,24 +34,7 @@ class AddFriendView(APIView):
             return Response({
                 "error": "User not found"
             }, status=404)
-
-class RemoveFriendView(APIView):
-    def post(self,request):
-        friendId = request.data.get('friend_id')
-        if friendId is None:
-            return Response({"error": "Friend id is required"}, status=status.HTTP_400_BAD_REQUEST)
-        try:
-            friend = User.objects.get(id=friendId)
-            try:
-                request.user.remove_friend(friend)
-                return Response({"message": "Friend removed."}, status=status.HTTP_200_OK)
-            except ValidationError as e:
-                return Response({"error": e}, status=status.HTTP_400_BAD_REQUEST)
-        except User.DoesNotExist:
-            return Response({
-                "error": "User not found"
-            }, status=404)
-
+        
 class AcceptFriendRequestView(APIView):
     def post(self,request):
         friendId = request.data.get('friend_id')
@@ -138,7 +120,7 @@ class BlockedUsersList(generics.ListAPIView):
         except User.DoesNotExist:
             raise NotFound("User not found.")
         
-        relations = Relationship.objects.filter((models.Q(user1=user) | models.Q(user2=user)) & models.Q(userWhoBlocked=user), status=Relationship.Status.BLOCKED)
+        relations = Relationship.objects.filter(models.Q(user1=user) | models.Q(user2=user), status=Relationship.Status.BLOCKED)
         blocked_users = [relation.user2 if relation.user1 == user else relation.user1 for relation in relations]
     
         return blocked_users
@@ -156,10 +138,10 @@ class FriendsOfView(APIView):
                 friend = relation.user2 if relation.user1 == user else relation.user1
                 if friend == user:
                     pass
-                friends_with_relationship.append((friend, relation)) 
+                friends_with_relationship.append((friend, relation.status, relation.user1)) 
 
             serializer = FriendSerializer(
-                [friend for friend, _ in friends_with_relationship],
+                [friend for friend, _,_ in friends_with_relationship],
                 many=True,
                 context={'request': request, 'relationships': friends_with_relationship}
             )
@@ -181,7 +163,7 @@ class ListFriendView(APIView):
             )
         elif relationship_type == 'friend_requests':
             relations = Relationship.objects.filter(
-                (models.Q(user2=user) | models.Q(user1=user)) &
+                (models.Q(user2=user)) &
                 models.Q(status=Relationship.Status.FRIENDREQUEST)
             )
         else: 
@@ -194,10 +176,10 @@ class ListFriendView(APIView):
             friend = relation.user2 if relation.user1 == user else relation.user1
             if friend == user:
                 pass
-            friends_with_relationship.append((friend, relation)) 
+            friends_with_relationship.append((friend, relation.status, relation.user1)) 
 
         serializer = FriendSerializer(
-            [friend for friend, _ in friends_with_relationship],
+            [friend for friend, _, _ in friends_with_relationship],
             many=True,
             context={'request': request, 'relationships': friends_with_relationship}
         )

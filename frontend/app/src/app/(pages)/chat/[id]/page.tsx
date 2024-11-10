@@ -1,12 +1,12 @@
 "use client";
-import { useRouter } from "next/navigation";
+import { useParams } from "next/navigation";
 import React, { useState, useEffect } from "react";
 
 const UserChatPage = ({ user }) => {
   const [messages, setMessages] = useState([]);
   const [input, setInput] = useState("");
   
-  const { name, image, activeStatus } = user;
+  const { username, profile_pic_url, is_online } = user;
 
   const handleSendMessage = () => {
     if (input.trim()) {
@@ -29,13 +29,13 @@ const UserChatPage = ({ user }) => {
               <div className="w-12 h-12 mr-4 relative flex flex-shrink-0">
                 <img
                   className="shadow-md rounded-full w-full h-full object-cover"
-                  src={image || "https://randomuser.me/api/portraits/women/33.jpg"} // Fallback image
-                  alt={name || "User"}
+                  src={profile_pic_url} // Fallback image
+                  alt={username}
                 />
               </div>
               <div className="text-sm">
-                <p className="font-bold">{name || "User"}</p>
-                <p>{activeStatus || "Active now"}</p>
+                <p className="font-bold">{username}</p>
+                <p>{is_online}</p>
               </div>
             </div>
           </div>
@@ -103,13 +103,52 @@ const UserChatPage = ({ user }) => {
 };
 
 export default function Page() {
-  const router = useRouter();
-  
-  const user = {
-    name: "Scarlett Johansson",
-    image: "https://randomuser.me/api/portraits/women/33.jpg",
-    activeStatus: "Active 1h ago"
-  };
+  const [user, setUser] = useState(null); // Start with null, to show loading state
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const param=useParams();
+  const userId =param.id; // Replace with actual userId, this can be from URL, context, or props
+  useEffect(() => {
+    const fetchUser = async () => {
+
+
+      try {
+        const response = await fetch("http://localhost:8000/api/userid", {
+          method: "POST",
+          body: JSON.stringify({ id: userId }),
+          headers: {
+            "Content-Type": "application/json",
+          },
+          credentials: "include", // If you're using cookies or session authentication
+        });
+
+        if (!response.ok) {
+          throw new Error("User not found or API error");
+        }
+
+        const data = await response.json();
+        setUser(data); // Set the user data
+      } catch (err) {
+        setError(err.message); // Handle error if fetching fails
+      } finally {
+        setLoading(false); // Stop loading once the fetch is complete
+      }
+    };
+
+    fetchUser();
+  }, []); // Empty dependency array means this runs once when component mounts
+
+  if (loading) {
+    return <div>Loading...</div>; // Optionally show a loading spinner or text
+  }
+
+  if (error) {
+    return <div>Error: {error}</div>; // Show error message if the fetch fails
+  }
+
+  if (!user) {
+    return <div>No user data found.</div>; // Fallback if no user data is available
+  }
 
   return <UserChatPage user={user} />;
 }

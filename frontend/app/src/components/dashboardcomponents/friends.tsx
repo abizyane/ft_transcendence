@@ -4,7 +4,15 @@ import userData from "../../app/data/Dashboarddata.json";
 import { IoChatbubbleEllipsesSharp } from "react-icons/io5";
 import { FaTableTennisPaddleBall } from "react-icons/fa6";
 import { useFriendsof } from "@/services/friendsof";
-
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+  DropdownMenuShortcut,
+} from "@/components/ui/dropdown-menu";
 
 
 const Friends = ({user}) => {
@@ -22,7 +30,7 @@ const Friends = ({user}) => {
       <div className="bg-gray-800/60 rounded-xl border h-full border-violet-primary mb-4 ">
         <div className="m-2 flex justify-between items-center">
           <p className="m-2 text-white text-2xl font-extrabold">Friends</p>
-          <Link href="/friends">
+          <Link href={`/friends/${user.id}`}>
             <div className="m-2 p-2 border border-violet-primary backdrop-blur-lg hover:bg-violet-primary rounded-xl">
               <p className="text-white">View All</p>
             </div>

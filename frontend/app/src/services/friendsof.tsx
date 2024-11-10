@@ -14,7 +14,6 @@ export const useFriendsof = (user:User) => {
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
     const fetchFriendsof = async () => {
       try {
         const response = await fetch(`http://localhost:8000/api/friendsof/${user.id}`, {
@@ -36,11 +35,8 @@ export const useFriendsof = (user:User) => {
       }
     };
 
-    if (user?.id) {
-      fetchFriendsof();
-    }
-  }, [user.id]);
-
-  return { friends, loading, error };
-};
-export default useFriendsof;
+    useEffect(() => {
+        fetchFriendsof();
+    }, []);
+    return { friends, loading, error,fetchFriendsof };
+  };

@@ -19,7 +19,7 @@ const gameHistory = user.history;
 const page = () => {
     const param = useParams();
     const userId= param.id;
-    const { user:currentuser } = useUser();
+    const { user:currentuser} = useUser();
     const [user, setUser] = useState<User | null>(null);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);

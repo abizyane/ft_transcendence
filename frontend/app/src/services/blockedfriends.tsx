@@ -24,10 +24,10 @@ export const useBlockedFriends = () => {
         setBlocked(responseData);
       } else {
         const errorData = await response.json();
-        setError('Failed to load friend requests');
+        console.log('Failed to load friend blocked');
       }
     } catch (error) {
-      setError('Error fetching friend requests');
+      console.log('Error fetching friend blocked');
     } finally {
       setblkLoading(false);
     }

@@ -47,7 +47,7 @@ export default function  Sidebar() {
             className={`w-7 h-7 ${iconClass('chat')}`}
           />
         </Link>
-        <Link href="/friends" onClick={() => handleIconClick('friends')}>
+        <Link href={`/friends/${user.id}`} onClick={() => handleIconClick('friends')}>
           <Image
             src={friends}
             alt="friends"

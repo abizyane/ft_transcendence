@@ -24,7 +24,7 @@ export const useUser = () => {
 
 export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
-  const [loading, setLoading] = useState(true);
+  const [userloading, setUserloading] = useState(true);
 
   useEffect(() => {
     const fetchUser = async () => {
@@ -37,7 +37,7 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
       } catch (error) {
         console.error('Failed to fetch user:', error);
       } finally {
-        setLoading(false);
+        setUserloading(false);
       }
     };
 
@@ -45,7 +45,7 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
   }, []);
 
   return (
-    <UserContext.Provider value={{ user, loading }}>
+    <UserContext.Provider value={{ user, userloading }}>
       {children}
     </UserContext.Provider>
   );

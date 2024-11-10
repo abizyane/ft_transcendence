@@ -13,10 +13,19 @@ import { useFriends } from "@/services/friends";
 import { useFriendRequests } from "@/services/friendrequest";
 import { useBlockedFriends } from "@/services/blockedfriends";
 import { fetchFriends } from '../../../services/friends';
+import { FaEllipsisV } from "react-icons/fa";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+  DropdownMenuShortcut,
+} from "@/components/ui/dropdown-menu";
 
-
-const friends = () => {
-  const { friends, loading, error ,fetchFriends } = useFriends();
+const friends = (user) => {
+  const { friends, loading, error ,fetchFriends } = useFriendsof();
   const { requests, reqloading, reqerror,fetchRequests } = useFriendRequests();
   const { blocked, blkloading, blkerror,fetchBlocked } = useBlockedFriends();
   const [ unblkloading, setUnblkloading] = useState(false);
@@ -29,6 +38,36 @@ const friends = () => {
   if (error || reqerror || blkerror || unblkerror) {
     return <div className="text-red-500">{error}</div>;
   }
+
+  //block
+  const handleblockFriend = async (userid:number) => {
+
+    try {
+      const response = await fetch('http://localhost:8000/api/block', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          user_id: userid,
+        }),
+        credentials: 'include',
+      });
+      if (response.ok) {
+        const data = await response.json();
+        console.log('Friend blocked successfully:', data);
+      } else {
+        const errorData = await response.json();
+        console.log('Failed to block friend:', errorData);
+      }
+    } catch (error) {
+      console.log('Error during the request:', error);
+    }
+    fetchFriends();
+    fetchRequests();
+    fetchBlocked();
+  }
+  //unblock
   const handleUnblockFriend = async (friendId:number) => {
     setUnblkloading(true);
     setUnblkerror(null);
@@ -58,6 +97,7 @@ const friends = () => {
     fetchBlocked();
     setUnblkloading(false);
   }
+  //accept
   const handleAcceptFriend = async (friendId:number) => {
     setUnblkloading(true);
     setUnblkerror(null);
@@ -122,11 +162,11 @@ const friends = () => {
       <h1 className="text-white text-center w-full text-xl lg:text-3xl font-bold mb-4 mt-2 ">
         Friends List
       </h1>
-      <div className="bg-gray-800/65 rounded-xl border w-full border-violet-primary flex flex-wrap gap-4 h-[230px] lg:h-[600px] overflow-y-auto no-scrollbar p-4">
+      <div className="bg-gray-800/65 rounded-xl border w-full border-violet-primary grid grid-cols-1 lg:grid-cols-2 gap-4 h-[230px] lg:h-[600px] overflow-y-auto no-scrollbar p-4">
         {friends?.map((friend, index) => (
           <div
             key={index}
-            className="flex justify-center items-center bg-gray-700/70 h-[90px] w-[48%] hover:bg-gray-600 transition-shadow border border-gray-600 rounded-lg p-4 shadow-lg hover:shadow-2xl"
+            className="flex justify-center items-center bg-gray-700/70 h-[90px] w-full hover:bg-gray-600 transition-shadow border border-gray-600 rounded-lg p-4 shadow-lg hover:shadow-2xl"
           >
             <div className="h-14 w-14 rounded-full overflow-hidden">
               <img
@@ -138,7 +178,7 @@ const friends = () => {
             <div className="flex flex-col justify-center ml-4">
               <span className="text-md font-semibold text-white">{friend.username}</span>
             </div>
-            <div className="ml-auto flex space-x-4">
+            <div className="ml-auto flex space-x-2 lg:space-x-4">
               <button
                 aria-label="Chat"
                 className="hover:text-blue-500 text-white transition-colors"
@@ -151,6 +191,20 @@ const friends = () => {
               >
                 <FaTableTennisPaddleBall className="w-6 h-6  text-red-600 hover:text-red-900" />
               </button>
+              <DropdownMenu >
+                  <DropdownMenuTrigger className=" text-white ">
+                  <FaEllipsisV/>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent className="mr-14 lg:mr-32 bg-gray-800/60 border-violet-primary">
+                      <DropdownMenuItem>
+                        <span className=" text-white">unfriend</span>
+                      </DropdownMenuItem>
+                    <DropdownMenuSeparator className="bg-black" />
+                    <DropdownMenuItem onClick={()=>handleblockFriend(friend.id)}>
+                      <span className=" text-white">block</span>
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
             </div>
           </div>
         ))}

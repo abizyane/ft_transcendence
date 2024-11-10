@@ -12,13 +12,7 @@ class User(AbstractUser):
     password = models.CharField(max_length=255)
     profile_pic = models.CharField(max_length=500, null=True)
     is_online = models.BooleanField(default=False)
-    friends = models.ManyToManyField(
-        'self', 
-        through='Relationship', 
-        symmetrical=False, 
-        related_name='friends_of', 
-        through_fields=('user1', 'user2')
-    )
+    friends = models.ManyToManyField('self', through='Relationship', symmetrical=False, related_name='friends_of')
     
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = ['username']
@@ -40,10 +34,7 @@ class User(AbstractUser):
                         raise ValidationError("You already sent a friend request to this user.")
                     else:
                         raise ValidationError("You already received a friend request from this user.")
-                elif relationship.status == Relationship.Status.FRIEND:
-                    raise ValidationError("You are already friends with this user.")
                 elif relationship.status != Relationship.Status.BLOCKED:
-                    relationship.userWhoRequest = self
                     relationship.status = Relationship.Status.FRIENDREQUEST
                     relationship.save()
                 else:
@@ -54,19 +45,8 @@ class User(AbstractUser):
             relationship = Relationship.objects.create(
                 user1=self,
                 user2=friend,
-                userWhoRequest=self,
                 status=Relationship.Status.FRIENDREQUEST
             )
-    
-    def remove_friend(self, friend):
-        try:
-            relationship = Relationship.objects.filter((models.Q(user1=self) & models.Q(user2=friend))
-                | (models.Q(user1=friend) & models.Q(user2=self)) & models.Q(status=Relationship.Status.FRIEND)).first()
-            if relationship is None:
-                raise Relationship.DoesNotExist
-            relationship.delete()
-        except Relationship.DoesNotExist:
-            raise ValidationError("You cannot remove a friend you don't have a relationship with")
 
     def accept_friend_request(self, friend):
         try:
@@ -99,16 +79,12 @@ class User(AbstractUser):
             relationship = Relationship.objects.filter(
                 (models.Q(user1=self) & models.Q(user2=friend)) | (models.Q(user1=friend) & models.Q(user2=self))
             ).first()
-            if relationship is None:
-                raise Relationship.DoesNotExist
-            relationship.userWhoBlocked = self
             relationship.status = Relationship.Status.BLOCKED
             relationship.save()
         except Relationship.DoesNotExist:
             relationship = Relationship.objects.create(
                 user1=self,
                 user2=friend,
-                userWhoBlocked=self,
                 status=Relationship.Status.BLOCKED
             )
 
@@ -116,8 +92,6 @@ class User(AbstractUser):
         try:
             relationship = Relationship.objects.filter(
                 (models.Q(user1=self) & models.Q(user2=friend)) | (models.Q(user1=friend) & models.Q(user2=self))).first()
-            if relationship is None:
-                raise Relationship.DoesNotExist
             if relationship.status == Relationship.Status.BLOCKED:
                 relationship.status = Relationship.Status.UNKNOWN
                 relationship.save()
@@ -137,8 +111,6 @@ class Relationship(models.Model):
     user1 = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, related_name='relationships_as_user1')
     user2 = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, related_name='relationships_as_user2')
     status = models.CharField(max_length=5, choices=Status.choices, default=Status.UNKNOWN)
-    userWhoRequest = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, related_name='relationships_userWhoRequest')
-    userWhoBlocked = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, related_name='relationships_userWhoBlocked')
 
     def __str__(self):
         return str(self.user1) + " - " + str(self.user2) + ": " + self.status
