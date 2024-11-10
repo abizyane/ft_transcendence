@@ -15,6 +15,7 @@ from rest_framework.exceptions import NotAuthenticated, NotFound
 
 User = get_user_model()
 
+
 class AddFriendView(APIView):
     def post(self, request):
         friendId = request.data.get('friend_id')
@@ -155,10 +156,10 @@ class FriendsOfView(APIView):
                 friend = relation.user2 if relation.user1 == user else relation.user1
                 if friend == user:
                     pass
-                friends_with_relationship.append((friend, relation.status, relation.user1)) 
+                friends_with_relationship.append((friend, relation)) 
 
             serializer = FriendSerializer(
-                [friend for friend, _,_ in friends_with_relationship],
+                [friend for friend, _ in friends_with_relationship],
                 many=True,
                 context={'request': request, 'relationships': friends_with_relationship}
             )
@@ -180,7 +181,7 @@ class ListFriendView(APIView):
             )
         elif relationship_type == 'friend_requests':
             relations = Relationship.objects.filter(
-                (models.Q(user2=user)) &
+                (models.Q(user2=user) | models.Q(user1=user)) &
                 models.Q(status=Relationship.Status.FRIENDREQUEST)
             )
         else: 
@@ -193,10 +194,10 @@ class ListFriendView(APIView):
             friend = relation.user2 if relation.user1 == user else relation.user1
             if friend == user:
                 pass
-            friends_with_relationship.append((friend, relation.status, relation.user1)) 
+            friends_with_relationship.append((friend, relation)) 
 
         serializer = FriendSerializer(
-            [friend for friend, _, _ in friends_with_relationship],
+            [friend for friend, _ in friends_with_relationship],
             many=True,
             context={'request': request, 'relationships': friends_with_relationship}
         )

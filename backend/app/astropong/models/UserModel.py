@@ -40,8 +40,10 @@ class User(AbstractUser):
                         raise ValidationError("You already sent a friend request to this user.")
                     else:
                         raise ValidationError("You already received a friend request from this user.")
+                elif relationship.status == Relationship.Status.FRIEND:
+                    raise ValidationError("You are already friends with this user.")
                 elif relationship.status != Relationship.Status.BLOCKED:
-                    relationship.userWhoRequest=self,
+                    relationship.userWhoRequest = self
                     relationship.status = Relationship.Status.FRIENDREQUEST
                     relationship.save()
                 else:
