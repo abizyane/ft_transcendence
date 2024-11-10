@@ -5,6 +5,7 @@ interface FriendRequest {
   username: string;
   pic: string;
   xp: number;
+  sender_id:number;
 }
 
 export const useFriendRequests = () => {

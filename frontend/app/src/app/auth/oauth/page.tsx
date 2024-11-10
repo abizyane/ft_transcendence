@@ -41,6 +41,9 @@ const OAuthPage = () => {
     return (
       <>
         <Loader />
+        <p className="text-zinc-600 font-medium text-4xl">
+        Your adventure is about to begin
+      </p>
       </>
     );
   };
