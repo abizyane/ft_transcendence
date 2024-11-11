@@ -51,6 +51,8 @@ class ChatRoomSerializer(serializers.Serializer):
         return {
             'user': UserSerializer(user, context=self.context).data,
             'messages': self.get_messages(instance),
+            'next': instance['next'],
+            'previous': instance['previous'],
         }
 
 class ConversationSerializer(serializers.ModelSerializer):

@@ -11,7 +11,7 @@ class ConversationsPageNumberPagination(PageNumberPagination):
     page_size = 9
 
 class MessagesPageNumberPagination(PageNumberPagination):
-    page_size = 15
+    page_size = 14
 
 class ConversationsView(generics.ListAPIView):
     serializer_class = ConversationSerializer
@@ -34,7 +34,7 @@ class ConversationsView(generics.ListAPIView):
             if user_pair not in latest_messages:
                 latest_messages[user_pair] = message
         
-        latest_messages = dict(sorted(latest_messages.items(), key=lambda message: message[1].timestamp, reverse=True))
+        # latest_messages = dict(sorted(latest_messages.items(), key=lambda message: message[1].timestamp, reverse=True))
         
         return list(latest_messages.values())
 
@@ -56,15 +56,15 @@ class ChatRoomView(generics.ListAPIView):
         if Relationship.objects.filter(Q(user1=currentuser, user2=otheruser) | Q(user1=otheruser, user2=currentuser), status = Relationship.Status.BLOCKED).exists():
             raise NotFound("These users are blocked.")
 
-        return Message.objects.filter(Q(sender=currentuser, receiver=otheruser) | Q(sender=otheruser, receiver=currentuser)).order_by('timestamp')
+        return Message.objects.filter(Q(sender=currentuser, receiver=otheruser) | Q(sender=otheruser, receiver=currentuser)).order_by('-timestamp')
 
     def list(self, request, *args, **kwargs):
         messages = self.get_queryset()
         paginator = self.pagination_class()
         paginated_messages = paginator.paginate_queryset(messages, request)
 
-        username = self.kwargs['username']
-        user = User.objects.get(username=username)
+        user_id = self.kwargs['id']
+        user = User.objects.get(id=user_id)
 
         chat_data = {
             'sender': request.user,
