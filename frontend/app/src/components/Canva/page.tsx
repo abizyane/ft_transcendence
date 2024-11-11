@@ -2,60 +2,21 @@
 import { useEffect, useState,useRef } from "react"
 import Game_Front from "./gameFront"
 
-export default function Canvas (){
+export default function Canvas ({socketRef}){
     const canvasRef = useRef(null);
-    const socketRef = useRef();
     const GameRef = useRef(null)
     let Connected = useRef(false)
 
-    const [bluePos, setBleu] = useState({})
+    const [bluePos, setBlue] = useState({})
     const [redPos, setRed] = useState({x:0, y:0})
     const [ball, setBall] = useState({x:0, y:0})
-
-    useEffect (() => {
-        const timer = setTimeout(() => {
-            if (Connected.current == false)
-                socketRef.current =  new WebSocket('ws://'+ window.location.hostname+':8000/ws/game/1/')
-            socketRef.current.onopen = e => {
-                console.log(e.data)
-                Connected.current = true
-            }
-            
-            socketRef.current.onclose = e=>{
-                console.log('closed')
-                Connected.current = false
-            }
-            
-            socketRef.current.onmessage = (e) => {
-                const msgObj = JSON.parse(e.data)
-                if (msgObj.type === 'send_position')
-                    if (msgObj.id === '0')
-                    {
-                        setBleu(msgObj.player)
-                        setRed(msgObj.player_two)
-                        setBall({x:msgObj.ball.x, y:msgObj.ball.y})
-                    }
-    
-                    if (msgObj.id === '1'){
-                        setRed(msgObj.player)
-                        setBleu(msgObj.player_two)
-                        setBall({x:msgObj.ball.x, y:msgObj.ball.y})
-                    }
-                    
-            }
-            if (canvasRef.current){
-                canvasRef.current.addEventListener('keydown', keyDownHandler, false);
-                canvasRef.current.addEventListener('keyup', keyUpHandler, false);
-            }
-        }, 300)
-        return () => {clearTimeout(timer)}
-    }, [])
     
     const keyDownHandler = (e) =>{
         if (e.key === 'w'){
             socketRef.current.send(JSON.stringify(
                 {
                     type: 'input',
+                    command: 'keyW_down',
                     w : 'true'
                 }
             ))
@@ -64,6 +25,7 @@ export default function Canvas (){
             socketRef.current.send(JSON.stringify(
                 {
                     type: 'input',
+                    command: 'keyS_down',
                     s: 'true'
                 }
             ))
@@ -75,6 +37,7 @@ export default function Canvas (){
             socketRef.current.send(JSON.stringify(
                 {
                     type: 'input',
+                    command : 'keyW_up',
                     w: 'false'
                 }
             ))
@@ -83,12 +46,39 @@ export default function Canvas (){
             socketRef.current.send(JSON.stringify(
                 {
                     type: 'input',
+                    command: 'keyS_up',
                     s: 'false'
                 }
             ))
         }
     }
 
+    useEffect(() => {
+        // Make sure the WebSocket is available before using it
+        if (socketRef.current) {
+          socketRef.current.onmessage = (e) => {
+            const jsondata = JSON.parse(e.data);
+            console.log('Received message:', jsondata);
+    
+            // Handle position updates or other messages here
+            if (jsondata.type === 'update') {
+              setBlue(jsondata.blue); // assuming the update contains the blue player's position
+              setRed(jsondata.red);   // assuming the update contains the red player's position
+              setBall(jsondata.ball);    // assuming the update contains the ball's position
+            }
+          };
+        }
+    
+        // Add event listeners for key events
+        window.addEventListener('keydown', keyDownHandler);
+        window.addEventListener('keyup', keyUpHandler);
+    
+        // Cleanup event listeners on unmount
+        return () => {
+          window.removeEventListener('keydown', keyDownHandler);
+          window.removeEventListener('keyup', keyUpHandler);
+        };
+      }, [socketRef]);
 
     /*Canvas Function */
     useEffect(()=>{
