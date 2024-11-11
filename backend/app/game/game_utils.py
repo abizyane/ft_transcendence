@@ -91,6 +91,9 @@ class Game:
         if len(self.players) == 2:
             raise self.RoomIsFull()
 
+    def init_paddle_pos(self):
+        self.blue.x = 25
+        self.red.x = self.width - self.red.width - 25
     def set_players(self, channel_name, id):
         self.is_full()
         if not self.players.get(channel_name):
