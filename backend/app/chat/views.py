@@ -8,10 +8,10 @@ from .serializers import ConversationSerializer, ChatRoomSerializer, UserSeriali
 from rest_framework import generics
 
 class ConversationsPageNumberPagination(PageNumberPagination):
-    page_size = 7
+    page_size = 9
 
 class MessagesPageNumberPagination(PageNumberPagination):
-    page_size = 5
+    page_size = 15
 
 class ConversationsView(generics.ListAPIView):
     serializer_class = ConversationSerializer
@@ -43,25 +43,26 @@ class ChatRoomView(generics.ListAPIView):
     pagination_class = MessagesPageNumberPagination
 
     def get_queryset(self):
-        other_user = self.kwargs['username']
+        user_id = self.kwargs['id']
         if not self.request.user.is_authenticated:
             raise NotAuthenticated("You must be authenticated to access this resource.")
         try:
             current_user = self.request.user.username
             currentuser = User.objects.get(username=current_user)
-            otheruser = User.objects.get(username=other_user)
+            otheruser = User.objects.get(id=user_id)
         except User.DoesNotExist:
             raise NotFound("User not found.")
 
         if Relationship.objects.filter(Q(user1=currentuser, user2=otheruser) | Q(user1=otheruser, user2=currentuser), status = Relationship.Status.BLOCKED).exists():
             raise NotFound("These users are blocked.")
 
-        return Message.objects.filter(Q(sender=currentuser, receiver=otheruser) | Q(sender=otheruser, receiver=currentuser)).order_by('-timestamp')
+        return Message.objects.filter(Q(sender=currentuser, receiver=otheruser) | Q(sender=otheruser, receiver=currentuser)).order_by('timestamp')
 
     def list(self, request, *args, **kwargs):
         messages = self.get_queryset()
         paginator = self.pagination_class()
         paginated_messages = paginator.paginate_queryset(messages, request)
+
         username = self.kwargs['username']
         user = User.objects.get(username=username)
 
@@ -69,6 +70,8 @@ class ChatRoomView(generics.ListAPIView):
             'sender': request.user,
             'receiver': user,
             'messages': paginated_messages,
+            'next': paginator.get_next_link(),
+            'previous': paginator.get_previous_link()
         }
 
         serializer = self.get_serializer(instance=chat_data)
