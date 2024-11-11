@@ -40,7 +40,7 @@ const OAuthPage = () => {
   
     return (
       <>
-        <div className="min-h-screen">
+        <div className="h-screen justify-center items-center flex flex-col">
           <Loader />
           <p className="text-zinc-600 font-medium text-4xl">
           Your adventure is about to begin

@@ -77,6 +77,9 @@ class User(AbstractUser):
             ).first()
             if relationship is None:
                 raise Relationship.DoesNotExist
+            if relationship.userWhoRequest == self:
+                raise ValidationError("You cannot accept a request that you sent.")
+
             relationship.status = Relationship.Status.FRIEND
             relationship.save()
         except Relationship.DoesNotExist:
@@ -90,6 +93,8 @@ class User(AbstractUser):
             ).first()
             if relationship is None:
                 raise Relationship.DoesNotExist
+            # if relationship.userWhoRequest == self:
+            #     raise ValidationError("You have to wait until you get accepted.")
             relationship.delete()
         except Relationship.DoesNotExist:
             raise ValidationError("No friend request from this user.")
