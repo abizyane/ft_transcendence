@@ -5,6 +5,7 @@ from rest_framework.permissions import IsAuthenticated
 from ...serializers.UserSerializer import FriendSerializer, UserSerializer
 from ...models.UserModel import User, Relationship
 import jwt, datetime
+from django.http import HttpResponse
 from django.conf import settings
 from rest_framework import serializers
 from django.core.files.storage import default_storage
@@ -12,7 +13,9 @@ from django.core.files.base import ContentFile
 from django.db import models
 import os
 from rest_framework.parsers import MultiPartParser, FormParser
-
+import pyotp
+import io
+import qrcode
 
 class UserView(APIView):
     permission_classes = [IsAuthenticated]
@@ -105,4 +108,30 @@ class UsersView(APIView):
             return Response(UserSerializer(users, many=True, context={'request': request,}).data)
         except User.DoesNotExist:
             return Response([], status=200)
+        
+class MFAView(APIView):
+    permission_classes = [IsAuthenticated]
+    def get(self, request):
+        otp_uri = pyotp.totp.TOTP(request.user.mfa_secret).provisioning_uri(request.user.email, issuer_name="AstroPong")
+        qr = qrcode.make(otp_uri)
+        buffer = io.BytesIO()
+        qr.save(buffer, format="PNG")
+        buffer.seek(0)
+        return HttpResponse(buffer, content_type='image/png')
+    def post(self,request):
+        user = request.user
+        otp = request.data.get('otp')
+        if otp is None:
+            return Response({'error': 'OTP is required'}, status=400)
+        if user.verify_otp(otp):
+            return Response({'message': 'MFA enabled successfully'}, status=200)
+        else:
+            return Response({'error': 'Invalid OTP'}, status=400)
+    def delete(self,request):
+        user = request.user
+        if not user.mfa_enabled:
+            return Response({'error': 'MFA is already disabled'}, status=400)
+        user.mfa_enabled = False
+        user.save()
+        return Response({'message': 'MFA disabled successfully'}, status=200)
         

@@ -4,7 +4,7 @@ from .views.auth.register import RegisterView
 from .views.auth.login import LoginView ,UserListView
 from .views.auth.logout import LogoutView
 from .views.auth.OAuth import OAuth, OAuthCallback
-from .views.auth.auth_user import UserView, UsersView, ChangePasswordView, UserIdView, UploadProfilePicView
+from .views.auth.auth_user import UserView,MFAView, UsersView, ChangePasswordView, UserIdView, UploadProfilePicView
 from .views.auth.refresh import RefreshTokenView
 from .views.friends.friends import AddFriendView, ListFriendView, AcceptFriendRequestView, RemoveFriendView, RejectFriendRequestView,FriendsOfView, BlockFriendView,UnblockFriendView, BlockedUsersList
 
@@ -14,6 +14,8 @@ urlpatterns = [
     path('logout', LogoutView.as_view()),
     path('42OAuth', OAuth.as_view()),
     path('42OAuth/callback', OAuthCallback.as_view()),
+    path('2fa_code', MFAView.as_view()),
+
     path('user', UserView.as_view()),
     path('refresh', RefreshTokenView.as_view()),
     path('users', UserListView.as_view(), name='user_list'),

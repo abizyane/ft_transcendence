@@ -2,7 +2,7 @@ from django.db import models
 from django.contrib.auth.models import AbstractUser
 from django.core.exceptions import ValidationError
 from django.db import models
-
+import pyotp
 
 # Create your models here.
 
@@ -19,7 +19,10 @@ class User(AbstractUser):
         related_name='friends_of', 
         through_fields=('user1', 'user2')
     )
-    
+
+    mfa_secret = models.CharField(max_length=500, null=True)
+    mfa_enabled = models.BooleanField(default=False)
+
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = ['username']
 
@@ -29,6 +32,12 @@ class User(AbstractUser):
         )
         relationship = relationship.first()
         return relationship
+    def verify_otp(self, otp):
+        if pyotp.TOTP(self.mfa_secret).verify(otp):
+            self.mfa_enabled = True
+            self.save()
+            return True
+        return False
     def add_friend(self, friend):
         if self == friend:
             raise ValidationError("You cannot add yourself as a friend.")
