@@ -19,7 +19,7 @@ from django.urls import include, path
 from .views import ChatRoomView, ConversationsView, OnlineUsersView
 
 urlpatterns = [
-    path('room/<str:username>/', ChatRoomView.as_view(), name='room'),
+    path('room/<int:id>/', ChatRoomView.as_view(), name='room'),
     path('conversations/', ConversationsView.as_view(), name='conversations'),
     path('online/', OnlineUsersView.as_view(), name='online'),
 ]

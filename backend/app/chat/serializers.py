@@ -9,7 +9,7 @@ class UserSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = User
-        fields = ['id', 'username', 'profile_pic']
+        fields = ['id', 'username', 'profile_pic', 'is_online']
 
     def get_profile_pic(self, obj):
         request = self.context.get('request')
@@ -19,6 +19,12 @@ class UserSerializer(serializers.ModelSerializer):
         if obj.profile_pic:
             return request.build_absolute_uri(obj.profile_pic)
         return default_image_url
+
+class MessageConsumerSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = Message
+        fields = ['message_id', 'sender', 'receiver', 'message', 'timestamp', 'seen']
 
 class MessageSerializer(serializers.ModelSerializer):
     sender = UserSerializer(read_only=True)
@@ -56,6 +62,7 @@ class ConversationSerializer(serializers.ModelSerializer):
             'id': instance.sender.id if instance.sender.id != self.context['request'].user.id else instance.receiver.id,
             'username': instance.sender.username if instance.sender.username != self.context['request'].user.username else instance.receiver.username,
             'profile_pic': instance.sender.profile_pic if instance.sender.username != self.context['request'].user.username else instance.receiver.profile_pic,
+            'is_online': instance.sender.is_online if instance.sender.username != self.context['request'].user.username else instance.receiver.is_online,
             'message': instance.message,
             'timestamp': instance.timestamp,
             'seen': instance.seen
