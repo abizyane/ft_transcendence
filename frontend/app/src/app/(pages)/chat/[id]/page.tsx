@@ -11,16 +11,16 @@ const UserChatPage = ({ currentUser, chatUser }) => {
     setMessages(chatUser.messages);
   });
 
-  // Function to handle sending a message
+  
   const handleSendMessage = () => {
     if (input.trim()) {
       const newMessage = {
-        text: input, // Store the message text
-        sender: currentUser.username, // Set sender as the current user
-        timestamp: new Date().toLocaleTimeString(), // Store the timestamp of the message
+        text: input, 
+        sender: currentUser.username, 
+        timestamp: new Date().toLocaleTimeString(), 
       };
-      setMessages((prevMessages) => [...prevMessages, newMessage]); // Add new message to messages array
-      setInput(""); // Clear the input field after sending the message
+      setMessages((prevMessages) => [...prevMessages, newMessage]); 
+      setInput("");
     }
   };
   console.log("test");
@@ -28,9 +28,7 @@ const UserChatPage = ({ currentUser, chatUser }) => {
     <div className="h-full">
       <main className="flex-grow flex flex-row min-h-full">
         <section className="flex flex-col flex-auto border-l border-gray-800">
-          {/* Chat header with user details */}
 
-          {/* Chat body displaying messages */}
           <div className="chat-body p-4  h-[630px] overflow-y-scroll">
             {messages
               .slice(0)
@@ -78,7 +76,6 @@ const UserChatPage = ({ currentUser, chatUser }) => {
             </p>
           </div>
 
-          {/* Chat footer for typing a message */}
           <div className="chat-footer h-fit">
             <div className="relative flex-grow">
               <label className="flex items-center">
@@ -86,12 +83,12 @@ const UserChatPage = ({ currentUser, chatUser }) => {
                   className="m-4 rounded-full py-2 pl-3 pr-20 w-full border border-gray-800 focus:border-gray-700 bg-gray-800 focus:bg-gray-900 focus:outline-none text-gray-200 focus:shadow-md"
                   type="text"
                   value={input}
-                  onChange={(e) => setInput(e.target.value)} // Update input state on change
+                  onChange={(e) => setInput(e.target.value)}
                   placeholder="Write your message"
                 />
                 <button
                   type="button"
-                  onClick={handleSendMessage} // Call send message on button click
+                  onClick={handleSendMessage}
                   className="absolute top-1/2 transform -translate-y-1/2 right-4 flex flex-shrink-0 focus:outline-none text-violet-primary  px-4 py-1"
                 >
                   Send
@@ -105,9 +102,6 @@ const UserChatPage = ({ currentUser, chatUser }) => {
   );
 };
 
-// import React, { useState, useEffect } from "react";
-// import { useUser } from "path-to-useUser-hook"; // Assuming this hook gives you the current user
-// import UserChatPage from "./UserChatPage"; // Assuming this is the chat page component
 
 export default function Page() {
   const chatUserid = useParams();
