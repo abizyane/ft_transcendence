@@ -8,8 +8,10 @@ import game from '../../../public/Game.svg';
 import chat from '../../../public/Chat.svg';
 import friends from '../../../public/User.svg';
 import rank from '../../../public/Activity.svg';
+import { useUser } from "@/services/context/usercontext";
 
 export default function  Sidebar() {
+  const {user} = useUser();
   const [activeIcon, setActiveIcon] = useState<string>('home');
 
   const handleIconClick = (icon: string) => {
@@ -18,11 +20,13 @@ export default function  Sidebar() {
 
   const iconClass = (icon: string) =>
     activeIcon === icon ? 'filter brightness-100' : 'filter brightness-50';
-
+  if (!user) {
+    return null;
+  }
   return (
     <div className=" bottom-0 left-0 w-full lg:w-24 h-full lg:justify-center lg:items-center lg:flex  backdrop-blur-md">
       <div className="w-full flex p-4 flex-row space-x-8 lg:space-x-0 lg:space-y-12 items-center justify-center lg:flex-col">
-        <Link href="/dashboard" onClick={() => handleIconClick('home')}>
+        <Link href={`/profile/${user.id}`} key={user.id} onClick={() => handleIconClick('home')}>
           <Image
             src={home}
             alt="home"
@@ -43,7 +47,7 @@ export default function  Sidebar() {
             className={`w-7 h-7 ${iconClass('chat')}`}
           />
         </Link>
-        <Link href="/friends" onClick={() => handleIconClick('friends')}>
+        <Link href={`/friends/${user.id}`} onClick={() => handleIconClick('friends')}>
           <Image
             src={friends}
             alt="friends"

@@ -74,6 +74,21 @@ status
 level
 
 
-other fetch for charts 
+other fetch for charts
 
 history topplayers friends
+
+
+when i block and deblock i can't see the profile from blocker and blocked
+block many times
+timestamp 
+serializer
+userid 
+online 
+pagination
+
+verify in hte socket if the curr user is one of the sender or receiver 
+
+verify the profile pic in converstation serializer
+
+verify id of sender to accept relationship

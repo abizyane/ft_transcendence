@@ -12,11 +12,12 @@ https://docs.djangoproject.com/en/4.2/ref/settings/
 
 from pathlib import Path
 import os
+from datetime import timedelta
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
-MEDIA_ROOT = BASE_DIR/"pictures"
-MEDIA_URL = "/media/"
+MEDIA_URL = "/pictures/"
+MEDIA_ROOT = os.path.join(BASE_DIR, 'pictures')
 
 
 # Quick-start development settings - unsuitable for production
@@ -58,6 +59,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'astropong.JWTAuthenticationMiddleware.JWTAuthenticationMiddleware',
     # 'astropong.middleware.JWTAuthenticationMiddleware',
 ]
 
@@ -138,13 +140,21 @@ CORS_ALLOW_CREDENTIALS=True
 AUTH_USER_MODEL = 'astropong.User'
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [
-        'rest_framework.authentication.SessionAuthentication',
-        'rest_framework.authentication.BasicAuthentication',
+        # 'rest_framework.authentication.SessionAuthentication',
+        # 'rest_framework.authentication.BasicAuthentication',
         'rest_framework_simplejwt.authentication.JWTAuthentication',  # Enable JWT authentication
     ],
     'DEFAULT_PERMISSION_CLASSES': [
         'rest_framework.permissions.IsAuthenticated',  # Enforce authentication globally
     ],
+}
+
+SIMPLE_JWT = {
+    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=1),  
+    'REFRESH_TOKEN_LIFETIME': timedelta(days=1),
+    'ROTATE_REFRESH_TOKENS': True,
+    'BLACKLIST_AFTER_ROTATION': True,
+    'AUTH_HEADER_TYPES': ('Bearer',),
 }
 DATABASES = {
     'default': {

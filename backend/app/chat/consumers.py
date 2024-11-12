@@ -4,7 +4,7 @@ from channels.db import database_sync_to_async
 from django.db.models import Q
 from .models import Message
 from astropong.models.UserModel import User, Relationship
-from .serializers import MessageSerializer
+from .serializers import MessageConsumerSerializer
 from channels.layers import get_channel_layer
 from datetime import datetime
 
@@ -71,7 +71,7 @@ class ChatRoomConsumer(AsyncWebsocketConsumer):
             self.room_group_name,
             {
                 'type': 'chat_message',
-                'message': MessageSerializer(message).data,
+                'message': MessageConsumerSerializer(message).data,
             }
         )
 

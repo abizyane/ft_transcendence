@@ -1,41 +1,277 @@
-import Image from "next/image";
-import Marshmellow from "../../../public/marshmello.svg";
-import "../../app/globals.css";
-import Link from "next/link";
+import React, { useEffect, useState } from "react";
 import DoughnutChart from "../Charts/Winrate";
-import data from"@/app/data/Dashboarddata.json";
+import Image from "next/image";
+import { useUser } from "@/services/context/usercontext";
+import { MdOutlinePersonAddAlt1, MdPersonAddAlt1 } from "react-icons/md";
+import { ImBlocked, ImEyeBlocked } from "react-icons/im";
+import { IoIosRemoveCircleOutline } from "react-icons/io";
 
+type User = {
+  id: string;
+  name: string;
+  profile_pic_url?: string;
+  xp: number;
+  sender_id: number;
+  wins: number;
+  totalGames: number;
+  relationship: string;
+};
 
-const Component = () => {
-  const {user} =data;
-  const totalXP = user.xp;
+type UserInfoProps = {
+  user: User;
+  setUser: (user:any) => void
+};
+
+const UserInfo: React.FC<UserInfoProps> = ({ user, setUser }) => {
+  const { user: currentUser } = useUser();
+  const { name, profile_pic_url, xp, wins, totalGames, id } = user;
   const maxXPPerLevel = 1000;
-  const level = Math.floor(totalXP / maxXPPerLevel); 
-  const remainingXP = (totalXP % maxXPPerLevel)/10;
-  const { wins, totalGames } = user.charts.winRate;
- 
-  function calculateWinRate(wins :number, totalGames :number) {
-    if (totalGames === 0) return 0; 
-    return (wins / totalGames) * 100;
-}
-const percentage = calculateWinRate(wins, totalGames);
+  const level = Math.floor(xp / maxXPPerLevel);
+  const remainingXP = ((xp % maxXPPerLevel) / maxXPPerLevel) * 100;
+  const calculateWinRate = (wins: number, totalGames: number) => {
+    return totalGames === 0 ? 0 : (wins / totalGames) * 100;
+  };
+  const winRatePercentage = calculateWinRate(wins, totalGames);
+
+  const [loading, setLoading] = useState(false);
+
+  const fetchUser = async () => {
+    fetch(`http://localhost:8000/api/userid`, {
+      method: 'POST',
+      body: JSON.stringify({ id: user.id }),
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      credentials: 'include',
+    })
+      .then((response) => {
+        if (!response.ok) {
+          console.log("Response not ok:", response.status);
+          if (response.status == 400)
+            {
+              throw new Error("You cannot see this profile");
+              // alert with the package
+              // redirect to dashboard
+            }
+        }
+        return response.json();
+      })
+      .then((data: User) => setUser(data))
+      .finally(() => setLoading(false));
+  };
+
+  // Handle Add Friend
+  const handleAddFriend = async () => {
+    setLoading(true);
+    try {
+      const response = await fetch('http://localhost:8000/api/add_friend', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          friend_id: id,
+        }),
+        credentials: 'include',
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        console.log('Friend added successfully:', data);
+        // Update the relationship after success
+        // onRelationshipChange("Friend");
+        fetchUser();
+      } else {
+        const errorData = await response.json();
+        console.log('Failed to add friend:', errorData);
+      }
+    } catch (error) {
+      console.log('Error during the request:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Handle Block Friend
+  const handleBlockFriend = async () => {
+    setLoading(true);
+    try {
+      const response = await fetch('http://localhost:8000/api/block', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          user_id: id,
+        }),
+        credentials: 'include',
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        console.log('Friend blocked successfully:', data);
+        // Update the relationship after success
+        // onRelationshipChange("Blocked");
+        fetchUser();
+
+      } else {
+        const errorData = await response.json();
+        console.log('Failed to block friend:', errorData);
+      }
+    } catch (error) {
+      console.log('Error during the request:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Handle Unblock Friend
+  const handleUnblockFriend = async () => {
+    setLoading(true);
+    try {
+      const response = await fetch('http://localhost:8000/api/unblock', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          user_id: id,
+        }),
+        credentials: 'include',
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        console.log('Friend unblocked successfully:', data);
+        // Update the relationship after success
+        // onRelationshipChange("None");
+        fetchUser();
+
+      } else {
+        const errorData = await response.json();
+        console.log('Failed to unblock friend:', errorData);
+      }
+    } catch (error) {
+      console.log('Error during the request:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Handle Remove Friend
+  const handleRemoveFriend = async () => {
+    setLoading(true);
+    try {
+      const response = await fetch('http://localhost:8000/api/remove_friend', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          friend_id: id,
+        }),
+        credentials: 'include',
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        console.log('Friend removed successfully:', data);
+        // Update the relationship after success
+        // onRelationshipChange("None");
+        fetchUser();
+
+      } else {
+        const errorData = await response.json();
+        console.log('Failed to remove friend:', errorData);
+      }
+    } catch (error) {
+      console.log('Error during the request:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Handle Accept Friend Request
+  const handleAcceptFriend = async () => {
+    setLoading(true);
+    try {
+      const response = await fetch('http://localhost:8000/api/accept_friend', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          friend_id: id,
+        }),
+        credentials: 'include',
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        console.log('Friend request accepted:', data);
+        // Update the relationship after success
+        // onRelationshipChange("Friend");
+        fetchUser();
+
+      } else {
+        const errorData = await response.json();
+        console.log('Failed to accept friend request:', errorData);
+      }
+    } catch (error) {
+      console.log('Error during the request:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Handle Reject Friend Request
+  const handleRejectFriend = async () => {
+    setLoading(true);
+    try {
+      const response = await fetch('http://localhost:8000/api/reject_friend', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          friend_id: id,
+        }),
+        credentials: 'include',
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        console.log('Friend request rejected:', data);
+        // Update the relationship after success
+        // onRelationshipChange("Unknown");
+        fetchUser();
+
+      } else {
+        const errorData = await response.json();
+        console.log('Failed to reject friend request:', errorData);
+      }
+    } catch (error) {
+      console.log('Error during the request:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <>
-<div className="h-full w-full border-[1px] border-violet-primary rounded-xl p-2">
-  <div className="flex gap-2">
-    <div className="flex-shrink-0 w-3/5">
-      <div className="mb-4">
-        <Image
-          src={user.pic}
-          alt="User Profile"
-          width={144}
-          height={144}
-          className="w-full h-auto rounded-2xl"
-        />
-      </div>
-      <div className="flex flex-col border-[2px] border-violet-primary rounded-xl m-1 h-auto p-2">
-        <p className="text-white font-semibold text-xs justify-start flex">Level {level}</p>
-        <div className="flex items-center h-2 w-5/6 rounded-xl bg-white">
+      <div className="h-full w-full border-[1px] border-violet-primary rounded-xl p-2">
+        <div className="flex gap-2">
+          <div className="flex-shrink-0 w-3/5">
+            <div className="mb-4 max-w-full aspect-square max-h-[300px] mx-auto">
+              <img
+                src={user.profile_pic_url}
+                alt="User Profile"
+                className="w-full h-auto object-cover rounded-2xl"
+              />
+            </div>
+            <div className="flex flex-col border-[2px] border-violet-primary rounded-xl m-1 h-auto p-2">
+              <p className="text-white font-semibold text-xs justify-start flex">Level {level}</p>
+              <div className="flex items-center h-2 w-full rounded-xl bg-white">
                 <div
                   className="bg-violet-primary h-2 rounded-xl"
                   style={{ width: `${remainingXP}%` }}
@@ -45,33 +281,106 @@ const percentage = calculateWinRate(wins, totalGames);
                 {user.xp} xp
               </p>
             </div>
-    </div>
-    <div className="flex flex-col w-2/5">
-      <div className="border-[2px] border-violet-primary rounded-3xl h-auto p-1 mb-2 mr-2">
-        <h1 className="text-base mr-2 lg:text-2xl font-bold text-violet-primary text-center">Welcome!</h1>
-        <p className="text-base lg:text-2xl font-bold text-white text-center">{user.username}</p>
-      </div>
-      <div className="p-2 rounded-xl border h-full border-violet-primary mr-2">
-      <div className="relative w-full h-full flex flex-col items-center justify-center bg-gray-800/20 rounded-xl">
-        <p className="text-white font-mont text-xs m-1">Win Rate</p> 
-        <div className="relative w-full h-full flex items-center justify-center">
-          <DoughnutChart winpercentage={percentage}/>
+          </div>
+
+          <div className="flex flex-col w-2/5">
+            {currentUser?.id === user?.id ? (
+              <div className="border-[2px] border-violet-primary rounded-3xl h-auto p-1 mb-2 mr-2">
+                <h1 className="text-base mr-2 lg:text-2xl font-bold text-violet-primary text-center">
+                  Welcome!
+                </h1>
+                <p className="text-base lg:text-2xl font-bold text-white text-center">{user.username}</p>
+              </div>
+            ) : user.relationship === "Friend" ? (
+              <div className="border-2 border-violet-primary rounded-3xl p-4 mb-2 mr-2 bg-gray-800 flex flex-col md:flex-row items-center space-y-2 md:space-y-0 md:space-x-2">
+                <button
+                  className="px-4 py-2 flex items-center justify-center bg-red-900 text-white rounded-lg hover:bg-red-950 transition duration-200 w-full md:w-1/2 lg:w-1/2"
+                  onClick={handleRemoveFriend}
+                  disabled={loading}
+                >
+                  <IoIosRemoveCircleOutline className="text-xl" />
+                  Remove Friend
+                </button>
+                <button
+                  className="px-4 py-2 flex items-center justify-center bg-red-900 text-white rounded-lg hover:bg-red-950 transition duration-200 w-full md:w-1/2 lg:w-1/2"
+                  onClick={handleBlockFriend}
+                  disabled={loading}
+                >
+                  <ImBlocked className="text-xl" />
+                  Block
+                </button>
+              </div>
+            ) : user.relationship === "Friend Request" && user?.sender_id !== currentUser?.id ? (
+              <div className="border-2 border-violet-primary rounded-3xl p-4 mb-2 mr-2 bg-gray-800 flex flex-col md:flex-row items-center space-y-2 md:space-y-0 md:space-x-2">
+                <button
+                  className="px-4 py-2 flex items-center justify-center bg-green-900 text-white rounded-lg hover:bg-green-950 transition duration-200 w-full md:w-1/2 lg:w-1/2"
+                  onClick={handleAcceptFriend}
+                  disabled={loading}
+                >
+                  <MdOutlinePersonAddAlt1 className="text-xl" />
+                  Accept
+                </button>
+                <button
+                  className="px-4 py-2 flex items-center justify-center bg-red-900 text-white rounded-lg hover:bg-red-950 transition duration-200 w-full md:w-1/2 lg:w-1/2"
+                  onClick={handleRejectFriend}
+                  disabled={loading}
+                >
+                  <ImEyeBlocked className="text-xl" />
+                  Reject
+                </button>
+              </div>
+            ) : user.relationship === "Friend Request" && user?.sender_id === currentUser?.id ? (
+              <div className="border-2 border-violet-primary rounded-3xl p-4 mb-2 mr-2 bg-gray-800 flex flex-col md:flex-row items-center space-y-2 md:space-y-0 md:space-x-2">
+                <button
+                  className="px-4 py-2 flex items-center justify-center bg-orange-400 text-white rounded-lg hover:bg-orange-450 transition duration-200 w-full md:w-1/2 lg:w-1/2"
+                  disabled
+                >
+                  <MdOutlinePersonAddAlt1 className="text-xl" />
+                  Pending
+                </button>
+                <button
+                  className="px-4 py-2 flex items-center justify-center bg-red-900 text-white rounded-lg hover:bg-red-950 transition duration-200 w-full md:w-1/2 lg:w-1/2"
+                  onClick={handleRejectFriend}
+                  disabled={loading}
+                >
+                  <ImEyeBlocked className="text-xl" />
+                  Cancel
+                </button>
+              </div>
+            ) : (
+              <div className="border-2 border-violet-primary rounded-3xl p-4 mb-2 mr-2 bg-gray-800 flex flex-col md:flex-row items-center space-y-2 md:space-y-0 md:space-x-2">
+                <button
+                  className="px-4 py-2 flex items-center justify-center bg-green-900 text-white rounded-lg hover:bg-green-950 transition duration-200 w-full md:w-1/2 lg:w-1/2"
+                  onClick={handleAddFriend}
+                  disabled={loading}
+                >
+                  <MdPersonAddAlt1 className="text-xl" />
+                  Add Friend
+                </button>
+                <button
+                  className="px-4 py-2 flex items-center justify-center bg-red-900 text-white rounded-lg hover:bg-red-950 transition duration-200 w-full md:w-1/2 lg:w-1/2"
+                  onClick={handleBlockFriend}
+                  disabled={loading}
+                >
+                  <ImBlocked className="text-xl" />
+                  Block
+                </button>
+              </div>
+            )}
+
+            <div className="p-2 rounded-xl border h-full border-violet-primary mr-2">
+              <div className="relative w-full h-full flex flex-col items-center justify-center bg-gray-800/20 rounded-xl">
+                <p className="text-white font-mont xl:font-bold xl:text-lg text-xs m-1">Win Rate</p>
+                <div className="relative w-full h-full flex items-center justify-center">
+                  <DoughnutChart winpercentage={winRatePercentage} />
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
-      </div>
-    </div>
-    
-    
-    
-  </div>
-</div>
- 
-
-     
     </>
-
   );
 };
 
-
-export default Component;
+export default UserInfo;
