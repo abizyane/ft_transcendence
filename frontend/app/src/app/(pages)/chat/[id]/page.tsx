@@ -1,9 +1,9 @@
 "use client";
 import { useUser } from "@/services/context/usercontext";
 import { useParams } from "next/navigation";
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import io from "socket.io-client";
-
+import { formatDistanceToNow } from "date-fns";
 const UserChatPage = ({ currentUser, chatUser }) => {
   const [messages, setMessages] = useState([]);
   const [input, setInput] = useState("");
@@ -24,7 +24,7 @@ const UserChatPage = ({ currentUser, chatUser }) => {
        console.log(currentUser.id);
        console.log(message.sender);
        if (currentUser.id === message.message.receiver)
-        setMessages((prevMessages) => [...prevMessages,  message.message]);
+        setMessages((prevMessages) => [message.message, ...prevMessages]);
     };
     socket.onclose = () => {
       console.log("Disconnected from WebSocket");
@@ -50,20 +50,30 @@ const UserChatPage = ({ currentUser, chatUser }) => {
       };
 
       ws.send(JSON.stringify(newMessage));
-      setMessages((prevMessages) => [...prevMessages, newMessage]);
+      setMessages((prevMessages) => [newMessage, ...prevMessages]);
       setInput("");
     } else {
       console.log("WebSocket is not open.");
     }
   };
+  const messageContainerRef = useRef(null);
 
-  console.log(messages);
+  // Scroll to bottom every time messages change
+  useEffect(() => {
+    if (messageContainerRef.current) {
+      messageContainerRef.current = messageContainerRef.current.scrollHeight;
+    }
+  }, [messages]);
+
+  console.log("chatuser",chatUser.messages[0].timestamp);
   return (
     <div className="h-full">
       <main className="flex-grow flex flex-row h-fit">
         <section className="flex flex-col flex-auto border-l border-gray-800">
-          <div className=" p-4  h-[640px] overflow-y-scroll">
+          <div className=" p-4  h-[640px] overflow-y-scroll    ref={messageContainerRef}">
             {messages
+            .slice(0)
+            .reverse()
               .map((msg, index) => (
                 <div
                   key={index}
@@ -74,7 +84,7 @@ const UserChatPage = ({ currentUser, chatUser }) => {
                   }`}
                 >
                   <div
-                    className={`messages text-sm ${
+                    className={`text-sm ${
                       msg.sender === currentUser.username
                         ? "text-white"
                         : "text-gray-700"
@@ -96,15 +106,20 @@ const UserChatPage = ({ currentUser, chatUser }) => {
                       >
                         {msg.message}
                       </p>
+                      <p className={`p-4 text-center w-full text-sm text-gray-500 ${ msg.sender === currentUser.username
+                            ? "order-first"
+                            : "bg-white justify-self-end"
+                        }`}>
+                        {messages.length
+                          
+                          // ? formatDistanceToNow(new Date(msg.timestamp))
+                          ? "ok"
+                          : "No messages yet"}
+                      </p>
                     </div>
                   </div>
                 </div>
               ))}
-            <p className="p-4 text-center text-sm text-gray-500">
-              {messages.length
-                ? messages[messages.length - 1].timestamp
-                : "No messages yet"}
-            </p>
           </div>
 
           <div className="h-fit">
