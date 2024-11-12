@@ -14,4 +14,6 @@ COPY --from=builder /app ./
 
 RUN npx next telemetry disable
 
+RUN npx shadcn@latest init -d
+
 CMD ["npx", "next", "dev"]
