@@ -17,6 +17,7 @@ class LoginView(APIView):
     def post(self, request):
         email = request.data.get('email')
         password = request.data.get('password')
+        otp = request.data.get('otp')
 
         user = User.objects.filter(email=email).first()
         if user is None:
@@ -24,6 +25,17 @@ class LoginView(APIView):
         
         if not user.check_password(password):
             raise AuthenticationFailed("Password is incorrect!")
+        if user.mfa_enabled:
+            if not otp:
+                return Response({
+                    'error': 'OTP is required',
+                    '2fa_enabled': True
+                    }, status=400)
+            if not user.verify_otp(otp):
+                return Response({
+                    'error': 'OTP is invalid',
+                    '2fa_enabled': True
+                    }, status=400)
 
         refresh = RefreshToken.for_user(user)
         user_data = UserSerializer(user, context={'request': request}).data
