@@ -33,11 +33,13 @@ const UserChatPage = ({ currentUser, chatUser }) => {
       socket.close();
     };
   }, [currentUser.username, chatUser.user.username]);
-
+  
+  const messageContainerRef = useRef(null);
   useEffect(() => {
     if (chatUser?.messages?.length > 0) {
       setMessages(chatUser.messages);
     }
+    
   }, [chatUser.messages]);
   
   const handleSendMessage = () => {
@@ -56,21 +58,18 @@ const UserChatPage = ({ currentUser, chatUser }) => {
       console.log("WebSocket is not open.");
     }
   };
-  const messageContainerRef = useRef(null);
 
-  // Scroll to bottom every time messages change
-  useEffect(() => {
+  useEffect(()=>{
     if (messageContainerRef.current) {
-      messageContainerRef.current = messageContainerRef.current.scrollHeight;
+      messageContainerRef.current.scrollTop = messageContainerRef.current.scrollHeight;
     }
-  }, [messages]);
+  },[messages]);
 
-  console.log("chatuser",chatUser.messages[0].timestamp);
   return (
     <div className="h-full">
       <main className="flex-grow flex flex-row h-fit">
         <section className="flex flex-col flex-auto border-l border-gray-800">
-          <div className=" p-4  h-[640px] overflow-y-scroll    ref={messageContainerRef}">
+          <div className=" p-4  h-[640px] overflow-y-scroll" ref={messageContainerRef}>
             {messages
             .slice(0)
             .reverse()
@@ -98,11 +97,11 @@ const UserChatPage = ({ currentUser, chatUser }) => {
                       }`}
                     >
                       <p
-                        className={`px-6 py-3 m-1 rounded-full ${
+                        className={`px-6 py-3 m-1 rounded-3xl max-w-xs lg:max-w-sm break-words whitespace-pre-wrap ${
                           msg.sender === currentUser.username
                             ? "bg-violet-primary"
                             : "bg-white"
-                        } max-w-xs lg:max-w-md`}
+                        }`}
                       >
                         {msg.message}
                       </p>
