@@ -92,3 +92,5 @@ verify in hte socket if the curr user is one of the sender or receiver
 verify the profile pic in converstation serializer
 
 verify id of sender to accept relationship
+
+replace http with https before push

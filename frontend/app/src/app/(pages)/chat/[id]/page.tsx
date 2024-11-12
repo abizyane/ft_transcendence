@@ -2,37 +2,68 @@
 import { useUser } from "@/services/context/usercontext";
 import { useParams } from "next/navigation";
 import React, { useState, useEffect } from "react";
+import io from "socket.io-client";
 
 const UserChatPage = ({ currentUser, chatUser }) => {
   const [messages, setMessages] = useState([]);
   const [input, setInput] = useState("");
+  const [ws, setWs] = useState(null);
   const { username, profile_pic_url, is_online, id } = currentUser;
   useEffect(() => {
-    setMessages(chatUser.messages);
-  });
+    const socket = new WebSocket(
+      `ws://127.0.0.1:8000/ws/chat/room/${currentUser.username}/${chatUser.user.username}`
+    );
+    setWs(socket);
+    socket.onopen = () => {
+      console.log("Connected to WebSocket");
+    };
+    socket.onmessage = (event) => {
+      console.log(event);
+      const message = JSON.parse(event.data);
+      console.log("Received message:", message.message);
+       console.log(currentUser.id);
+       console.log(message.sender);
+       if (currentUser.id === message.message.receiver)
+        setMessages((prevMessages) => [...prevMessages,  message.message]);
+    };
+    socket.onclose = () => {
+      console.log("Disconnected from WebSocket");
+    };
+    return () => {
+      socket.close();
+    };
+  }, [currentUser.username, chatUser.user.username]);
 
+  useEffect(() => {
+    if (chatUser?.messages?.length > 0) {
+      setMessages(chatUser.messages);
+    }
+  }, [chatUser.messages]);
   
   const handleSendMessage = () => {
-    if (input.trim()) {
+    if (input.trim() && ws?.readyState === WebSocket.OPEN) {
       const newMessage = {
-        text: input, 
-        sender: currentUser.username, 
-        timestamp: new Date().toLocaleTimeString(), 
+        message: input,
+        sender: currentUser.username,
+        receiver: chatUser.user.username,
+        type: "chat_message",
       };
-      setMessages((prevMessages) => [...prevMessages, newMessage]); 
+
+      ws.send(JSON.stringify(newMessage));
+      setMessages((prevMessages) => [...prevMessages, newMessage]);
       setInput("");
+    } else {
+      console.log("WebSocket is not open.");
     }
   };
-  console.log("test");
+
+  console.log(messages);
   return (
     <div className="h-full">
-      <main className="flex-grow flex flex-row min-h-full">
+      <main className="flex-grow flex flex-row h-fit">
         <section className="flex flex-col flex-auto border-l border-gray-800">
-
-          <div className="chat-body p-4  h-[630px] overflow-y-scroll">
+          <div className=" p-4  h-[640px] overflow-y-scroll">
             {messages
-              .slice(0)
-              .reverse()
               .map((msg, index) => (
                 <div
                   key={index}
@@ -76,7 +107,7 @@ const UserChatPage = ({ currentUser, chatUser }) => {
             </p>
           </div>
 
-          <div className="chat-footer h-fit">
+          <div className="h-fit">
             <div className="relative flex-grow">
               <label className="flex items-center">
                 <input
@@ -102,7 +133,6 @@ const UserChatPage = ({ currentUser, chatUser }) => {
   );
 };
 
-
 export default function Page() {
   const chatUserid = useParams();
   const { user: currentUser } = useUser();
@@ -126,7 +156,6 @@ export default function Page() {
         }
 
         const data = await response.json();
-        console.log("here", data);
         setChatUser(data);
       } catch (err) {
         setError(err.message);

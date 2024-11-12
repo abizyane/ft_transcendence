@@ -128,7 +128,7 @@ export default function Chat({ children }: ChatLayoutProps) {
                   </div>
 
                   {/* User list */}
-                  <div className="p-2 flex-1 md:w-full h-[600px] overflow-y-scroll">
+                  <div className="p-2 flex-1 md:w-full h-[650px] overflow-y-scroll">
                     {users.map((user) => (
                       <div
                         key={`message-${user.id}`}
@@ -160,13 +160,7 @@ export default function Chat({ children }: ChatLayoutProps) {
               {/* Main Content (Children) */}
               <div className="flex-1 hidden lg:block">
                 {selectedId && (
-                  <div className="chat-header px-6 py-4 flex bg-gray-800/60 rounded-tl-xl flex-row flex-none justify-start gap-4 items-center shadow">
-                    <button
-                      onClick={closeSlider}
-                      className="text-gray-600 hover:text-black"
-                    >
-                      Close
-                    </button>
+                  <div className="px-6 py-4 flex bg-gray-800/60 rounded-xl flex-row flex-none justify-start gap-4 items-center shadow">
                     <div className="flex">
                       <div className="w-12 h-12 mr-4 relative flex flex-shrink-0">
                         <img
@@ -195,7 +189,7 @@ export default function Chat({ children }: ChatLayoutProps) {
         }`}
       >
         {selectedId && (
-          <div className="chat-header px-6 py-4 flex bg-gray-800/60 rounded-tl-xl flex-row flex-none justify-start gap-4 items-center shadow">
+          <div className="px-6 py-4 flex bg-gray-800/60 rounded-xl flex-row flex-none justify-start gap-4 items-center shadow">
             <button
               onClick={closeSlider}
               className="text-gray-600 hover:text-black"
