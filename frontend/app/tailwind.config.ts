@@ -26,21 +26,30 @@ const config: Config = {
         'xs': '320px',   
         'sm': '640px',
         'md': '768px',
-        'lg': '1024px',
+        'lg': '1023px',
         'xl': '1280px',
         '2xl': '1536px',
      
     },
     width: {
-      'desktop': 'calc(100% - 100px)',
+      'desktop': 'calc(100% - 64px)',
       'phone': 'calc(100% - 112px)',
     },
     height: {
-      'desktop': 'calc(100% - 112px)',
+      'desktop': 'calc(100vh - 112px)',
       'phone': 'calc(100% - 112px)',
     },
     fontSize: {
       '2xs': '0.625rem', // Example for extra small text
+    },
+    keyframes: {
+      fadeInLetter: {
+        '0%': { opacity: '0' },
+        '100%': { opacity: '1' },
+      },
+    },
+    animation: {
+      'fade-in-letter': 'fadeInLetter 0.08s ease-in-out forwards', 
     },
   },
   },

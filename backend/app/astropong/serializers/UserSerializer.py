@@ -3,9 +3,11 @@ from ..models.UserModel import User
 from game.models import Profile
 
 class UserSerializer(serializers.ModelSerializer):
+    profile_pic_url = serializers.SerializerMethodField()
+
     class Meta:
         model = User
-        fields = ['id', 'email', 'username', 'password']
+        fields = ['id', 'email', 'username', 'password','profile_pic_url']
         extra_kwargs = {
             'password': {'write_only':True}
         }
@@ -19,3 +21,9 @@ class UserSerializer(serializers.ModelSerializer):
         p = Profile.objects.create(user_id=instance, level=0,xp=0)
         p.save()
         return instance
+    def get_profile_pic_url(self, obj):
+        request = self.context.get('request')
+        if obj.profile_pic:
+            return request.build_absolute_uri(obj.profile_pic.url)
+        return None
+

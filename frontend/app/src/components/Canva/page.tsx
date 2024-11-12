@@ -100,6 +100,6 @@ export default function Canvas ({socketRef}){
     }, [bluePos, redPos, ball])
 
     return (
-        <canvas tabIndex={1} ref={canvasRef} className="w-full h-full"></canvas>
+        <canvas tabIndex={1} ref={canvasRef} className="w-full h-full "></canvas>
     );
 }

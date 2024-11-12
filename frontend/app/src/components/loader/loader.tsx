@@ -1,6 +1,6 @@
 import React from 'react'
 
-const Loader = () => {
+const loader = () => {
   return (
     <div class="text-center">
     <div
@@ -14,4 +14,4 @@ const Loader = () => {
   )
 }
 
-export default Loader
+export default loader

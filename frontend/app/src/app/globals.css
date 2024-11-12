@@ -4,7 +4,7 @@
 @tailwind utilities;
 
 .golden {
-background: linear-gradient(90.54deg, #9E7A03 0.28%, #725802 5.43%, #876802 6.08%, #6F5502 6.58%, #634C02 57.91%, #382B01 99.72%);
+background: linear-gradient(90.54deg, #9E7A03 0.28%, #7a5e02 5.43%, #876802 6.08%, #6F5502 6.58%, #634C02 57.91%, #473700 99.72%);
 box-shadow: 0px 0px 0px 1px rgba(207, 207, 207, 0.25);
 backdrop-filter: blur(25px);
 
@@ -36,36 +36,26 @@ backdrop-filter: blur(25px);
 }
 
 .purple_button:hover {
-  box-shadow: 0 0 0 1px rgba(159, 122, 234, 0.5); /* hover:ring hover:ring-violet-300 */
+  box-shadow: 0 0 0 4px rgba(159, 122, 234, 0.7); /* hover:ring hover:ring-violet-300 */
 }
-/* 
-:root {
-  --foreground-rgb: 0, 0, 0;
-  --background-start-rgb: 214, 219, 220;
-  --background-end-rgb: 255, 255, 255;
-} */
-
-/* @media (prefers-color-scheme: dark) {
-  :root {
-    --foreground-rgb: 255, 255, 255;
-    --background-start-rgb: 0, 0, 0;
-    --background-end-rgb: 0, 0, 0;
-  }
-} */
-
-/* body {
-  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
-  color: rgb(var(--foreground-rgb));
-} */
 
 .montserrat_font {
   font-family: Montserrat, system-ui, -apple-system, BlinkMacSystemFont,
     "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue",
     sans-serif;
 }
-/* 
-@layer utilities {
-  .text-balance {
-    text-wrap: balance;
-  } */
-/* } */
+
+@keyframes rainbow-border {
+  0% { border-color: red; }
+  14% { border-color: orange; }
+  28% { border-color: yellow; }
+  42% { border-color: green; }
+  57% { border-color: blue; }
+  71% { border-color: indigo; }
+  85% { border-color: violet; }
+  100% { border-color: red; }
+}
+
+.rainbow-border {
+  animation: rainbow-border 5s linear infinite;
+}

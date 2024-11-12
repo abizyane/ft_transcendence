@@ -75,7 +75,7 @@ class ChatRoomConsumer(AsyncWebsocketConsumer):
             }
         )
 
-        await self.send_notification(sender, receiver)
+        await self.send_notification(sender, receiver) 
 
     async def handle_typing(self, text_data_json):
         await self.channel_layer.group_send(

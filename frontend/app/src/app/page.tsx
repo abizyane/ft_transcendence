@@ -3,10 +3,12 @@ import Logo from "@/components/Logo/Logo";
 export default function Home() {
   return (
     <>
-    <div className="h-16">
+    <div className="flex flex-col  min-h-screen">
         <Logo />
-    </div>
+    <div className="flex-1 flex justify-center items-center overflow-hidden ">
       <Landingpage />
+    </div>
+    </div>
     </>
   );
 }

@@ -1,30 +1,37 @@
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.exceptions import AuthenticationFailed
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import AllowAny
+from rest_framework_simplejwt.tokens import RefreshToken
+from django.contrib.auth import get_user_model
+from django.conf import settings
+from rest_framework.decorators import api_view, permission_classes
+from rest_framework import generics
 from ...serializers.UserSerializer import UserSerializer
-from ...models.UserModel import User
-import jwt, datetime
+User = get_user_model()
 
+@permission_classes([AllowAny])
 class LoginView(APIView):
+
     def post(self, request):
-        email = request.data['email']
-        password = request.data['password']
+        email = request.data.get('email')
+        password = request.data.get('password')
+
         user = User.objects.filter(email=email).first()
-        if user is None :
-            raise AuthenticationFailed("User not found !")
-        if not user.check_password(password):
-            raise AuthenticationFailed("Password is incorrect !")
+        if user is None:
+            raise AuthenticationFailed("User not found!")
         
-        payload = {
-            'id':user.id,
-            'expire_at': (datetime.datetime.now() + datetime.timedelta(minutes=60)).strftime("%Y-%m-%d %H:%M:%S"),
-            'created_at':datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-        }
-        response = Response()
-        token = jwt.encode(payload, "SECRET_KEY", algorithm='HS256')
-        response.data = {
-            'jwt':token
-        }
-        response.set_cookie(key='jwt', value=token, httponly=True)
+        if not user.check_password(password):
+            raise AuthenticationFailed("Password is incorrect!")
+
+        refresh = RefreshToken.for_user(user)
+        response = Response({
+            'access': str(refresh.access_token),
+        })
+
+        response.set_cookie(key='jwt', value=str(refresh), httponly=True, secure=True)
+
         return response
+class UserListView(generics.ListAPIView):
+    queryset = User.objects.all()  # Fetch all users
+    serializer_class = UserSerializer  # Specify the serializer class to use

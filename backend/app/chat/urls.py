@@ -16,9 +16,10 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import include, path
-from .views import ChatRoomView, ConversationsView
+from .views import ChatRoomView, ConversationsView, OnlineUsersView
 
 urlpatterns = [
-    path('room/<str:sender>/<str:receiver>/', ChatRoomView.as_view(), name='room'),
+    path('room/<str:l_user>/<str:r_user>/', ChatRoomView.as_view(), name='room'),
     path('conversations/', ConversationsView.as_view(), name='conversations'),
+    path('online/', OnlineUsersView.as_view(), name='online'),
 ]

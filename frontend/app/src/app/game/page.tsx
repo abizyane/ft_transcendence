@@ -1,0 +1,54 @@
+'use client';
+import { useState } from 'react';
+import solo from "../../../public/solo.jpeg";
+import multiplayers from "../../../public/multiplayers.jpeg";
+import Link from "next/link";
+
+const Page = () => {
+
+  const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
+
+  return (
+    <>
+      <div className=" rounded-xl flex flex-col gap-4  w-fit  h-fit justify-center items-center md:flex-row mb-24 lg:mb-0">
+        
+        <div
+          onMouseEnter={() => setHoveredIndex(0)}
+          onMouseLeave={() => setHoveredIndex(null)}
+          className={`min-w-[300px] max-w-[500px] lg:min-w-[400px] lg:max-w-[600px] xl:min-w-[500px] xl:max-w-[900px] m-2 mt-8 md:mt-2 h-fit rounded-2xl border-4 border-violet-primary overflow-hidden transform transition-transform duration-300 ${hoveredIndex === 0 ? 'scale-105' : hoveredIndex === null ? 'scale-100' : 'blur-sm'}`}
+        >
+          <Link href="game/solo">
+            <div
+              className="relative h-[30vh] md:h-[70vh] w-full z-0 bg-cover bg-center rounded-t-xl"
+              style={{ backgroundImage: `url(${solo.src})` }}
+            >
+              <p className="absolute bottom-0 left-0 right-0 bg-black/50 text-center text-xl md:text-3xl font-bold text-white rounded-b-xl p-4">
+                Mode Solo
+              </p>
+            </div>
+          </Link>
+        </div>
+
+        <div
+          onMouseEnter={() => setHoveredIndex(1)}
+          onMouseLeave={() => setHoveredIndex(null)}
+          className={`min-w-[300px] max-w-[500px] lg:min-w-[400px] lg:max-w-[600px] xl:min-w-[500px] xl:max-w-[900px] m-2 mt-8 md:mt-2 h-fit rounded-2xl border-4 border-violet-primary overflow-hidden transform transition-transform duration-300 ${hoveredIndex === 1 ? 'scale-105' : hoveredIndex === null ? 'scale-100' : 'blur-sm'}`}
+        >
+          <Link href="dashboard/game/tournaments">
+            <div
+              className="relative h-[30vh] md:h-[70vh] w-full z-0 bg-cover bg-center rounded-t-xl"
+              style={{ backgroundImage: `url(${multiplayers.src})` }}
+            >
+              <p className="absolute bottom-0 text-nowrap left-0 right-0 bg-black/50 text-center text-xl md:text-3xl font-bold text-white rounded-b-xl p-4">
+                Mode Tournaments
+              </p>
+            </div>
+          </Link>
+        </div>
+
+      </div>
+    </>
+  );
+};
+
+export default Page;

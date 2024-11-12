@@ -5,11 +5,11 @@ import Registration from "components/Registration/Registration";
 const page = () => {
   return (
     <>
-    <div className="h-16">
-      <Logo/>
-    </div>
-    <div className="flex justify-center items-center h-screen w-full"> 
+     <div className="flex flex-col  min-h-screen">
+        <Logo />
+    <div className="flex-1 flex  justify-center items-center   overflow-hidden "> 
       <Registration />
+    </div>
     </div>
     </>
   );

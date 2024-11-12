@@ -20,8 +20,8 @@ export default function  Sidebar() {
     activeIcon === icon ? 'filter brightness-100' : 'filter brightness-50';
 
   return (
-    <div className=" bottom-0 left-0 w-full lg:w-24 lg:h-full   backdrop-blur-md">
-      <div className="w-full lg:min-h-full flex p-4 flex-row space-x-8 lg:space-x-0 lg:space-y-12 items-center justify-center lg:flex-col">
+    <div className=" bottom-0 left-0 w-full lg:w-24 h-full lg:justify-center lg:items-center lg:flex  backdrop-blur-md">
+      <div className="w-full flex p-4 flex-row space-x-8 lg:space-x-0 lg:space-y-12 items-center justify-center lg:flex-col">
         <Link href="/dashboard" onClick={() => handleIconClick('home')}>
           <Image
             src={home}
@@ -29,7 +29,7 @@ export default function  Sidebar() {
             className={`w-7 h-7 ${iconClass('home')}`}
           />
         </Link>
-        <Link href="/dashboard/game" onClick={() => handleIconClick('game')}>
+        <Link href="/game" onClick={() => handleIconClick('game')}>
           <Image
             src={game}
             alt="game"
@@ -50,7 +50,7 @@ export default function  Sidebar() {
             className={`w-7 h-7 ${iconClass('friends')}`}
           />
         </Link>
-        <Link href="/rank" onClick={() => handleIconClick('rank')}>
+        <Link href="/ranking" onClick={() => handleIconClick('rank')}>
           <Image
             src={rank}
             alt="rank"
