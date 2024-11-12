@@ -7,15 +7,21 @@ import asyncio
 from .tournament import Tournament
 from ..game_utils import Game, Player
 
+def set_competitor_info(competitor, name, img=None):
+    competitor.name = name
+    competitor.img = 'https://static.wikia.nocookie.net/pokemon/images/2/2b/0057.png/revision/latest?cb=20241005055710'
+
 class TournamentConsumer(AsyncWebsocketConsumer):
     rm = RoomListManager()
     rooms = {}
     i = 0
     _id = 0
     async def connect(self):
+        user = self.scope['user']
         #get_user_info
         await self.accept()
         self.p_holder = PlayerHolder(Competitor(self.channel_name))
+        set_competitor_info(self.p_holder.competitor, name=use.username)
         self._type = self.scope['url_route']['kwargs']['competition_type']
         self.room = None
         self.match = None
@@ -101,6 +107,11 @@ class TournamentConsumer(AsyncWebsocketConsumer):
             self.p_holder.upgrade() # if err mean he won
             self.match = self.room.tournament.get_player_match(self.channel_name)
             self.match_name = str(f'{self.room.name}m_{self.match.index}')
+            #send room state to every one in match
+            await self.channel_layer.group_send(self.match_name,{
+                'type' : 'room_update',
+            })
+            #
             await self.channel_layer.group_add(self.match_name, self.channel_name)
             if self.p_holder.back.is_ready():
                 await self.channel_layer.group_send(self.match_name, {
@@ -115,8 +126,14 @@ class TournamentConsumer(AsyncWebsocketConsumer):
             await self.send(text_data=json.dumps({
                 'msg': 'You Lost'
             }))
-                
-                
+
+    async def room_update(self, event):
+        await self.send({
+            'type' : 'room',
+            'command' : 'wait',
+            'competitorsInfo' : self.p_holder.competitor.get_allroom_info()
+        })
+
     async def newgame_request(self, event):
         await self.send(text_data=json.dumps({
             'debuf' : f'{self.match_name}'
@@ -133,19 +150,6 @@ class TournamentConsumer(AsyncWebsocketConsumer):
     async def send_pos(self, event):
         if not self.match.is_ready() or not self.match.game or self.match.game.status == 1:
             return
-        # player = self.game.players[self.channel_name]
-        # player2 = None
-        # for p in self.game.players.keys():
-        #     if not p == self.channel_name:
-        #         player2 = self.game.players[p]
-        # await self.send(text_data=json.dumps({
-        #     'type': 'update',
-        #     'player': player.get_data(),
-        #     'player_two': player2.get_data(),
-        #     'ball': {'x': str(self.game.ball.posX), 'y':str(self.game.ball.posY)},
-        #     'id': str(player.id),
-        #     'channel_name': self.channel_name,
-        # }))
         await self.send(text_data=json.dumps(
             {
                 'type' : 'update',
@@ -156,9 +160,11 @@ class TournamentConsumer(AsyncWebsocketConsumer):
         ))
     
     async def joined_competitor_data(self, event):
+        comp_info = self.get_allroom_info()
         await self.send(text_data=json.dumps({
             "msg" : event['competitor'],
             "size" : event['currentsize'],
+            "competitors" : comp_info,
         }))
 
     async def disconnect(self, error_code):

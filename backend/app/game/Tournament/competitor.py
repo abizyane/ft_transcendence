@@ -18,9 +18,12 @@ class AbstractCompetitor(ABC):
 class Competitor(AbstractCompetitor):
     def __init__(self, name):
         self.name = name
+        self.username = ''
         self.room:Room = None
         self._type = ''
         self._state = None
+        self.img = ''
+        self.islost = False
     """
         Comptitor should ask manager for Type of Tournament He wanna join
         1/2, 1/4, 1/8 , manager will search for type of room if available
@@ -46,3 +49,20 @@ class Competitor(AbstractCompetitor):
     
     def get_data(self):
         return self.__dict__
+
+    def get_info(self):
+        return {
+            'username' : self.name,
+            'imgUrl' : self.img,
+            'lost' : self.islost
+        }
+    
+    def get_allroom_info(self):
+        res = {}
+        for i,competitor in enumerate(self.room.competitors) :
+            if competitor == self:
+                res = {'you' : self.get_info()}
+            else:
+                res = {str(i) : competitor.get_info()}
+        return res
+            
