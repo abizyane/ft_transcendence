@@ -18,6 +18,7 @@ class AbstractCompetitor(ABC):
 class Competitor(AbstractCompetitor):
     def __init__(self, name):
         self.name = name
+        self._id = -1
         self.username = ''
         self.room:Room = None
         self._type = ''
@@ -30,6 +31,7 @@ class Competitor(AbstractCompetitor):
         if Not create a new Room of desired type
     """
     def join_room(self, room:Room) -> Room:
+        self.room = room
         return room.add_player(self)
 
     def exit_room(self, room:Room) -> None:
@@ -54,15 +56,13 @@ class Competitor(AbstractCompetitor):
         return {
             'username' : self.name,
             'imgUrl' : self.img,
-            'lost' : self.islost
+            'lost' : self.islost,
+            'id' : self._id,
         }
     
     def get_allroom_info(self):
         res = {}
-        for i,competitor in enumerate(self.room.competitors) :
-            if competitor == self:
-                res = {'you' : self.get_info()}
-            else:
-                res = {str(i) : competitor.get_info()}
+        for competitor in (self.room.competitors) :
+            res[competitor._id] = competitor.get_info()
         return res
             

@@ -1,6 +1,6 @@
 from channels.generic.websocket import AsyncWebsocketConsumer
 from .tournament_utils import RoomListManager
-from .competitor import Competitor
+from .competitor import Competitor,Room
 import json
 from .matchHolder import MatchTreeBuilder, MatchHolder, PlayerHolder
 import asyncio
@@ -21,9 +21,9 @@ class TournamentConsumer(AsyncWebsocketConsumer):
         #get_user_info
         await self.accept()
         self.p_holder = PlayerHolder(Competitor(self.channel_name))
-        set_competitor_info(self.p_holder.competitor, name=use.username)
+        set_competitor_info(self.p_holder.competitor, name=user.username)
         self._type = self.scope['url_route']['kwargs']['competition_type']
-        self.room = None
+        self.room:Room = None
         self.match = None
         self.match_name = ''
         self.task = None
@@ -34,7 +34,7 @@ class TournamentConsumer(AsyncWebsocketConsumer):
         await self.channel_layer.group_send(self.room.name, {
             "type" : "joined.competitor.data",
             "competitor" : self.p_holder.competitor.__dict__['name'],
-            "currentsize" : str(self.room.competitors_count()),
+            "currentsize" : str(self.room.size),
         })
         if self.room.is_ready():
             TournamentConsumer.rm.switch_to_ready(self.room)
@@ -160,11 +160,13 @@ class TournamentConsumer(AsyncWebsocketConsumer):
         ))
     
     async def joined_competitor_data(self, event):
-        comp_info = self.get_allroom_info()
+        comp_info = self.p_holder.competitor.get_allroom_info()
         await self.send(text_data=json.dumps({
+            "type" : "room",
             "msg" : event['competitor'],
             "size" : event['currentsize'],
             "competitors" : comp_info,
+            "command" : "setCompetitors"
         }))
 
     async def disconnect(self, error_code):
