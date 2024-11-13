@@ -6,6 +6,7 @@ from .matchHolder import MatchTreeBuilder, MatchHolder, PlayerHolder
 import asyncio
 from .tournament import Tournament
 from ..game_utils import Game, Player
+import gc
 
 def set_competitor_info(competitor, name, img=None):
     competitor.name = name
@@ -63,6 +64,9 @@ class TournamentConsumer(AsyncWebsocketConsumer):
                 'type' : 'init.match',
                 'msg' : self.match_name
             })
+            self.game.init_paddle_pos()
+            self.task = asyncio.create_task(self.game_loop())
+  
 
     async def init_match(self, event):
         await self.send(text_data=json.dumps({
@@ -70,8 +74,6 @@ class TournamentConsumer(AsyncWebsocketConsumer):
             'command' : 'setReady'
         }))
         self.game = self.match.game
-        self.game.init_paddle_pos()
-        self.task = asyncio.create_task(self.game_loop())
 
     async def game_loop(self):
         while not self.game.status:
@@ -104,6 +106,9 @@ class TournamentConsumer(AsyncWebsocketConsumer):
             await self.send(text_data=json.dumps({
                 'msg': 'You Won'
             }))
+            del self.game
+            del self.p_holder.paddle
+            gc.collect()
             self.p_holder.upgrade() # if err mean he won
             self.match = self.room.tournament.get_player_match(self.channel_name)
             self.match_name = str(f'{self.room.name}m_{self.match.index}')
@@ -123,6 +128,9 @@ class TournamentConsumer(AsyncWebsocketConsumer):
                     'msg': f'wait for {self.match_name} to strat'
                 }))
         else:
+            del self.game
+            del self.p_holder.paddle
+            gc.collect()
             await self.send(text_data=json.dumps({
                 'msg': 'You Lost'
             }))
@@ -143,6 +151,10 @@ class TournamentConsumer(AsyncWebsocketConsumer):
                 'timer': str(i)
             })) 
             await asyncio.sleep(1)
+        await self.send(text_data=json.dumps({
+            'type': 'room',
+            'command' : 'setReady'
+        }))
         await self.channel_layer.group_send(self.match_name, {
             'type' : 'init.game'
         })
