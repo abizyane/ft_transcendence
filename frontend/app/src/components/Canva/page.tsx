@@ -5,6 +5,7 @@ import Game_Front from "./gameFront"
 export default function Canvas ({socketRef}){
     const canvasRef = useRef(null);
     const GameRef = useRef(null)
+    const Context = useRef(null)
     let Connected = useRef(false)
 
     const [bluePos, setBlue] = useState({})
@@ -85,19 +86,17 @@ export default function Canvas ({socketRef}){
         const canvas = canvasRef.current
         canvas.width = 1080
         canvas.height = 720
-        const context = canvas.getContext('2d');
+        Context.current = canvas.getContext('2d');
         if (!GameRef.current)
             GameRef.current = new Game_Front(canvas, {player_one: {posX:bluePos.x, posY: 3, width: 12, height:50, color: 'blue'}, player_two:{posX:redPos.x, posY: 3, width: 12, height:50, color: 'red'}, ball:{}})
-        let animatedFrame
-        const animate = () =>{
-            context.clearRect(0,0, canvas.width, canvas.height)
-            GameRef.current.render(context)
-            animatedFrame = window.requestAnimationFrame(animate)
-            GameRef.current.update({player_1: bluePos, player_2: redPos, ball: ball})
-        }
-        animate()
-        canvas.focus();
-    }, [bluePos, redPos, ball])
+
+        }, [])
+        
+    useEffect(() => {
+        Context.current.clearRect(0,0, canvasRef.current.width, canvasRef.current.height)
+        GameRef.current.update({player_1: bluePos, player_2: redPos, ball: ball})
+        GameRef.current.render(Context.current)
+    },[bluePos, redPos, ball])
 
     return (
         <canvas tabIndex={1} ref={canvasRef} className="w-full h-full "></canvas>
