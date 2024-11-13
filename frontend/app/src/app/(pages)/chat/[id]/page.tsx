@@ -1,40 +1,78 @@
 "use client";
 import { useUser } from "@/services/context/usercontext";
 import { useParams } from "next/navigation";
-import React, { useState, useEffect } from "react";
-
+import React, { useState, useEffect, useRef } from "react";
+import io from "socket.io-client";
+import { formatDistanceToNow } from "date-fns";
 const UserChatPage = ({ currentUser, chatUser }) => {
   const [messages, setMessages] = useState([]);
   const [input, setInput] = useState("");
+  const [ws, setWs] = useState(null);
   const { username, profile_pic_url, is_online, id } = currentUser;
   useEffect(() => {
-    setMessages(chatUser.messages);
-  });
-
-  // Function to handle sending a message
+    const socket = new WebSocket(
+      `ws://127.0.0.1:8000/ws/chat/room/${currentUser.username}/${chatUser.user.username}`
+    );
+    setWs(socket);
+    socket.onopen = () => {
+      console.log("Connected to WebSocket");
+    };
+    socket.onmessage = (event) => {
+      console.log(event);
+      const message = JSON.parse(event.data);
+      console.log("Received message:", message.message);
+       console.log(currentUser.id);
+       console.log(message.sender);
+       if (currentUser.id === message.message.receiver)
+        setMessages((prevMessages) => [message.message, ...prevMessages]);
+    };
+    socket.onclose = () => {
+      console.log("Disconnected from WebSocket");
+    };
+    return () => {
+      socket.close();
+    };
+  }, [currentUser.username, chatUser.user.username]);
+  
+  const messageContainerRef = useRef(null);
+  useEffect(() => {
+    if (chatUser?.messages?.length > 0) {
+      setMessages(chatUser.messages);
+    }
+    
+  }, [chatUser.messages]);
+  
   const handleSendMessage = () => {
-    if (input.trim()) {
+    if (input.trim() && ws?.readyState === WebSocket.OPEN) {
       const newMessage = {
-        text: input, // Store the message text
-        sender: currentUser.username, // Set sender as the current user
-        timestamp: new Date().toLocaleTimeString(), // Store the timestamp of the message
+        message: input,
+        sender: currentUser.username,
+        receiver: chatUser.user.username,
+        type: "chat_message",
       };
-      setMessages((prevMessages) => [...prevMessages, newMessage]); // Add new message to messages array
-      setInput(""); // Clear the input field after sending the message
+
+      ws.send(JSON.stringify(newMessage));
+      setMessages((prevMessages) => [newMessage, ...prevMessages]);
+      setInput("");
+    } else {
+      console.log("WebSocket is not open.");
     }
   };
-  console.log("test");
+
+  useEffect(()=>{
+    if (messageContainerRef.current) {
+      messageContainerRef.current.scrollTop = messageContainerRef.current.scrollHeight;
+    }
+  },[messages]);
+
   return (
     <div className="h-full">
-      <main className="flex-grow flex flex-row min-h-full">
+      <main className="flex-grow flex flex-row h-fit">
         <section className="flex flex-col flex-auto border-l border-gray-800">
-          {/* Chat header with user details */}
-
-          {/* Chat body displaying messages */}
-          <div className="chat-body p-4  h-[630px] overflow-y-scroll">
+          <div className=" p-4  h-[640px] overflow-y-scroll" ref={messageContainerRef}>
             {messages
-              .slice(0)
-              .reverse()
+            .slice(0)
+            .reverse()
               .map((msg, index) => (
                 <div
                   key={index}
@@ -45,7 +83,7 @@ const UserChatPage = ({ currentUser, chatUser }) => {
                   }`}
                 >
                   <div
-                    className={`messages text-sm ${
+                    className={`text-sm ${
                       msg.sender === currentUser.username
                         ? "text-white"
                         : "text-gray-700"
@@ -59,39 +97,43 @@ const UserChatPage = ({ currentUser, chatUser }) => {
                       }`}
                     >
                       <p
-                        className={`px-6 py-3 m-1 rounded-full ${
+                        className={`px-6 py-3 m-1 rounded-3xl max-w-xs lg:max-w-sm break-words whitespace-pre-wrap ${
                           msg.sender === currentUser.username
                             ? "bg-violet-primary"
                             : "bg-white"
-                        } max-w-xs lg:max-w-md`}
+                        }`}
                       >
                         {msg.message}
+                      </p>
+                      <p className={`p-4 text-center w-full text-sm text-gray-500 ${ msg.sender === currentUser.username
+                            ? "order-first"
+                            : "bg-white justify-self-end"
+                        }`}>
+                        {messages.length
+                          
+                          // ? formatDistanceToNow(new Date(msg.timestamp))
+                          ? "ok"
+                          : "No messages yet"}
                       </p>
                     </div>
                   </div>
                 </div>
               ))}
-            <p className="p-4 text-center text-sm text-gray-500">
-              {messages.length
-                ? messages[messages.length - 1].timestamp
-                : "No messages yet"}
-            </p>
           </div>
 
-          {/* Chat footer for typing a message */}
-          <div className="chat-footer h-fit">
+          <div className="h-fit">
             <div className="relative flex-grow">
               <label className="flex items-center">
                 <input
                   className="m-4 rounded-full py-2 pl-3 pr-20 w-full border border-gray-800 focus:border-gray-700 bg-gray-800 focus:bg-gray-900 focus:outline-none text-gray-200 focus:shadow-md"
                   type="text"
                   value={input}
-                  onChange={(e) => setInput(e.target.value)} // Update input state on change
+                  onChange={(e) => setInput(e.target.value)}
                   placeholder="Write your message"
                 />
                 <button
                   type="button"
-                  onClick={handleSendMessage} // Call send message on button click
+                  onClick={handleSendMessage}
                   className="absolute top-1/2 transform -translate-y-1/2 right-4 flex flex-shrink-0 focus:outline-none text-violet-primary  px-4 py-1"
                 >
                   Send
@@ -104,10 +146,6 @@ const UserChatPage = ({ currentUser, chatUser }) => {
     </div>
   );
 };
-
-// import React, { useState, useEffect } from "react";
-// import { useUser } from "path-to-useUser-hook"; // Assuming this hook gives you the current user
-// import UserChatPage from "./UserChatPage"; // Assuming this is the chat page component
 
 export default function Page() {
   const chatUserid = useParams();
@@ -132,7 +170,6 @@ export default function Page() {
         }
 
         const data = await response.json();
-        console.log("here", data);
         setChatUser(data);
       } catch (err) {
         setError(err.message);

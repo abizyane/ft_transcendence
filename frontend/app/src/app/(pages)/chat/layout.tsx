@@ -1,11 +1,11 @@
 "use client";
 
 import React, { ReactNode, useEffect, useState } from "react";
-import { useRouter } from "next/navigation"; // Ensure you're using the correct import for useRouter
+import { useRouter } from "next/navigation";
 import { formatDistanceToNow } from "date-fns";
 import { FiPlusCircle } from "react-icons/fi";
 import { FaSearch } from "react-icons/fa";
-import Link from "next/link"; // Don't forget the import for Link component
+import Link from "next/link";
 
 interface ChatLayoutProps {
   children: ReactNode;
@@ -23,10 +23,10 @@ export default function Chat({ children }: ChatLayoutProps) {
   const [users, setUsers] = useState<User[]>([]);
   const [isSliderOpen, setIsSliderOpen] = useState(false);
   const [selectedId, setSelectedId] = useState<User | undefined>();
-  const [isMobile, setIsMobile] = useState(false); // Track if the user is on a mobile device
+  const [isMobile, setIsMobile] = useState(false); 
   const router = useRouter();
   const is_online = true;
-  // Fetch conversation data from the backend
+  
   const fetchConversation = async () => {
     try {
       const response = await fetch(`http://localhost:8000/chat/conversations`, {
@@ -56,8 +56,6 @@ export default function Chat({ children }: ChatLayoutProps) {
 
   useEffect(() => {
     fetchConversation();
-
-    // Check if the window size is mobile or desktop
     const handleResize = () => {
       if (window.innerWidth <= 1024) {
         setIsMobile(true);
@@ -65,20 +63,13 @@ export default function Chat({ children }: ChatLayoutProps) {
         setIsMobile(false);
       }
     };
-
-    // Add resize event listener
     window.addEventListener("resize", handleResize);
-
-    // Initial check
     handleResize();
-
-    // Cleanup the event listener
     return () => {
       window.removeEventListener("resize", handleResize);
     };
   }, []);
 
-  // Open the sidebar (slide-out) for mobile
   const openSlider = (user: User) => {
     setSelectedId(user);
     setIsSliderOpen(true);
@@ -87,7 +78,7 @@ export default function Chat({ children }: ChatLayoutProps) {
   useEffect(() => {
     console.log(selectedId);
   }, [selectedId]);
-  // Close the slider
+
   const closeSlider = () => {
     setIsSliderOpen(false);
     router.push("/chat");
@@ -102,7 +93,7 @@ export default function Chat({ children }: ChatLayoutProps) {
   };
 
   return (
-    <div className="w-full flex flex-col justify-start items-start">
+    <div className=" w-full flex flex-col justify-start items-start">
       <div className="w-full flex lg:flex-row h-full flex-col-reverse">
         {/* Main content */}
           <div className="w-full h-full lg:h-full flex flex-col justify-center items-center p-2">
@@ -137,7 +128,7 @@ export default function Chat({ children }: ChatLayoutProps) {
                   </div>
 
                   {/* User list */}
-                  <div className="p-2 flex-1 md:w-full h-[600px] overflow-y-scroll">
+                  <div className="p-2 flex-1 md:w-full h-[650px] overflow-y-scroll">
                     {users.map((user) => (
                       <div
                         key={`message-${user.id}`}
@@ -169,19 +160,13 @@ export default function Chat({ children }: ChatLayoutProps) {
               {/* Main Content (Children) */}
               <div className="flex-1 hidden lg:block">
                 {selectedId && (
-                  <div className="chat-header px-6 py-4 flex bg-gray-800/60 rounded-tl-xl flex-row flex-none justify-start gap-4 items-center shadow">
-                    <button
-                      onClick={closeSlider}
-                      className="text-gray-600 hover:text-black"
-                    >
-                      Close
-                    </button>
+                  <div className="px-6 py-4 flex bg-gray-800/60 rounded-xl flex-row flex-none justify-start gap-4 items-center shadow">
                     <div className="flex">
                       <div className="w-12 h-12 mr-4 relative flex flex-shrink-0">
                         <img
                           className="shadow-md rounded-full w-full h-full object-cover"
-                          src={selectedId.profile_pic} // Display the other user's profile picture
-                          alt={selectedId.username} // Alt text should be the other user's username
+                          src={selectedId.profile_pic}
+                          alt={selectedId.username}
                         />
                       </div>
                       <div className="text-sm">
@@ -204,7 +189,7 @@ export default function Chat({ children }: ChatLayoutProps) {
         }`}
       >
         {selectedId && (
-          <div className="chat-header px-6 py-4 flex bg-gray-800/60 rounded-tl-xl flex-row flex-none justify-start gap-4 items-center shadow">
+          <div className="px-6 py-4 flex bg-gray-800/60 rounded-xl flex-row flex-none justify-start gap-4 items-center shadow">
             <button
               onClick={closeSlider}
               className="text-gray-600 hover:text-black"
@@ -215,8 +200,8 @@ export default function Chat({ children }: ChatLayoutProps) {
               <div className="w-12 h-12 mr-4 relative flex flex-shrink-0">
                 <img
                   className="shadow-md rounded-full w-full h-full object-cover"
-                  src={selectedId.profile_pic} // Display the other user's profile picture
-                  alt={selectedId.username} // Alt text should be the other user's username
+                  src={selectedId.profile_pic}
+                  alt={selectedId.username}
                 />
               </div>
               <div className="text-sm">

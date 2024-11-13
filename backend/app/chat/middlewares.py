@@ -3,7 +3,7 @@ from django.conf import settings
 from rest_framework_simplejwt.tokens import AccessToken, RefreshToken
 from rest_framework_simplejwt.exceptions import TokenError
 from django.contrib.auth.models import AnonymousUser
-from channels.middleware.base import BaseMiddleware
+from channels.middleware import BaseMiddleware
 from channels.db import database_sync_to_async
 from django.contrib.auth import get_user_model
 
