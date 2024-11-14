@@ -18,7 +18,7 @@ class Ball:
         #blue Range 
         if (self.posX < self.game.width * 1/4):
             if (self.posX - self.rad <= 0):
-                self.game.players_color['red'].score += 1
+                self.game.red.score += 1
                 self.reset_ball()
             if (self.posX - self.rad <= self.game.blue.x + self.game.blue.width and (self.posY >= self.game.blue.y and self.posY <= self.game.blue.y + self.game.blue.height) and not self.game.blue.isHiting):
                 self.dirX *= -1
@@ -26,7 +26,7 @@ class Ball:
         #red Range
         elif (self.posX > self.game.width * 3/4):
             if (self.posX + self.rad >= self.game.width):
-                self.game.players_color['blue'].score += 1
+                self.game.blue.score += 1
                 self.reset_ball()
             if (self.posX + self.rad >= self.game.red.x and (self.posY >= self.game.red.y and self.posY <= self.game.red.y + self.game.red.height) and not self.game.red.isHiting):
                 self.dirX *= -1

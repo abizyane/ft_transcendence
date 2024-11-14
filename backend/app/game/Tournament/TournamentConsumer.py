@@ -28,6 +28,7 @@ class TournamentConsumer(AsyncWebsocketConsumer):
         self.match = None
         self.match_name = ''
         self.task = None
+        self.game = None
         self.state = ''
         self.access_competition(self.p_holder.competitor);
         self.room.tournament.p_holders[self.channel_name] = self.p_holder
@@ -59,21 +60,30 @@ class TournamentConsumer(AsyncWebsocketConsumer):
             self.match.game.players = self.match.get_players()
             self.p_holder.paddle.color = 'blue'
             opponent.paddle.color = 'red'
-            self.match.game.set_players_color()
+            #Error Occure This Part 
+            self.match.game.blue = self.p_holder.paddle
+            self.match.game.red = opponent.paddle
+            self.match.game.players[self.channel_name] = self.p_holder.paddle
+            self.match.game.players[opponent.get_name()] = opponent.paddle
+            #*** Temporary Fixed This Way ***#
+
+            self.match.game.init_paddle_pos()
             await self.channel_layer.group_send(self.match_name,{
                 'type' : 'init.match',
                 'msg' : self.match_name
             })
-            self.game.init_paddle_pos()
-            self.task = asyncio.create_task(self.game_loop())
-  
+            
+    async def call_game(self):
+        self.task = asyncio.create_task(self.game_loop())
 
     async def init_match(self, event):
+        self.game = self.match.game
         await self.send(text_data=json.dumps({
             'type' : 'room',
             'command' : 'setReady'
         }))
-        self.game = self.match.game
+        if self.p_holder.index % 2 != 0 :
+            await self.call_game()
 
     async def game_loop(self):
         while not self.game.status:
@@ -85,7 +95,9 @@ class TournamentConsumer(AsyncWebsocketConsumer):
             await asyncio.sleep(1/40)
         self.game.status = 1
         print(self.match.state)
-        await self.finalize_match(event=None)
+        await self.channel_layer.group_send(self.match_name,{
+            'type' : 'finalize_match'
+        })
     
     """
         -   set loser , set winner
@@ -102,14 +114,17 @@ class TournamentConsumer(AsyncWebsocketConsumer):
             self.match.game.set_winner()
         prev_match_name  = self.match_name
 
+        # self.game = None
+        if self.p_holder.index % 2 != 0 :
+            self.task.cancel()
+
         if self.p_holder.is_won():
             await self.send(text_data=json.dumps({
                 'msg': 'You Won'
             }))
-            del self.game
-            del self.p_holder.paddle
-            gc.collect()
+            # self.p_holder.paddle = None
             self.p_holder.upgrade() # if err mean he won
+            gc.collect()
             self.match = self.room.tournament.get_player_match(self.channel_name)
             self.match_name = str(f'{self.room.name}m_{self.match.index}')
             #send room state to every one in match
@@ -128,19 +143,19 @@ class TournamentConsumer(AsyncWebsocketConsumer):
                     'msg': f'wait for {self.match_name} to strat'
                 }))
         else:
-            del self.game
-            del self.p_holder.paddle
-            gc.collect()
+            # self.p_holder.paddle = None
             await self.send(text_data=json.dumps({
                 'msg': 'You Lost'
             }))
+       
+        
 
     async def room_update(self, event):
-        await self.send({
+        await self.send(text_data=json.dumps({
             'type' : 'room',
             'command' : 'wait',
             'competitorsInfo' : self.p_holder.competitor.get_allroom_info()
-        })
+        }))
 
     async def newgame_request(self, event):
         await self.send(text_data=json.dumps({
