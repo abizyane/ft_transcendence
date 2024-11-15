@@ -8,11 +8,13 @@ https://docs.djangoproject.com/en/4.2/howto/deployment/asgi/
 """
 
 import os
+from django.urls import re_path
 
 from channels.auth import AuthMiddlewareStack
 from channels.routing import ProtocolTypeRouter, URLRouter
 from channels.security.websocket import AllowedHostsOriginValidator
 from django.core.asgi import get_asgi_application
+from astropong.JWTAuthMiddleware import JWTAuthMiddleware
 
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'base.settings')
 # Initialize Django ASGI application early to ensure the AppRegistry
@@ -23,16 +25,16 @@ from chat.routing import websocket_urlpatterns as chat_routing
 from notification.routing import websocket_urlpatterns as notifications_routing
 from game.routing import websocket_urlpatterns as game_routing
 
+
 application = ProtocolTypeRouter(
     {
         "http": get_asgi_application(),
-        "websocket": AllowedHostsOriginValidator(
-            AuthMiddlewareStack(
+        "websocket": JWTAuthMiddleware
+(
                 URLRouter(
                     chat_routing +
                     notifications_routing +
                     game_routing
-                )
             )
         ),
     }

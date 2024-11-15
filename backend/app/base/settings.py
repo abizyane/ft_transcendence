@@ -24,7 +24,7 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'pictures')
 # See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = os.getenv('DJANGO_KEY','django-insecure-%bqq!eb^hc2*i6ime4#b7p4vwik#b=yzjil61ifm0f#*j5yfov')
+SECRET_KEY = 'django-insecure-qq!eb^hc2*i6ime4#b7p4vwik#b=yzjil61ifm0f#*j5yfov'
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -52,15 +52,15 @@ INSTALLED_APPS = [
 ]
 
 MIDDLEWARE = [
+    'astropong.JWTAuthenticationMiddleware.JWTAuthenticationMiddleware',  
     'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
+    'astropong.TwoFactorMiddleware.TwoFactorAuthMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    'astropong.JWTAuthenticationMiddleware.JWTAuthenticationMiddleware',
-    # 'astropong.middleware.JWTAuthenticationMiddleware',
 ]
 
 ROOT_URLCONF = 'base.urls'
@@ -135,12 +135,17 @@ STATIC_URL = 'static/'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
+# SESSION_ENGINE = 'django.contrib.sessions.backends.signed_cookies'
+# SESSION_COOKIE_NAME = "sessionid" 
+# SESSION_COOKIE_SECURE = False  # Set to True in production with HTTPS
+# SESSION_COOKIE_HTTPONLY = True 
+
 CORS_ORIGIN_ALLOW_ALL=True
 CORS_ALLOW_CREDENTIALS=True
 AUTH_USER_MODEL = 'astropong.User'
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [
-        # 'rest_framework.authentication.SessionAuthentication',
+        'rest_framework.authentication.SessionAuthentication',
         # 'rest_framework.authentication.BasicAuthentication',
         'rest_framework_simplejwt.authentication.JWTAuthentication',  # Enable JWT authentication
     ],
@@ -150,11 +155,14 @@ REST_FRAMEWORK = {
 }
 
 SIMPLE_JWT = {
-    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=1),  
+    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=60),  
     'REFRESH_TOKEN_LIFETIME': timedelta(days=1),
-    'ROTATE_REFRESH_TOKENS': True,
-    'BLACKLIST_AFTER_ROTATION': True,
+    'ROTATE_REFRESH_TOKENS': False,
+    'BLACKLIST_AFTER_ROTATION': False,
     'AUTH_HEADER_TYPES': ('Bearer',),
+    'SIGNING_KEY': SECRET_KEY,
+    'ALGORITHM': 'HS256',
+    "AUTH_TOKEN_CLASSES": ("rest_framework_simplejwt.tokens.AccessToken",),
 }
 DATABASES = {
     'default': {

@@ -80,8 +80,8 @@ class OAuthCallback(APIView):
         print("User model instance:", user_instance) 
         response = Response(user_data)
         
-        response.set_cookie(key='refresh', value=str(refresh), httponly=True, secure=True)
-        response.set_cookie(key='access', value=str(refresh.access_token), httponly=True, secure=True)
+        response.set_cookie(key='refresh', value=str(refresh),samesite='None', httponly=True, secure=True)
+        response.set_cookie(key='access', value=str(refresh.access_token),samesite='None', httponly=True, secure=True)
         
         return response
 
