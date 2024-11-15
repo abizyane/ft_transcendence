@@ -87,12 +87,12 @@ class TournamentConsumer(AsyncWebsocketConsumer):
 
     async def game_loop(self):
         while not self.game.status:
+            await asyncio.sleep(1/40)
             self.game.update()
             self.game.update_status()
             await self.channel_layer.group_send(self.match_name, {
                 'type' : 'send.pos'
             })
-            await asyncio.sleep(1/40)
         self.game.status = 1
         print(self.match.state)
         await self.channel_layer.group_send(self.match_name,{
@@ -221,7 +221,6 @@ class TournamentConsumer(AsyncWebsocketConsumer):
         
     async def receive(self, text_data):
         recv_data = json.loads(text_data)
-        print(recv_data)
         if self.p_holder.paddle :
             self.p_holder.paddle_command(recv_data['command'])
     

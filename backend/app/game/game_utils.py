@@ -7,7 +7,7 @@ class Ball:
         self.rad = 15
         self.posX = game.width / 2
         self.posY = game.height / 2
-        self.speed = 5
+        self.speed = 10
         self.angle = 45
         self.dirX = math.cos(self.angle)
         self.dirY = math.sin(self.angle)
