@@ -50,19 +50,17 @@ INSTALLED_APPS = [
     'game',
     'notification',
 ]
-
 MIDDLEWARE = [
-    'astropong.JWTAuthenticationMiddleware.JWTAuthenticationMiddleware',  
     'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
-    'django.contrib.auth.middleware.AuthenticationMiddleware',
-    'astropong.TwoFactorMiddleware.TwoFactorAuthMiddleware',
+    'django.contrib.auth.middleware.AuthenticationMiddleware',  # Populates request.user
+    'astropong.JWTAuthenticationMiddleware.JWTAuthenticationMiddleware',  # Relies on request.user
+    'astropong.TwoFactorMiddleware.TwoFactorAuthMiddleware',  # Needs request.user
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
-
 ROOT_URLCONF = 'base.urls'
 
 TEMPLATES = [

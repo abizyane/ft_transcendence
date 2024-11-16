@@ -9,12 +9,12 @@ from .views.auth.refresh import RefreshTokenView
 from .views.friends.friends import AddFriendView, ListFriendView, AcceptFriendRequestView, RemoveFriendView, RejectFriendRequestView,FriendsOfView, BlockFriendView,UnblockFriendView, BlockedUsersList
 
 urlpatterns = [
-    path('register', RegisterView.as_view()),
-    path('login', LoginView.as_view()),
+    path('register', RegisterView.as_view(), name='register'),
+    path('login', LoginView.as_view(), name='login'),
     path('logout', LogoutView.as_view()),
     path('42OAuth', OAuth.as_view()),
     path('42OAuth/callback', OAuthCallback.as_view()),
-    path('2fa_code', MFAView.as_view()),
+    path('2fa_code', MFAView.as_view(), name='2fa_code'),
 
     path('user', UserView.as_view()),
     path('refresh', RefreshTokenView.as_view()),

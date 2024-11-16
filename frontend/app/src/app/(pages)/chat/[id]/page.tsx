@@ -11,7 +11,7 @@ const UserChatPage = ({ currentUser, chatUser }) => {
   const { username, profile_pic_url, is_online, id } = currentUser;
   useEffect(() => {
     const socket = new WebSocket(
-      `ws://127.0.0.1:8000/ws/chat/room/${currentUser.username}/${chatUser.user.username}`
+      `ws://localhost:8000/ws/chat/room/${currentUser.username}/${chatUser.user.username}`
     );
     setWs(socket);
     socket.onopen = () => {

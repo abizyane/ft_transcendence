@@ -124,6 +124,7 @@ class MFAView(APIView):
         if otp is None:
             return Response({'error': 'OTP is required'}, status=400)
         if user.verify_otp(otp):
+            request.session['2fa_verified'] = True
             return Response({'message': 'MFA enabled successfully'}, status=200)
         else:
             return Response({'error': 'Invalid OTP'}, status=400)
@@ -132,6 +133,7 @@ class MFAView(APIView):
         if not user.mfa_enabled:
             return Response({'error': 'MFA is already disabled'}, status=400)
         user.mfa_enabled = False
+        request.session['2fa_verified'] = None
         user.save()
         return Response({'message': 'MFA disabled successfully'}, status=200)
         
