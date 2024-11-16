@@ -7,6 +7,7 @@ import asyncio
 from .tournament import Tournament
 from ..game_utils import Game, Player
 import gc
+import numpy as np
 
 def set_competitor_info(competitor, name, img=None):
     competitor.name = name
@@ -98,14 +99,7 @@ class TournamentConsumer(AsyncWebsocketConsumer):
         await self.channel_layer.group_send(self.match_name,{
             'type' : 'finalize_match'
         })
-    
-    """
-        -   set loser , set winner
-        -   leave old match group
-        -   upgrade winner
-        -   eliminate loser 
-        -   check if actual match winner if its ready if its not automatticaly next winner will check it 
-    """
+
     async def finalize_match(self, event):
         if not self.game.status == 1 :
             return
@@ -175,16 +169,9 @@ class TournamentConsumer(AsyncWebsocketConsumer):
         })
 
     async def send_pos(self, event):
-        if not self.match.is_ready() or not self.match.game or self.match.game.status == 1:
-            return
-        await self.send(text_data=json.dumps(
-            {
-                'type' : 'update',
-                'blue' : self.game.blue.get_data(),
-                'red' : self.game.red.get_data(),
-                 'ball': {'x': str(self.game.ball.posX), 'y':str(self.game.ball.posY)},
-            }
-        ))
+        float_list = [self.game.blue.x, self.game.blue.y, self.game.red.x, self.game.red.y, self.game.ball.posX, self.game.ball.posY]
+        f_arr = np.array(float_list, dtype=np.float32).tobytes()
+        await self.send(bytes_data=f_arr)
     
     async def joined_competitor_data(self, event):
         comp_info = self.p_holder.competitor.get_allroom_info()

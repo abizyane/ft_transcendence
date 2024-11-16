@@ -53,28 +53,26 @@ export default function Canvas ({socketRef}){
             ))
         }
     }
+    
 
     useEffect(() => {
-        // Make sure the WebSocket is available before using it
         if (socketRef.current) {
-          socketRef.current.onmessage = (e) => {
-            const jsondata = JSON.parse(e.data);
-            console.log('Received message:', jsondata);
-    
-            // Handle position updates or other messages here
-            if (jsondata.type === 'update') {
-              setBlue(jsondata.blue); // assuming the update contains the blue player's position
-              setRed(jsondata.red);   // assuming the update contains the red player's position
-              setBall(jsondata.ball);    // assuming the update contains the ball's position
-            }
-          };
+            socketRef.current.onmessage = async (event) => {
+                if (event.data instanceof Blob) {
+                    const arrayBuffer = await event.data.arrayBuffer();
+                    const floatArray = new Float32Array(arrayBuffer);
+                    setBlue({x:floatArray[0], y:floatArray[1]})
+                    setRed({x:floatArray[2],y:floatArray[3]})
+                    setBall({x:floatArray[4], y:floatArray[5]})
+                } else {
+                    console.log('Received non-binary data:', event.data);
+                }
+            };
         }
     
-        // Add event listeners for key events
         window.addEventListener('keydown', keyDownHandler);
         window.addEventListener('keyup', keyUpHandler);
     
-        // Cleanup event listeners on unmount
         return () => {
           window.removeEventListener('keydown', keyDownHandler);
           window.removeEventListener('keyup', keyUpHandler);
