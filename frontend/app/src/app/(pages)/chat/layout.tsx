@@ -1,8 +1,8 @@
 "use client";
 
-import React, { ReactNode, useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
-import { formatDistanceToNow } from "date-fns";
+import React, { ReactNode, useEffect, useRef, useState } from "react";
+import { useParams, useRouter } from "next/navigation";
+import { format, formatDistanceToNow, isToday, isYesterday } from "date-fns";
 import { FiPlusCircle } from "react-icons/fi";
 import { FaSearch } from "react-icons/fa";
 import Link from "next/link";
@@ -26,7 +26,10 @@ export default function Chat({ children }: ChatLayoutProps) {
   const [isMobile, setIsMobile] = useState(false); 
   const router = useRouter();
   const is_online = true;
-  
+  const messageContainerRef = useRef(null);
+  const param = useParams();
+  const userId = param.id;
+
   const fetchConversation = async () => {
     try {
       const response = await fetch(`http://localhost:8000/chat/conversations`, {
@@ -36,6 +39,11 @@ export default function Chat({ children }: ChatLayoutProps) {
         console.error("Fetch error:", error);
       }
       const data = await response.json();
+      data.results.map((item : any) => {
+        if ( item.id == userId)
+            setSelectedId(item);
+      })
+
       setUsers(() => {
         return data?.results.map((User: any) => {
           return {
@@ -43,9 +51,7 @@ export default function Chat({ children }: ChatLayoutProps) {
             username: User.username,
             profile_pic: User.profile_pic,
             message: User.message,
-            time: formatDistanceToNow(new Date(User.timestamp), {
-              addSuffix: true,
-            }),
+            time: User.timestamp,
           };
         });
       });
@@ -56,6 +62,7 @@ export default function Chat({ children }: ChatLayoutProps) {
 
   useEffect(() => {
     fetchConversation();
+   
     const handleResize = () => {
       if (window.innerWidth <= 1024) {
         setIsMobile(true);
@@ -75,9 +82,6 @@ export default function Chat({ children }: ChatLayoutProps) {
     setIsSliderOpen(true);
   };
 
-  useEffect(() => {
-    console.log(selectedId);
-  }, [selectedId]);
 
   const closeSlider = () => {
     setIsSliderOpen(false);
@@ -92,12 +96,18 @@ export default function Chat({ children }: ChatLayoutProps) {
     router.push(`/chat/${user.id}`);
   };
 
+  useEffect(()=>{
+    if (messageContainerRef.current) {
+      messageContainerRef.current.scrollTop = messageContainerRef.current.scrollHeight;
+    }
+  },[]);
+
   return (
     <div className=" w-full flex flex-col justify-start items-start">
       <div className="w-full flex lg:flex-row h-full flex-col-reverse">
         {/* Main content */}
           <div className="w-full h-full lg:h-full flex flex-col justify-center items-center p-2">
-            <div className="bg-gray-800/60 h-[800px] w-full text-gray-200 rounded-xl border-2 border-violet-primary flex">
+            <div className="bg-gray-800/60 h-[800px]   w-full text-gray-200 rounded-xl border-2 border-violet-primary flex">
               <div className="w-full lg:w-96 backdrop-blur-md rounded-xl">
                 <section className="w-full">
                   <div className="p-4 rounded-xl flex justify-between items-center w-full">
@@ -128,7 +138,7 @@ export default function Chat({ children }: ChatLayoutProps) {
                   </div>
 
                   {/* User list */}
-                  <div className="p-2 flex-1 md:w-full h-[650px] overflow-y-scroll">
+                  <div className="p-2 flex-1 md:w-full h-[650px]  overflow-y-scroll">
                     {users.map((user) => (
                       <div
                         key={`message-${user.id}`}
@@ -147,7 +157,13 @@ export default function Chat({ children }: ChatLayoutProps) {
                           <div className="flex justify-between items-center text-sm text-gray-600">
                             <p className="truncate">{user.message}</p>
                             <p className="ml-4 text-white-primary whitespace-nowrap">
-                              {user.time}
+                            {
+                              isToday(new Date(user.time))
+                                ? formatDistanceToNow(new Date(user.time), { addSuffix: true })
+                                : isYesterday(new Date(user.time))
+                                ? "Yesterday"
+                                : format(new Date(user.time), "yyyy-MM-dd")
+                            }
                             </p>
                           </div>
                         </div>
@@ -184,9 +200,10 @@ export default function Chat({ children }: ChatLayoutProps) {
 
       {/* Slide-out Sidebar (mobile) */}
       <div
+        ref={messageContainerRef}
         className={`lg:hidden fixed  bg-gray-800 h-[800px] w-[95%] sm:w-[97%] m-2  text-gray-200 rounded-xl border-2 border-violet-primary  transition-transform transform ${
           isSliderOpen ? "translate-x-0" : "translate-x-[110%]"
-        }`}
+        }` }
       >
         {selectedId && (
           <div className="px-6 py-4 flex bg-gray-800/60 rounded-xl flex-row flex-none justify-start gap-4 items-center shadow">
