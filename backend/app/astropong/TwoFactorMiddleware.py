@@ -8,7 +8,7 @@ class TwoFactorAuthMiddleware:
 
     def __call__(self, request):
 
-        if not request.user.is_authenticated or (request.user.mfa_enabled and request.session.get("2fa_verified", False)):
+        if not request.user.is_authenticated or not request.user.mfa_enabled or request.session.get("2fa_verified", False):
             return self.get_response(request)
         # if :
         #     return self.get_response(request)

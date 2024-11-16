@@ -16,6 +16,7 @@ class JWTAuthenticationMiddleware(MiddlewareMixin):
         if access_token:
             try:
                 token = AccessToken(access_token)
+                request.META['HTTP_AUTHORIZATION'] = f'Bearer {access_token}'
                 user_id = token.get('user_id')
 
                 cached_user = cache.get(f"user_{user_id}")

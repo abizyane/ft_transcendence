@@ -63,6 +63,7 @@ MIDDLEWARE = [
 ]
 ROOT_URLCONF = 'base.urls'
 
+
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
@@ -143,7 +144,7 @@ CORS_ALLOW_CREDENTIALS=True
 AUTH_USER_MODEL = 'astropong.User'
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [
-        'rest_framework.authentication.SessionAuthentication',
+        # 'rest_framework.authentication.SessionAuthentication',
         # 'rest_framework.authentication.BasicAuthentication',
         'rest_framework_simplejwt.authentication.JWTAuthentication',  # Enable JWT authentication
     ],
