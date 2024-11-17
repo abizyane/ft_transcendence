@@ -17,7 +17,7 @@ const UserChatPage = ({ currentUser, chatUser }) => {
   
   useEffect(() => {
     const socket = new WebSocket(
-      `ws://127.0.0.1:8000/ws/chat/room/${currentUser.username}/${chatUser.user.username}`
+      `ws://127.0.0.1:8000/ws/chat/room/`
     );
     setWs(socket);
     socket.onopen = () => {
@@ -25,12 +25,20 @@ const UserChatPage = ({ currentUser, chatUser }) => {
     };
     socket.onmessage = (event) => {
       console.log(event);
-      const message = JSON.parse(event.data);
-      console.log("Received message:", message.message);
-       console.log(currentUser.id);
-       console.log(message.sender);
-       if (currentUser.id === message.message.receiver)
-        setMessages((prevMessages) => [message.message, ...prevMessages]);
+      if (event.type == "message")
+      {
+
+          const message = JSON.parse(event.data);
+          // console.log("Received message:", message.message);
+          // console.log(currentUser.id);
+          // console.log(message.sender);
+          if (currentUser.id === message.message.receiver)
+            setMessages((prevMessages) => [message.message, ...prevMessages]);
+      }
+      else if (event.type == "typing")
+      {
+        
+      }
     };
     socket.onclose = () => {
       console.log("Disconnected from WebSocket");
@@ -45,7 +53,7 @@ const UserChatPage = ({ currentUser, chatUser }) => {
     if (chatUser?.messages?.length > 0) {
       setMessages(chatUser.messages);
     }
-    
+
   }, [chatUser.messages]);
   
   const handleSendMessage = () => {
@@ -117,12 +125,18 @@ const UserChatPage = ({ currentUser, chatUser }) => {
                         }`}
                         >
                         {msg.message}
-                     
                       </p>
                     </div>
                   </div>
                 </div>
               ))}
+                <div className="bg-white rounded-3xl h-11 w-16 flex items-center justify-center">
+                  <div className="flex space-x-1">
+                    <div className="dot bg-gray-900 rounded-full h-2 w-2"></div>
+                    <div className="dot bg-gray-900 rounded-full h-2 w-2"></div>
+                    <div className="dot bg-gray-900 rounded-full h-2 w-2"></div>
+                  </div>
+                </div>
           </div>
 
           <div className="h-fit">
