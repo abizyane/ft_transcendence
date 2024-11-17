@@ -6,11 +6,9 @@ export default function Canvas ({socketRef}){
     const canvasRef = useRef(null);
     const GameRef = useRef(null)
     const Context = useRef(null)
-    let Connected = useRef(false)
-
-    const [bluePos, setBlue] = useState({})
-    const [redPos, setRed] = useState({x:0, y:0})
-    const [ball, setBall] = useState({x:0, y:0})
+    const bluePosRef = useRef({ x: 0, y: 0 });
+    const redPosRef = useRef({ x: 0, y: 0 });
+    const ballRef = useRef({ x: 0, y: 0 });
     
     const keyDownHandler = (e) =>{
         if (e.key === 'w'){
@@ -61,11 +59,11 @@ export default function Canvas ({socketRef}){
                 if (event.data instanceof Blob) {
                     const arrayBuffer = await event.data.arrayBuffer();
                     const floatArray = new Float32Array(arrayBuffer);
-                    setBlue({x:floatArray[0], y:floatArray[1]})
-                    setRed({x:floatArray[2],y:floatArray[3]})
-                    setBall({x:floatArray[4], y:floatArray[5]})
+                    bluePosRef.current = {x:floatArray[0], y:floatArray[1]}
+                    redPosRef.current = {x:floatArray[2],y:floatArray[3]}
+                    ballRef.current = {x:floatArray[4], y:floatArray[5]}
                 } else {
-                    console.log('Received non-binary data:', event.data);
+                    // console.log('Received non-binary data:', event.data);
                 }
             };
         }
@@ -80,21 +78,26 @@ export default function Canvas ({socketRef}){
       }, [socketRef]);
 
     /*Canvas Function */
+    let lastTime = 0
     useEffect(()=>{
         const canvas = canvasRef.current
         canvas.width = 1080
         canvas.height = 720
         Context.current = canvas.getContext('2d');
         if (!GameRef.current)
-            GameRef.current = new Game_Front(canvas, {player_one: {posX:bluePos.x, posY: 3, width: 12, height:50, color: 'blue'}, player_two:{posX:redPos.x, posY: 3, width: 12, height:50, color: 'red'}, ball:{}})
+            GameRef.current = new Game_Front(canvas, {player_one: {posX:bluePosRef.current.x, posY: 3, width: 12, height:50, color: 'blue'}, player_two:{posX:redPosRef.current.x, posY: 3, width: 12, height:50, color: 'red'}, ball:{}})
 
         }, [])
         
     useEffect(() => {
-        Context.current.clearRect(0,0, canvasRef.current.width, canvasRef.current.height)
-        GameRef.current.update({player_1: bluePos, player_2: redPos, ball: ball})
-        GameRef.current.render(Context.current)
-    },[bluePos, redPos, ball])
+        const game_loop = () =>{
+            Context.current.clearRect(0,0, canvasRef.current.width, canvasRef.current.height)
+            GameRef.current.update({player_1: bluePosRef.current, player_2: redPosRef.current, ball: ballRef.current})
+            GameRef.current.render(Context.current)
+            requestAnimationFrame(game_loop)
+        }
+        requestAnimationFrame(game_loop)
+    },[])
 
     return (
         <canvas tabIndex={1} ref={canvasRef} className="w-full h-full "></canvas>
