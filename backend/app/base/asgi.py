@@ -29,8 +29,7 @@ from game.routing import websocket_urlpatterns as game_routing
 application = ProtocolTypeRouter(
     {
         "http": get_asgi_application(),
-        "websocket": JWTAuthMiddleware
-(
+        "websocket": JWTAuthMiddleware(
                 URLRouter(
                     chat_routing +
                     notifications_routing +
