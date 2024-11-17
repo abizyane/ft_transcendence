@@ -4,6 +4,7 @@ import { useForm } from 'react-hook-form';
 import { useState } from 'react';
 import { Switch } from "@/components/ui/switch"
 import {useUser} from "@/services/context/usercontext";
+import { disableCache } from '@iconify/react';
 
 const SettingsPage = () => {
    
@@ -52,7 +53,9 @@ const ProfileSettings = () => {
     const { register, handleSubmit, formState: { errors }, watch } = useForm();
     const [profileImage, setProfileImage] = useState<File | null>(null);
     const [is2FAEnabled, setIs2FAEnabled] = useState(false);
-    const {user} =useUser();
+    const [otpValue, setOtpValue] = useState('');
+
+    const {user, fetchUser} =useUser();
     if(!user)
         return null;
   
@@ -67,6 +70,43 @@ const ProfileSettings = () => {
     if (file) {
       setProfileImage(file);
     }
+  };
+  
+  const disable2FA = async () => {
+    try {
+      const response = await fetch('http://localhost:8000/api/2fa_code', {
+        method: 'DELETE',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+      });
+      const data = await response.json();
+      if (!response.ok) {
+        console.error(data)
+      }
+      console.log(data.message);
+    } catch (error) {
+      console.error('Error:', error);
+    }
+    fetchUser();
+  };
+  const handleVerifyOtp = async () => {
+    try {
+      const response = await fetch('http://localhost:8000/api/2fa_code', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({ otp: otpValue }),
+      });
+      const data = await response.json();
+      if (!response.ok) {
+        console.error(data)
+      }
+      console.log(data.message);
+    } catch (error) {
+      console.error('Error:', error);
+    }
+    fetchUser();
+
   };
 
   return (
@@ -135,22 +175,51 @@ const ProfileSettings = () => {
           </div>
 
           {/* Right Section: 2FA Toggle and QR Code */}
-          <div className="w-full lg:w-1/2 flex flex-col items-center lg:items-start space-y-4">
-            <div className="flex items-center">
+          <div className="w-full lg:w-1/2 flex flex-col justify-center items-center space-y-4">
+            {/* <div className="flex items-center">
               <label className="font-semibold mr-2">Enable Two-Factor Authentication (2FA)</label>
               <Switch />
 
-            </div>
+            </div> */}
 
             {/* QR Code for 2FA */}
-            {is2FAEnabled && (
-              <div className="mt-4 text-center lg:text-left">
-                <p className="font-semibold">Scan this QR code to enable 2FA:</p>
-                <div className="flex justify-center lg:justify-start mt-2">
-                  <img src="/path-to-your-qr-code.png" alt="2FA QR Code" className="w-32 h-32" />
+            { user.mfa_enabled === false && (
+              <div className="mt-4 justify-center text-center lg:text-center">
+                <p className="font-semibold text-center">Scan this QR code to enable 2FA:</p>
+                <div className="flex justify-center lg:justify-center mt-2">
+                  <img src="http://localhost:8000/api/2fa_code" alt="2FA QR Code" className="min-w-24 min-h-24 w-[50%] h-[50%] lg:w-[80%] lg:h-[80%]" />
                 </div>
+                <div className='flex mt-4 justify-center items-end'>
+                  <div>
+                    <p className="flex font-semibold text-center mb-1">OTP:</p>
+                    <input value={otpValue}
+                      onChange={(e) => setOtpValue(e.target.value)}
+                      className='flex border rounded text-black'></input>
+                  </div>
+                  <button
+                    type="submit"
+                    onClick={handleVerifyOtp}
+                    className="px-4 py-2 ml-4 flex bg-blue-500 text-white rounded"
+                  >
+                    Enable 2FA
+                  </button>
+                </div>
+                
               </div>
             )}
+            { user.mfa_enabled === true && (
+              <div className="mt-4 w-full flex flex-col justify-center items-center text-center lg:text-center">
+                <p className="font-semibold text-center">2FA is enabled for your account.</p>
+                <button
+                    type="submit"
+                    onClick={disable2FA}
+                    className="px-4 py-2 ml-4 flex mt-4 bg-blue-500 text-white rounded text-center"
+                  >
+                    Disable 2FA
+                  </button>
+              </div>
+                
+              )}
           </div>
         </div>
 
