@@ -10,21 +10,14 @@ from datetime import datetime
 
 class ChatRoomConsumer(AsyncWebsocketConsumer):
     async def connect(self):
+        self.room_group_name = "chat_room"
+
         user = self.scope["user"]
-        sender = self.scope["url_route"]["kwargs"]["sender"]
-        receiver = self.scope["url_route"]["kwargs"]["receiver"]
-        
-        self.sender = sender
-        self.receiver = receiver
-
-        # if user.is_anonymous or (user.username != sender and user.username != receiver):
-        #     await self.accept() 
-        #     await self.send_error(f"{user} is not allowed to connect to this chat.")
-        #     await self.close()
-        #     return
-
-        sorted_users = sorted([sender, receiver])
-        self.room_group_name = '_'.join(sorted_users)
+        if user.is_anonymous or not user.is_authenticated:
+            await self.accept() 
+            await self.send_error(f"{user} is not authenticated.")
+            await self.close()
+            return
 
         await self.channel_layer.group_add(
             self.room_group_name,
@@ -44,8 +37,25 @@ class ChatRoomConsumer(AsyncWebsocketConsumer):
         if not text_data_json:
             return
         
-        message_type = text_data_json.get('type')
+        sender = text_data_json.get('sender')
+        receiver = text_data_json.get('receiver')
+        
+        if sender != self.scope['user'].username and receiver != self.scope['user'].username:
+            return
+        
+        sender, receiver = await self.get_users()
 
+        if not sender or not receiver:
+            await self.send_error('User not found.')
+            return
+
+
+        relationship = await self.get_relationship(sender, receiver)
+        if not relationship:
+            await self.send_error('You must be friends in order to chat.')
+            return
+
+        message_type = text_data_json.get('type')
         if message_type == 'chat_message':
             await self.handle_chat_message(text_data_json)
         elif message_type == 'typing':
@@ -56,17 +66,7 @@ class ChatRoomConsumer(AsyncWebsocketConsumer):
             await self.send_error('Invalid message type.')
 
     async def handle_chat_message(self, text_data_json):
-        sender, receiver = await self.get_users()
-        if not sender or not receiver:
-            await self.send_error('User not found.')
-            return
-
-        relationship = await self.get_relationship(sender, receiver)
-        if not relationship:
-            await self.send_error('You must be friends in order to chat.')
-            return
-
-        message = await self.save_message(sender, receiver, text_data_json['message'])
+        message = await self.save_message(self.sender, self.receiver, text_data_json['message'])
         await self.channel_layer.group_send(
             self.room_group_name,
             {
@@ -75,7 +75,7 @@ class ChatRoomConsumer(AsyncWebsocketConsumer):
             }
         )
 
-        await self.send_notification(sender, receiver) 
+        await self.send_notification(self.sender, self.receiver) 
 
     async def handle_typing(self, text_data_json):
         await self.channel_layer.group_send(
@@ -98,6 +98,10 @@ class ChatRoomConsumer(AsyncWebsocketConsumer):
         )
 
     async def chat_message(self, event):
+        receiver = event['receiver']
+        if receiver != self.scope['user'].username:
+            return
+
         message = event['message']
         await self.send(text_data=json.dumps({
             'message': message,
@@ -105,6 +109,10 @@ class ChatRoomConsumer(AsyncWebsocketConsumer):
         }))
 
     async def typing(self, event):
+        receiver = event['receiver']
+        if receiver != self.scope['user'].username:
+            return
+
         await self.send(text_data=json.dumps({
             'type': 'typing',
             'sender': event['sender'],
@@ -112,6 +120,10 @@ class ChatRoomConsumer(AsyncWebsocketConsumer):
         }))
 
     async def stop_typing(self, event):
+        receiver = event['receiver']
+        if receiver != self.scope['user'].username:
+            return
+
         await self.send(text_data=json.dumps({
             'type': 'stop_typing',
             'sender': event['sender'],

@@ -1,11 +1,10 @@
 from channels.middleware import BaseMiddleware
-from rest_framework_simplejwt.tokens import AccessToken
 from channels.db import database_sync_to_async
 from rest_framework_simplejwt.backends import TokenBackend
 from rest_framework_simplejwt.exceptions import TokenError, InvalidToken
 from django.conf import settings
 from django.contrib.auth import get_user_model
-
+from django.contrib.auth.models import AnonymousUser
 User = get_user_model()
 
 class JWTAuthMiddleware(BaseMiddleware):
@@ -17,15 +16,15 @@ class JWTAuthMiddleware(BaseMiddleware):
         if token != None:
             user = await self.get_user_from_token(token) 
             if user:
-                print("user ", user, flush=True)
                 scope['user'] = user
 
             else:
                 scope['error'] = 'Invalid token'
+                scope['user'] = AnonymousUser()
 
         if token == None:
-            scope['error'] = 'provide an auth token'    
-    
+            scope['error'] = 'provide an auth token'
+            scope['user'] = AnonymousUser()
                 
         return await super().__call__(scope, receive, send)
     def parse_cookies(self,cookie_header):
