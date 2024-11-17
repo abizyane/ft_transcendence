@@ -12,8 +12,8 @@ urlpatterns = [
     path('register', RegisterView.as_view(), name='register'),
     path('login', LoginView.as_view(), name='login'),
     path('logout', LogoutView.as_view()),
-    path('42OAuth', OAuth.as_view()),
-    path('42OAuth/callback', OAuthCallback.as_view()),
+    path('42OAuth', OAuth.as_view(), name="42OAuth"),
+    path('42OAuth/callback', OAuthCallback.as_view(), name="42OAuth/callback"),
     path('2fa_code', MFAView.as_view(), name='2fa_code'),
 
     path('user', UserView.as_view()),

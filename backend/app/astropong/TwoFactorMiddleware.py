@@ -17,6 +17,8 @@ class TwoFactorAuthMiddleware:
             reverse("login"),
             reverse("register"),
             reverse("2fa_code"),
+            reverse("42OAuth/callback"),
+            reverse("42OAuth"),
         ]
 
         if request.path not in bypass_paths:
