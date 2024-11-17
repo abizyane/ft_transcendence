@@ -18,14 +18,18 @@ export const handleLogin = async (
       credentials: 'include',
     });
 
+    const responseData = await response.json();
+    console.log(responseData);
     if (response.ok) {
-      const responseData = await response.json();
       setErrorMessage(null);
       setSuccessMessage('Login successful.');
       router.push(`/profile/${responseData.id}`);
-    } else {
+    } else if (response.status === 401) {
       const errorData = await response.json();
       setErrorMessage(() => 'Invalid email or password');
+    } else if (response.status === 403 && responseData.mfa_enabled) {
+      router.push(`/auth/mfa`);
+      
     }
   } catch (error) {
     setErrorMessage(() => 'An unexpected error occurred. Please try again.');

@@ -4,6 +4,7 @@ from game.models import Profile
 from urllib.parse import urljoin
 from django.conf import settings
 from django.db import models
+import pyotp
 
 class UserSerializer(serializers.ModelSerializer):
     profile_pic_url = serializers.SerializerMethodField()
@@ -11,7 +12,7 @@ class UserSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = User
-        fields = ['id', 'email', 'username', 'password','profile_pic','profile_pic_url','xp']
+        fields = ['id', 'email', 'username', 'password','profile_pic','profile_pic_url','mfa_enabled','xp']
         extra_kwargs = {
             'password': {'write_only':True},
             'profile_pic': {'write_only':True}
@@ -22,6 +23,7 @@ class UserSerializer(serializers.ModelSerializer):
         instance = self.Meta.model(**validated_data)
         if password is not None:
             instance.set_password(password)
+        instance.mfa_secret = pyotp.random_base32()
         instance.save()
         p = Profile.objects.create(user_id=instance, level=0,xp=0)
         p.save()

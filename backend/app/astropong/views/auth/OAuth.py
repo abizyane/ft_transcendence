@@ -70,7 +70,7 @@ class OAuthCallback(APIView):
             print("Error", str(e))
             return Response({'error': str(e)}, status=status.HTTP_401_UNAUTHORIZED)
     
-    def loginUser(self, user_instance):
+    def loginUser(self, user_instance, request):
         print(user_instance)
 
         refresh = RefreshToken.for_user(user_instance)
@@ -80,9 +80,11 @@ class OAuthCallback(APIView):
         print("User model instance:", user_instance) 
         response = Response(user_data)
         
-        response.set_cookie(key='refresh', value=str(refresh), httponly=True, secure=True)
-        response.set_cookie(key='access', value=str(refresh.access_token), httponly=True, secure=True)
-        
+        response.set_cookie(key='refresh', value=str(refresh),samesite='None', httponly=True, secure=True)
+        response.set_cookie(key='access', value=str(refresh.access_token),samesite='None', httponly=True, secure=True)
+        if user_instance.mfa_enabled:
+            response.status_code = 403
+            request.session['2fa_verified'] = False
         return response
 
     def getUser(self, access_token, code):
@@ -92,7 +94,7 @@ class OAuthCallback(APIView):
             user = resp.json()
             if self.is_email_existing(user['email']):
                 user = User.objects.filter(email=user['email']).get()
-                return self.loginUser(user)
+                return self.loginUser(user, self.request)
             else:
                 return self.createUserInfo(user, code)    
         else:

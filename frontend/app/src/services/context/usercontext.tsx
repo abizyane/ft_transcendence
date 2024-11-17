@@ -5,11 +5,13 @@ interface User {
   username: string;
   email: string;
   profile_pic_url:string
+  mfa_enabled: boolean;
 }
 
 interface UserContextType {
   user: User | null;
   loading: boolean;
+  fetchUser: () => void;
 }
 
 const UserContext = createContext<UserContextType | undefined>(undefined);
@@ -26,26 +28,26 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [user, setUser] = useState<User | null>(null);
   const [userloading, setUserloading] = useState(true);
 
-  useEffect(() => {
-    const fetchUser = async () => {
-      try {
-        const response = await fetch('http://localhost:8000/api/user', {credentials: 'include',});
-        if (response.ok) {
-          const data = await response.json();
-          setUser(data);
-        }
-      } catch (error) {
-        console.error('Failed to fetch user:', error);
-      } finally {
-        setUserloading(false);
+  const fetchUser = async () => {
+    try {
+      const response = await fetch('http://localhost:8000/api/user', {credentials: 'include',});
+      if (response.ok) {
+        const data = await response.json();
+        setUser(data);
       }
-    };
+    } catch (error) {
+      console.error('Failed to fetch user:', error);
+    } finally {
+      setUserloading(false);
+    }
+  };
+  useEffect(() => {
 
     fetchUser();
   }, []);
 
   return (
-    <UserContext.Provider value={{ user, userloading }}>
+    <UserContext.Provider value={{ user, userloading, fetchUser }}>
       {children}
     </UserContext.Provider>
   );
