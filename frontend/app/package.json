@@ -21,7 +21,7 @@
     "date-fns": "^4.1.0",
     "formik": "^2.4.6",
     "js-cookie": "^3.0.5",
-    "lucide-react": "^0.454.0",
+    "lucide-react": "^0.460.0",
     "next": "latest",
     "react": "latest",
     "react-chartjs-2": "^5.2.0",

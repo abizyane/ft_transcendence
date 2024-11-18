@@ -18,10 +18,11 @@ do
     sleep 2
 done
 
-python manage.py makemigrations chat notification astropong game
+python manage.py makemigrations chat notification astropong ga00me
 python manage.py migrate
 
 # python manage.py create_users
 # python manage.py create_messages
+# python manage.py create_matches_history
 
 exec python manage.py runserver 0.0.0.0:8000

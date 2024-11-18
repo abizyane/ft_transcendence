@@ -8,6 +8,7 @@ import Friends from "@/components/dashboardcomponents/friends";
 import { useParams, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { useUser } from "@/services/context/usercontext";
+import Loader from "components/loader/loader";
 import Legend from "../../../../../public/Legend.svg"
 import ProfileChart from "@/components/Charts/profileChart";
 
@@ -51,8 +52,8 @@ const Page = () => {
     }
   }, [userId, currentUser]);
 
-  if (userloading) return <p className="text-white">Loading...</p>;
-  if (loading) return <p>Loading...</p>;
+  if (userloading) return (<div className="w-full h-full flex justify-center items-center"><Loader/></div>);
+  if (loading) return (<div className="w-full h-full flex justify-center items-center"><Loader/></div>);
   if (error) return <p>Error: {error}</p>;
   if (!user) return <p>No user found.</p>;
   return (

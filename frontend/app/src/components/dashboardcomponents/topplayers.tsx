@@ -1,17 +1,47 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import Link from "next/link";
 import data from "../../app/data/Dashboarddata.json";
+import Loader from "components/loader/loader";
+
+interface User {
+  id: number;
+  email: string;
+  username: string;
+  profile_pic_url: string;
+}
 
 interface Player {
-  firstName: string;
-  lastName: string;
-  pic: string;
   xp: number;
+  level:number;
+  user:User;
 }
 
 const TopPlayers: React.FC = () => {
   const user = data.user;
-  const topPlayers: Player[] = user.topPlayers;
+  // const topPlayers: Player[] = user.topPlayers;
+  const [topPlayers, setTopPlayers] = useState<Player[]>([]);
+  const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    setLoading(true);
+    fetch(`http://localhost:8000/api/top_players`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      credentials: 'include',
+    })
+    .then(async (response) => {
+      if (!response.ok) {
+        console.log("Response not ok:", response.status);
+        // throw new Error("User not found");
+      }
+      const responseData = await response.json();
+      setTopPlayers(responseData.topPlayers);
+    }).finally(() => {
+      setLoading(false);
+    });
+  }, []);
 
   const sortedTopPlayers = topPlayers.sort((a, b) => b.xp - a.xp);
 
@@ -30,53 +60,58 @@ const TopPlayers: React.FC = () => {
           </Link>
         </div>
 
-        <div className=" flex flex-col h-full justify-center items center">
-          {sortedTopPlayers.length === 0 ? (
+          {loading ? 
+            <div className="w-full h-full flex justify-start items-center">
+              <Loader />
+            </div>
+          : sortedTopPlayers.length === 0 ? (
             <div className="w-full h-full flex justify-center items-center">
               <p className="text-xl text-white-primary font-bold">
                 No Data Found.
               </p>
             </div>
           ) : (
-            sortedTopPlayers.slice(0, displayCount).map((player, index) => (
-              <div
-                key={index}
-                className={`flex items-center justify-between m-1   ${
-                  index === 0 ? "golden" : index === 1 ? "silver" : "bronze"
-                } rounded-[34px] pl-2 py-2 pr-5 border border-violet-primary`}
-              >
-                <div className="flex items-center space-x-4">
-                  <img
-                    src={player.pic}
-                    alt={`${player.firstName} ${player.lastName}`}
-                    className="w-12 h-12 rounded-full"
-                  />
-                  <div className="flex flex-col">
-                    <p className="font-bold text-white">{`${player.firstName} ${player.lastName}`}</p>
-                    <p className="text-xs justify-start flex ml-3 text-gray-400">
-                      {player.xp} XP
-                    </p>
+            <div className=" flex flex-col h-full justify-start">
+          
+            {sortedTopPlayers.slice(0, displayCount).map((player, index) => (
+                <div
+                  key={index}
+                  className={`flex items-center justify-between m-1   ${
+                    index === 0 ? "golden" : index === 1 ? "silver" : "bronze"
+                  } rounded-[34px] pl-2 py-2 pr-5 border border-violet-primary`}
+                >
+                  <div className="flex items-center space-x-4">
+                    <img
+                      src={player.user.profile_pic_url}
+                      alt={`${player.user.username}`}
+                      className="w-12 h-12 rounded-full"
+                    />
+                    <div className="flex flex-col">
+                      <p className="font-bold text-white">{`${player.user.username}`}</p>
+                      <p className="text-xs justify-start flex ml-3 text-gray-400">
+                        {player.xp} XP
+                      </p>
+                    </div>
+                  </div>
+                  <div className="flex items-center">
+                    <img
+                      src={
+                        index === 0
+                          ? "GoldBadge.svg"
+                          : index === 1
+                          ? "SilverBadge.svg"
+                          : "BronzeBadge.svg"
+                      }
+                      alt={`${
+                        index === 0 ? "Gold" : index === 1 ? "Silver" : "Bronze"
+                      } Badge`}
+                      className="w-8 h-8"
+                    />
                   </div>
                 </div>
-                <div className="flex items-center">
-                  <img
-                    src={
-                      index === 0
-                        ? "GoldBadge.svg"
-                        : index === 1
-                        ? "SilverBadge.svg"
-                        : "BronzeBadge.svg"
-                    }
-                    alt={`${
-                      index === 0 ? "Gold" : index === 1 ? "Silver" : "Bronze"
-                    } Badge`}
-                    className="w-8 h-8"
-                  />
-                </div>
-              </div>
-            ))
+              ))}
+          </div>
           )}
-        </div>
       </div>
     </div>
   );

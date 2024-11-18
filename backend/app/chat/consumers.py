@@ -4,7 +4,7 @@ from channels.db import database_sync_to_async
 from django.db.models import Q
 from .models import Message
 from astropong.models.UserModel import User, Relationship
-from .serializers import MessageConsumerSerializer
+from .serializers import MessageConsumerSerializer, UserSerializer
 from channels.layers import get_channel_layer
 from datetime import datetime
 
@@ -39,20 +39,18 @@ class ChatRoomConsumer(AsyncWebsocketConsumer):
         
         self.sender = text_data_json.get('sender')
         self.receiver = text_data_json.get('receiver')
-        print("sender ", self.sender, flush=True)
-        print("receiver ", self.receiver, flush=True)
         
         if self.sender != self.scope['user'].username and self.receiver != self.scope['user'].username:
             return
         
-        sender, receiver = await self.get_users()
+        self.sender, self.receiver = await self.get_users()
 
-        if not sender or not receiver:
+        if not self.sender or not self.receiver:
             await self.send_error('User not found.')
             return
 
 
-        relationship = await self.get_relationship(sender, receiver)
+        relationship = await self.get_relationship(self.sender, self.receiver)
         if not relationship:
             await self.send_error('You must be friends in order to chat.')
             return
@@ -61,9 +59,15 @@ class ChatRoomConsumer(AsyncWebsocketConsumer):
         if message_type == 'chat_message':
             await self.handle_chat_message(text_data_json, sender,receiver)
         elif message_type == 'typing':
-            await self.handle_typing(text_data_json)
+            await self.handle_typing()
         elif message_type == 'stop_typing':
-            await self.handle_stop_typing(text_data_json)
+            await self.handle_stop_typing()
+        elif message_type == 'read_message':
+            await self.handle_read_message()
+        elif message_type == 'delete_message':
+            await self.handle_delete_message(text_data_json)
+        elif message_type == 'online_users':
+            await self.handle_online_users()
         else:
             await self.send_error('Invalid message type.')
 
@@ -76,30 +80,45 @@ class ChatRoomConsumer(AsyncWebsocketConsumer):
             {
                 'type': 'chat_message',
                 'message': MessageConsumerSerializer(message).data,
+                'sender': self.sender.username,
+                'receiver': self.receiver.username,
             }
         )
 
         await self.send_notification(sender, receiver) 
 
-    async def handle_typing(self, text_data_json):
+    async def handle_typing(self):
         await self.channel_layer.group_send(
             self.room_group_name,
             {
                 'type': 'typing',
-                'sender': self.sender,
-                'receiver': self.receiver,
+                'sender': self.sender.username,
+                'receiver': self.receiver.username,
             }
         )
 
-    async def handle_stop_typing(self, text_data_json):
+    async def handle_stop_typing(self):
         await self.channel_layer.group_send(
             self.room_group_name,
             {
                 'type': 'stop_typing',
-                'sender': self.sender,
-                'receiver': self.receiver,
+                'sender': self.sender.username,
+                'receiver': self.receiver.username,
             }
         )
+
+    async def handle_read_message(self):
+        await self.mark_messages_as_read(self.sender, self.receiver)
+
+    async def handle_delete_message(self, text_data_json):
+        await self.delete_message(text_data_json['message_id'])
+
+    async def handle_online_users(self):
+        online_users = await self.get_online_users()
+        await self.send(text_data=json.dumps({
+            'type': 'online_users',
+            'users': UserSerializer(online_users, many=True, context={'request': self.scope['request']}).data,
+        }))
 
     async def chat_message(self, event):
         print("event ", event, flush=True)
@@ -142,13 +161,22 @@ class ChatRoomConsumer(AsyncWebsocketConsumer):
             {
                 'type': 'notification',
                 'content': f'New message from {sender.username}',
-                'sender': sender.username,
                 'receiver': receiver.username,
                 'notification_type': 'chat_message',
-                'timestamp': str(datetime.now()),
-                'seen': False,
             }
         )
+
+    @database_sync_to_async
+    def get_online_users(self):
+        return User.objects.filter(is_online=True)
+
+    @database_sync_to_async
+    def delete_message(self, message_id):
+        Message.objects.filter(id=message_id).delete()
+
+    @database_sync_to_async
+    def mark_messages_as_read(self, sender, receiver):
+        Message.objects.filter(sender=sender, receiver=receiver, seen=False).update(seen=True)
 
     @database_sync_to_async
     def get_user(self, username):
@@ -165,7 +193,11 @@ class ChatRoomConsumer(AsyncWebsocketConsumer):
 
     @database_sync_to_async
     def save_message(self, sender, receiver, message):
-        return Message.objects.create(sender=sender, receiver=receiver, message=message)
+        return Message.objects.create(
+            sender=sender,
+            receiver=receiver,
+            message=message
+        )
 
     async def validate_json(self, text_data):
         try:

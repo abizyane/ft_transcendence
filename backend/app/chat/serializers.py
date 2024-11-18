@@ -21,6 +21,14 @@ class UserSerializer(serializers.ModelSerializer):
         return default_image_url
 
 class MessageConsumerSerializer(serializers.ModelSerializer):
+    sender = serializers.SerializerMethodField()
+    receiver = serializers.SerializerMethodField()
+
+    def get_sender(self, obj):
+        return obj.sender.username
+
+    def get_receiver(self, obj):
+        return obj.receiver.username
 
     class Meta:
         model = Message
