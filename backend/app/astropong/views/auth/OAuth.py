@@ -42,8 +42,9 @@ class OAuthCallback(APIView):
             "redirect_uri": OAuth.REDIRECT_URI
         }
         response = requests.post(OAuth.TOKEN_URL, data=payload)
-        print(response.json())
+        print(response.json(), flush=True)
         if response.status_code != 200:
+            print("Error", response.json(), flush=True)
             return Response("Invalid request", status=status.HTTP_401_UNAUTHORIZED)
         resp = response.json()
         access_token = resp['access_token']
@@ -64,20 +65,22 @@ class OAuthCallback(APIView):
                 'password' : code
             })
             serializer.is_valid(raise_exception=True)
+            print("Serializer valid", flush=True)
             serializer.save()
-            return self.loginUser(serializer.instance)
+            print("User saved", flush=True)
+            return self.loginUser(serializer.instance, self.request)
         except Exception as e:
-            print("Error", str(e))
+            print("Error", str(e), flush=True)
             return Response({'error': str(e)}, status=status.HTTP_401_UNAUTHORIZED)
     
     def loginUser(self, user_instance, request):
-        print(user_instance)
+        print("user instance", user_instance, flush=True)
 
         refresh = RefreshToken.for_user(user_instance)
-        user_data = UserSerializer(user_instance).data
+        user_data = UserSerializer(user_instance, context={'request': self.request}).data
         
-        print("Serialized data:", user_data)
-        print("User model instance:", user_instance) 
+        print("Serialized data:", user_data, flush=True)
+        print("User model instance:", user_instance, flush=True) 
         response = Response(user_data)
         
         response.set_cookie(key='refresh', value=str(refresh),samesite='None', httponly=True, secure=True)
@@ -94,8 +97,10 @@ class OAuthCallback(APIView):
             user = resp.json()
             if self.is_email_existing(user['email']):
                 user = User.objects.filter(email=user['email']).get()
+                print("User found", user, flush=True)
                 return self.loginUser(user, self.request)
             else:
+                print("User not found", user, flush=True)
                 return self.createUserInfo(user, code)    
         else:
             return Response({'error': "An error has occured"}, status=status.HTTP_401_UNAUTHORIZED)
