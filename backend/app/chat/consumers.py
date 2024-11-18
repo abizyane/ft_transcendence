@@ -37,20 +37,20 @@ class ChatRoomConsumer(AsyncWebsocketConsumer):
         if not text_data_json:
             return
         
-        sender = text_data_json.get('sender')
-        receiver = text_data_json.get('receiver')
+        self.sender = text_data_json.get('sender')
+        self.receiver = text_data_json.get('receiver')
         
-        if sender != self.scope['user'].username and receiver != self.scope['user'].username:
+        if self.sender != self.scope['user'].username and self.receiver != self.scope['user'].username:
             return
         
-        sender, receiver = await self.get_users()
+        self.sender, self.receiver = await self.get_users()
 
-        if not sender or not receiver:
+        if not self.sender or not self.receiver:
             await self.send_error('User not found.')
             return
 
 
-        relationship = await self.get_relationship(sender, receiver)
+        relationship = await self.get_relationship(self.sender, self.receiver)
         if not relationship:
             await self.send_error('You must be friends in order to chat.')
             return
@@ -72,6 +72,8 @@ class ChatRoomConsumer(AsyncWebsocketConsumer):
             {
                 'type': 'chat_message',
                 'message': MessageConsumerSerializer(message).data,
+                'sender': self.sender.username,
+                'receiver': self.receiver.username,
             }
         )
 
@@ -82,8 +84,8 @@ class ChatRoomConsumer(AsyncWebsocketConsumer):
             self.room_group_name,
             {
                 'type': 'typing',
-                'sender': self.sender,
-                'receiver': self.receiver,
+                'sender': self.sender.username,
+                'receiver': self.receiver.username,
             }
         )
 
@@ -92,8 +94,8 @@ class ChatRoomConsumer(AsyncWebsocketConsumer):
             self.room_group_name,
             {
                 'type': 'stop_typing',
-                'sender': self.sender,
-                'receiver': self.receiver,
+                'sender': self.sender.username,
+                'receiver': self.receiver.username,
             }
         )
 
