@@ -14,10 +14,19 @@ const UserChatPage = ({ currentUser, chatUser }) => {
   const [input, setInput] = useState("");
   const [ws, setWs] = useState(null);
   const { username, profile_pic_url, is_online, id } = currentUser;
-  
+  const [typing, setTyping] = useState(false);
+  const [timeoutTyping, setTimeoutTyping] = useState(undefined);
+  const messageContainerRef = useRef(null);
+
+
+  const scrollToBottom = () => {
+    if (messageContainerRef.current) {
+      messageContainerRef.current.scrollTop = messageContainerRef.current.scrollHeight;
+    }
+  };
   useEffect(() => {
     const socket = new WebSocket(
-      `ws://127.0.0.1:8000/ws/chat/room/`
+      `ws://localhost:8000/ws/chat/room/`
     );
     setWs(socket);
     socket.onopen = () => {
@@ -28,16 +37,21 @@ const UserChatPage = ({ currentUser, chatUser }) => {
       if (event.type == "message")
       {
 
-          const message = JSON.parse(event.data);
-          // console.log("Received message:", message.message);
-          // console.log(currentUser.id);
-          // console.log(message.sender);
-          if (currentUser.id === message.message.receiver)
-            setMessages((prevMessages) => [message.message, ...prevMessages]);
-      }
-      else if (event.type == "typing")
-      {
-        
+          const data = JSON.parse(event.data);
+          if (data.type == "chat_message")
+          {
+            setMessages((prevMessages) => [data.message, ...prevMessages]);
+            console.log(messages);
+          }
+          else if (data.type == "typing")
+          {
+            setTyping(true);
+          }
+          else if (data.type == "stop_typing")
+          {
+            setTyping(false);
+          }
+          scrollToBottom();
       }
     };
     socket.onclose = () => {
@@ -48,7 +62,6 @@ const UserChatPage = ({ currentUser, chatUser }) => {
     };
   }, [currentUser.username, chatUser.user.username]);
   
-  const messageContainerRef = useRef(null);
   useEffect(() => {
     if (chatUser?.messages?.length > 0) {
       setMessages(chatUser.messages);
@@ -63,6 +76,7 @@ const UserChatPage = ({ currentUser, chatUser }) => {
         sender: currentUser.username,
         receiver: chatUser.user.username,
         type: "chat_message",
+        timestamp: new Date().toISOString(),
       };
 
       ws.send(JSON.stringify(newMessage));
@@ -73,8 +87,27 @@ const UserChatPage = ({ currentUser, chatUser }) => {
     }
   };
 
+
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    console.log('Key Pressed:', e.key); 
+    console.log('Key Pressed:', e.key);
+    e.stopPropagation();
+    ws.send(JSON.stringify({
+      type: "typing",
+      sender: currentUser.username,
+      receiver: chatUser.user.username
+    }));
+    if (timeoutTyping) {
+      clearTimeout(timeoutTyping);
+    }
+    setTimeoutTyping(setTimeout(() => {
+      ws.send(JSON.stringify({
+        type: "stop_typing",
+        sender: currentUser.username,
+        receiver: chatUser.user.username,
+      }));
+    }, 1000));
+
+
     if (e.key === 'Enter') {
       e.preventDefault();
       handleSendMessage(); 
@@ -125,18 +158,29 @@ const UserChatPage = ({ currentUser, chatUser }) => {
                         }`}
                         >
                         {msg.message}
+                        <span className={` m-2 text-center w-full text-sm text-gray-500 ${ msg.sender === currentUser.username
+                        ? "order-first"
+                        : "bg-white justify-self-end"
+                      }`}>
+                              <span className="text-[10px] text-gray-500">
+                      {isToday(new Date(msg.timestamp))
+                      ? format(new Date(msg.timestamp), "hh:mm a")
+                      : format(new Date(msg.timestamp), "MMM dd")}
+                      </span>
+                      </span> 
                       </p>
+                     
                     </div>
                   </div>
                 </div>
               ))}
-                <div className="bg-white rounded-3xl h-11 w-16 flex items-center justify-center">
+              {typing ? <div className="bg-white rounded-3xl h-11 w-16 flex items-center justify-center">
                   <div className="flex space-x-1">
                     <div className="dot bg-gray-900 rounded-full h-2 w-2"></div>
                     <div className="dot bg-gray-900 rounded-full h-2 w-2"></div>
                     <div className="dot bg-gray-900 rounded-full h-2 w-2"></div>
                   </div>
-                </div>
+                </div> : <></>}
           </div>
 
           <div className="h-fit">
@@ -214,13 +258,3 @@ export default function Page() {
 
   return <UserChatPage currentUser={currentUser} chatUser={chatUser} />;
 }
-{/* <p className={` text-center w-full text-sm text-gray-500 ${ msg.sender === currentUser.username
-  ? "order-first"
-  : "bg-white justify-self-end"
-}`}>
-        <span className="text-[10px] text-gray-500">
-{isToday(new Date(msg.timestamp))
-? format(new Date(msg.timestamp), "hh:mm a")
-: format(new Date(msg.timestamp), "MMM dd")}
-</span>
-</p> */}
