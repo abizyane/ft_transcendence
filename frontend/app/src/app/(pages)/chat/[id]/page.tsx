@@ -17,7 +17,7 @@ const UserChatPage = ({ currentUser, chatUser }) => {
   
   useEffect(() => {
     const socket = new WebSocket(
-      `ws://127.0.0.1:8000/ws/chat/room/`
+      `ws://localhost:8000/ws/chat/room/`
     );
     setWs(socket);
     socket.onopen = () => {
@@ -29,9 +29,9 @@ const UserChatPage = ({ currentUser, chatUser }) => {
       {
 
           const message = JSON.parse(event.data);
-          // console.log("Received message:", message.message);
-          // console.log(currentUser.id);
-          // console.log(message.sender);
+          console.log("Received message:", message.message);
+          console.log(currentUser.id);
+          console.log(message.sender);
           if (currentUser.id === message.message.receiver)
             setMessages((prevMessages) => [message.message, ...prevMessages]);
       }

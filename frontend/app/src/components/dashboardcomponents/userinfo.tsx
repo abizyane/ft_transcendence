@@ -5,6 +5,7 @@ import { useUser } from "@/services/context/usercontext";
 import { MdOutlinePersonAddAlt1, MdPersonAddAlt1 } from "react-icons/md";
 import { ImBlocked, ImEyeBlocked } from "react-icons/im";
 import { IoIosRemoveCircleOutline } from "react-icons/io";
+import Link from "next/link";
 
 type User = {
   id: string;
@@ -29,9 +30,9 @@ const UserInfo: React.FC<UserInfoProps> = ({ user, setUser }) => {
   const level = Math.floor(xp / maxXPPerLevel);
   const remainingXP = ((xp % maxXPPerLevel) / maxXPPerLevel) * 100;
   const calculateWinRate = (wins: number, totalGames: number) => {
-    return totalGames === 0 ? 0 : (wins / totalGames) * 100;
+    return totalGames === 0 ? 20 : (wins / totalGames) * 100;
   };
-  const winRatePercentage = calculateWinRate(wins, totalGames);
+  const winRatePercentage = calculateWinRate(20, 100);
 
   const [loading, setLoading] = useState(false);
 
@@ -259,7 +260,7 @@ const UserInfo: React.FC<UserInfoProps> = ({ user, setUser }) => {
 
   return (
     <>
-      <div className="h-full w-full border-[1px] border-violet-primary rounded-xl p-2">
+      <div className=" w-full rounded-xl p-2">
         <div className="flex gap-2">
           <div className="flex-shrink-0 w-3/5">
             <div className="mb-4 max-w-full aspect-square max-h-[300px] mx-auto">
@@ -269,7 +270,7 @@ const UserInfo: React.FC<UserInfoProps> = ({ user, setUser }) => {
                 className="w-full h-auto object-cover rounded-2xl"
               />
             </div>
-            <div className="flex flex-col border-[2px] border-violet-primary rounded-xl m-1 h-auto p-2">
+            <div className="flex flex-col border-[2px] border-violet-primary rounded-xl m-1 h-auto w-full p-2">
               <p className="text-white font-semibold text-xs justify-start flex">Level {level}</p>
               <div className="flex items-center h-2 w-full rounded-xl bg-white">
                 <div
@@ -283,7 +284,7 @@ const UserInfo: React.FC<UserInfoProps> = ({ user, setUser }) => {
             </div>
           </div>
 
-          <div className="flex flex-col w-2/5">
+          <div className="flex flex-col w-2/5 ">
             {currentUser?.id === user?.id ? (
               <div className="border-[2px] border-violet-primary rounded-3xl h-auto p-1 mb-2 mr-2">
                 <h1 className="text-base mr-2 lg:text-2xl font-bold text-violet-primary text-center">
