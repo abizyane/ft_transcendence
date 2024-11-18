@@ -133,7 +133,8 @@ class MFAView(APIView):
         if not user.mfa_enabled:
             return Response({'error': 'MFA is already disabled'}, status=400)
         user.mfa_enabled = False
-        request.session['2fa_verified'] = None
+        request.session['2fa_verified'] = False
+        print("session", request.session['2fa_verified'], flush=True)
         user.save()
         return Response({'message': 'MFA disabled successfully'}, status=200)
         
