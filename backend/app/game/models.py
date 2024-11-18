@@ -4,6 +4,7 @@ from django.utils import timezone
 from django.db.models.query import EmptyQuerySet
 
 
+
 class Profile(models.Model):
     user_id = models.OneToOneField(User, on_delete=models.CASCADE)
     level = models.IntegerField()
@@ -17,6 +18,10 @@ class Profile(models.Model):
 
     def get_username(self):
         return self.user_id.username
+    
+    def get_profile_pic(self, request):
+        from astropong.serializers.UserSerializer import UserSerializer
+        return UserSerializer(self.user_id, context={'request': request}).data['profile_pic_url']
     
     def history(self):
         games = GameModel.get_all_games(self.id)
