@@ -33,6 +33,11 @@ class Profile(models.Model):
             opponent = game.get_opponent(self)
             print(score, opponent)
 
+    def calculate_xp(self):
+        level_up_threshold = 1000
+        self.level = self.xp / level_up_threshold
+        self.save()
+
 
 class GameModel(models.Model):
     player_1 = models.ForeignKey(Profile, related_name="player_one", null=True,on_delete=models.CASCADE)

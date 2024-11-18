@@ -17,9 +17,10 @@ from rest_framework.parsers import MultiPartParser, FormParser
 
 class GamesHistoryView(APIView):
     permission_classes = [IsAuthenticated]
-    def get(self, request):
+    def post(self, request):
         try:
-            user_profile = Profile.objects.get(user_id=request.user)
+            userid = request.data.get('id')
+            user_profile = Profile.objects.get(user_id=userid)
             games = GameModel.get_all_games(user_profile.id).order_by('-created')
             history = []
             for game in games:

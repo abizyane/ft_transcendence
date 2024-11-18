@@ -34,7 +34,7 @@ interface User {
     };
   }
 
-const history = () => {
+const history = ({id}: {id: number}) => {
     const user = data.user;
     // const gameHistory = user.history;
     const [gameHistory, setGameHistory] = useState<Game[]>([]);
@@ -43,10 +43,11 @@ const history = () => {
     useEffect(() => {
       setLoading(true);
       fetch(`http://localhost:8000/api/games_history`, {
-        method: 'GET',
+        method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
+        body: JSON.stringify({ id: id }),
         credentials: 'include',
       })
       .then(async (response) => {
