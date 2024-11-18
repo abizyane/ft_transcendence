@@ -9,6 +9,15 @@ class Command(BaseCommand):
     help = 'Creates sample match history data'
 
     def handle(self, *args, **kwargs):
+        users = User.objects.all()
+        for user in users:
+            if not Profile.objects.filter(user_id=user).exists():
+                Profile.objects.create(
+                    user_id=user,
+                    level=1,
+                    xp=0
+                )
+                self.stdout.write(self.style.SUCCESS(f'Created profile for user {user.username}'))
         # Get all profiles
         profiles = Profile.objects.all()
         if len(profiles) < 2:
@@ -16,7 +25,7 @@ class Command(BaseCommand):
             return
 
         # Create 20 random matches
-        for i in range(20):
+        for i in range(500):
             # Select two random players
             players = random.sample(list(profiles), 2)
             player1, player2 = players
@@ -61,6 +70,8 @@ class Command(BaseCommand):
 
             player1.save()
             player2.save()
+            player1.calculate_xp()
+            player2.calculate_xp()
 
             self.stdout.write(
                 self.style.SUCCESS(
