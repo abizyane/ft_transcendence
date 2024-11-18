@@ -3,15 +3,21 @@ import { useUser } from "@/services/context/usercontext";
 import { useParams } from "next/navigation";
 import React, { useState, useEffect, useRef } from "react";
 import io from "socket.io-client";
-import { formatDistanceToNow } from "date-fns";
+import { format, formatDistanceToNow, isToday } from "date-fns";
+
+
+
+
+
 const UserChatPage = ({ currentUser, chatUser }) => {
   const [messages, setMessages] = useState([]);
   const [input, setInput] = useState("");
   const [ws, setWs] = useState(null);
   const { username, profile_pic_url, is_online, id } = currentUser;
+  
   useEffect(() => {
     const socket = new WebSocket(
-      `ws://localhost:8000/ws/chat/room/${currentUser.username}/${chatUser.user.username}`
+      `ws://127.0.0.1:8000/ws/chat/room/`
     );
     setWs(socket);
     socket.onopen = () => {
@@ -19,12 +25,20 @@ const UserChatPage = ({ currentUser, chatUser }) => {
     };
     socket.onmessage = (event) => {
       console.log(event);
-      const message = JSON.parse(event.data);
-      console.log("Received message:", message.message);
-       console.log(currentUser.id);
-       console.log(message.sender);
-       if (currentUser.id === message.message.receiver)
-        setMessages((prevMessages) => [message.message, ...prevMessages]);
+      if (event.type == "message")
+      {
+
+          const message = JSON.parse(event.data);
+          // console.log("Received message:", message.message);
+          // console.log(currentUser.id);
+          // console.log(message.sender);
+          if (currentUser.id === message.message.receiver)
+            setMessages((prevMessages) => [message.message, ...prevMessages]);
+      }
+      else if (event.type == "typing")
+      {
+        
+      }
     };
     socket.onclose = () => {
       console.log("Disconnected from WebSocket");
@@ -39,7 +53,7 @@ const UserChatPage = ({ currentUser, chatUser }) => {
     if (chatUser?.messages?.length > 0) {
       setMessages(chatUser.messages);
     }
-    
+
   }, [chatUser.messages]);
   
   const handleSendMessage = () => {
@@ -59,6 +73,13 @@ const UserChatPage = ({ currentUser, chatUser }) => {
     }
   };
 
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    console.log('Key Pressed:', e.key); 
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      handleSendMessage(); 
+    }
+  };
   useEffect(()=>{
     if (messageContainerRef.current) {
       messageContainerRef.current.scrollTop = messageContainerRef.current.scrollHeight;
@@ -102,23 +123,20 @@ const UserChatPage = ({ currentUser, chatUser }) => {
                             ? "bg-violet-primary"
                             : "bg-white"
                         }`}
-                      >
+                        >
                         {msg.message}
-                      </p>
-                      <p className={`p-4 text-center w-full text-sm text-gray-500 ${ msg.sender === currentUser.username
-                            ? "order-first"
-                            : "bg-white justify-self-end"
-                        }`}>
-                        {messages.length
-                          
-                          // ? formatDistanceToNow(new Date(msg.timestamp))
-                          ? "ok"
-                          : "No messages yet"}
                       </p>
                     </div>
                   </div>
                 </div>
               ))}
+                <div className="bg-white rounded-3xl h-11 w-16 flex items-center justify-center">
+                  <div className="flex space-x-1">
+                    <div className="dot bg-gray-900 rounded-full h-2 w-2"></div>
+                    <div className="dot bg-gray-900 rounded-full h-2 w-2"></div>
+                    <div className="dot bg-gray-900 rounded-full h-2 w-2"></div>
+                  </div>
+                </div>
           </div>
 
           <div className="h-fit">
@@ -130,6 +148,7 @@ const UserChatPage = ({ currentUser, chatUser }) => {
                   value={input}
                   onChange={(e) => setInput(e.target.value)}
                   placeholder="Write your message"
+                  onKeyDown={handleKeyDown}
                 />
                 <button
                   type="button"
@@ -195,3 +214,13 @@ export default function Page() {
 
   return <UserChatPage currentUser={currentUser} chatUser={chatUser} />;
 }
+{/* <p className={` text-center w-full text-sm text-gray-500 ${ msg.sender === currentUser.username
+  ? "order-first"
+  : "bg-white justify-self-end"
+}`}>
+        <span className="text-[10px] text-gray-500">
+{isToday(new Date(msg.timestamp))
+? format(new Date(msg.timestamp), "hh:mm a")
+: format(new Date(msg.timestamp), "MMM dd")}
+</span>
+</p> */}
