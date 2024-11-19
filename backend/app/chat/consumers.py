@@ -57,7 +57,7 @@ class ChatRoomConsumer(AsyncWebsocketConsumer):
 
         message_type = text_data_json.get('type')
         if message_type == 'chat_message':
-            await self.handle_chat_message(text_data_json, sender,receiver)
+            await self.handle_chat_message(text_data_json)
         elif message_type == 'typing':
             await self.handle_typing()
         elif message_type == 'stop_typing':
@@ -71,10 +71,8 @@ class ChatRoomConsumer(AsyncWebsocketConsumer):
         else:
             await self.send_error('Invalid message type.')
 
-    async def handle_chat_message(self, text_data_json, sender, receiver):
-        message = await self.save_message(sender, receiver, text_data_json['message'])
-        print("message ",message, flush=True)
-        print("message send", flush=True)
+    async def handle_chat_message(self, text_data_json):
+        message = await self.save_message(self.sender, self.receiver, text_data_json['message'])
         await self.channel_layer.group_send(
             self.room_group_name,
             {
@@ -85,7 +83,7 @@ class ChatRoomConsumer(AsyncWebsocketConsumer):
             }
         )
 
-        await self.send_notification(sender, receiver) 
+        await self.send_notification(self.sender, self.receiver) 
 
     async def handle_typing(self):
         await self.channel_layer.group_send(
@@ -121,8 +119,7 @@ class ChatRoomConsumer(AsyncWebsocketConsumer):
         }))
 
     async def chat_message(self, event):
-        print("event ", event, flush=True)
-        receiver = event['message']['receiver']
+        receiver = event['receiver']
         if receiver != self.scope['user'].username:
             return
 
