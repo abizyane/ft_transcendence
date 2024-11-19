@@ -163,9 +163,31 @@ class ChatRoomConsumer(AsyncWebsocketConsumer):
             }
         )
 
+    async def validate_json(self, text_data):
+        try:
+            return json.loads(text_data)
+        except json.JSONDecodeError:
+            await self.send_error(f"Invalid JSON: {text_data}")
+            return None
+
+    async def get_users(self):
+        sender = await self.get_user(self.sender)
+        receiver = await self.get_user(self.receiver)
+        return sender, receiver
+
+    async def send_error(self, error_message):
+        await self.send(text_data=json.dumps({
+            'message': error_message,
+            'type': 'error',
+        }))
+
     @database_sync_to_async
     def get_online_users(self):
-        return User.objects.filter(is_online=True)
+        friends_relationships = Relationship.objects.filter(Q(user1=self.scope['user']) | Q(user2=self.scope['user']), status=Relationship.Status.FRIEND)
+        friends_usernames = [relationship.user1.username if relationship.user1 != self.scope['user'] else relationship.user2.username for relationship in friends_relationships]
+        online_users = User.objects.filter(username__in=friends_usernames, is_online=True)
+        return online_users
+
 
     @database_sync_to_async
     def delete_message(self, message_id):
@@ -195,21 +217,3 @@ class ChatRoomConsumer(AsyncWebsocketConsumer):
             receiver=receiver,
             message=message
         )
-
-    async def validate_json(self, text_data):
-        try:
-            return json.loads(text_data)
-        except json.JSONDecodeError:
-            await self.send_error(f"Invalid JSON: {text_data}")
-            return None
-
-    async def get_users(self):
-        sender = await self.get_user(self.sender)
-        receiver = await self.get_user(self.receiver)
-        return sender, receiver
-
-    async def send_error(self, error_message):
-        await self.send(text_data=json.dumps({
-            'message': error_message,
-            'type': 'error',
-        }))

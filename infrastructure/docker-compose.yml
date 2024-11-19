@@ -5,26 +5,26 @@ networks:
     name: astropong
 
 services:
-  frontend:
-    build: 
-      context: ../frontend
-      dockerfile: Dockerfile
-    image: frontend:sa
-    container_name: frontend
-    volumes:
-      - ../frontend/app:/app
-    ports:
-      - "3000:3000"
-    depends_on:
-      - backend
-    networks:
-      - infra
-    healthcheck:
-      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost:3000"]
-      interval: 10s
-      timeout: 5s
-      retries: 3
-    restart: always
+  # frontend:
+  #   build: 
+  #     context: ../frontend
+  #     dockerfile: Dockerfile
+  #   image: frontend:sa
+  #   container_name: frontend
+  #   volumes:
+  #     - ../frontend/app:/app
+  #   ports:
+  #     - "3000:3000"
+  #   depends_on:
+  #     - backend
+  #   networks:
+  #     - infra
+  #   healthcheck:
+  #     test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost:3000"]
+  #     interval: 10s
+  #     timeout: 5s
+  #     retries: 3
+  #   restart: always
 
   backend:
     build: 
@@ -50,12 +50,15 @@ services:
     restart: always
 
   database:
-    image: postgres:13
+    build:
+      context: ./database
+      dockerfile: Dockerfile
+    image: database:sa
     container_name: ${POSTGRES_HOST}
     volumes:
       - ./database/data:/var/lib/postgresql/data
-    ports:
-      - "5432:5432"
+    expose:
+      - "5432"
     env_file:
       - .env
     networks:
@@ -66,3 +69,14 @@ services:
       timeout: 5s
       retries: 3
     restart: always
+
+  # redis:
+  #   image: redis:latest
+  #   container_name: redis
+  #   expose:
+  #     - "6379"
+  #   env_file:
+  #     - .env
+  #   networks:
+  #     - infra
+  #   restart: always
