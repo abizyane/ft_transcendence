@@ -2,6 +2,7 @@ import data from "@/app/data/Dashboarddata.json";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import Loader from "components/loader/loader";
+import { useUser } from "@/services/context/usercontext";
 
 interface User {
     name: string;
@@ -34,12 +35,12 @@ interface User {
     };
   }
 
-const history = ({id}: {id: number}) => {
-    const user = data.user;
+const History = () => {
     // const gameHistory = user.history;
     const [gameHistory, setGameHistory] = useState<Game[]>([]);
     const [loading, setLoading] = useState(false);
-
+    const {user:cUser, setUser} = useUser();
+    console.log(cUser);
     useEffect(() => {
       setLoading(true);
       fetch(`http://localhost:8000/api/games_history`, {
@@ -47,7 +48,7 @@ const history = ({id}: {id: number}) => {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ id: id }),
+        body: JSON.stringify({ id: cUser.id }),
         credentials: 'include',
       })
       .then(async (response) => {
@@ -64,7 +65,9 @@ const history = ({id}: {id: number}) => {
         // .catch((err) => setError(err.message))
         // .finally(() => setLoading(false));
 
-    }, [user.history]);
+    }, [cUser]);
+    if (!cUser)
+      return null;
     const renderGame = (game:Game) => (
       <div
         key={game.gameId}
@@ -147,5 +150,5 @@ const history = ({id}: {id: number}) => {
     );
   };
   
-  export default history;
+  export default History;
   

@@ -10,6 +10,7 @@ interface User {
 
 interface UserContextType {
   user: User | null;
+  setUser: () => void;
   loading: boolean;
   fetchUser: () => void;
 }

@@ -4,15 +4,19 @@ import Profil from "../../../../public/Profil.jpg"
 import History from "@/components/dashboardcomponents/history";
 import LineChart from '../../../components/Charts/Linechart';
 import Data from "../../data/Dashboarddata.json"
-
+import { useUser } from "@/services/context/usercontext";
 
 const Dashboard = () => {
+  const { user:cUser} = useUser();
+  console.log(cUser);
+  if (!cUser)
+    return null;
     const winRatePercentage= 20;
   return (
     <>
       <div className=" w-full mt-10 h-full">
         <div className="p-10 flex flex-col items-center w-full">
-            <img src={Profil.src} alt="User pic"   className="rounded-full h-40 w-40 "/>
+            <img src={cUser.profile_pic_url} alt="User pic"   className="rounded-full h-40 w-40 "/>
             <div className="w-full flex bg-gray-800/50 h-18 p-2 text-center  mt-2 rounded-tl-2xl rounded-tr-2xl text-white">
                 <span className="w-1/3 ">Total Games</span>
                 <span className="w-1/3 ">Games won</span>
@@ -45,7 +49,7 @@ const Dashboard = () => {
                 <LineChart data={Data.user.charts.lineChart.data} />
             </div>
             </div>
-            {/* <History /> */}
+            <History />
         </div>
       </div>
     </>
