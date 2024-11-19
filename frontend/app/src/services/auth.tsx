@@ -3,7 +3,7 @@ import { getUserData } from "./user";
 import { useRouter } from "next/navigation";
 import { registerFormData } from "@/components/Registration/Registration";
 import { cookies } from "next/headers";
-
+import toast from "react-hot-toast";
 
 export const handleLogin = async (
   data: FormData,
@@ -23,16 +23,18 @@ export const handleLogin = async (
     if (response.ok) {
       setErrorMessage(null);
       setSuccessMessage('Login successful.');
+      toast.success('Login successful.')
       router.push(`/profile/${responseData.id}`);
     } else if (response.status === 401) {
-      const errorData = await response.json();
       setErrorMessage(() => 'Invalid email or password');
+      toast.error('Invalid email or password.');
     } else if (response.status === 403 && responseData.mfa_enabled) {
       router.push(`/auth/mfa`);
-      
     }
   } catch (error) {
     setErrorMessage(() => 'An unexpected error occurred. Please try again.');
+    console.log('error',error)
+    toast.error('Login error.')
   }
 };
 
@@ -55,7 +57,6 @@ export const handleLogin = async (
       },
       body: JSON.stringify(data),
     });
- 
     if (response.ok) {
       setErrorMessage(null);
       setSuccessMessage('Registration successful! Redirecting...');

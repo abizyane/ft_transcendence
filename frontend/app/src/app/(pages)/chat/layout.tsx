@@ -6,6 +6,7 @@ import { format, formatDistanceToNow, isToday, isYesterday } from "date-fns";
 import { FiPlusCircle } from "react-icons/fi";
 import { FaEllipsisV, FaSearch } from "react-icons/fa";
 import Link from "next/link";
+import Newchat from "@/components/Chat/Newchat";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -66,6 +67,7 @@ export default function Chat({ children }: ChatLayoutProps) {
     }
   };
 
+
   useEffect(() => {
     fetchConversation();
 
@@ -105,7 +107,16 @@ export default function Chat({ children }: ChatLayoutProps) {
         messageContainerRef.current.scrollHeight;
     }
   }, []);
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
+  const toggleModal = () => {
+    setIsModalOpen((prevState) => !prevState);
+  };
+
+  const closeModal = () => {
+    setIsModalOpen(false);
+  };
+ 
   return (
     <div className=" w-full flex flex-col justify-start items-start">
       <div className="w-full flex lg:flex-row h-full flex-col-reverse">
@@ -117,9 +128,10 @@ export default function Chat({ children }: ChatLayoutProps) {
                 <div className="p-4 rounded-xl flex justify-between items-center w-full">
                   <p className="text-md font-bold">Messages</p>
                   <div className="rounded-full bg-violet-primary w-10 h-10 flex justify-center items-center">
-                    <button className="text-sm">
+                    <button className="text-sm" onClick={toggleModal}>
                       <FiPlusCircle className="w-8 h-8 rounded-full hover:text-gray-700" />
                     </button>
+                    
                   </div>
                 </div>
 
@@ -179,6 +191,7 @@ export default function Chat({ children }: ChatLayoutProps) {
 
             {/* Main Content (Children) */}
             <div className="flex-1 hidden lg:block ">
+            <Newchat isOpen={isModalOpen} closeModal={closeModal} />
               {selectedId && (
                 <div className="px-6 py-4 flex  bg-gray-800/60 rounded-xl flex-row flex-none justify-start gap-4 items-center shadow">
                   <div className="flex">

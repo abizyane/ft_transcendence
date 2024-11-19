@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import Logo from "components/Logo/Logo";
+import toast, { Toaster } from 'react-hot-toast';
 
 export const metadata: Metadata = {
   title: "ft_transcendence",
@@ -30,6 +31,14 @@ export default function RootLayout({
         <div className="absolute inset-0 bg-black/70 w-full h-full"></div>
         <div className="relative z-10">
           {children}
+        <Toaster toastOptions={{
+          className: '',
+          style: {
+            border: '2px solid violet',
+            backgroundColor: 'darkviolet',
+            color:'white'
+          },
+        }}/>
         </div>
       </body>
     </html>

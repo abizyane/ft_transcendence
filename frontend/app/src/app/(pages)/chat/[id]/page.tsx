@@ -4,7 +4,7 @@ import { useParams } from "next/navigation";
 import React, { useState, useEffect, useRef } from "react";
 import io from "socket.io-client";
 import { format, formatDistanceToNow, isToday } from "date-fns";
-
+import toast from "react-hot-toast";
 
 
 
@@ -42,6 +42,7 @@ const UserChatPage = ({ currentUser, chatUser }) => {
           {
             setMessages((prevMessages) => [data.message, ...prevMessages]);
             console.log(messages);
+            setTyping(false);
           }
           else if (data.type == "typing")
           {
@@ -50,6 +51,10 @@ const UserChatPage = ({ currentUser, chatUser }) => {
           else if (data.type == "stop_typing")
           {
             setTyping(false);
+          }
+          else if (data.message == "You must be friends in order to chat.")
+          {
+            toast.error("You must be friends in order to chat.");
           }
           scrollToBottom();
       }
@@ -167,9 +172,8 @@ const UserChatPage = ({ currentUser, chatUser }) => {
                       ? format(new Date(msg.timestamp), "hh:mm a")
                       : format(new Date(msg.timestamp), "MMM dd")}
                       </span>
-                      </span> 
+                      </span>
                       </p>
-                     
                     </div>
                   </div>
                 </div>

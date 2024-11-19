@@ -9,11 +9,12 @@ const searchUsers = () =>{
     const [loading, setLoading] = useState(false);
     const [isOpen, setIsOpen] = useState(false);
     // Debounce function
-    let timer;
+    const [timer, setTimer] = useState(undefined);
+
     const debounce = (func, delay) => {
       return (...args) => {
         clearTimeout(timer);
-        timer = setTimeout(() => func(...args), delay);
+        setTimer(setTimeout(() => func(...args), delay));
       };
     };
   
