@@ -49,7 +49,7 @@ const ProfileChart = ({ user }) => {
     <div className="flex-1  mt-8 w-full lg:mt-0 py-4 lg:w-1/3  overflow-hidden">
         <div className="bg-gray-800/60 rounded-xl border border-violet-primary">
           <p className="m-4 text-white text-2xl font-extrabold">STATS</p>
-          <div className='h-[300px] mx-12 w-full'>
+          <div className='h-[300px]  w-full'>
             <Bar data={data} options={options} />
           </div>
          </div>
