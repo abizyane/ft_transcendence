@@ -18,7 +18,7 @@ do
     sleep 2
 done
 
-python manage.py makemigrations chat notification astropong ga00me
+python manage.py makemigrations chat notification astropong game
 python manage.py migrate
 
 # python manage.py create_users
