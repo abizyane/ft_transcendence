@@ -1,4 +1,4 @@
-FROM postgres:15
+FROM postgres:17.1-alpine3.20
 
 COPY ./scripts/entrypoint.sh /entrypoint.sh
 

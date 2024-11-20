@@ -5,12 +5,10 @@ from django.db.models import Q
 from .models import Message
 from astropong.models.UserModel import User, Relationship
 from .serializers import MessageConsumerSerializer, UserSerializer
-from channels.layers import get_channel_layer
-from datetime import datetime
 
 class ChatRoomConsumer(AsyncWebsocketConsumer):
     async def connect(self):
-        self.room_group_name = "chat_room"
+        self.group_name = "chat_room"
 
         user = self.scope["user"]
         if user.is_anonymous or not user.is_authenticated:
@@ -20,14 +18,14 @@ class ChatRoomConsumer(AsyncWebsocketConsumer):
             return
 
         await self.channel_layer.group_add(
-            self.room_group_name,
+            self.group_name,
             self.channel_name
         )
         await self.accept()
 
     async def disconnect(self, close_code):
         await self.channel_layer.group_discard(
-            self.room_group_name,
+            self.group_name,
             self.channel_name
         )
         await self.close()
@@ -152,8 +150,7 @@ class ChatRoomConsumer(AsyncWebsocketConsumer):
         }))
 
     async def send_notification(self, sender, receiver):
-        channel_layer = get_channel_layer()
-        await channel_layer.group_send(
+        await self.channel_layer.group_send(
             'notifications_' + receiver.username,
             {
                 'type': 'notification',
