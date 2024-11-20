@@ -83,9 +83,6 @@ const History = () => {
             <p className="font-bold text-white text-xs">
               {game.player.username}
             </p>
-            <p className="text-xs text-gray-400 text-nowrap">
-              @{game.player.username}
-            </p>
           </div>
         </div>
         <p className="font-semibold text-white text-center w-20 mx-4">
@@ -95,9 +92,6 @@ const History = () => {
           <div className="flex flex-col items-end">
             <p className="font-bold text-white text-xs">
               {game.opponent.username}
-            </p>
-            <p className="text-xs text-gray-400 text-nowrap">
-              @{game.opponent.username}
             </p>
           </div>
           <img
