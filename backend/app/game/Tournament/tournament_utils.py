@@ -60,9 +60,8 @@ class RoomManager(AbstractRoomManager):
     def get_room(self, _id) -> Room:
         return self.rooms[_id]
 
-    def get_available_rooms(_type:str):
+    def get_available_rooms(self, _type:str):
         return (lambda room : room.ready, self.rooms)
-
 
 class RoomListManager(RoomManager):
     RoomTypes = {

@@ -9,6 +9,10 @@ from .serializers import MessageConsumerSerializer, UserSerializer
 class ChatRoomConsumer(AsyncWebsocketConsumer):
     async def connect(self):
         self.group_name = "chat_room"
+        
+        self.sender = None
+        self.receiver = None
+        self.latest_type = None
 
         user = self.scope["user"]
         if user.is_anonymous or not user.is_authenticated:
@@ -24,6 +28,9 @@ class ChatRoomConsumer(AsyncWebsocketConsumer):
         await self.accept()
 
     async def disconnect(self, close_code):
+        if self.sender and self.receiver and self.latest_type == 'typing':
+            await self.handle_stop_typing()
+
         await self.channel_layer.group_discard(
             self.group_name,
             self.channel_name
@@ -54,6 +61,7 @@ class ChatRoomConsumer(AsyncWebsocketConsumer):
             return
 
         message_type = text_data_json.get('type')
+        self.latest_type = message_type
         if message_type == 'chat_message':
             await self.handle_chat_message(text_data_json)
         elif message_type == 'typing':
