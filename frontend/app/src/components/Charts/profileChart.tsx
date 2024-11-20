@@ -43,14 +43,15 @@ const ProfileChart = ({ user }) => {
 
   const options = {
     responsive: true,
+    maintainAspectRatio: false,
   };
 
   return (
-    <div className="flex-1  mt-8 w-full lg:mt-0 py-4 lg:w-1/3  overflow-hidden">
-        <div className="bg-gray-800/60 rounded-xl border border-violet-primary">
+    <div className="flex-1 h-full mt-8 w-full lg:mt-0 py-4 lg:w-1/3 ">
+        <div className="bg-gray-800/60 rounded-xl border border-violet-primary h-fit ">
           <p className="m-4 text-white text-2xl font-extrabold">STATS</p>
-          <div className='h-[300px]  w-full'>
-            <Bar data={data} options={options} />
+          <div className='h-fit lg:h-[300px]  w-full  flex justify-center items-center'>
+            <Bar data={data} options={options} className='h-full w-full p-2' />
           </div>
          </div>
     </div>

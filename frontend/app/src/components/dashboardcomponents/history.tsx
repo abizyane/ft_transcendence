@@ -2,6 +2,7 @@ import data from "@/app/data/Dashboarddata.json";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import Loader from "components/loader/loader";
+import { useUser } from "@/services/context/usercontext";
 
 interface User {
     name: string;
@@ -34,12 +35,12 @@ interface User {
     };
   }
 
-const history = ({id}: {id: number}) => {
-    const user = data.user;
+const History = () => {
     // const gameHistory = user.history;
     const [gameHistory, setGameHistory] = useState<Game[]>([]);
     const [loading, setLoading] = useState(false);
-
+    const {user:cUser, setUser} = useUser();
+    console.log(cUser);
     useEffect(() => {
       setLoading(true);
       fetch(`http://localhost:8000/api/games_history`, {
@@ -47,7 +48,7 @@ const history = ({id}: {id: number}) => {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ id: id }),
+        body: JSON.stringify({ id: cUser.id }),
         credentials: 'include',
       })
       .then(async (response) => {
@@ -64,7 +65,9 @@ const history = ({id}: {id: number}) => {
         // .catch((err) => setError(err.message))
         // .finally(() => setLoading(false));
 
-    }, [user.history]);
+    }, [cUser]);
+    if (!cUser)
+      return null;
     const renderGame = (game:Game) => (
       <div
         key={game.gameId}
@@ -80,9 +83,6 @@ const history = ({id}: {id: number}) => {
             <p className="font-bold text-white text-xs">
               {game.player.username}
             </p>
-            <p className="text-xs text-gray-400 text-nowrap">
-              @{game.player.username}
-            </p>
           </div>
         </div>
         <p className="font-semibold text-white text-center w-20 mx-4">
@@ -92,9 +92,6 @@ const history = ({id}: {id: number}) => {
           <div className="flex flex-col items-end">
             <p className="font-bold text-white text-xs">
               {game.opponent.username}
-            </p>
-            <p className="text-xs text-gray-400 text-nowrap">
-              @{game.opponent.username}
             </p>
           </div>
           <img
@@ -108,7 +105,7 @@ const history = ({id}: {id: number}) => {
   
     return (
       
-        <div className="mt-8 w-full lg:mt-0 py-4 lg:w-1/3 lg:flex lg:flex-col overflow-hidden">
+        <div className="mt-8 w-full lg:mt-0 pt-4 lg:pt-0 lg:h-[335px] 2xl:h-[360px] lg:w-full lg:flex lg:flex-col overflow-hidden"> 
           <div className="bg-gray-800/60 rounded-xl border border-violet-primary flex flex-col flex-1 ">
             <div className="m-2 flex justify-between items-center">
               <p className="m-2 text-white text-2xl font-extrabold">History</p>
@@ -147,5 +144,5 @@ const history = ({id}: {id: number}) => {
     );
   };
   
-  export default history;
+  export default History;
   
