@@ -32,6 +32,10 @@ const Page = () => {
         {
           setCompetitors(jsondata.competitors)
         }
+        else if (jsondata.command == "wait"){
+          console.log("not ready")
+          setReady(false)
+        }
       }
       else if (e.type == "update"){
 
