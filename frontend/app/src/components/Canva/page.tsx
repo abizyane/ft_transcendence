@@ -2,7 +2,7 @@
 import { useEffect, useState,useRef } from "react"
 import Game_Front from "./gameFront"
 
-export default function Canvas ({socketRef}){
+export default function Canvas ({socketRef, callback}){
     const canvasRef = useRef(null);
     const GameRef = useRef(null)
     const Context = useRef(null)
@@ -63,7 +63,16 @@ export default function Canvas ({socketRef}){
                     redPosRef.current = {x:floatArray[2],y:floatArray[3]}
                     ballRef.current = {x:floatArray[4], y:floatArray[5]}
                 } else {
-                    // console.log('Received non-binary data:', event.data);
+                    const jsondata = JSON.parse(e.data)
+                    if (jsondata.type == "room"){
+                        if (jsondata.command == "setReady"){
+                        callback(true)
+                        console.log("READY")
+                        } 
+                        else if (jsondata.command == "wait")
+                            callback(false)
+                        
+                    }
                 }
             };
         }
