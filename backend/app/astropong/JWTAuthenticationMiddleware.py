@@ -4,6 +4,10 @@ from rest_framework_simplejwt.tokens import AccessToken, RefreshToken
 from rest_framework_simplejwt.exceptions import TokenError, InvalidToken
 from django.contrib.auth.models import AnonymousUser
 import requests
+from django.core.cache import cache
+from django.contrib.auth import get_user_model
+
+User = get_user_model()
 class JWTAuthenticationMiddleware(MiddlewareMixin):
     def process_request(self, request):
         access_token = request.COOKIES.get('access')
@@ -11,11 +15,21 @@ class JWTAuthenticationMiddleware(MiddlewareMixin):
 
         if access_token:
             try:
-                AccessToken(access_token)
+                token = AccessToken(access_token)
                 request.META['HTTP_AUTHORIZATION'] = f'Bearer {access_token}'
+                user_id = token.get('user_id')
+
+                cached_user = cache.get(f"user_{user_id}")
+                if cached_user:
+                    request.user = cached_user
+                else:
+                    user = User.objects.get(id=user_id)
+                    cache.set(f"user_{user_id}", user, timeout=300)  # Cache for 5 minutes
+                    request.user = user
                 return
-            except TokenError:
-                pass 
+            except (TokenError, User.DoesNotExist):
+                pass
+
 
         if refresh_token:
             try:

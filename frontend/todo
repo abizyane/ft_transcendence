@@ -1,94 +1,24 @@
-landing page text div isghar
-
-login page 
-42 douwara
-inputs bg in register color 
-or continue with tsghar O majuscule
-register tsghar grey bahta underline
-bg login bhal registration
-inputs bhal design 
-registration page
-card khasha tkber bhal login o inputs hta homa 
-login tsghar grey bahta underline
-or continue with tsghar O majuscule
-42 douwara
-
-Dashboard
-mobile 
-font khassou ir9a9
-viewn all tsghar
-height top player
-icons friends
-bg components tkoun bhal design
-on md: cards ikbarou f width 
-bg-winrate biyad la winrate tsghar chwiya f big screens 
-colors dial icons itbdlou
-borders blach
-view all itbdel liha loun
-
-navbar
-search notif settings background bhal design
-pic tkoun dayra o point vert teht mnha o online thiyd 
-
-modes 
-invite friend bg bhal register
-modes ir9a9o
-o smiya tkoun ghlida 3la username
-
-
-maps 
-button play with default replace or choose another color 
-
-match making 
-card loun d register
-pic tsghar
-
-
-game page 
-image d player tkber 
-
-chat 
-loun zre9 itbdel b loun d register 
-o icon dial new twli + 
-o no messages yet blbiyad chwiya
-mobile 
-blasst send icon dial send 
-borders li hda input ithayd 
-bg dial register
-options tbdel tkoun b liyad  o hayd lbg tick tabler 
-
-ranking 
-bg bhal register 
-kber tswira 
-zid rank 
-
-
-costimuse scroll bar 
-
-
-what i need for user usecontext
-
-username
-pic
-status
-level
-
-
-other fetch for charts
-
-history topplayers friends
-
-
-when i block and deblock i can't see the profile from blocker and blocked
-block many times
-timestamp 
-serializer
-userid 
-online 
-pagination
-
-verify in hte socket if the curr user is one of the sender or receiver 
-
-verify the profile pic in converstation serializer
-
-verify id of sender to accept relationship
+History twila f mobile (ahmed)
+ranking page khkassha margin f top mobile (ahmed)
+regiter 42 makhdmach lboutouna (ahmed)
+blasst send icon dial send  (ahmed)
+costimuse scroll bar (ahmed)
+block many times (ismail)
+online (ahmed)
+replace http with https before push (ismail)
+props l game page (ahmed)
+merge with taha (game) (ahmed)
+tournament 3 (ahmed)
+dashboard (Desktop)(ahmed)
+history page (ahmed)
+settings responsive (ahmed)
+chart profil responsive(ahmed)
+search on chat  (ismail)
+connect to socket notif in the first layout  (ismail)
+connect to chat socket from the layout chat (ahmed)
+zid tswira dial fserializer dial chat dial  (achraf)
+chat new chat  (ahmed)
+chat pagination  (ismail)
+dropdown dial chat (ahmed)
+notifications (ahmed)
+update user profil when notif  (ahmed)

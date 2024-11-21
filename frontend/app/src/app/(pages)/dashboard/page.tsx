@@ -1,41 +1,77 @@
 "use client";
-import React from "react";
-import { useEffect, useState } from "react";
-import UserInfo from "@/components/dashboardcomponents/userinfo";
-import Linechart from "@/components/Charts/Linechart";
-import data from "@/app/data/Dashboarddata.json";
+import DoughnutChart from "@/components/Charts/Winrate";
+import Profil from "../../../../public/Profil.jpg";
 import History from "@/components/dashboardcomponents/history";
-import TopPlayers from "@/components/dashboardcomponents/topplayers";
-import Friends from "@/components/dashboardcomponents/friends";
-
+import LineChart from "../../../components/Charts/Linechart";
+import Data from "../../data/Dashboarddata.json";
+import { useUser } from "@/services/context/usercontext";
 
 const Dashboard = () => {
-
-  const user = data.user;
-  const values = user.charts.lineChart.data;
-  const gameHistory = user.history;
-
+  const { user: cUser } = useUser();
+  console.log(cUser);
+  if (!cUser) return null;
+  const winRatePercentage = 20;
   return (
     <>
-      <div className="flex flex-1  w-full px-1 overflow-hidden justify-center items-center">
-        <div className="flex-1 w-full flex flex-col items-center justify-center mb-14 mt-2 relative">
-          <div className="flex flex-col lg:flex-row w-full space-y-4 lg:space-y-0 lg:space-x-4">
-            <div className="bg-gray-800/60 backdrop-blur-sm rounded-xl lg:w-2/4 lg:border border-violet-primary mb-4 lg:mb-0">
-              <UserInfo />
-            </div>
-            <div className="bg-gray-800/60 backdrop-blur-sm  rounded-xl flex-1 border border-violet-primary">
-              <p className="m-2 text-white text-2xl p-4 font-extrabold w-full">
-                Experience Performance
-              </p>
-              <div className=" w-[90%] h-[90%] justify-center items-center">
-                <Linechart data={values} />
+      <div className="w-full mt-10 h-full">
+        <div className="p-10 flex flex-col  lg:gap-8 items-center w-full">
+          <div className="flex flex-col lg:flex-row lg:items-center lg:gap-8 w-full ">
+            <img
+              src={cUser.profile_pic_url}
+              alt="User pic"
+              className="rounded-full h-40 w-40 mx-auto lg:mx-0"
+            />
+            <div className="w-full lg:w-full flex flex-col">
+              <div className="w-full flex bg-gray-800/50 h-18 p-2 text-center mt-2 rounded-tl-2xl rounded-tr-2xl text-white">
+                <span className="w-1/3">Total Games</span>
+                <span className="w-1/3">Games won</span>
+                <span className="w-1/3">Games Losses</span>
+              </div>
+              <div className="w-full  bg-gray-800/50  h-18 p-2 rounded-bl-2xl rounded-br-2xl text-white">
+                <div className="border-t w-full flex text-center">
+                  <span className="w-1/3">20</span>
+                  <span className="w-1/3">11</span>
+                  <span className="w-1/3">9</span>
+                </div>
               </div>
             </div>
           </div>
-          <div className="flex flex-col lg:flex-row w-full space-y-4 lg:space-y-0 lg:space-x-4">
-            <History />
-            <TopPlayers />
-            <Friends/>
+
+          <div className="flex flex-col lg:flex-row lg:items-center lg:gap-8 w-full">
+            <div className="w-full lg:w-1/2 p-4 rounded-xl border border-violet-primary mt-4">
+              <div className="relative w-full h-full flex flex-col items-center justify-center bg-gray-800/20 rounded-xl p-4">
+                <p className="text-white font-mont xl:font-bold xl:text-lg text-xs m-1">
+                  Win Rate
+                </p>
+                <div className="relative w-full h-full flex items-center justify-center">
+                  <DoughnutChart winpercentage={winRatePercentage} />
+                </div>
+              </div>
+            </div>
+            <div className="w-full lg:w-1/2 ">
+              <div className="w-full flex flex-col ">
+                <div className="w-full flex bg-gray-800/50 h-18 p-2 text-center mt-2 rounded-tl-2xl rounded-tr-2xl text-white">
+                  <span className="w-1/2">Tournament Played</span>
+                  <span className="w-1/2">Tournament Won</span>
+                </div>
+                <div className="w-full flex bg-gray-800/50  h-18 p-2 rounded-bl-2xl rounded-br-2xl text-white">
+                  <div className="border-t w-full flex text-center">
+                    <span className="w-1/2">20</span>
+                    <span className="w-1/2">11</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div className="flex flex-col lg:flex-row lg:gap-8 w-full">
+            <div className="w-full lg:w-1/2 p-4 rounded-xl border border-violet-primary mt-4">
+              <h1 className="text-white text-center">Experience Performance</h1>
+              <LineChart data={Data.user.charts.lineChart.data} />
+            </div>
+            <div className="w-full lg:w-1/2  mt-4">
+              <History />
+            </div>
           </div>
         </div>
       </div>

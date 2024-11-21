@@ -25,7 +25,14 @@ const OAuthPage = () => {
             const data = await response.json();
   
             router.push(`/profile/${data.id}`);
-          } else {
+            
+          } else if (response.status === 403) {
+            const data = await response.json();
+            if (data.mfa_enabled) {
+              router.push(`/auth/mfa`);
+            }
+            
+          }else {
             const errorData = await response.json();
             router.push(`/login?error=${encodeURIComponent(errorData.message)}`);
           }

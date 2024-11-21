@@ -8,8 +8,9 @@ import Friends from "@/components/dashboardcomponents/friends";
 import { useParams, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { useUser } from "@/services/context/usercontext";
-
-
+import Loader from "components/loader/loader";
+import Legend from "../../../../../public/Legend.svg"
+import ProfileChart from "@/components/Charts/profileChart";
 
 const user = data.user;
 const values = user.charts.lineChart.data;
@@ -51,8 +52,8 @@ const Page = () => {
     }
   }, [userId, currentUser]);
 
-  if (userloading) return <p className="text-white">Loading...</p>;
-  if (loading) return <p>Loading...</p>;
+  if (userloading) return (<div className="w-full h-full flex justify-center items-center"><Loader/></div>);
+  if (loading) return (<div className="w-full h-full flex justify-center items-center"><Loader/></div>);
   if (error) return <p>Error: {error}</p>;
   if (!user) return <p>No user found.</p>;
   return (
@@ -64,15 +65,20 @@ const Page = () => {
         </div>
         <div className="bg-gray-800/60 backdrop-blur-sm  rounded-xl flex-1 border border-violet-primary">
           <p className="m-2 text-white text-2xl p-4 font-extrabold w-full">
-            Experience Performance
+              Rank
           </p>
-          <div className=" w-[90%] h-[90%] justify-center items-center">
-            <Linechart data={values} />
-          </div>
+          <div className="h-64  flex justify-center items-center">
+          <img
+            src={Legend.src}
+            alt="User Rank"
+            className="w-full h-full object-contain rounded-2xl"
+          />
+        </div>
         </div>
       </div>
       <div className="flex flex-col lg:flex-row w-full space-y-4 lg:space-y-0 lg:space-x-4">
-        <History />
+        {/* <History /> */}
+        <ProfileChart user={user} />
         <TopPlayers />
         <Friends user={user}/>
       </div>

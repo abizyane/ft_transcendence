@@ -13,13 +13,11 @@ import {
   DropdownMenuTrigger,
   DropdownMenuShortcut,
 } from "@/components/ui/dropdown-menu";
+import Loader from "components/loader/loader";
 
 
 const Friends = ({user}) => {
   const { friends, loading, error } = useFriendsof(user);
-  if (loading) {
-    return <div>Loading...</div>;
-  }
 
   if (error) {
     return <div className="text-red-500">{error}</div>;
@@ -37,7 +35,10 @@ const Friends = ({user}) => {
           </Link>
         </div>
 
-        {friends.length === 0 ? (
+        {loading ? <div className="w-full h-[252px] flex justify-center items-center">
+          <Loader/>
+        </div> : 
+        friends.length === 0 ? (
           <div className="w-full h-[252px] flex justify-center items-center">
             <p className="text-xl text-white-primary font-bold">
               No Data Found.
@@ -85,6 +86,7 @@ const Friends = ({user}) => {
               </div>
             ))
         )}
+        
       </div>
     </div>
   );

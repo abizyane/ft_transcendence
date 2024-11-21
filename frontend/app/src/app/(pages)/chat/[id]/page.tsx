@@ -1,38 +1,137 @@
 "use client";
 import { useUser } from "@/services/context/usercontext";
 import { useParams } from "next/navigation";
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
+import io from "socket.io-client";
+import { format, formatDistanceToNow, isToday } from "date-fns";
+import toast from "react-hot-toast";
+
+
+
 
 const UserChatPage = ({ currentUser, chatUser }) => {
   const [messages, setMessages] = useState([]);
   const [input, setInput] = useState("");
+  const [ws, setWs] = useState(null);
   const { username, profile_pic_url, is_online, id } = currentUser;
-  useEffect(() => {
-    setMessages(chatUser.messages);
-  });
+  const [typing, setTyping] = useState(false);
+  const [timeoutTyping, setTimeoutTyping] = useState(undefined);
+  const messageContainerRef = useRef(null);
 
-  
-  const handleSendMessage = () => {
-    if (input.trim()) {
-      const newMessage = {
-        text: input, 
-        sender: currentUser.username, 
-        timestamp: new Date().toLocaleTimeString(), 
-      };
-      setMessages((prevMessages) => [...prevMessages, newMessage]); 
-      setInput("");
+
+  const scrollToBottom = () => {
+    if (messageContainerRef.current) {
+      messageContainerRef.current.scrollTop = messageContainerRef.current.scrollHeight;
     }
   };
-  console.log("test");
+  useEffect(() => {
+    const socket = new WebSocket(
+      `ws://localhost:8000/ws/chat/room/`
+    );
+    setWs(socket);
+    socket.onopen = () => {
+      console.log("Connected to WebSocket");
+    };
+    socket.onmessage = (event) => {
+      console.log(event);
+      if (event.type == "message")
+      {
+
+          const data = JSON.parse(event.data);
+          if (data.type == "chat_message")
+          {
+            setMessages((prevMessages) => [data.message, ...prevMessages]);
+            console.log(messages);
+            setTyping(false);
+          }
+          else if (data.type == "typing")
+          {
+            setTyping(true);
+          }
+          else if (data.type == "stop_typing")
+          {
+            setTyping(false);
+          }
+          else if (data.message == "You must be friends in order to chat.")
+          {
+            toast.error("You must be friends in order to chat.");
+          }
+          scrollToBottom();
+      }
+    };
+    socket.onclose = () => {
+      console.log("Disconnected from WebSocket");
+    };
+    return () => {
+      socket.close();
+    };
+  }, [currentUser.username, chatUser.user.username]);
+  
+  useEffect(() => {
+    if (chatUser?.messages?.length > 0) {
+      setMessages(chatUser.messages);
+    }
+
+  }, [chatUser.messages]);
+  
+  const handleSendMessage = () => {
+    if (input.trim() && ws?.readyState === WebSocket.OPEN) {
+      const newMessage = {
+        message: input,
+        sender: currentUser.username,
+        receiver: chatUser.user.username,
+        type: "chat_message",
+        timestamp: new Date().toISOString(),
+      };
+
+      ws.send(JSON.stringify(newMessage));
+      setMessages((prevMessages) => [newMessage, ...prevMessages]);
+      setInput("");
+    } else {
+      console.log("WebSocket is not open.");
+    }
+  };
+
+
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    console.log('Key Pressed:', e.key);
+    e.stopPropagation();
+    ws.send(JSON.stringify({
+      type: "typing",
+      sender: currentUser.username,
+      receiver: chatUser.user.username
+    }));
+    if (timeoutTyping) {
+      clearTimeout(timeoutTyping);
+    }
+    setTimeoutTyping(setTimeout(() => {
+      ws.send(JSON.stringify({
+        type: "stop_typing",
+        sender: currentUser.username,
+        receiver: chatUser.user.username,
+      }));
+    }, 1000));
+
+
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      handleSendMessage(); 
+    }
+  };
+  useEffect(()=>{
+    if (messageContainerRef.current) {
+      messageContainerRef.current.scrollTop = messageContainerRef.current.scrollHeight;
+    }
+  },[messages]);
+
   return (
     <div className="h-full">
-      <main className="flex-grow flex flex-row min-h-full">
+      <main className="flex-grow flex flex-row h-fit">
         <section className="flex flex-col flex-auto border-l border-gray-800">
-
-          <div className="chat-body p-4  h-[630px] overflow-y-scroll">
+          <div className=" p-4  h-[640px] overflow-y-scroll" ref={messageContainerRef}>
             {messages
-              .slice(0)
-              .reverse()
+            .slice(0)
+            .reverse()
               .map((msg, index) => (
                 <div
                   key={index}
@@ -43,7 +142,7 @@ const UserChatPage = ({ currentUser, chatUser }) => {
                   }`}
                 >
                   <div
-                    className={`messages text-sm ${
+                    className={`text-sm ${
                       msg.sender === currentUser.username
                         ? "text-white"
                         : "text-gray-700"
@@ -57,26 +156,38 @@ const UserChatPage = ({ currentUser, chatUser }) => {
                       }`}
                     >
                       <p
-                        className={`px-6 py-3 m-1 rounded-full ${
+                        className={`px-6 py-3 m-1 rounded-3xl max-w-xs lg:max-w-sm break-words whitespace-pre-wrap ${
                           msg.sender === currentUser.username
                             ? "bg-violet-primary"
                             : "bg-white"
-                        } max-w-xs lg:max-w-md`}
-                      >
+                        }`}
+                        >
                         {msg.message}
+                        <span className={` m-2 text-center w-full text-sm text-gray-500 ${ msg.sender === currentUser.username
+                        ? "order-first"
+                        : "bg-white justify-self-end"
+                      }`}>
+                              <span className="text-[10px] text-gray-500">
+                      {isToday(new Date(msg.timestamp))
+                      ? format(new Date(msg.timestamp), "hh:mm a")
+                      : format(new Date(msg.timestamp), "MMM dd")}
+                      </span>
+                      </span>
                       </p>
                     </div>
                   </div>
                 </div>
               ))}
-            <p className="p-4 text-center text-sm text-gray-500">
-              {messages.length
-                ? messages[messages.length - 1].timestamp
-                : "No messages yet"}
-            </p>
+              {typing ? <div className="bg-white rounded-3xl h-11 w-16 flex items-center justify-center">
+                  <div className="flex space-x-1">
+                    <div className="dot bg-gray-900 rounded-full h-2 w-2"></div>
+                    <div className="dot bg-gray-900 rounded-full h-2 w-2"></div>
+                    <div className="dot bg-gray-900 rounded-full h-2 w-2"></div>
+                  </div>
+                </div> : <></>}
           </div>
 
-          <div className="chat-footer h-fit">
+          <div className="h-fit">
             <div className="relative flex-grow">
               <label className="flex items-center">
                 <input
@@ -85,6 +196,7 @@ const UserChatPage = ({ currentUser, chatUser }) => {
                   value={input}
                   onChange={(e) => setInput(e.target.value)}
                   placeholder="Write your message"
+                  onKeyDown={handleKeyDown}
                 />
                 <button
                   type="button"
@@ -101,7 +213,6 @@ const UserChatPage = ({ currentUser, chatUser }) => {
     </div>
   );
 };
-
 
 export default function Page() {
   const chatUserid = useParams();
@@ -126,7 +237,6 @@ export default function Page() {
         }
 
         const data = await response.json();
-        console.log("here", data);
         setChatUser(data);
       } catch (err) {
         setError(err.message);

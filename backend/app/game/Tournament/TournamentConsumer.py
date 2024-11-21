@@ -22,6 +22,10 @@ class TournamentConsumer(AsyncWebsocketConsumer):
         user = self.scope['user']
         #get_user_info
         await self.accept()
+        await self.send(text_data=json.dumps({
+            "test": self.scope['user'].username
+        }))
+        
         self.p_holder = PlayerHolder(Competitor(self.channel_name))
         set_competitor_info(self.p_holder.competitor, name=user.username)
         self._type = self.scope['url_route']['kwargs']['competition_type']

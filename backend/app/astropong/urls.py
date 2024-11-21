@@ -7,14 +7,15 @@ from .views.auth.OAuth import OAuth, OAuthCallback
 from .views.auth.auth_user import UserView,MFAView, UsersView, ChangePasswordView, UserIdView, UploadProfilePicView
 from .views.auth.refresh import RefreshTokenView
 from .views.friends.friends import AddFriendView, ListFriendView, AcceptFriendRequestView, RemoveFriendView, RejectFriendRequestView,FriendsOfView, BlockFriendView,UnblockFriendView, BlockedUsersList
+from .views.dashboard.dashboard import GamesHistoryView, PlayerRanking, PlayerWinRateView, TopPlayersView
 
 urlpatterns = [
-    path('register', RegisterView.as_view()),
-    path('login', LoginView.as_view()),
+    path('register', RegisterView.as_view(), name='register'),
+    path('login', LoginView.as_view(), name='login'),
     path('logout', LogoutView.as_view()),
-    path('42OAuth', OAuth.as_view()),
-    path('42OAuth/callback', OAuthCallback.as_view()),
-    path('2fa_code', MFAView.as_view()),
+    path('42OAuth', OAuth.as_view(), name="42OAuth"),
+    path('42OAuth/callback', OAuthCallback.as_view(), name="42OAuth/callback"),
+    path('2fa_code', MFAView.as_view(), name='2fa_code'),
 
     path('user', UserView.as_view()),
     path('refresh', RefreshTokenView.as_view()),
@@ -35,5 +36,10 @@ urlpatterns = [
     path('accept_friend', AcceptFriendRequestView.as_view(), name='accept_friend'),
     path('reject_friend', RejectFriendRequestView.as_view(), name='reject_friend'),
     path('remove_friend', RemoveFriendView.as_view(), name='remove_friend'),
+
+    path('games_history', GamesHistoryView.as_view(), name='games_history'),
+    path('win_rate', PlayerWinRateView.as_view(), name='win_rate'),
+    path('top_players', TopPlayersView.as_view(), name='top_players'),
+    path('ranking', PlayerRanking.as_view(), name='ranking'),
 
 ]
