@@ -2,7 +2,7 @@
 import { useEffect, useState,useRef } from "react"
 import Game_Front from "./gameFront"
 
-export default function Canvas ({socketRef}){
+export default function Canvas ({socketRef, callback}){
     const canvasRef = useRef(null);
     const GameRef = useRef(null)
     const Context = useRef(null)
@@ -64,6 +64,15 @@ export default function Canvas ({socketRef}){
                     ballRef.current = {x:floatArray[4], y:floatArray[5]}
                 } else {
                     // console.log('Received non-binary data:', event.data);
+                    const jsondata = JSON.parse(event.data)
+                    if (jsondata.command == "setReady"){
+                        callback(true)
+                        console.log("READY")
+                      }
+                      else if (jsondata.command == "wait"){
+                        console.log("not ready")
+                        callback(false)
+                      }
                 }
             };
         }
@@ -87,17 +96,24 @@ export default function Canvas ({socketRef}){
         if (!GameRef.current)
             GameRef.current = new Game_Front(canvas, {player_one: {posX:bluePosRef.current.x, posY: 3, width: 12, height:50, color: 'blue'}, player_two:{posX:redPosRef.current.x, posY: 3, width: 12, height:50, color: 'red'}, ball:{}})
 
-        }, [])
+        }, [callback])
         
     useEffect(() => {
+        let animationFrameId = null
         const game_loop = () =>{
-            Context.current.clearRect(0,0, canvasRef.current.width, canvasRef.current.height)
-            GameRef.current.update({player_1: bluePosRef.current, player_2: redPosRef.current, ball: ballRef.current})
-            GameRef.current.render(Context.current)
-            requestAnimationFrame(game_loop)
-        }
-        requestAnimationFrame(game_loop)
-    },[])
+                if (canvasRef.current != null && Context.current != null){
+                    Context.current.clearRect(0,0, canvasRef.current.width, canvasRef.current.height)
+                    GameRef.current.update({player_1: bluePosRef.current, player_2: redPosRef.current, ball: ballRef.current})
+                    GameRef.current.render(Context.current)
+                    requestAnimationFrame(game_loop)
+                }
+            }
+            animationFrameId = requestAnimationFrame(game_loop); 
+            return () => {
+                cancelAnimationFrame(animationFrameId);
+            };
+        
+    },[callback])
 
     return (
         <canvas tabIndex={1} ref={canvasRef} className="w-full h-full "></canvas>
