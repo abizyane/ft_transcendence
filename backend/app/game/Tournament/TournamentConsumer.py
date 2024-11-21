@@ -119,12 +119,12 @@ class TournamentConsumer(AsyncWebsocketConsumer):
             # self.p_holder.paddle = None
             self.p_holder.upgrade() # if err mean he won
             gc.collect()
+            await self.channel_layer.group_send(prev_match_name,{
+                'type' : 'room.update',
+            })
             self.match = self.room.tournament.get_player_match(self.channel_name)
             self.match_name = str(f'{self.room.name}m_{self.match.index}')
             #send room state to every one in match
-            await self.channel_layer.group_send(self.match_name,{
-                'type' : 'room.update',
-            })
             #
             await self.channel_layer.group_add(self.match_name, self.channel_name)
             if self.p_holder.back.is_ready():
