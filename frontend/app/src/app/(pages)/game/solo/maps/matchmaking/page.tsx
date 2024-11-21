@@ -1,7 +1,9 @@
+"use client"
 import Mars from "../../../../../../../public/Mars.jpeg";
 import VS from "../../../../../../../public/VS.jpeg";
 import Link from "next/link";
-
+import Canvas from "@/components/Canva/page";
+import { useEffect, useRef, useState } from "react";
 // Sample users data
 const users = [
   {
@@ -21,7 +23,43 @@ const users = [
 ];
 
 const Page = () => {
+  const [gameready, setReady] = useState(false)
+  const socketRef = useRef(null)
+
+  useEffect(()=>{
+    socketRef.current = new WebSocket("ws://localhost:8000/ws/tournament/TWO/")
+    socketRef.current.onopen = () =>{
+      console.log("ws connected")
+    }
+
+    socketRef.current.onclose = (e) =>{
+      console.log("ws closed")
+    }
+
+    return (()=>{
+      socketRef.current.close()
+    })
+  }, [])
+
+  useEffect(() =>{
+    socketRef.current.onmessage = (e) => {
+      if (e.data instanceof Blob){
+      }else{
+        const data = JSON.parse(e.data)
+        if (data.type == 'room'){
+          if (data.command == "setReady")
+            setReady(true)
+          else if (data.command == "wait")
+            setReady(false)
+        }
+      }
+    }
+  }, [socketRef])
+
   return (
+    <>
+    {
+    gameready ? <Canvas socketRef={socketRef} callback={setReady}/> :
     <div className=" flex flex-col lg:flex-row gap-4   lg:gap-24 items-center justify-center lg:w-fit h-fit ">
       <div className="bg-[rgba(145,145,145,0.23)] p-4 rounded-lg flex flex-col items-center lg:min-h-[500px] lg:min-w-[300px]  md:min-h-[300px] md:min-w-[300px] m-2">
         <img
@@ -80,7 +118,8 @@ const Page = () => {
       </div>
       <Link href="matchmaking/ponggame" className="bg-blue-500 text-blue-800"> <button>start</button> </Link>
     </div>
-  );
+  }
+  </>);
 };
 
 export default Page;
