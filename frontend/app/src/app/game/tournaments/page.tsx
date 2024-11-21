@@ -35,7 +35,7 @@ const Page = () => {
         }
         else if (jsondata.command == "wait")
           {
-
+            console.log("Not ready")
             setReady(false)
           }
       }

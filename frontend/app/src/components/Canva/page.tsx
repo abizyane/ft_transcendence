@@ -63,15 +63,15 @@ export default function Canvas ({socketRef, callback}){
                     redPosRef.current = {x:floatArray[2],y:floatArray[3]}
                     ballRef.current = {x:floatArray[4], y:floatArray[5]}
                 } else {
-                    // const jsondata = JSON.parse(event.data)
-                    // if (jsondata.type == "room"){
-                    //     if (jsondata.command == "setReady"){
-                    //     callback(true)
-                    //     console.log("READY")
-                    //     } 
-                    //     else if (jsondata.command == "wait")
-                    //         callback(false)       
-                    // }
+                    const jsondata = JSON.parse(event.data)
+                    if (jsondata.type == "room"){
+                        if (jsondata.command == "setReady"){
+                        callback(true)
+                        console.log("READY")
+                        } 
+                        else if (jsondata.command == "wait")
+                            callback(false)       
+                    }
                 }
             };
         }
@@ -100,7 +100,7 @@ export default function Canvas ({socketRef, callback}){
         }, [])
         
     useEffect(() => {
-        if (canvasRef.current){
+        if (canvasRef.current != null){
             const game_loop = () =>{
                 Context.current.clearRect(0,0, canvasRef.current.width, canvasRef.current.height)
                 GameRef.current.update({player_1: bluePosRef.current, player_2: redPosRef.current, ball: ballRef.current})
