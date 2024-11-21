@@ -23,17 +23,21 @@ const Page = () => {
 
     ws.current.onmessage = (e) => {
       const jsondata = JSON.parse(e.data)
+      console.log(jsondata)
       if (jsondata.type == "room"){
         if (jsondata.command == "setReady"){
-          setReady(true)
           console.log("READY")
+          setReady(true)
         }
         else if (jsondata.command == "setCompetitors")
         {
           setCompetitors(jsondata.competitors)
         }
         else if (jsondata.command == "wait")
-          setReady(false)
+          {
+
+            setReady(false)
+          }
       }
       else if (e.type == "update"){
 

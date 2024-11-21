@@ -63,16 +63,15 @@ export default function Canvas ({socketRef, callback}){
                     redPosRef.current = {x:floatArray[2],y:floatArray[3]}
                     ballRef.current = {x:floatArray[4], y:floatArray[5]}
                 } else {
-                    const jsondata = JSON.parse(e.data)
-                    if (jsondata.type == "room"){
-                        if (jsondata.command == "setReady"){
-                        callback(true)
-                        console.log("READY")
-                        } 
-                        else if (jsondata.command == "wait")
-                            callback(false)
-                        
-                    }
+                    // const jsondata = JSON.parse(event.data)
+                    // if (jsondata.type == "room"){
+                    //     if (jsondata.command == "setReady"){
+                    //     callback(true)
+                    //     console.log("READY")
+                    //     } 
+                    //     else if (jsondata.command == "wait")
+                    //         callback(false)       
+                    // }
                 }
             };
         }
@@ -90,22 +89,26 @@ export default function Canvas ({socketRef, callback}){
     let lastTime = 0
     useEffect(()=>{
         const canvas = canvasRef.current
-        canvas.width = 1080
-        canvas.height = 720
-        Context.current = canvas.getContext('2d');
-        if (!GameRef.current)
-            GameRef.current = new Game_Front(canvas, {player_one: {posX:bluePosRef.current.x, posY: 3, width: 12, height:50, color: 'blue'}, player_two:{posX:redPosRef.current.x, posY: 3, width: 12, height:50, color: 'red'}, ball:{}})
+        if (canvas){
+            canvas.width = 1080
+            canvas.height = 720
+            Context.current = canvas.getContext('2d');
+            if (!GameRef.current)
+                GameRef.current = new Game_Front(canvas, {player_one: {posX:bluePosRef.current.x, posY: 3, width: 12, height:50, color: 'blue'}, player_two:{posX:redPosRef.current.x, posY: 3, width: 12, height:50, color: 'red'}, ball:{}})
+        }
 
         }, [])
         
     useEffect(() => {
-        const game_loop = () =>{
-            Context.current.clearRect(0,0, canvasRef.current.width, canvasRef.current.height)
-            GameRef.current.update({player_1: bluePosRef.current, player_2: redPosRef.current, ball: ballRef.current})
-            GameRef.current.render(Context.current)
+        if (canvasRef.current){
+            const game_loop = () =>{
+                Context.current.clearRect(0,0, canvasRef.current.width, canvasRef.current.height)
+                GameRef.current.update({player_1: bluePosRef.current, player_2: redPosRef.current, ball: ballRef.current})
+                GameRef.current.render(Context.current)
+                requestAnimationFrame(game_loop)
+            }
             requestAnimationFrame(game_loop)
         }
-        requestAnimationFrame(game_loop)
     },[])
 
     return (

@@ -97,7 +97,7 @@ class TournamentConsumer(AsyncWebsocketConsumer):
         self.game.status = 1
         print(self.match.state)
         await self.channel_layer.group_send(self.match_name,{
-            'type' : 'finalize_match'
+            'type' : 'finalize.match'
         })
 
     async def finalize_match(self, event):
@@ -123,7 +123,7 @@ class TournamentConsumer(AsyncWebsocketConsumer):
             self.match_name = str(f'{self.room.name}m_{self.match.index}')
             #send room state to every one in match
             await self.channel_layer.group_send(self.match_name,{
-                'type' : 'room_update',
+                'type' : 'room.update',
             })
             #
             await self.channel_layer.group_add(self.match_name, self.channel_name)
