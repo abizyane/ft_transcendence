@@ -26,25 +26,38 @@ class NotificationConsumer(AsyncWebsocketConsumer):
             self.group_name,
             self.channel_name
         )
+        await self.close()
 
     async def receive(self, text_data):
         text_data_json = self.validate_json(text_data)
         if not text_data_json:
             return
         
-        notification_id = text_data_json['notification_id']
-        await self.mark_notification_as_seen(notification_id)
+        if text_data_json['type'] == 'mark_as_seen':
+            notification_id = text_data_json['notification_id']
+            await self.mark_notification_as_seen(notification_id)
+        elif text_data_json['type'] == 'all_seen':
+            await self.mark_all_notifications_as_seen()
+        else:
+            await self.send_error(f"Invalid message type: {text_data_json['type']}")
 
     @database_sync_to_async
     def mark_notification_as_seen(self, notification_id):
         try:
-            notification = Notifications.objects.get(notification_id=notification_id)
-            notification.seen = True
-            notification.save()
+            Notifications.objects.filter(notification_id=notification_id).update(seen=True)
         except Notifications.DoesNotExist:
             self.send(text_data=json.dumps({
                 'error': 'Notification does not exist'
         }))
+
+    @database_sync_to_async
+    def mark_all_notifications_as_seen(self):
+        try:
+            Notifications.objects.filter(user=self.scope['user'], seen=False).update(seen=True)
+        except Notifications.DoesNotExist:
+            self.send(text_data=json.dumps({
+                'error': 'No notifications to mark as seen'
+            }))
 
     @database_sync_to_async
     def create_notification(self, receiver, type, content):

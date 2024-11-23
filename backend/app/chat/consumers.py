@@ -5,12 +5,14 @@ from django.db.models import Q
 from .models import Message
 from astropong.models.UserModel import User, Relationship
 from .serializers import MessageConsumerSerializer, UserSerializer
-from channels.layers import get_channel_layer
-from datetime import datetime
 
 class ChatRoomConsumer(AsyncWebsocketConsumer):
     async def connect(self):
-        self.room_group_name = "chat_room"
+        self.group_name = "chat_room"
+        
+        self.sender = None
+        self.receiver = None
+        self.latest_type = None
 
         user = self.scope["user"]
         if user.is_anonymous or not user.is_authenticated:
@@ -20,14 +22,17 @@ class ChatRoomConsumer(AsyncWebsocketConsumer):
             return
 
         await self.channel_layer.group_add(
-            self.room_group_name,
+            self.group_name,
             self.channel_name
         )
         await self.accept()
 
     async def disconnect(self, close_code):
+        if self.sender and self.receiver and self.latest_type == 'typing':
+            await self.handle_stop_typing()
+
         await self.channel_layer.group_discard(
-            self.room_group_name,
+            self.group_name,
             self.channel_name
         )
         await self.close()
@@ -56,6 +61,7 @@ class ChatRoomConsumer(AsyncWebsocketConsumer):
             return
 
         message_type = text_data_json.get('type')
+        self.latest_type = message_type
         if message_type == 'chat_message':
             await self.handle_chat_message(text_data_json)
         elif message_type == 'typing':
@@ -152,8 +158,7 @@ class ChatRoomConsumer(AsyncWebsocketConsumer):
         }))
 
     async def send_notification(self, sender, receiver):
-        channel_layer = get_channel_layer()
-        await channel_layer.group_send(
+        await self.channel_layer.group_send(
             'notifications_' + receiver.username,
             {
                 'type': 'notification',
@@ -163,9 +168,31 @@ class ChatRoomConsumer(AsyncWebsocketConsumer):
             }
         )
 
+    async def validate_json(self, text_data):
+        try:
+            return json.loads(text_data)
+        except json.JSONDecodeError:
+            await self.send_error(f"Invalid JSON: {text_data}")
+            return None
+
+    async def get_users(self):
+        sender = await self.get_user(self.sender)
+        receiver = await self.get_user(self.receiver)
+        return sender, receiver
+
+    async def send_error(self, error_message):
+        await self.send(text_data=json.dumps({
+            'message': error_message,
+            'type': 'error',
+        }))
+
     @database_sync_to_async
     def get_online_users(self):
-        return User.objects.filter(is_online=True)
+        friends_relationships = Relationship.objects.filter(Q(user1=self.scope['user']) | Q(user2=self.scope['user']), status=Relationship.Status.FRIEND)
+        friends_usernames = [relationship.user1.username if relationship.user1 != self.scope['user'] else relationship.user2.username for relationship in friends_relationships]
+        online_users = User.objects.filter(username__in=friends_usernames, is_online=True)
+        return online_users
+
 
     @database_sync_to_async
     def delete_message(self, message_id):
@@ -195,21 +222,3 @@ class ChatRoomConsumer(AsyncWebsocketConsumer):
             receiver=receiver,
             message=message
         )
-
-    async def validate_json(self, text_data):
-        try:
-            return json.loads(text_data)
-        except json.JSONDecodeError:
-            await self.send_error(f"Invalid JSON: {text_data}")
-            return None
-
-    async def get_users(self):
-        sender = await self.get_user(self.sender)
-        receiver = await self.get_user(self.receiver)
-        return sender, receiver
-
-    async def send_error(self, error_message):
-        await self.send(text_data=json.dumps({
-            'message': error_message,
-            'type': 'error',
-        }))

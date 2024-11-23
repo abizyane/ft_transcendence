@@ -20,7 +20,15 @@ class TournamentConsumer(AsyncWebsocketConsumer):
     _id = 0
     async def connect(self):
         user = self.scope['user']
-        #get_user_info
+        if user.is_anonymous or not user.is_authenticated:
+            await self.accept()
+            await self.send(text_data=json.dumps({
+                "msg" : f"{user} is not authenticated.",
+                "type" : "error"
+            }))
+            await self.close()
+            return
+
         await self.accept()
         await self.send(text_data=json.dumps({
             "test": self.scope['user'].username

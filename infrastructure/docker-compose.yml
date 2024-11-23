@@ -50,12 +50,15 @@ services:
     restart: always
 
   database:
-    image: postgres:13
+    build:
+      context: ./database
+      dockerfile: Dockerfile
+    image: database:sa
     container_name: ${POSTGRES_HOST}
     volumes:
       - ./database/data:/var/lib/postgresql/data
-    ports:
-      - "5432:5432"
+    expose:
+      - "5432"
     env_file:
       - .env
     networks:

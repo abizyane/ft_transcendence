@@ -1,6 +1,6 @@
 from abc import ABC, abstractmethod
 from .matchHolder import Holder, MatchHolder, PlayerHolder
-
+from .competitor import Competitor
 
 class Tournament():
     def __init__(self):
