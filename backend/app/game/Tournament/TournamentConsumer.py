@@ -9,9 +9,10 @@ from ..game_utils import Game, Player
 import gc
 import numpy as np
 
-def set_competitor_info(competitor, name, img=None):
+def set_competitor_info(competitor, name, img, userId):
     competitor.name = name
-    competitor.img = 'https://static.wikia.nocookie.net/pokemon/images/2/2b/0057.png/revision/latest?cb=20241005055710'
+    competitor.img = img
+    competitor.user_id = userId
 
 class TournamentConsumer(AsyncWebsocketConsumer):
     rm = RoomListManager()
@@ -33,9 +34,10 @@ class TournamentConsumer(AsyncWebsocketConsumer):
         await self.send(text_data=json.dumps({
             "test": self.scope['user'].username
         }))
+        print(self.scope['user'].__dict__, flush=True)
         
         self.p_holder = PlayerHolder(Competitor(self.channel_name))
-        set_competitor_info(self.p_holder.competitor, name=user.username)
+        set_competitor_info(self.p_holder.competitor, name=user.username, img=user.profile_pic, userId=user.id)
         self._type = self.scope['url_route']['kwargs']['competition_type']
         self.room:Room = None
         self.match = None
@@ -228,3 +230,5 @@ class TournamentConsumer(AsyncWebsocketConsumer):
         self.p_holder.paddle.win_state = "WIN"
         await self.send(text_data=json.dumps({'msg' : f'{event["player"]} is left'}))
         self.game.status = 1
+    
+    # async def get_user_info(self)

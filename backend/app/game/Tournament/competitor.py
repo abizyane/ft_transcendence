@@ -24,6 +24,7 @@ class Competitor(AbstractCompetitor):
         self._type = ''
         self._state = None
         self.img = ''
+        self.user_id = None
         self.islost = False
     """
         Comptitor should ask manager for Type of Tournament He wanna join
@@ -57,7 +58,7 @@ class Competitor(AbstractCompetitor):
             'username' : self.name,
             'imgUrl' : self.img,
             'lost' : self.islost,
-            'id' : self._id,
+            'id' : self.user_id,
         }
     
     def get_allroom_info(self):
