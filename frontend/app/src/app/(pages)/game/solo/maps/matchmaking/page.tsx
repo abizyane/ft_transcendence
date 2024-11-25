@@ -24,15 +24,26 @@ import { useEffect, useRef, useState } from "react";
 
 const defaultCompetitors = [
   {
-    id: 1,
+    id: 0,
     name: "",
     username: "",
-    profilePic:"",
+    profilePic:"../../../../../Profil.jpg",
     score: 0,
     level: 0,
     xp:0
   },
   {
+    id: 1,
+    name: "",
+    username: "",
+    profilePic:"../../../../../Profil.jpg",
+    score: 0,
+    level:0,
+    xp:0
+  },
+]
+
+const defaultUser ={
     id: 2,
     name: "",
     username: "",
@@ -40,9 +51,10 @@ const defaultCompetitors = [
     score: 0,
     level:0,
     xp:0
-  },
-]
+  }
+
 function Avatar({user}){
+  return(
   <div className="bg-[rgba(145,145,145,0.23)] p-4 rounded-lg flex flex-col items-center lg:min-h-[500px] lg:min-w-[300px]  md:min-h-[300px] md:min-w-[300px] m-2">
         <img
           src={user.profilePic}
@@ -50,7 +62,7 @@ function Avatar({user}){
           className="w-16 h-16 lg:w-72 lg:h-72 object-cover rounded-full mb-2"
         />
         <span className="text-lg text-nowrap text-white font-semibold pt-4">
-          {user.name}
+          {user.username}
         </span>
         <div className="flex flex-col border-[2px] border-gray-400 rounded-xl m-9 w-full p-2">
           <p className="text-white font-semibold text-xs justify-start flex m-1">
@@ -66,7 +78,7 @@ function Avatar({user}){
             {user.xp} xp
           </p>
         </div>
-  </div>
+  </div>)
 }
 
 
@@ -74,14 +86,17 @@ const Page = () => {
   const [gameready, setReady] = useState(false)
   const socketRef = useRef(null)
   const [users, setCompetitors] = useState(defaultCompetitors)
+  let indexId = 0
 
   const updateCompetitors = (competitor) => {
-    const nextCompetitors = users.map(c => {
+    
+    const nextCompetitors = users.map((c) =>{
       if (c.id == competitor.id)
         return competitor
       else
         return c
     })
+    console.log(nextCompetitors)
     setCompetitors(nextCompetitors)
   }
 
@@ -105,11 +120,16 @@ const Page = () => {
       if (e.data instanceof Blob){
       }else{
         const data = JSON.parse(e.data)
+        console.log("yo",data)
         if (data.type == 'room'){
           if (data.command == "setReady")
             setReady(true)
           else if (data.command == "wait")
             setReady(false)
+          if (data.competitors){
+            updateCompetitors(data.competitors[indexId])
+            // indexId++
+          }
         }
       }
     }

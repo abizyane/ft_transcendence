@@ -9,16 +9,17 @@ from ..game_utils import Game, Player
 import gc
 import numpy as np
 
-def set_competitor_info(competitor, name, img, userId):
-    competitor.name = name
-    competitor.img = img
-    competitor.user_id = userId
 
 class TournamentConsumer(AsyncWebsocketConsumer):
     rm = RoomListManager()
     rooms = {}
     i = 0
     _id = 0
+    def set_competitor_info(self,username, img, userId):
+        self.p_holder.competitor.username = username
+        self.p_holder.competitor.img = img
+        self.p_holder.competitor.user_id = userId
+    
     async def connect(self):
         user = self.scope['user']
         if user.is_anonymous or not user.is_authenticated:
@@ -31,13 +32,8 @@ class TournamentConsumer(AsyncWebsocketConsumer):
             return
 
         await self.accept()
-        await self.send(text_data=json.dumps({
-            "test": self.scope['user'].username
-        }))
-        print(self.scope['user'].__dict__, flush=True)
-        
         self.p_holder = PlayerHolder(Competitor(self.channel_name))
-        set_competitor_info(self.p_holder.competitor, name=user.username, img=user.profile_pic, userId=user.id)
+        self.set_competitor_info(username=user.username, img=user.profile_pic, userId=user.id)
         self._type = self.scope['url_route']['kwargs']['competition_type']
         self.room:Room = None
         self.match = None
@@ -49,11 +45,10 @@ class TournamentConsumer(AsyncWebsocketConsumer):
         self.room.tournament.p_holders[self.channel_name] = self.p_holder
         await self.channel_layer.group_add((self.room.name), self.channel_name)
         await self.channel_layer.group_send(self.room.name, {
-            "type" : "joined.competitor.data",
-            "competitor" : self.p_holder.competitor.__dict__['name'],
-            "currentsize" : str(self.room.size),
+            "type" : "joined.competitor",
         })
         if self.room.is_ready():
+            await asyncio.sleep(3)
             TournamentConsumer.rm.switch_to_ready(self.room)
             competitors_gen = iter(list(self.room.tournament.p_holders.values()))
             self.room.holder = MatchTreeBuilder.build_tree(MatchHolder(),0, 1, competitors_gen, self.room.size)
@@ -187,12 +182,10 @@ class TournamentConsumer(AsyncWebsocketConsumer):
         f_arr = np.array(float_list, dtype=np.float32).tobytes()
         await self.send(bytes_data=f_arr)
     
-    async def joined_competitor_data(self, event):
+    async def joined_competitor(self, event):
         comp_info = self.p_holder.competitor.get_allroom_info()
         await self.send(text_data=json.dumps({
             "type" : "room",
-            "msg" : event['competitor'],
-            "size" : event['currentsize'],
             "competitors" : comp_info,
             "command" : "setCompetitors"
         }))

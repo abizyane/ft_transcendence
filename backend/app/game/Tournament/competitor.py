@@ -55,15 +55,15 @@ class Competitor(AbstractCompetitor):
 
     def get_info(self):
         return {
-            'username' : self.name,
-            'imgUrl' : self.img,
+            'username' : self.username,
+            'profilePic' : self.img,
             'lost' : self.islost,
-            'id' : self.user_id,
+            'id' : self._id,
         }
     
     def get_allroom_info(self):
-        res = {}
+        res = []
         for competitor in (self.room.competitors) :
-            res[competitor._id] = competitor.get_info()
+            res.append(competitor.get_info())
         return res
             
