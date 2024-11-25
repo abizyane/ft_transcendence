@@ -45,7 +45,6 @@ const Page = () => {
             </div>
           </Link>
         </div>
-
       </div>
     </>
   );

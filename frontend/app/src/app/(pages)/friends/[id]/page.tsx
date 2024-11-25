@@ -163,13 +163,13 @@ const Friends = () => {
       {/* Friends List */}
 
       <div
-        className={`bg-gray-800/65 rounded-xl border w-full p-4 border-violet-primary ${listHeight} grid grid-cols-1 lg:grid-cols-2 gap-4  overflow-y-auto no-scrollbar p-41`}
+        className={`bg-gray-800/65 rounded-xl border w-full p-4 border-violet-primary ${listHeight}  overflow-y-auto no-scrollbar p-41`}
         >
         {friends?.map((friend, index) => (
           
           <div
             key={index}
-            className="flex justify-center items-center bg-gray-700/70 h-[90px] w-full hover:bg-gray-600 transition-shadow border border-gray-600 rounded-lg p-4 shadow-lg hover:shadow-2xl"
+            className="flex justify-center items-center bg-gray-700/70 h-[90px] w-full hover:bg-gray-600 transition-shadow border border-gray-600 rounded-lg p-4 my-2 shadow-lg hover:shadow-2xl"
           >
           <Link className="flex items-center " href={`/profile/${friend.id}`} key={friend.id}>
             <div className="h-14 w-14 rounded-full overflow-hidden">
@@ -230,7 +230,7 @@ const Friends = () => {
               <h1 className="text-white text-center w-full text-xl font-bold mb-4 mt-2 ">
                 Request List
               </h1>
-              <div className="bg-gray-800/65 rounded-xl border w-full border-violet-primary grid grid-cols-1 gap-4   h-[250px] overflow-y-auto no-scrollbar p-4">
+              <div className="bg-gray-800/65 rounded-xl border w-full border-violet-primary  gap-4   h-[250px] overflow-y-auto no-scrollbar p-4">
                 {requests?.map((request, index) => (
                   <div
                     key={index}

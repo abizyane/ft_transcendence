@@ -5,7 +5,7 @@ import React, { useState, useEffect, useRef } from "react";
 import io from "socket.io-client";
 import { format, formatDistanceToNow, isToday } from "date-fns";
 import toast from "react-hot-toast";
-
+import { IoSend } from "react-icons/io5";
 
 
 
@@ -203,7 +203,7 @@ const UserChatPage = ({ currentUser, chatUser }) => {
                   onClick={handleSendMessage}
                   className="absolute top-1/2 transform -translate-y-1/2 right-4 flex flex-shrink-0 focus:outline-none text-violet-primary  px-4 py-1"
                 >
-                  Send
+                  <IoSend  className="w-6 h-6"/>
                 </button>
               </label>
             </div>

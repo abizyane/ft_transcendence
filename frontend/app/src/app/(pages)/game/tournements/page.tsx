@@ -1,4 +1,4 @@
-import solo from "../../../../public/solo.jpeg";
+import solo from "../../../../../public/solo.jpeg";
 import multiplayers from "../../../../public/multiplayers.jpeg";
 import Link from "next/link";
 

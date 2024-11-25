@@ -69,13 +69,13 @@ const page = () => {
     </div>;
   }
   return (
-    <div className="w-full h-full flex flex-col  pb-24 md:pb-0 ">
+    <div className="w-full h-full flex flex-col mt-10 pb-24 md:pb-0 ">
         <div className='flex gap-4 flex-col md:w-full p-2  md:flex-row'>
 
       <div className="w-full md:w-1/3 md:h-fit md:order-2 md:mb-4">
         <div className="w-full  flex">
           <div className="border-2 rainbow-border p-4 flex flex-col text-white lg:h-[300px] rounded-xl bg-gradient-to-r from-[rgba(248,229,123,0.45)] to-[rgba(70,65,28,0.89)] justify-center items-center w-full">
-            {ranking[0] === undefined ? 
+            {ranking[0] === undefined ?
               <div>
                 No user found
               </div>

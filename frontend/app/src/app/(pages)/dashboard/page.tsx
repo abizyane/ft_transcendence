@@ -13,7 +13,7 @@ const Dashboard = () => {
   const winRatePercentage = 20;
   return (
     <>
-      <div className="w-full mt-10 h-full">
+      <div className="w-full my-10 h-full">
         <div className="p-10 flex flex-col  lg:gap-8 items-center w-full">
           <div className="flex flex-col lg:flex-row lg:items-center lg:gap-8 w-full ">
             <img

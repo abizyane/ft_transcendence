@@ -77,7 +77,7 @@ const History = () => {
           <img
             src={game.player.picture}
             alt={`${game.player.username} Image`}
-            className="w-8 h-8 lg:w-12 lg:h-12 rounded-full"
+            className="w-6 h-6 lg:w-12 lg:h-12 rounded-full"
           />
           <div className="flex flex-col">
             <p className="font-bold text-white text-xs">
@@ -97,7 +97,7 @@ const History = () => {
           <img
             src={game.opponent.picture}
             alt={`${game.opponent.username} Image`}
-            className="w-8 h-8 lg:w-12 lg:h-12 rounded-full"
+            className="w-6 h-6 lg:w-12 lg:h-12 rounded-full"
           />
         </div>
       </div>
