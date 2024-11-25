@@ -90,11 +90,13 @@ export default function Canvas ({socketRef, callback}){
     let lastTime = 0
     useEffect(()=>{
         const canvas = canvasRef.current
-        canvas.width = 1080
-        canvas.height = 720
-        Context.current = canvas.getContext('2d');
-        if (!GameRef.current)
-            GameRef.current = new Game_Front(canvas, {player_one: {posX:bluePosRef.current.x, posY: 3, width: 12, height:50, color: 'blue'}, player_two:{posX:redPosRef.current.x, posY: 3, width: 12, height:50, color: 'red'}, ball:{}})
+        if (canvas){
+            canvas.width = 1080
+            canvas.height = 720
+            Context.current = canvas.getContext('2d');
+            if (!GameRef.current)
+                GameRef.current = new Game_Front(canvas, {player_one: {posX:bluePosRef.current.x, posY: 3, width: 12, height:50, color: 'blue'}, player_two:{posX:redPosRef.current.x, posY: 3, width: 12, height:50, color: 'red'}, ball:{}})
+        }
 
         }, [callback])
         

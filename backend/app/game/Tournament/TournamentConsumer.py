@@ -107,6 +107,7 @@ class TournamentConsumer(AsyncWebsocketConsumer):
         print(self.match.state)
         await self.channel_layer.group_send(self.match_name,{
             'type' : 'finalize.match'
+            'type' : 'finalize.match'
         })
 
     async def finalize_match(self, event):
