@@ -17,7 +17,7 @@ const Page = () => {
           onMouseLeave={() => setHoveredIndex(null)}
           className={`min-w-[300px] max-w-[500px] lg:min-w-[400px] lg:max-w-[600px] xl:min-w-[500px] xl:max-w-[900px] m-2 mt-8 md:mt-2 h-fit rounded-2xl border-4 border-violet-primary overflow-hidden transform transition-transform duration-300 ${hoveredIndex === 0 ? 'scale-105' : hoveredIndex === null ? 'scale-100' : 'blur-sm'}`}
         >
-          <Link href="game/solo">
+          <Link href="/game/solo">
             <div
               className="relative h-[30vh] md:h-[70vh] w-full z-0 bg-cover bg-center rounded-t-xl"
               style={{ backgroundImage: `url(${solo.src})` }}
@@ -34,7 +34,7 @@ const Page = () => {
           onMouseLeave={() => setHoveredIndex(null)}
           className={`min-w-[300px] max-w-[500px] lg:min-w-[400px] lg:max-w-[600px] xl:min-w-[500px] xl:max-w-[900px] m-2 mt-8 md:mt-2 h-fit rounded-2xl border-4 border-violet-primary overflow-hidden transform transition-transform duration-300 ${hoveredIndex === 1 ? 'scale-105' : hoveredIndex === null ? 'scale-100' : 'blur-sm'}`}
         >
-          <Link href="dashboard/game/tournaments">
+          <Link href="/game/tournaments">
             <div
               className="relative h-[30vh] md:h-[70vh] w-full z-0 bg-cover bg-center rounded-t-xl"
               style={{ backgroundImage: `url(${multiplayers.src})` }}
