@@ -31,6 +31,11 @@ class Profile(models.Model):
             opponent = game.get_opponent(self)
             print(score, opponent)
 
+    def increment_xp(self, xp):
+        self.xp += xp
+        self.save()
+        self.calculate_xp()
+
     def calculate_xp(self):
         level_up_threshold = (400, 800, 1200, 2000, 3200, 5200, 8400, 13600, 22000, 35600, 57200, 92800, 150000, 242800, 402800, 642800, 1042800, 1682800, 2722800, 4028000)
 
@@ -87,8 +92,6 @@ class Scores(models.Model):
     created = models.DateTimeField(default=timezone.now, null=False)
     updated = models.DateTimeField(default=timezone.now, null=False)
     created.editable = False
-
-    
 
     def get_all_player_scores(player_id:int):
         games = GameModel.get_all_games(player_id)

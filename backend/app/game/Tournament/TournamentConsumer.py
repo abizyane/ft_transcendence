@@ -9,6 +9,8 @@ from ..game_utils import Game, Player
 import gc
 import numpy as np
 
+from ..models import Profile, GameModel, Scores
+
 
 class TournamentConsumer(AsyncWebsocketConsumer):
     rm = RoomListManager()
@@ -35,6 +37,7 @@ class TournamentConsumer(AsyncWebsocketConsumer):
         self.p_holder = PlayerHolder(Competitor(self.channel_name))
         self.set_competitor_info(username=user.username, img=user.profile_pic, userId=user.id)
         self._type = self.scope['url_route']['kwargs']['competition_type']
+        self.game_mode = "tournament" if self._type == "tournament" else "1v1"
         self.room:Room = None
         self.match = None
         self.match_name = ''
@@ -115,6 +118,7 @@ class TournamentConsumer(AsyncWebsocketConsumer):
         if not self.match.state == "LEAVE" :
             print(self.match.state)
             self.match.game.set_winner()
+
         prev_match_name  = self.match_name
 
         # self.game = None
@@ -122,6 +126,10 @@ class TournamentConsumer(AsyncWebsocketConsumer):
             self.task.cancel()
 
         if self.p_holder.is_won():
+            await self.save_game()
+
+            await self.award_xp(True)
+
             await self.send(text_data=json.dumps({
                 'msg': 'You Won'
             }))
@@ -147,6 +155,8 @@ class TournamentConsumer(AsyncWebsocketConsumer):
                 }))
         else:
             # self.p_holder.paddle = None
+            await self.award_xp(False)
+
             await self.send(text_data=json.dumps({
                 'msg': 'You Lost'
             }))
@@ -224,4 +234,46 @@ class TournamentConsumer(AsyncWebsocketConsumer):
         await self.send(text_data=json.dumps({'msg' : f'{event["player"]} is left'}))
         self.game.status = 1
     
-    # async def get_user_info(self)
+    async def save_game(self):
+        curr_player = Profile.objects.get(
+            user_id=self.p_holder.competitor.user_id
+        )
+        opponent = Profile.objects.get(
+            user_id=self.match.get_opponent(self.p_holder).user_id
+        )
+
+        if self.p_holder.paddle.color == 'blue':
+            player_1, player_2 = curr_player, opponent
+            score_1, score_2 = self.game.blue_score, self.game.red_score
+        else:
+            player_1, player_2 = opponent, curr_player
+            score_1, score_2 = self.game.red_score, self.game.blue_score
+
+        game = GameModel.objects.create(
+            player_1=player_1,
+            player_2=player_2,
+            status='done'
+        )
+
+        Scores.objects.create(
+            game=game,
+            score_1=score_1,
+            score_2=score_2
+        )
+
+    async def award_xp(self, won: bool):
+        curr_player = Profile.objects.get(
+            user_id=self.p_holder.competitor.user_id
+        )
+
+        xp = 100
+        if self.game_mode == 'bot':
+            pass
+        elif won:
+            xp = xp * 3 if self.game_mode == 'tournament' else xp * 1.5
+            xp += self.game.blue_score * 20 if self.p_holder.paddle.color == 'blue' else self.game.red_score * 20
+        else:
+            xp /= 2
+            xp += self.game.blue_score * 10 if self.p_holder.paddle.color == 'blue' else self.game.red_score * 10
+
+        curr_player.increment_xp(xp)
