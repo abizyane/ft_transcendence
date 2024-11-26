@@ -12,12 +12,12 @@ export function middleware(request: NextRequest) {
 
 export const config = {
   matcher: [
-    '/dashboard', 
-    '/chat', 
-    '/friends', 
-    '/game', 
-    '/ranking', 
-    '/settings', 
+    '/dashboard',
+    '/chat',
+    '/friends',
+    '/game',
+    '/ranking',
+    '/settings',
     '/profile',
     '/((?!auth/).)'
   ],
