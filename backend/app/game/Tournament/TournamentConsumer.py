@@ -9,7 +9,7 @@ from ..game_utils import Game, Player
 import gc
 import numpy as np
 
-from ..models import Profile, GameModel, Scores
+from ..models import Profile, GameModel, Scores, TournamentModel
 
 
 class TournamentConsumer(AsyncWebsocketConsumer):
