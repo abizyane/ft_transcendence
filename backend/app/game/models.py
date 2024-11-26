@@ -48,9 +48,8 @@ class Profile(models.Model):
             elif self.xp >= level_up_threshold[i] and i == len(level_up_threshold) - 1:
                 self.level = len(level_up_threshold) + 1
 
-        self.level = round(self.level, 3)
+        self.level = round(self.level, 2)
         self.save()
-
 
 class GameModel(models.Model):
     player_1 = models.ForeignKey(Profile, related_name="player_one", null=True,on_delete=models.CASCADE)
@@ -111,15 +110,26 @@ class TournamentModel(models.Model):
         TWO = 'TWO'
         FOUR = 'FOUR'
         EIGHT = 'EIGHT'
+    
+    class Permission(models.TextChoices):
+        PUBLIC = 'PUBLIC'
+        PRIVATE = 'PRIVATE'
 
     tournament_id = models.AutoField(primary_key=True)
     name = models.CharField(max_length=100, default='AstroTournament')
-    start_time = models.DateTimeField(default=timezone.now + timezone.timedelta(days=1))
-    state = models.CharField(max_length=10, choices=State.choices, default=State.SCHEDULED)
-    tournament_type = models.CharField(max_length=5, choices=TournamentType.choices, default=TournamentType.TWO)
+    permission = models.CharField(max_length=10, choices=Permission.choices, default=Permission.PUBLIC)
+    owner = models.ForeignKey(Profile, related_name='tournament_owner', null=True, on_delete=models.CASCADE)
+    invites = models.ManyToManyField(Profile, related_name='tournament_invites')
+    # picture = models.ImageField(upload_to='tournament_pictures/', null=True)
+    
     players = models.ManyToManyField(Profile, related_name='tournament_players')
     games = models.ManyToManyField(GameModel, related_name='tournament_games')
-    winner = models.ForeignKey(Profile, related_name='tournament_winner', null=True, on_delete=models.CASCADE)
+    winner = models.ForeignKey(Profile, related_name='tournament_winner', null=True, on_delete=models.
+    CASCADE)
+
+    start_time = models.DateTimeField(default=timezone.now + timezone.timedelta(days=1))
+    state = models.CharField(max_length=10, choices=State.choices, default=State.SCHEDULED)
+    tournament_type = models.CharField(max_length=5, choices=TournamentType.choices, default=TournamentType.TWO)    
 
     created = models.DateTimeField(auto_now_add=True)
     updated = models.DateTimeField(auto_now_add=True)
