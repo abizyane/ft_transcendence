@@ -51,7 +51,7 @@ const Page = () => {
           onMouseLeave={() => setHoveredIndex(null)}
           className={`w-[70%] md:w-[40%] xl:w-[30%] md:h-[40%]  xl:h-[50%] m-2 flex flex-col rounded-2xl border-4 border-violet-primary overflow-hidden transform transition-transform duration-300 ${hoveredIndex === 2 ? 'scale-105' : hoveredIndex === null ? 'scale-100' : 'blur-sm'}`}
         >
-          <Link href="solo/maps" className='h-full'>
+          <Link href="./localgame/maps" className='h-full'>
             <div className=" h-48 md:h-full bg-cover bg-center" style={{ backgroundImage: `url(${Localgame.src})` }}>
               <div className="absolute bottom-0 left-0 right-0 bg-black/50  text-center text-lg md:text-xl lg:text-2xl font-bold text-white flex items-center justify-center">
                 Local Game
