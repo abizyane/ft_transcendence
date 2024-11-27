@@ -64,15 +64,24 @@ class ChatRoomSerializer(serializers.Serializer):
         }
 
 class ConversationSerializer(serializers.ModelSerializer):
-    sender = UserSerializer(read_only=True)
-    receiver = UserSerializer(read_only=True)
+    sender = serializers.SerializerMethodField()
+    receiver = serializers.SerializerMethodField()
+
+    def get_sender(self, obj):
+        return UserSerializer(obj.sender, context=self.context).data
+    
+    def get_receiver(self, obj):
+        return UserSerializer(obj.receiver, context=self.context).data
 
     def to_representation(self, instance):
+        current_user = self.context['request'].user
+        other_user = instance.sender if instance.sender.id != current_user.id else instance.receiver
+        
         return {
-            'id': instance.sender.id if instance.sender.id != self.context['request'].user.id else instance.receiver.id,
-            'username': instance.sender.username if instance.sender.username != self.context['request'].user.username else instance.receiver.username,
-            'profile_pic': instance.sender.profile_pic if instance.sender.username != self.context['request'].user.username else instance.receiver.profile_pic,
-            'is_online': instance.sender.is_online if instance.sender.username != self.context['request'].user.username else instance.receiver.is_online,
+            'id': other_user.id,
+            'username': other_user.username,
+            'profile_pic': other_user.profile_pic,
+            'is_online': other_user.is_online,
             'message': instance.message,
             'timestamp': instance.timestamp,
             'seen': instance.seen

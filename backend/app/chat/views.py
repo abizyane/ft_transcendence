@@ -25,7 +25,7 @@ class ConversationsView(generics.ListAPIView):
             user = User.objects.get(username=current_user)
         except User.DoesNotExist:
             raise NotFound("User not found.")
-        
+
         messages = Message.objects.filter(Q(sender=user) | Q(receiver=user)).order_by('-timestamp')
 
         latest_messages = {}
@@ -33,9 +33,7 @@ class ConversationsView(generics.ListAPIView):
             user_pair = tuple(sorted([message.sender.username, message.receiver.username]))
             if user_pair not in latest_messages:
                 latest_messages[user_pair] = message
-        
-        # latest_messages = dict(sorted(latest_messages.items(), key=lambda message: message[1].timestamp, reverse=True))
-        
+
         return list(latest_messages.values())
 
 class ChatRoomView(generics.ListAPIView):
