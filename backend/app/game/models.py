@@ -4,7 +4,7 @@ from django.utils import timezone
 from django.db.models.query import EmptyQuerySet
 
 class Profile(models.Model):
-    profile_id = models.AutoField(primary_key=True)
+    # profile_id = models.AutoField(primary_key=True)
     user_id = models.OneToOneField(User, on_delete=models.CASCADE)
     level = models.IntegerField()
     xp = models.IntegerField()
@@ -127,7 +127,7 @@ class TournamentModel(models.Model):
     winner = models.ForeignKey(Profile, related_name='tournament_winner', null=True, on_delete=models.
     CASCADE)
 
-    start_time = models.DateTimeField(default=timezone.now + timezone.timedelta(days=1))
+    # start_time = models.DateTimeField(default=timezone.now + timezone.timedelta(days=1))
     state = models.CharField(max_length=10, choices=State.choices, default=State.SCHEDULED)
     tournament_type = models.CharField(max_length=5, choices=TournamentType.choices, default=TournamentType.TWO)    
 
