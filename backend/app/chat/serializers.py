@@ -80,7 +80,7 @@ class ConversationSerializer(serializers.ModelSerializer):
         return {
             'id': other_user.id,
             'username': other_user.username,
-            'profile_pic': other_user.profile_pic,
+            'profile_pic': UserSerializer(other_user, context=self.context).data['profile_pic'],
             'is_online': other_user.is_online,
             'message': instance.message,
             'timestamp': instance.timestamp,

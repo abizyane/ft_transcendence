@@ -218,7 +218,7 @@ class ChatRoomConsumer(AsyncWebsocketConsumer):
 
     @database_sync_to_async
     def get_relationship(self, sender, receiver):
-        combined_key = f"relationship_{sender}_{receiver}" if sender < receiver else f"relationship_{receiver}_{sender}"
+        combined_key = f"relationship_{sender.username}_{receiver.username}" if sender.username < receiver.username else f"relationship_{receiver.username}_{sender.username}"
         relationship = cache.get(combined_key)
         if relationship:
             return relationship
