@@ -5,6 +5,7 @@ from django.db.models import Q
 from .models import Message
 from astropong.models.UserModel import User, Relationship
 from .serializers import MessageConsumerSerializer, UserSerializer
+from django.core.cache import cache
 
 class ChatRoomConsumer(AsyncWebsocketConsumer):
     async def connect(self):
@@ -204,16 +205,29 @@ class ChatRoomConsumer(AsyncWebsocketConsumer):
 
     @database_sync_to_async
     def get_user(self, username):
-        try:
-            return User.objects.get(username=username)
-        except User.DoesNotExist:
-            return None
+        cached_user = cache.get(f"user_{username}")
+        if cached_user:
+            return cached_user
+        else:
+            try:
+                user = User.objects.get(username=username)
+                cache.set(f"user_{username}", user, timeout=600)
+                return user
+            except User.DoesNotExist:
+                return None
 
     @database_sync_to_async
     def get_relationship(self, sender, receiver):
-        return Relationship.objects.filter(
-            Q(user1=sender, user2=receiver) | Q(user1=receiver, user2=sender),
-            status=Relationship.Status.FRIEND).exists()
+        combined_key = f"relationship_{sender}_{receiver}" if sender < receiver else f"relationship_{receiver}_{sender}"
+        relationship = cache.get(combined_key)
+        if relationship:
+            return relationship
+        else:
+            relationship = Relationship.objects.filter(
+                Q(user1=sender, user2=receiver) | Q(user1=receiver, user2=sender),
+                status=Relationship.Status.FRIEND).exists()
+            cache.set(combined_key, relationship, timeout=600)
+            return relationship
 
     @database_sync_to_async
     def save_message(self, sender, receiver, message):
