@@ -127,7 +127,7 @@ class ChatRoomConsumer(AsyncWebsocketConsumer):
 
     async def chat_message(self, event):
         receiver = event['receiver']
-        if receiver != self.scope['user'].username:
+        if receiver != self.scope['user'].username and self.sender != self.scope['user'].username:
             return
 
         message = event['message']
