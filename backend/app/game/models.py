@@ -3,9 +3,8 @@ from astropong.models import User
 from django.utils import timezone
 from django.db.models.query import EmptyQuerySet
 
-
-
 class Profile(models.Model):
+    profile_id = models.AutoField(primary_key=True)
     user_id = models.OneToOneField(User, on_delete=models.CASCADE)
     level = models.IntegerField()
     xp = models.IntegerField()
@@ -33,11 +32,24 @@ class Profile(models.Model):
             opponent = game.get_opponent(self)
             print(score, opponent)
 
-    def calculate_xp(self):
-        level_up_threshold = 1000
-        self.level = self.xp / level_up_threshold
+    def increment_xp(self, xp):
+        self.xp += xp
         self.save()
+        self.calculate_xp()
 
+    def calculate_xp(self):
+        level_up_threshold = (400, 800, 1200, 2000, 3200, 5200, 8400, 13600, 22000, 35600, 57200, 92800, 150000, 242800, 402800, 642800, 1042800, 1682800, 2722800, 4028000)
+
+        for i in range(len(level_up_threshold)):
+            if self.xp < level_up_threshold[i]:
+                progress = self.xp / level_up_threshold[i]
+                self.level = i + progress
+                break
+            elif self.xp >= level_up_threshold[i] and i == len(level_up_threshold) - 1:
+                self.level = len(level_up_threshold) + 1
+
+        self.level = round(self.level, 2)
+        self.save()
 
 class GameModel(models.Model):
     player_1 = models.ForeignKey(Profile, related_name="player_one", null=True,on_delete=models.CASCADE)
@@ -73,6 +85,7 @@ class GameModel(models.Model):
     def __str__(self):
         return f"{self.player_1.get_username()} vs {self.player_2.get_username()}"
 
+
 class Scores(models.Model):
     game_id = models.OneToOneField(GameModel, on_delete=models.CASCADE)
     score_1 = models.IntegerField()
@@ -81,12 +94,46 @@ class Scores(models.Model):
     updated = models.DateTimeField(default=timezone.now, null=False)
     created.editable = False
 
-    
-
     def get_all_player_scores(player_id:int):
         games = GameModel.get_all_games(player_id)
         scores = Scores.objects.filter(game_id__in=games)
         return scores
+
+
+class TournamentModel(models.Model):
+    class State(models.TextChoices):
+        SCHEDULED = 'SCHEDULED'
+        ONGOING = 'ONGOING'
+        COMPLETED = 'COMPLETED'
+
+    class TournamentType(models.TextChoices):
+        TWO = 'TWO'
+        FOUR = 'FOUR'
+        EIGHT = 'EIGHT'
+    
+    class Permission(models.TextChoices):
+        PUBLIC = 'PUBLIC'
+        PRIVATE = 'PRIVATE'
+
+    tournament_id = models.AutoField(primary_key=True)
+    name = models.CharField(max_length=100, default='AstroTournament')
+    permission = models.CharField(max_length=10, choices=Permission.choices, default=Permission.PUBLIC)
+    owner = models.ForeignKey(Profile, related_name='tournament_owner', null=True, on_delete=models.CASCADE)
+    invites = models.ManyToManyField(Profile, related_name='tournament_invites')
+    # picture = models.ImageField(upload_to='tournament_pictures/', null=True)
+    
+    players = models.ManyToManyField(Profile, related_name='tournament_players')
+    games = models.ManyToManyField(GameModel, related_name='tournament_games')
+    winner = models.ForeignKey(Profile, related_name='tournament_winner', null=True, on_delete=models.
+    CASCADE)
+
+    start_time = models.DateTimeField(default=timezone.now + timezone.timedelta(days=1))
+    state = models.CharField(max_length=10, choices=State.choices, default=State.SCHEDULED)
+    tournament_type = models.CharField(max_length=5, choices=TournamentType.choices, default=TournamentType.TWO)    
+
+    created = models.DateTimeField(auto_now_add=True)
+    updated = models.DateTimeField(auto_now_add=True)
+    created.editable = False
 
     # def history(player:Profile):
     #     games = GameModel.get_all_games(player_id=player.id);
@@ -96,5 +143,3 @@ class Scores(models.Model):
     #         oppenent_score = self.get_player_game_score(player.id)
     #         state = "Win" if score > oppenent_score else "Lose"
     #         print(f'{player.get_username()} {score}  Vs  {oppenent.get_username()} {oppenent}')
-
-

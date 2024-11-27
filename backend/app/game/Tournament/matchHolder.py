@@ -54,6 +54,7 @@ class PlayerHolder(Holder):
             else:
                 tmp.right = self
             self.lvl = match.lvl
+            self.index = match.index
             self.back = tmp
         else:
             raise ValueError("You Cant Upgrade AnyMore")
@@ -70,9 +71,9 @@ class PlayerHolder(Holder):
         elif _cmd == "keyW_down":
             self.paddle.isW = False
         elif _cmd == "keyS_up":
-            self.paddle.isW = True
+            self.paddle.isS = True
         elif _cmd == "keyS_down":
-            self.paddle.isW = False
+            self.paddle.isS = False
     def is_won(self):
         return self.paddle.win_state == 'WIN'
     pass

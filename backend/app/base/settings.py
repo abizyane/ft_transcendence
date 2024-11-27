@@ -33,6 +33,14 @@ ALLOWED_HOSTS = ['*'] # For development purposes only - anbedelha b localhost:30
 
 
 # Application definition
+CHANNEL_LAYERS = {
+    'default': {
+        'BACKEND': 'channels_redis.core.RedisChannelLayer',
+        'CONFIG': {
+            "hosts": [('127.0.0.1', 6379)],
+        },
+    },
+}
 
 INSTALLED_APPS = [
     'daphne',
