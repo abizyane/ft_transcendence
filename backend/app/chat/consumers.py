@@ -211,7 +211,7 @@ class ChatRoomConsumer(AsyncWebsocketConsumer):
         else:
             try:
                 user = User.objects.get(username=username)
-                cache.set(f"user_{username}", user, timeout=600)
+                cache.set(f"user_{username}", user, timeout=300)
                 return user
             except User.DoesNotExist:
                 return None
@@ -226,7 +226,7 @@ class ChatRoomConsumer(AsyncWebsocketConsumer):
             relationship = Relationship.objects.filter(
                 Q(user1=sender, user2=receiver) | Q(user1=receiver, user2=sender),
                 status=Relationship.Status.FRIEND).exists()
-            cache.set(combined_key, relationship, timeout=600)
+            cache.set(combined_key, relationship, timeout=30)
             return relationship
 
     @database_sync_to_async
