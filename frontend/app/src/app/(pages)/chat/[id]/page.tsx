@@ -1,92 +1,52 @@
 "use client";
 import { useUser } from "@/services/context/usercontext";
+import { useChat } from "@/services/context/chatContext";
 import { useParams } from "next/navigation";
 import React, { useState, useEffect, useRef } from "react";
-import io from "socket.io-client";
-import { format, formatDistanceToNow, isToday } from "date-fns";
+import { format, isToday } from "date-fns";
 import toast from "react-hot-toast";
+import { ConstructionIcon } from "lucide-react";
+import Loader from "../../../../components/loader/loader";
 
 
 
 
-const UserChatPage = ({ currentUser, chatUser }) => {
-  const [messages, setMessages] = useState([]);
+const UserChatPage = ({ currentUser }) => {
+  const { currentChat, conversations, typing, ws, setScrollToBottom, addMessage, fetchMessages } = useChat();
+  // console.log("currentChat c", currentChat);
+  // console.log("conversations c", conversations);
   const [input, setInput] = useState("");
-  const [ws, setWs] = useState(null);
+  const [loading, setLoading] = useState(false);
   const { username, profile_pic_url, is_online, id } = currentUser;
-  const [typing, setTyping] = useState(false);
   const [timeoutTyping, setTimeoutTyping] = useState(undefined);
   const messageContainerRef = useRef(null);
-
-
+  
+  
   const scrollToBottom = () => {
     if (messageContainerRef.current) {
+    console.log("scrolling to bottom");
       messageContainerRef.current.scrollTop = messageContainerRef.current.scrollHeight;
     }
   };
   useEffect(() => {
-    const socket = new WebSocket(
-      `ws://localhost:8000/ws/chat/room/`
-    );
-    setWs(socket);
-    socket.onopen = () => {
-      console.log("Connected to WebSocket");
-    };
-    socket.onmessage = (event) => {
-      console.log(event);
-      if (event.type == "message")
-      {
+    setScrollToBottom(scrollToBottom);
 
-          const data = JSON.parse(event.data);
-          if (data.type == "chat_message")
-          {
-            setMessages((prevMessages) => [data.message, ...prevMessages]);
-            console.log(messages);
-            setTyping(false);
-          }
-          else if (data.type == "typing")
-          {
-            setTyping(true);
-          }
-          else if (data.type == "stop_typing")
-          {
-            setTyping(false);
-          }
-          else if (data.message == "You must be friends in order to chat.")
-          {
-            toast.error("You must be friends in order to chat.");
-          }
-          scrollToBottom();
-      }
-    };
-    socket.onclose = () => {
-      console.log("Disconnected from WebSocket");
-    };
-    return () => {
-      socket.close();
-    };
-  }, [currentUser.username, chatUser.user.username]);
-  
-  useEffect(() => {
-    if (chatUser?.messages?.length > 0) {
-      setMessages(chatUser.messages);
-    }
-
-  }, [chatUser.messages]);
+  }, [currentUser, currentChat, conversations, messageContainerRef, scrollToBottom]);
   
   const handleSendMessage = () => {
     if (input.trim() && ws?.readyState === WebSocket.OPEN) {
       const newMessage = {
         message: input,
         sender: currentUser.username,
-        receiver: chatUser.user.username,
+        receiver: currentChat.user.username,
         type: "chat_message",
         timestamp: new Date().toISOString(),
       };
-
+      console.log("message sent ", newMessage);
       ws.send(JSON.stringify(newMessage));
-      setMessages((prevMessages) => [newMessage, ...prevMessages]);
+      addMessage(newMessage);
       setInput("");
+      scrollToBottom();
     } else {
       console.log("WebSocket is not open.");
     }
@@ -99,8 +59,10 @@ const UserChatPage = ({ currentUser, chatUser }) => {
     ws.send(JSON.stringify({
       type: "typing",
       sender: currentUser.username,
-      receiver: chatUser.user.username
+      receiver: currentChat.user.username
     }));
+    
+
     if (timeoutTyping) {
       clearTimeout(timeoutTyping);
     }
@@ -108,7 +70,7 @@ const UserChatPage = ({ currentUser, chatUser }) => {
       ws.send(JSON.stringify({
         type: "stop_typing",
         sender: currentUser.username,
-        receiver: chatUser.user.username,
+        receiver: currentChat.user.username,
       }));
     }, 1000));
 
@@ -118,66 +80,101 @@ const UserChatPage = ({ currentUser, chatUser }) => {
       handleSendMessage(); 
     }
   };
-  useEffect(()=>{
+  
+  const handleScroll = async () => {
     if (messageContainerRef.current) {
-      messageContainerRef.current.scrollTop = messageContainerRef.current.scrollHeight;
+      const { scrollTop } = messageContainerRef.current;
+      
+      if (scrollTop === 0 && !loading && currentChat?.messages?.length) {
+        setLoading(true);
+        
+        try {
+          await fetchMessages(currentChat.user.id);
+        } finally {
+          setLoading(false);
+        }
+      }
     }
-  },[messages]);
+  };
 
+  useEffect(() => {
+    const messageContainer = messageContainerRef.current;
+    if (messageContainer) {
+      messageContainer.addEventListener('scroll', handleScroll);
+    }
+    
+    return () => {
+      if (messageContainer) {
+        messageContainer.removeEventListener('scroll', handleScroll);
+      }
+    };
+  }, [currentChat, loading]);
+
+  if (!currentChat) {
+    return <div>No chat data found.</div>;
+  }
+  console.log("messages ", currentChat.messages);
   return (
     <div className="h-full">
       <main className="flex-grow flex flex-row h-fit">
         <section className="flex flex-col flex-auto border-l border-gray-800">
           <div className=" p-4  h-[640px] overflow-y-scroll" ref={messageContainerRef}>
-            {messages
-            .slice(0)
-            .reverse()
-              .map((msg, index) => (
-                <div
-                  key={index}
-                  className={`flex ${
-                    msg.sender === currentUser.username
-                      ? "justify-end"
-                      : "justify-start"
-                  }`}
-                >
+            {loading && (
+              <div className="flex justify-center py-2">
+                <Loader />
+              </div>
+            )}
+            {currentChat?.messages
+              .sort((a, b) => new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime())
+              .map((msg, index) => {
+                console.log("msg", msg);
+                return (
                   <div
-                    className={`text-sm ${
+                    key={index}
+                    className={`flex ${
                       msg.sender === currentUser.username
-                        ? "text-white"
-                        : "text-gray-700"
-                    } grid grid-flow-row gap-2`}
+                        ? "justify-end"
+                        : "justify-start"
+                    }`}
                   >
                     <div
-                      className={`flex items-center ${
+                      className={`text-sm ${
                         msg.sender === currentUser.username
-                          ? "flex-row-reverse"
-                          : ""
-                      }`}
+                          ? "text-white"
+                          : "text-gray-700"
+                      } grid grid-flow-row gap-2`}
                     >
-                      <p
-                        className={`px-6 py-3 m-1 rounded-3xl max-w-xs lg:max-w-sm break-words whitespace-pre-wrap ${
+                      <div
+                        className={`flex items-center ${
                           msg.sender === currentUser.username
-                            ? "bg-violet-primary"
-                            : "bg-white"
+                            ? "flex-row-reverse"
+                            : ""
                         }`}
-                        >
-                        {msg.message}
-                        <span className={` m-2 text-center w-full text-sm text-gray-500 ${ msg.sender === currentUser.username
-                        ? "order-first"
-                        : "bg-white justify-self-end"
-                      }`}>
-                              <span className="text-[10px] text-gray-500">
-                      {isToday(new Date(msg.timestamp))
-                      ? format(new Date(msg.timestamp), "hh:mm a")
-                      : format(new Date(msg.timestamp), "MMM dd")}
-                      </span>
-                      </span>
-                      </p>
+                      >
+                        <p
+                          className={`px-6 py-3 m-1 rounded-3xl max-w-xs lg:max-w-sm break-words whitespace-pre-wrap ${
+                            msg.sender === currentUser.username
+                              ? "bg-violet-primary"
+                              : "bg-white"
+                          }`}
+                          >
+                          {msg.message}
+                          <span className={` m-2 text-center w-full text-sm text-gray-500 ${ msg.sender === currentUser.username
+                          ? "order-first"
+                          : "bg-white justify-self-end"
+                        }`}>
+                                <span className="text-[10px] text-gray-500">
+                        {isToday(new Date(msg.timestamp))
+                        ? format(new Date(msg.timestamp), "hh:mm a")
+                        : format(new Date(msg.timestamp), "MMM dd")}
+                        </span>
+                        </span>
+                        </p>
+                      </div>
                     </div>
                   </div>
-                </div>
-              ))}
+                )
+              })}
               {typing ? <div className="bg-white rounded-3xl h-11 w-16 flex items-center justify-center">
                   <div className="flex space-x-1">
                     <div className="dot bg-gray-900 rounded-full h-2 w-2"></div>
@@ -217,48 +214,65 @@ const UserChatPage = ({ currentUser, chatUser }) => {
 export default function Page() {
   const chatUserid = useParams();
   const { user: currentUser } = useUser();
-  const [chatUser, setChatUser] = useState(null);
+  const { fetchMessages } = useChat();
+  // const [chatUser, setChatUser] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-
+  
   useEffect(() => {
-    const fetchChatUser = async () => {
-      try {
-        const response = await fetch(
-          `http://localhost:8000/chat/room/${chatUserid.id}`,
-          {
-            method: "GET",
-            credentials: "include",
-          }
-        );
+    // const fetchChatUser = async () => {
+    //   try {
+    //     console.log("chatUserid", chatUserid);
+    //     const response = await fetch(
+    //       `http://localhost:8000/chat/room/${chatUserid.id}`,
+    //       {
+    //         method: "GET",
+    //         credentials: "include",
+    //       }
+    //     );
 
-        if (!response.ok) {
-          throw new Error("User not found or API error");
-        }
+    //     if (!response.ok) {
+    //       throw new Error("User not found or API error");
+    //     }
 
-        const data = await response.json();
-        setChatUser(data);
-      } catch (err) {
-        setError(err.message);
-      } finally {
-        setLoading(false);
-      }
-    };
+    //     const data = await response.json();
+    //     // setChatUser(data);
+    //     console.log(data);
+    //     setCurrentChat(data.user.username);
+    //   } catch (err) {
+    //     setError(err.message);
+    //   } finally {
+    //     setLoading(false);
+    //   }
+    // };
+    
+    // fetchChatUser();
+    // console.log("chatUserid", chatUserid);
+    // console.log("conversations", conversations);
+    // let timer = setTimeout(()=>{
 
-    fetchChatUser();
-  }, []);
+    // },100);
+    // if (conversations)
+      fetchMessages(chatUserid.id, true).then(()=>{
+          setLoading(false);
+          // console.log("fetching chat user", currentChat);
+        });
+  }, [chatUserid.id]);
 
   if (loading) {
-    return <div>Loading...</div>;
+  return <div className="w-full h-full flex justify-center items-center"><Loader/></div>
   }
 
   if (error) {
     return <div>Error: {error}</div>;
   }
-
-  if (!chatUser || !currentUser) {
+  // console.log("current chat", currentChat);
+  if ( !currentUser) {
     return <div>No user data found.</div>;
   }
+  // if (!currentChat) {
+  //   return <div>No chat data found.</div>;
+  // }
 
-  return <UserChatPage currentUser={currentUser} chatUser={chatUser} />;
+  return <UserChatPage currentUser={currentUser} />;
 }
