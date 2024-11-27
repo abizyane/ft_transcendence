@@ -7,6 +7,7 @@ import { FiPlusCircle } from "react-icons/fi";
 import { FaEllipsisV, FaSearch } from "react-icons/fa";
 import Link from "next/link";
 import Newchat from "@/components/Chat/Newchat";
+import { ChatProvider, useChat } from '@/services/context/chatContext';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -14,6 +15,7 @@ import {
   DropdownMenuTrigger,
   DropdownMenuSeparator,
 } from "@/components/ui/dropdown-menu";
+import Loader from "components/loader/loader";
 
 interface ChatLayoutProps {
   children: ReactNode;
@@ -27,10 +29,11 @@ interface User {
   time: string;
 }
 
-export default function Chat({ children }: ChatLayoutProps) {
+export function Chat({ children }: ChatLayoutProps) {
+  const { conversations, currentChat,fetchConversations } = useChat();
   const [users, setUsers] = useState<User[]>([]);
   const [isSliderOpen, setIsSliderOpen] = useState(false);
-  const [selectedId, setSelectedId] = useState<User | undefined>();
+  // const [selectedId, setSelectedId] = useState<User | undefined>();
   const [isMobile, setIsMobile] = useState(false);
   const router = useRouter();
   const is_online = true;
@@ -38,38 +41,56 @@ export default function Chat({ children }: ChatLayoutProps) {
   const param = useParams();
   const userId = param.id;
 
-  const fetchConversation = async () => {
-    try {
-      const response = await fetch(`http://localhost:8000/chat/conversations`, {
-        credentials: "include",
-      });
-      if (!response.ok) {
-        console.error("Fetch error:", error);
-      }
-      const data = await response.json();
-      data.results.map((item: any) => {
-        if (item.id == userId) setSelectedId(item);
-      });
+  // const fetchConversation = async () => {
+  //   try {
+  //     const response = await fetch(`http://localhost:8000/chat/conversations`, {
+  //       credentials: "include",
+  //     });
+  //     if (!response.ok) {
+  //       console.error("Fetch error:", error);
+  //     }
+  //     const data = await response.json();
+  //     data.results.map((item: any) => {
+  //       if (item.id == userId) setSelectedId(item);
+  //     });
 
-      setUsers(() => {
-        return data?.results.map((User: any) => {
-          return {
-            id: User.id,
-            username: User.username,
-            profile_pic: User.profile_pic,
-            message: User.message,
-            time: User.timestamp,
-          };
-        });
-      });
-    } catch (error) {
-      console.log("Fetch error:", error);
-    }
-  };
+     
+  //   } catch (error) {
+  //     console.log("Fetch error:", error);
+  //   }
+  // };
+
+
+  // setUsers(() => {
+  //   return data?.results.map((User: any) => {
+  //     return {
+  //       id: User.id,
+  //       username: User.username,
+  //       profile_pic: User.profile_pic,
+  //       message: User.message,
+  //       time: User.timestamp,
+  //     };
+  //   });
 
 
   useEffect(() => {
-    fetchConversation();
+    // const fetchData = async () => {
+    //   const conversations = await fetchConversations();
+    //   console.log('conv ', conversations);
+    //   Object.values(conversations).forEach((conversation) => {
+    //     setUsers((prevUsers) => [...prevUsers,
+    //       {
+    //         id: conversation.user.id,
+    //         username: conversation.user.username,
+    //         profile_pic: conversation.user.profile_pic,
+    //         message: conversation.lastMessage?.message || '',
+    //         time: conversation.lastMessage?.timestamp || ''
+    //       }
+    //     ]);
+    //   });
+    // };
+    
+    // fetchData();
 
     const handleResize = () => {
       if (window.innerWidth <= 1024) {
@@ -80,13 +101,15 @@ export default function Chat({ children }: ChatLayoutProps) {
     };
     window.addEventListener("resize", handleResize);
     handleResize();
+
+    console.log("conversations layout", conversations);
     return () => {
       window.removeEventListener("resize", handleResize);
     };
-  }, []);
+  }, [conversations]);
 
   const openSlider = (user: User) => {
-    setSelectedId(user);
+    // setSelectedId(user);
     setIsSliderOpen(true);
   };
 
@@ -96,8 +119,10 @@ export default function Chat({ children }: ChatLayoutProps) {
   };
 
   const handleUserClick = (user: User) => {
+    if (currentChat && currentChat.user.username == user.username)
+      return;
     if (isMobile) openSlider(user);
-    else setSelectedId(user);
+    // else setSelectedId(user);
     router.push(`/chat/${user.id}`);
   };
 
@@ -116,8 +141,13 @@ export default function Chat({ children }: ChatLayoutProps) {
   const closeModal = () => {
     setIsModalOpen(false);
   };
+  // console.log("current chat", currentChat);
+  // console.log("convs rendered", conversations);
+if (!conversations)
+  return <div className="w-full h-full flex justify-center items-center"><Loader/></div>
  
   return (
+
     <div className=" w-full flex flex-col justify-start items-start">
       <div className="w-full flex lg:flex-row h-full flex-col-reverse">
         {/* Main content */}
@@ -155,36 +185,42 @@ export default function Chat({ children }: ChatLayoutProps) {
 
                 {/* User list */}
                 <div className="p-2 flex-1 md:w-full h-[650px]  overflow-y-scroll">
-                  {users.map((user) => (
-                    <div
-                      key={`message-${user.id}`}
-                      onClick={() => handleUserClick(user)}
-                      className="flex justify-between items-center p-3 hover:bg-gray-800 rounded-lg cursor-pointer"
-                    >
-                      <div className="w-16 h-16 flex-shrink-0">
-                        <img
-                          className="shadow-md rounded-full w-full h-full object-cover"
-                          src={user.profile_pic}
-                          alt={user.username}
-                        />
-                      </div>
-                      <div className="flex-auto min-w-0 ml-4 mr-6">
-                        <p className="font-bold">{user.username}</p>
-                        <div className="flex justify-between items-center text-sm text-gray-600">
-                          <p className="truncate">{user.message}</p>
-                          <p className="ml-4 text-white-primary whitespace-nowrap">
-                            {isToday(new Date(user.time))
-                              ? formatDistanceToNow(new Date(user.time), {
-                                  addSuffix: true,
-                                })
-                              : isYesterday(new Date(user.time))
-                              ? "Yesterday"
-                              : format(new Date(user.time), "yyyy-MM-dd")}
-                          </p>
+                  {Object.values(conversations)
+                    .sort((a, b) => 
+                      new Date(b.lastMessage?.timestamp).getTime() - new Date(a.lastMessage?.timestamp).getTime()
+                    )
+                    .map((conv) => {
+                    return (
+                      <div
+                        key={`message-${conv.user.id}`}
+                        onClick={() => handleUserClick(conv.user)}
+                        className="flex justify-between items-center p-3 hover:bg-gray-800 rounded-lg cursor-pointer"
+                      >
+                        <div className="w-16 h-16 flex-shrink-0">
+                          <img
+                            className="shadow-md rounded-full w-full h-full object-cover"
+                            src={conv.user.profile_pic}
+                            alt={conv.user.username}
+                          />
+                        </div>
+                        <div className="flex-auto min-w-0 ml-4 mr-6">
+                          <p className="font-bold">{conv.user.username}</p>
+                          <div className="flex justify-between items-center text-sm text-gray-600">
+                            <p className={`truncate`}>{conv.lastMessage?.message}</p>
+                            <p className="ml-4 text-white-primary whitespace-nowrap">
+                              {isToday(new Date(conv.lastMessage?.timestamp))
+                                ? formatDistanceToNow(new Date(conv.lastMessage?.timestamp), {
+                                    addSuffix: true,
+                                  })
+                                : isYesterday(new Date(conv.lastMessage?.timestamp))
+                                ? "Yesterday"
+                                : format(new Date(conv.lastMessage?.timestamp), "yyyy-MM-dd")}
+                            </p>
+                          </div>
                         </div>
                       </div>
-                    </div>
-                  ))}
+                    )
+                  })}
                 </div>
               </section>
             </div>
@@ -192,18 +228,18 @@ export default function Chat({ children }: ChatLayoutProps) {
             {/* Main Content (Children) */}
             <div className="flex-1 hidden lg:block ">
             <Newchat isOpen={isModalOpen} closeModal={closeModal} />
-              {selectedId && (
+              {currentChat && (
                 <div className="px-6 py-4 flex  bg-gray-800/60 rounded-xl flex-row flex-none justify-start gap-4 items-center shadow">
                   <div className="flex">
                     <div className="w-12 h-12 mr-4 relative flex flex-shrink-0">
                       <img
                         className="shadow-md rounded-full w-full h-full object-cover"
-                        src={selectedId.profile_pic}
-                        alt={selectedId.username}
+                        src={currentChat.user.profile_pic}
+                        alt={currentChat.user.username}
                       />
                     </div>
                     <div className="text-sm">
-                      <p className="font-bold">{selectedId.username}</p>
+                      <p className="font-bold">{currentChat.user.username}</p>
                       <p>{is_online ? "Online" : "Offline"}</p>
                     </div>
                   </div>
@@ -244,7 +280,7 @@ export default function Chat({ children }: ChatLayoutProps) {
           isSliderOpen ? "translate-x-0" : "translate-x-[110%]"
         }`}
       >
-        {selectedId && (
+        {currentChat && (
           <div className="px-6 py-4 flex bg-gray-800/60 rounded-xl flex-row flex-none justify-start gap-4 items-center shadow">
             <button
               onClick={closeSlider}
@@ -256,12 +292,12 @@ export default function Chat({ children }: ChatLayoutProps) {
               <div className="w-12 h-12 mr-4 relative flex flex-shrink-0">
                 <img
                   className="shadow-md rounded-full w-full h-full object-cover"
-                  src={selectedId.profile_pic}
-                  alt={selectedId.username}
+                  src={currentChat.user.profile_pic}
+                  alt={currentChat.user.username}
                 />
               </div>
               <div className="text-sm">
-                <p className="font-bold">{selectedId.username}</p>
+                <p className="font-bold">{currentChat.user.username}</p>
                 <p>{is_online ? "Online" : "Offline"}</p>
               </div>
             </div>
@@ -270,5 +306,14 @@ export default function Chat({ children }: ChatLayoutProps) {
         {children}
       </div>
     </div>
+  );
+}
+
+
+export default function ChatLayout({ children }: ChatLayoutProps) {
+  return (
+    <ChatProvider>
+      <Chat children={children} />
+    </ChatProvider>
   );
 }

@@ -30,7 +30,7 @@ class JWTAuthMiddleware(BaseMiddleware):
                         if user:
                             scope['user'] = user
                             return await super().__call__(scope, receive, send)
-                    except Exception as e:
+                    except TokenBackendError as e:
                         print("Refresh token error:", e, flush=True)
                         scope['error'] = f"Refresh token error: {str(e)}"
                         scope['user'] = AnonymousUser()
