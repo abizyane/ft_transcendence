@@ -1,4 +1,5 @@
 "use client"
+import Image from "next/image";
 import Mars from "../../../../../../../public/Mars.jpeg";
 import VS from "../../../../../../../public/VS.jpeg";
 import Link from "next/link";
@@ -86,18 +87,21 @@ const Page = () => {
   const [gameready, setReady] = useState(false)
   const socketRef = useRef(null)
   const [users, setCompetitors] = useState(defaultCompetitors)
+  const [scores, setScores] = useState({one:0, two:0})
   let indexId = 0
 
-  const updateCompetitors = (competitor) => {
+  const updateCompetitors = (competitors) => {
     
-    const nextCompetitors = users.map((c) =>{
-      if (c.id == competitor.id)
-        return competitor
-      else
-        return c
-    })
-    console.log(nextCompetitors)
-    setCompetitors(nextCompetitors)
+    // const nextCompetitors = users.map((c) =>{
+    //   if (c.id == competitor.id){
+    //     console.log(c.id, competitor.id)
+    //     return competitor
+    //   }
+    //   else
+    //     return c
+    // })
+    // console.log(nextCompetitors)
+    setCompetitors(competitors)
   }
 
   useEffect(()=>{
@@ -127,8 +131,8 @@ const Page = () => {
           else if (data.command == "wait")
             setReady(false)
           if (data.competitors){
-            updateCompetitors(data.competitors[indexId])
-            // indexId++
+            updateCompetitors(data.competitors)
+            indexId++
           }
         }
       }
@@ -138,7 +142,42 @@ const Page = () => {
   return (
     <>
     {
-    gameready ? <Canvas socketRef={socketRef} callback={setReady}/> :
+    gameready ?<div className="min-w-[320px] w-full h-full flex flex-col items-center justify-between p-2  ">
+    <div className="w-full max-w-full h-full border-violet-primary backdrop-blur-lg border-2 p-2 rounded-lg flex flex-col mb-24 lg:mb-0">
+      <div className="flex justify-between items-center w-full bg-transparent p-2 rounded-lg mb-2">
+        <div className="flex items-center space-x-2 bg-gray-700 p-1  lg:p-3 rounded-full w-36  lg:w-1/3 lg:h-14  justify-center lg:justify-start">
+          <Image src={Mars} alt="First User" width={30} height={30} className="rounded-full " />
+          <div className="text-white">
+            <div className="text-xs font-bold">{users[0].name}</div>
+            <div className="text-[10px] text-gray-300">@{users[0].username}</div>
+          </div>
+        </div>
+        <div className="flex items-center space-x-2 m-2">
+          <div className="text-xl lg:text-3xl text-white font-bold">{scores.one}</div>
+          <span className="text-xl lg:text-3xl text-white">:</span>
+          <div className="text-xl lg:text-3xl text-white font-bold">{scores.two}</div>
+        </div>
+        <div className="flex items-center space-x-2 bg-gray-700 p-1 lg:p-3 rounded-full w-36 lg:w-1/3 lg:h-14 justify-center lg:justify-end">
+          <div className="text-white">
+            <div className="text-xs font-bold text-right">{users[1].name}</div>
+            <div className="text-[10px] text-gray-300 text-right">@{users[1].username}</div>
+          </div>
+          <Image src={Mars} alt="Second User" width={30} height={30} className="rounded-full" />
+        </div>
+      </div>
+      <div
+        className="flex-grow w-full h-full flex items-center justify-center border-4 bg-fixed border-white rounded-lg relative"
+        style={{
+          backgroundImage: "url('/Mars.jpeg')", 
+          backgroundSize: "cover",
+          backgroundPosition: "center",            
+          opacity: 0.7,
+        }}
+      >
+        <Canvas socketRef={socketRef} callback={setReady} scoreSetter={setScores}></Canvas>
+      </div>
+    </div>
+    </div> :
     <div className=" flex flex-col lg:flex-row gap-4   lg:gap-24 items-center justify-center lg:w-fit h-fit ">
       <Avatar user={users[0]} />
       <div className="flex items-center justify-center">
@@ -146,7 +185,7 @@ const Page = () => {
          <img src={VS.src} alt="vs" className="w-full h-full rounded-full" />
         </div>
       </div>
-      <Avatar user={users[1]} />
+      {users[1] ? <Avatar user={users[1]} /> : <></>}
       <Link href="matchmaking/ponggame" className="bg-blue-500 text-blue-800"> <button>start</button> </Link>
     </div>
   }
