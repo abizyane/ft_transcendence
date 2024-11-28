@@ -8,6 +8,7 @@ from .tournament import Tournament
 from ..game_utils import Game, Player
 import gc
 import numpy as np
+from channels.db import database_sync_to_async
 
 from ..models import Profile, GameModel, Scores, TournamentModel
 
@@ -242,7 +243,8 @@ class TournamentConsumer(AsyncWebsocketConsumer):
         await self.send(text_data=json.dumps({'msg' : f'{event["player"]} is left'}))
         self.game.status = 1
     
-    async def save_game(self):
+    @database_sync_to_async
+    def save_game(self):
         curr_player = Profile.objects.get(
             user_id=self.p_holder.competitor.user_id
         )
