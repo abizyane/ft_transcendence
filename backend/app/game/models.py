@@ -130,6 +130,7 @@ class TournamentModel(models.Model):
 
     # state = models.CharField(max_length=10, choices=State.choices, default=State.SCHEDULED)
     # tournament_type = models.CharField(max_length=5, choices=TournamentType.choices, default=TournamentType.TWO)    
+    # start_time = models.DateTimeField(default=timezone.now + timezone.timedelta(days=1))
 
     # created = models.DateTimeField(auto_now_add=True)
     # updated = models.DateTimeField(auto_now_add=True)
