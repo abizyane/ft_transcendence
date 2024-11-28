@@ -89,16 +89,18 @@ const Page = () => {
   const [users, setCompetitors] = useState(defaultCompetitors)
   let indexId = 0
 
-  const updateCompetitors = (competitor) => {
+  const updateCompetitors = (competitors) => {
     
-    const nextCompetitors = users.map((c) =>{
-      if (c.id == competitor.id)
-        return competitor
-      else
-        return c
-    })
-    console.log(nextCompetitors)
-    setCompetitors(nextCompetitors)
+    // const nextCompetitors = users.map((c) =>{
+    //   if (c.id == competitor.id){
+    //     console.log(c.id, competitor.id)
+    //     return competitor
+    //   }
+    //   else
+    //     return c
+    // })
+    // console.log(nextCompetitors)
+    setCompetitors(competitors)
   }
 
   useEffect(()=>{
@@ -128,8 +130,8 @@ const Page = () => {
           else if (data.command == "wait")
             setReady(false)
           if (data.competitors){
-            updateCompetitors(data.competitors[indexId])
-            // indexId++
+            updateCompetitors(data.competitors)
+            indexId++
           }
         }
       }
@@ -182,7 +184,7 @@ const Page = () => {
          <img src={VS.src} alt="vs" className="w-full h-full rounded-full" />
         </div>
       </div>
-      <Avatar user={users[1]} />
+      {users[1] ? <Avatar user={users[1]} /> : <></>}
       <Link href="matchmaking/ponggame" className="bg-blue-500 text-blue-800"> <button>start</button> </Link>
     </div>
   }
