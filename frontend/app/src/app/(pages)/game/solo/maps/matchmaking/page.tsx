@@ -87,6 +87,7 @@ const Page = () => {
   const [gameready, setReady] = useState(false)
   const socketRef = useRef(null)
   const [users, setCompetitors] = useState(defaultCompetitors)
+  const [scores, setScores] = useState({one:0, two:0})
   let indexId = 0
 
   const updateCompetitors = (competitors) => {
@@ -152,9 +153,9 @@ const Page = () => {
           </div>
         </div>
         <div className="flex items-center space-x-2 m-2">
-          <div className="text-xl lg:text-3xl text-white font-bold">{users[0].score}</div>
+          <div className="text-xl lg:text-3xl text-white font-bold">{scores.one}</div>
           <span className="text-xl lg:text-3xl text-white">:</span>
-          <div className="text-xl lg:text-3xl text-white font-bold">{users[1].score}</div>
+          <div className="text-xl lg:text-3xl text-white font-bold">{scores.two}</div>
         </div>
         <div className="flex items-center space-x-2 bg-gray-700 p-1 lg:p-3 rounded-full w-36 lg:w-1/3 lg:h-14 justify-center lg:justify-end">
           <div className="text-white">
@@ -173,7 +174,7 @@ const Page = () => {
           opacity: 0.7,
         }}
       >
-        <Canvas socketRef={socketRef} callback={setReady}></Canvas>
+        <Canvas socketRef={socketRef} callback={setReady} scoreSetter={setScores}></Canvas>
       </div>
     </div>
     </div> :

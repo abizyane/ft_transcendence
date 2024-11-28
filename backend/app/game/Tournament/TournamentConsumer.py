@@ -185,7 +185,7 @@ class TournamentConsumer(AsyncWebsocketConsumer):
         })
 
     async def send_pos(self, event):
-        float_list = [self.game.blue.x, self.game.blue.y, self.game.red.x, self.game.red.y, self.game.ball.posX, self.game.ball.posY]
+        float_list = [self.game.blue.x, self.game.blue.y, self.game.red.x, self.game.red.y, self.game.ball.posX, self.game.ball.posY, self.game.blue.score, self.game.red.score]
         f_arr = np.array(float_list, dtype=np.float32).tobytes()
         await self.send(bytes_data=f_arr)
     
