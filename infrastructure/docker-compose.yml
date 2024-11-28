@@ -4,6 +4,9 @@ networks:
   infra:
     name: astropong
 
+volumes:
+  node_modules:
+
 services:
   frontend:
     build: 
@@ -13,6 +16,7 @@ services:
     container_name: frontend
     volumes:
       - ../frontend/app:/app
+      - node_modules:/app/node_modules
     ports:
       - "3000:3000"
     depends_on:
@@ -50,12 +54,15 @@ services:
     restart: always
 
   database:
-    image: postgres:13
+    build:
+      context: ./database
+      dockerfile: Dockerfile
+    image: database:sa
     container_name: ${POSTGRES_HOST}
     volumes:
       - ./database/data:/var/lib/postgresql/data
-    ports:
-      - "5432:5432"
+    expose:
+      - "5432"
     env_file:
       - .env
     networks:
@@ -66,3 +73,9 @@ services:
       timeout: 5s
       retries: 3
     restart: always
+  
+  # redis:
+  #   image: redis:latest
+  #   ports:
+  #     - "6379:6379"
+  #   restart: always

@@ -67,6 +67,7 @@ fclean: clean
 	@rm -rf ./frontend/app/yarn.lock
 	@find ./backend/app/ -name 'migrations' -type d -depth -exec rm -rf {} \;
 	@find ./backend/app -name '__pycache__' -type d -depth -exec rm -rf {} \;
+	@find . -name ".DS_Store" -delete
 	@docker system prune -af --volumes > /dev/null 2>&1
 	@echo "${C_RED}Full cleaning Done!${C_RESET}"
 

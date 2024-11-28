@@ -18,15 +18,21 @@ class AbstractCompetitor(ABC):
 class Competitor(AbstractCompetitor):
     def __init__(self, name):
         self.name = name
+        self._id = -1
+        self.username = ''
         self.room:Room = None
         self._type = ''
         self._state = None
+        self.img = ''
+        self.user_id = None
+        self.islost = False
     """
         Comptitor should ask manager for Type of Tournament He wanna join
         1/2, 1/4, 1/8 , manager will search for type of room if available
         if Not create a new Room of desired type
     """
     def join_room(self, room:Room) -> Room:
+        self.room = room
         return room.add_player(self)
 
     def exit_room(self, room:Room) -> None:
@@ -46,3 +52,18 @@ class Competitor(AbstractCompetitor):
     
     def get_data(self):
         return self.__dict__
+
+    def get_info(self):
+        return {
+            'username' : self.username,
+            'profilePic' : self.img,
+            'lost' : self.islost,
+            'id' : self._id,
+        }
+    
+    def get_allroom_info(self):
+        res = []
+        for competitor in (self.room.competitors) :
+            res.append(competitor.get_info())
+        return res
+            

@@ -33,6 +33,14 @@ ALLOWED_HOSTS = ['*'] # For development purposes only - anbedelha b localhost:30
 
 
 # Application definition
+CHANNEL_LAYERS = {
+    'default': {
+        'BACKEND': 'channels_redis.core.RedisChannelLayer',
+        'CONFIG': {
+            "hosts": [('127.0.0.1', 6379)],
+        },
+    },
+}
 
 INSTALLED_APPS = [
     'daphne',
@@ -154,7 +162,7 @@ REST_FRAMEWORK = {
 }
 
 SIMPLE_JWT = {
-    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=60),  
+    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=5),  
     'REFRESH_TOKEN_LIFETIME': timedelta(days=1),
     'ROTATE_REFRESH_TOKENS': False,
     'BLACKLIST_AFTER_ROTATION': False,

@@ -7,7 +7,7 @@ class Ball:
         self.rad = 15
         self.posX = game.width / 2
         self.posY = game.height / 2
-        self.speed = 5
+        self.speed = 10
         self.angle = 45
         self.dirX = math.cos(self.angle)
         self.dirY = math.sin(self.angle)
@@ -18,7 +18,7 @@ class Ball:
         #blue Range 
         if (self.posX < self.game.width * 1/4):
             if (self.posX - self.rad <= 0):
-                self.game.players_color['red'].score += 1
+                self.game.red.score += 1
                 self.reset_ball()
             if (self.posX - self.rad <= self.game.blue.x + self.game.blue.width and (self.posY >= self.game.blue.y and self.posY <= self.game.blue.y + self.game.blue.height) and not self.game.blue.isHiting):
                 self.dirX *= -1
@@ -26,7 +26,7 @@ class Ball:
         #red Range
         elif (self.posX > self.game.width * 3/4):
             if (self.posX + self.rad >= self.game.width):
-                self.game.players_color['blue'].score += 1
+                self.game.blue.score += 1
                 self.reset_ball()
             if (self.posX + self.rad >= self.game.red.x and (self.posY >= self.game.red.y and self.posY <= self.game.red.y + self.game.red.height) and not self.game.red.isHiting):
                 self.dirX *= -1
@@ -91,6 +91,9 @@ class Game:
         if len(self.players) == 2:
             raise self.RoomIsFull()
 
+    def init_paddle_pos(self):
+        self.blue.x = 25
+        self.red.x = self.width - self.red.width - 25
     def set_players(self, channel_name, id):
         self.is_full()
         if not self.players.get(channel_name):
@@ -121,14 +124,13 @@ class Game:
         scores = [player.score for player in  self.players.values()]
         if self.max_score in scores:
             self.status = 1
+
     def set_winner(self):
         for player in self.players.values():
             if player.score == self.max_score:
                 player.win_state = "WIN"
             else:
-                player.win_state = "LOSE"
-            
-       
+                player.win_state = "LOSE" 
         
     class RoomIsFull(Exception):
         def __init__(self):
