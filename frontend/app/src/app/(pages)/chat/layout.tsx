@@ -30,11 +30,12 @@ interface User {
 }
 
 export function Chat({ children }: ChatLayoutProps) {
-  const { conversations, currentChat,fetchConversations } = useChat();
+  const { conversations, currentChat, fetchConversations, searchConversations, setSearchConversations } = useChat();
   const [users, setUsers] = useState<User[]>([]);
   const [isSliderOpen, setIsSliderOpen] = useState(false);
   // const [selectedId, setSelectedId] = useState<User | undefined>();
   const [isMobile, setIsMobile] = useState(false);
+  const [searchValue, setSearchValue] = useState("");
   const router = useRouter();
   const is_online = true;
   const messageContainerRef = useRef(null);
@@ -141,6 +142,20 @@ export function Chat({ children }: ChatLayoutProps) {
   const closeModal = () => {
     setIsModalOpen(false);
   };
+  const handleSearch = (value: string) => {
+    if (value == "") {
+      setSearchValue("");
+      setSearchConversations(undefined);
+      return;
+    }else{
+      setSearchValue(value);
+      setSearchConversations(Object.values(conversations).filter((conv) => conv.user.username.toLowerCase().includes(value.toLowerCase())));
+    }
+  };
+
+  const handleViewProfileClick = (userId: number) => {
+    router.push(`/profile/${userId}`);
+  };
   // console.log("current chat", currentChat);
   // console.log("convs rendered", conversations);
 if (!conversations)
@@ -173,6 +188,7 @@ if (!conversations)
                           className="rounded-full py-2 pr-6 pl-10 w-full border border-gray-800 focus:border-gray-700 bg-gray-800 focus:bg-gray-900 focus:outline-none text-gray-200 focus:shadow-md transition duration-300 ease-in"
                           type="text"
                           defaultValue=""
+                          onChange={(e) => handleSearch(e.target.value)}
                           placeholder="Search Messages"
                         />
                         <span className="absolute top-0 left-0 mt-3 ml-3 inline-block">
@@ -185,7 +201,7 @@ if (!conversations)
 
                 {/* User list */}
                 <div className="p-2 flex-1 md:w-full h-[650px]  overflow-y-scroll">
-                  {Object.values(conversations)
+                  {Object.values(searchValue ? searchConversations : conversations)
                     .sort((a, b) => 
                       new Date(b.lastMessage?.timestamp).getTime() - new Date(a.lastMessage?.timestamp).getTime()
                     )
@@ -206,7 +222,7 @@ if (!conversations)
                         <div className="flex-auto min-w-0 ml-4 mr-6">
                           <p className="font-bold">{conv.user.username}</p>
                           <div className="flex justify-between items-center text-sm text-gray-600">
-                            <p className={`truncate`}>{conv.lastMessage?.message}</p>
+                            <p className={`truncate ${conv.unreadCount > 0 ? "font-bold text-white" : ""}`}>{conv.lastMessage?.message}</p>
                             <p className="ml-4 text-white-primary whitespace-nowrap">
                               {isToday(new Date(conv.lastMessage?.timestamp))
                                 ? formatDistanceToNow(new Date(conv.lastMessage?.timestamp), {
@@ -250,7 +266,7 @@ if (!conversations)
                           <FaEllipsisV />
                         </DropdownMenuTrigger>
                         <DropdownMenuContent className="mr-12 mt-1 bg-gray-800 border-violet-primary">
-                          <DropdownMenuItem>
+                          <DropdownMenuItem onClick={() => handleViewProfileClick(currentChat.user.id)}>
                             <span className="text-white">View profile</span>
                           </DropdownMenuItem>
                           <DropdownMenuSeparator className="bg-black" />

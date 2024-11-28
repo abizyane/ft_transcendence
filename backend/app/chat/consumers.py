@@ -55,22 +55,24 @@ class ChatRoomConsumer(AsyncWebsocketConsumer):
             await self.send_error('User not found.')
             return
 
+        message_type = text_data_json.get('type')
+        self.latest_type = message_type
 
+        if message_type == 'read_message':
+            await self.handle_read_message()
+            return
+        
         relationship = await self.get_relationship(self.sender, self.receiver)
         if not relationship:
             await self.send_error('You must be friends in order to chat.')
             return
 
-        message_type = text_data_json.get('type')
-        self.latest_type = message_type
         if message_type == 'chat_message':
             await self.handle_chat_message(text_data_json)
         elif message_type == 'typing':
             await self.handle_typing()
         elif message_type == 'stop_typing':
             await self.handle_stop_typing()
-        elif message_type == 'read_message':
-            await self.handle_read_message()
         elif message_type == 'delete_message':
             await self.handle_delete_message(text_data_json)
         elif message_type == 'online_users':
@@ -81,7 +83,7 @@ class ChatRoomConsumer(AsyncWebsocketConsumer):
     async def handle_chat_message(self, text_data_json):
         message = await self.save_message(self.sender, self.receiver, text_data_json['message'])
         await self.channel_layer.group_send(
-            self.room_group_name,
+            self.group_name,
             {
                 'type': 'chat_message',
                 'message': MessageConsumerSerializer(message).data,
@@ -94,7 +96,7 @@ class ChatRoomConsumer(AsyncWebsocketConsumer):
 
     async def handle_typing(self):
         await self.channel_layer.group_send(
-            self.room_group_name,
+            self.group_name,
             {
                 'type': 'typing',
                 'sender': self.sender.username,
@@ -104,7 +106,7 @@ class ChatRoomConsumer(AsyncWebsocketConsumer):
 
     async def handle_stop_typing(self):
         await self.channel_layer.group_send(
-            self.room_group_name,
+            self.group_name,
             {
                 'type': 'stop_typing',
                 'sender': self.sender.username,

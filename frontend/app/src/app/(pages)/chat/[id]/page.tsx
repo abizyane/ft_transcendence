@@ -31,7 +31,7 @@ const UserChatPage = ({ currentUser }) => {
   useEffect(() => {
     setScrollToBottom(scrollToBottom);
 
-  }, [currentUser, currentChat, conversations, messageContainerRef, scrollToBottom]);
+  }, [currentUser, currentChat, conversations, messageContainerRef]);
   
   const handleSendMessage = () => {
     if (input.trim() && ws?.readyState === WebSocket.OPEN) {
@@ -113,7 +113,6 @@ const UserChatPage = ({ currentUser }) => {
   if (!currentChat) {
     return <div>No chat data found.</div>;
   }
-  console.log("messages ", currentChat.messages);
   return (
     <div className="h-full">
       <main className="flex-grow flex flex-row h-fit">
@@ -127,7 +126,6 @@ const UserChatPage = ({ currentUser }) => {
             {currentChat?.messages
               .sort((a, b) => new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime())
               .map((msg, index) => {
-                console.log("msg", msg);
                 return (
                   <div
                     key={index}

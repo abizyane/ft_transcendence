@@ -30,8 +30,11 @@ interface ChatContextType {
   currentChat?: Conversation;
   ws: WebSocket | null;
   typing: boolean;
+  searchConversations: { [key: string]: Conversation };
+  setSearchConversations: (searchConversations: { [key: string]: Conversation }) => void;
   setCurrentChat: (username: string, conversation?: Conversation) => void;
-  setScrollToBottom: (scrollToBottom: () => void) => void;
+  setScrollToBottom: (callback: () => void) => void;
+  setMessageContainerRef: (ref: React.RefObject<HTMLDivElement> | null) => void;
   setTyping: (typing: boolean) => void;
   addMessage: (message: Message) => void;
   updateUserStatus: (username: string, isOnline: boolean) => void;
@@ -51,11 +54,13 @@ export const useChat = () => {
 
 export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [conversations, setConversations] = useState<{ [key: string]: Conversation }>(undefined);
+  const [searchConversations, setSearchConversations] = useState<{ [key: string]: Conversation }>(undefined);
   const [nextPage, setNextPage] = useState<string | null>(null);
   const [currentChat, setCurrentChat] = useState<Conversation>(undefined);
-  const [scrollToBottom, setScrollToBottom] = useState<() => void>(null);
+  const [scrollToBottom, setScrollToBottom] = useState<(() => void) | null>(null);
   const [ws, setWs] = useState<WebSocket | null>(null);
   const [typing, setTyping] = useState(false);
+  const [messageContainerRef, setMessageContainerRef] = useState<React.RefObject<HTMLDivElement> | null>(null);
   const { user } = useUser();
 
   const fetchConversations = async () => {
@@ -139,24 +144,39 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const addMessage = (message: Message) => {
     console.log("adding message", message);
     const otherUser = message.sender === user?.username ? message.receiver : message.sender;
+    const convSeen = message.sender === currentChat?.user.username  || user.username === message.sender ? 0 : 1;
     setConversations(prev => ({
       ...prev,
       [otherUser]: {
         ...prev[otherUser],
         messages: [message, ...(prev[otherUser]?.messages || [])],
         lastMessage: message,
-        unreadCount: prev[otherUser]?.unreadCount + (message.sender !== user?.username ? 1 : 0)
+        unreadCount: convSeen
       }
     }));
 
     if (currentChat?.user.username === otherUser) {
+      sendSeenMessage(message.sender, message.receiver);
       setCurrentChat(prev => prev ? {
         ...prev,
+        unreadCount: convSeen,
         messages: [message, ...prev.messages],
         lastMessage: message
       } : undefined);
     }
+    if (scrollToBottom) {
+      console.log("addMessage scrollToBottom");
+      scrollToBottom();
+    }
   };
+
+  const sendSeenMessage = (senderUser:string, receiverUser:string) => {
+    ws.send(JSON.stringify({
+      type: "read_message",
+      sender: senderUser,
+      receiver: receiverUser
+    }));
+  }
 
   const updateUserStatus = (username: string, isOnline: boolean) => {
     setConversations(prev => ({
@@ -177,6 +197,7 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
     if (conversation) {
       setCurrentChat(conversation);
+      // sendSeenMessage(user.username, username);
       setConversations(prev => ({
         ...prev,
         [username]: {
@@ -195,6 +216,7 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
         const data = JSON.parse(event.data);
         if (data.type === "chat_message") {
           addMessage(data.message);
+          console.log("current chat", data);
           setTyping(false);
           if (scrollToBottom) {
             scrollToBottom();
@@ -243,9 +265,12 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
       ws,
       typing,
       setTyping,
+      searchConversations,
+      setSearchConversations,
       setScrollToBottom,
       setCurrentChat: handleSetCurrentChat,
       addMessage,
+      setMessageContainerRef,
       updateUserStatus,
       fetchConversations,
       fetchMessages
