@@ -73,6 +73,9 @@ export default function Canvas ({socketRef, callback}){
                         console.log("not ready")
                         callback(false)
                       }
+                    if (jsondata.msg){
+                        console.log(jsondata.msg)
+                    }
                 }
             };
         }

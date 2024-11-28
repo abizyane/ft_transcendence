@@ -48,7 +48,6 @@ class TournamentConsumer(AsyncWebsocketConsumer):
             "type" : "joined.competitor",
         })
         if self.room.is_ready():
-            await asyncio.sleep(3)
             TournamentConsumer.rm.switch_to_ready(self.room)
             competitors_gen = iter(list(self.room.tournament.p_holders.values()))
             self.room.holder = MatchTreeBuilder.build_tree(MatchHolder(),0, 1, competitors_gen, self.room.size)
@@ -126,24 +125,32 @@ class TournamentConsumer(AsyncWebsocketConsumer):
                 'msg': 'You Won'
             }))
             # self.p_holder.paddle = None
-            self.p_holder.upgrade() # if err mean he won
-            gc.collect()
-            await self.channel_layer.group_send(prev_match_name,{
-                'type' : 'room.update',
-            })
-            self.match = self.room.tournament.get_player_match(self.channel_name)
-            self.match_name = str(f'{self.room.name}m_{self.match.index}')
-            #send room state to every one in match
-            #
-            await self.channel_layer.group_add(self.match_name, self.channel_name)
-            if self.p_holder.back.is_ready():
-                await self.channel_layer.group_send(self.match_name, {
-                    'type' : 'newgame.request'
+            try :
+                self.p_holder.upgrade() # if err mean he won
+                gc.collect()
+                await self.channel_layer.group_send(prev_match_name,{
+                    'type' : 'room.update',
                 })
-                await self.channel_layer.group_discard(prev_match_name, self.channel_name)
-            else :
+                self.match = self.room.tournament.get_player_match(self.channel_name)
+                self.match_name = str(f'{self.room.name}m_{self.match.index}')
+                #send room state to every one in match
+                #
+                await self.channel_layer.group_add(self.match_name, self.channel_name)
+                if self.p_holder.back.is_ready():
+                    await self.channel_layer.group_send(self.match_name, {
+                        'type' : 'newgame.request'
+                    })
+                    await self.channel_layer.group_discard(prev_match_name, self.channel_name)
+                else :
+                    await self.send(text_data=json.dumps({
+                        'msg': f'wait for {self.match_name} to strat'
+                    }))
+            except:
+                await self.channel_layer.group_send(prev_match_name,{
+                    'type' : 'room.update',
+                })
                 await self.send(text_data=json.dumps({
-                    'msg': f'wait for {self.match_name} to strat'
+                    'msg': 'You Won'
                 }))
         else:
             # self.p_holder.paddle = None
@@ -189,6 +196,7 @@ class TournamentConsumer(AsyncWebsocketConsumer):
             "competitors" : comp_info,
             "command" : "setCompetitors"
         }))
+        
 
     async def disconnect(self, error_code):
         if self.room:
