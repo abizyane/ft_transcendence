@@ -275,6 +275,6 @@ class Game{
     }, [])
     
     return (
-        <canvas tabIndex={1} ref={CanvasRef} className="w-full h-full "></canvas>
+        <canvas tabIndex={1} ref={CanvasRef} className="w-fit h-fit "></canvas>
     );
 }

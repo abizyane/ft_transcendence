@@ -1,3 +1,23 @@
+function neonEffect(ctx, rgb , callback){
+    ctx.shadowColor = "rgb("+rgb[0]+","+rgb[1]+","+rgb[2]+")";
+    ctx.shadowBlur = 20;
+    ctx.strokeStyle= "rgba("+rgb[0]+","+rgb[1]+","+rgb[2]+",0.2)";
+    ctx.lineWidth=7.5;
+    callback;
+    ctx.strokeStyle= "rgba("+rgb[0]+","+rgb[1]+","+rgb[2]+",0.2)";
+    ctx.lineWidth=6;
+    callback;
+    ctx.strokeStyle= "rgba("+rgb[0]+","+rgb[1]+","+rgb[2]+",0.2)";
+    ctx.lineWidth=4.5;
+    callback;
+    ctx.strokeStyle= "rgba("+rgb[0]+","+rgb[1]+","+rgb[2]+",0.2)";
+    ctx.lineWidth=3;
+    callback;
+    ctx.strokeStyle= '#fff';
+    ctx.lineWidth=1.5;
+    callback;
+}
+
 class Ball{
     constructor(game, init){
         this.game = game
@@ -28,9 +48,32 @@ class Player
         this.posY = init.posY
         this.color = init.color
     }
+    drawRect(ctx){
+        ctx.fillRect(this.posX, this.posY, this.width, this.height);
+        ctx.strokeRect(this.posX, this.posY, this.width, this.height );
+    }
     draw(ctx){
         ctx.fillStyle = this.color;
-        ctx.fillRect(this.posX, this.posY, this.width, this.height);
+        ctx.save()
+        const rgb = [0,0,255]
+        ctx.shadowColor = "rgb("+rgb[0]+","+rgb[1]+","+rgb[2]+")";
+        ctx.shadowBlur = 10;
+        ctx.strokeStyle= "rgba("+rgb[0]+","+rgb[1]+","+rgb[2]+",0.2)";
+        ctx.lineWidth=7.5;
+        this.drawRect(ctx);
+        ctx.strokeStyle= "rgba("+rgb[0]+","+rgb[1]+","+rgb[2]+",0.2)";
+        ctx.lineWidth=6;
+        this.drawRect(ctx);
+        ctx.strokeStyle= "rgba("+rgb[0]+","+rgb[1]+","+rgb[2]+",0.2)";
+        ctx.lineWidth=4.5;
+        this.drawRect(ctx);
+        ctx.strokeStyle= "rgba("+rgb[0]+","+rgb[1]+","+rgb[2]+",0.2)";
+        ctx.lineWidth=3;
+        this.drawRect(ctx);
+        ctx.strokeStyle= '#fff';
+        ctx.lineWidth=1;
+        this.drawRect(ctx);
+        ctx.restore()
     }
     update(cordinate){
         this.posY = cordinate.y
@@ -49,6 +92,8 @@ export default class Game_Front{
     }
 
     render(ctx){
+        ctx.fillStyle = "rgba(0,0,0,0.7)";
+        ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
         this.player_1.draw(ctx)
         this.player_2.draw(ctx)
         this.ball.draw(ctx)
