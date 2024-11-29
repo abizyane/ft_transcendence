@@ -91,6 +91,11 @@ class TournamentConsumer(AsyncWebsocketConsumer):
 
     async def init_match(self, event):
         self.game = self.match.game
+        for i in range(1,4):
+            await self.send(json.dumps({
+                'timer': str(i)
+            })) 
+            await asyncio.sleep(1)
         await self.send(text_data=json.dumps({
             'type' : 'room',
             'command' : 'setReady'
@@ -222,7 +227,7 @@ class TournamentConsumer(AsyncWebsocketConsumer):
             else :
                 try:
                     self.p_holder.competitor.exit_room(self.room)
-                    del self.room.tournament.p_holders[self.channel_name]
+                    # del self.room.tournament.p_holders[self.channel_name]
                 except self.room.RoomIsEmpty:
                     TournamentConsumer.rm.remove_not_ready(self.room)
         await self.channel_layer.group_discard(self.room.name, self.channel_name)
@@ -249,15 +254,15 @@ class TournamentConsumer(AsyncWebsocketConsumer):
             user_id=self.p_holder.competitor.user_id
         )
         opponent = Profile.objects.get(
-            user_id=self.match.get_opponent(self.p_holder).user_id
+            user_id=self.match.get_opponent(self.p_holder).competitor.user_id
         )
 
         if self.p_holder.paddle.color == 'blue':
             player_1, player_2 = curr_player, opponent
-            score_1, score_2 = self.game.blue_score, self.game.red_score
+            score_1, score_2 = self.game.blue.score, self.game.red.score
         else:
             player_1, player_2 = opponent, curr_player
-            score_1, score_2 = self.game.red_score, self.game.blue_score
+            score_1, score_2 = self.game.red.score, self.game.blue.score
 
         game = GameModel.objects.create(
             player_1=player_1,
@@ -266,12 +271,13 @@ class TournamentConsumer(AsyncWebsocketConsumer):
         )
 
         Scores.objects.create(
-            game=game,
+            game_id=game,
             score_1=score_1,
             score_2=score_2
         )
 
-    async def award_xp(self, won: bool):
+    @database_sync_to_async
+    def award_xp(self, won: bool):
         curr_player = Profile.objects.get(
             user_id=self.p_holder.competitor.user_id
         )
@@ -281,9 +287,9 @@ class TournamentConsumer(AsyncWebsocketConsumer):
             pass
         elif won:
             xp = xp * 3 if self.game_mode == 'tournament' else xp * 1.5
-            xp += self.game.blue_score * 20 if self.p_holder.paddle.color == 'blue' else self.game.red_score * 20
+            xp += self.game.blue.score * 20 if self.p_holder.paddle.color == 'blue' else self.game.red.score * 20
         else:
             xp /= 2
-            xp += self.game.blue_score * 10 if self.p_holder.paddle.color == 'blue' else self.game.red_score * 10
+            xp += self.game.blue.score * 10 if self.p_holder.paddle.color == 'blue' else self.game.red.score * 10
 
         curr_player.increment_xp(xp)
