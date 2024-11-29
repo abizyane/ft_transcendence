@@ -11,6 +11,7 @@ import numpy as np
 from channels.db import database_sync_to_async
 
 from ..models import Profile, GameModel, Scores, TournamentModel
+from ...astropong.serializers.UserSerializer import UserSerializer
 
 
 class TournamentConsumer(AsyncWebsocketConsumer):
