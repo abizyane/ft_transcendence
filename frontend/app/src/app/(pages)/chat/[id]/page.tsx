@@ -13,7 +13,7 @@ import { IoSend } from "react-icons/io5";
 
 
 const UserChatPage = ({ currentUser }) => {
-  const { currentChat, conversations, typing, ws, setScrollToBottom, addMessage, fetchMessages } = useChat();
+  const { currentChat, conversations, typing, ws, setMessageContainerRef, addMessage, fetchMessages } = useChat();
   // console.log("currentChat c", currentChat);
   // console.log("conversations c", conversations);
   const [input, setInput] = useState("");
@@ -25,15 +25,19 @@ const UserChatPage = ({ currentUser }) => {
   
   const scrollToBottom = () => {
     if (messageContainerRef.current) {
-    console.log("scrolling to bottom");
       messageContainerRef.current.scrollTop = messageContainerRef.current.scrollHeight;
     }
   };
-  useEffect(() => {
-    setScrollToBottom(scrollToBottom);
 
-  }, [currentUser, currentChat, conversations, messageContainerRef]);
+  useEffect(() => {
+    setMessageContainerRef(messageContainerRef);
+    // scrollToBottom();
+  }, [messageContainerRef]);
   
+useEffect(() => {
+  scrollToBottom();
+}, [typing]);
+
   const handleSendMessage = () => {
     if (input.trim() && ws?.readyState === WebSocket.OPEN) {
       const newMessage = {
@@ -47,7 +51,7 @@ const UserChatPage = ({ currentUser }) => {
       ws.send(JSON.stringify(newMessage));
       addMessage(newMessage);
       setInput("");
-      scrollToBottom();
+      setTimeout(scrollToBottom, 100);
     } else {
       console.log("WebSocket is not open.");
     }
@@ -219,42 +223,9 @@ export default function Page() {
   const [error, setError] = useState(null);
   
   useEffect(() => {
-    // const fetchChatUser = async () => {
-    //   try {
-    //     console.log("chatUserid", chatUserid);
-    //     const response = await fetch(
-    //       `http://localhost:8000/chat/room/${chatUserid.id}`,
-    //       {
-    //         method: "GET",
-    //         credentials: "include",
-    //       }
-    //     );
 
-    //     if (!response.ok) {
-    //       throw new Error("User not found or API error");
-    //     }
-
-    //     const data = await response.json();
-    //     // setChatUser(data);
-    //     console.log(data);
-    //     setCurrentChat(data.user.username);
-    //   } catch (err) {
-    //     setError(err.message);
-    //   } finally {
-    //     setLoading(false);
-    //   }
-    // };
-    
-    // fetchChatUser();
-    // console.log("chatUserid", chatUserid);
-    // console.log("conversations", conversations);
-    // let timer = setTimeout(()=>{
-
-    // },100);
-    // if (conversations)
       fetchMessages(chatUserid.id, true).then(()=>{
           setLoading(false);
-          // console.log("fetching chat user", currentChat);
         });
   }, [chatUserid.id]);
 
@@ -265,13 +236,9 @@ export default function Page() {
   if (error) {
     return <div>Error: {error}</div>;
   }
-  // console.log("current chat", currentChat);
   if ( !currentUser) {
     return <div>No user data found.</div>;
   }
-  // if (!currentChat) {
-  //   return <div>No chat data found.</div>;
-  // }
 
   return <UserChatPage currentUser={currentUser} />;
 }

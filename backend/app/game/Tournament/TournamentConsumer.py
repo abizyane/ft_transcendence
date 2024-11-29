@@ -4,6 +4,8 @@ from .competitor import Competitor,Room
 import json
 from .matchHolder import MatchTreeBuilder, MatchHolder, PlayerHolder
 import asyncio
+from urllib.parse import urljoin
+from django.conf import settings
 from .tournament import Tournament
 from ..game_utils import Game, Player
 import gc
@@ -11,9 +13,17 @@ import numpy as np
 from channels.db import database_sync_to_async
 
 from ..models import Profile, GameModel, Scores, TournamentModel
+from astropong.serializers.UserSerializer import UserSerializer
 
+def build_absolute_image_uri(scope, relative_path):
+    host = dict(scope['headers']).get(b'host', b'localhost').decode('utf-8')
 
+    scheme = scope.get('scheme', 'http')
 
+    base_url = f"{scheme}://{host}"
+    if relative_path is None:
+        return urljoin(base_url, settings.MEDIA_URL + "Profil.jpg")
+    return urljoin(base_url, relative_path)
 class TournamentConsumer(AsyncWebsocketConsumer):
     rm = RoomListManager()
     rooms = {}
@@ -37,7 +47,7 @@ class TournamentConsumer(AsyncWebsocketConsumer):
 
         await self.accept()
         self.p_holder = PlayerHolder(Competitor(self.channel_name))
-        self.set_competitor_info(username=user.username, img=user.profile_pic, userId=user.id)
+        self.set_competitor_info(username=user.username, img=build_absolute_image_uri(self.scope, user.profile_pic), userId=user.id)
         self._type = self.scope['url_route']['kwargs']['competition_type']
         self.game_mode = "tournament" if self._type == "tournament" else "1v1"
         self.room:Room = None
