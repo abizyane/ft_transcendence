@@ -120,10 +120,10 @@ export function Chat({ children }: ChatLayoutProps) {
   };
 
   const handleUserClick = (user: User) => {
-    if (currentChat && currentChat.user.username == user.username)
-      return;
     if (isMobile) openSlider(user);
     // else setSelectedId(user);
+
+    console.log("user clicked", user);
     router.push(`/chat/${user.id}`);
   };
 
@@ -160,7 +160,7 @@ export function Chat({ children }: ChatLayoutProps) {
   // console.log("convs rendered", conversations);
 if (!conversations)
   return <div className="w-full h-full flex justify-center items-center"><Loader/></div>
- 
+ console.log("current chat layout", currentChat);
   return (
 
     <div className=" w-full flex flex-col justify-start items-start">
@@ -298,9 +298,10 @@ if (!conversations)
       >
         {currentChat && (
           <div className="px-6 py-4 flex bg-gray-800/60 rounded-xl flex-row flex-none justify-start gap-4 items-center shadow">
+            <div className="flex justify-start w-full">
             <button
               onClick={closeSlider}
-              className="text-gray-600 hover:text-black"
+              className="text-gray-600 hover:text-black mr-8"
             >
               Close
             </button>
@@ -315,6 +316,29 @@ if (!conversations)
               <div className="text-sm">
                 <p className="font-bold">{currentChat.user.username}</p>
                 <p>{is_online ? "Online" : "Offline"}</p>
+                </div>
+              </div>              
+            </div>
+            <div className="w-full  flex justify-end">
+              <div className="h-8 w-8 rounded-full bg-gray-900 flex  justify-center items-center">
+                <DropdownMenu>
+                  <DropdownMenuTrigger className="text-white">
+                    <FaEllipsisV />
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent className="mr-12 mt-1 bg-gray-800 border-violet-primary">
+                    <DropdownMenuItem onClick={() => handleViewProfileClick(currentChat.user.id)}>
+                      <span className="text-white">View profile</span>
+                    </DropdownMenuItem>
+                    <DropdownMenuSeparator className="bg-black" />
+                    <DropdownMenuItem>
+                      <span className="text-white">Invite friend</span>
+                    </DropdownMenuItem>
+                    <DropdownMenuSeparator className="bg-black" />
+                    <DropdownMenuItem>
+                      <span className="text-white">Block</span>
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
               </div>
             </div>
           </div>

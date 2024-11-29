@@ -13,7 +13,7 @@ import { IoSend } from "react-icons/io5";
 
 
 const UserChatPage = ({ currentUser }) => {
-  const { currentChat, conversations, typing, ws, setScrollToBottom, addMessage, fetchMessages } = useChat();
+  const { currentChat, conversations, typing, ws, setMessageContainerRef, addMessage, fetchMessages } = useChat();
   // console.log("currentChat c", currentChat);
   // console.log("conversations c", conversations);
   const [input, setInput] = useState("");
@@ -25,15 +25,19 @@ const UserChatPage = ({ currentUser }) => {
   
   const scrollToBottom = () => {
     if (messageContainerRef.current) {
-    console.log("scrolling to bottom");
       messageContainerRef.current.scrollTop = messageContainerRef.current.scrollHeight;
     }
   };
-  useEffect(() => {
-    setScrollToBottom(scrollToBottom);
 
-  }, [currentUser, currentChat, conversations, messageContainerRef]);
+  useEffect(() => {
+    setMessageContainerRef(messageContainerRef);
+    // scrollToBottom();
+  }, [messageContainerRef]);
   
+useEffect(() => {
+  scrollToBottom();
+}, [typing]);
+
   const handleSendMessage = () => {
     if (input.trim() && ws?.readyState === WebSocket.OPEN) {
       const newMessage = {
@@ -47,7 +51,7 @@ const UserChatPage = ({ currentUser }) => {
       ws.send(JSON.stringify(newMessage));
       addMessage(newMessage);
       setInput("");
-      scrollToBottom();
+      setTimeout(scrollToBottom, 100);
     } else {
       console.log("WebSocket is not open.");
     }
