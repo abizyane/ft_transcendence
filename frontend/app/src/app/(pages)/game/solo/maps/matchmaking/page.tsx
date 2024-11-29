@@ -208,7 +208,6 @@ const Page = () => {
       <div className="w-full h-full absolute text-center inset-0 bg-black/20 backdrop-blur-md  z-[100] ">
         <h3 className="justify-center items-center w-full h-full flex text-center text-3xl text-white text-nowrap font-extrabold">Game Starting in: {countdown}s</h3>
       </div>)}
-    <div>
       {gameready && isRandomMatch && countdown === 0 ? (
         <div className="min-w-[300px] w-full h-full flex flex-col items-center justify-between p-2">
           <div className="w-full  h-full border-violet-primary backdrop-blur-lg border-2 p-2 rounded-lg flex flex-col mb-24 lg:mb-0">
@@ -256,7 +255,7 @@ const Page = () => {
               </div>
             </div>
             <div
-              className=" w-full h-full flex items-center justify-center border-4 bg-fixed border-white rounded-lg relative"
+              className=" w-full h-full flex items-center justify-center border-4 object-cover border-white rounded-lg relative"
               style={{
                 backgroundImage: `url('/${map}.jpeg')`,
                 backgroundSize: "cover",
@@ -269,8 +268,8 @@ const Page = () => {
           </div>
         </div>
       ) : isVsBot && countdown === 0 ? (
-        <div className="min-w-[320px] w-full h-full flex flex-col items-center justify-between p-2">
-          <div className="w-full max-w-full h-full border-violet-primary backdrop-blur-lg border-2 p-2 rounded-lg flex flex-col mb-24 lg:mb-0">
+        <div className="max-h-[900px] w-full h-full flex flex-col items-center justify-between p-2">
+          <div className="w-full h-full border-violet-primary backdrop-blur-lg border-2 p-2 rounded-lg flex flex-col mb-24 lg:mb-0">
             <div className="flex justify-between items-center w-full bg-transparent p-2 rounded-lg mb-2">
               <div className="flex items-center space-x-2 bg-gray-700 p-1 lg:p-3 rounded-full w-36 lg:w-1/3 lg:h-14 justify-center lg:justify-start">
                 <Image
@@ -315,7 +314,7 @@ const Page = () => {
               </div>
             </div>
             <div
-              className="flex-grow w-full h-full flex items-center justify-center border-4 bg-fixed border-white rounded-lg relative"
+              className=" w-full max-h-[800px] flex items-center justify-center border-4 object-cover border-white rounded-lg relative"
               style={{
                 backgroundImage: `url('/${map}.jpeg')`,
                 backgroundSize: "cover",
@@ -374,7 +373,7 @@ const Page = () => {
               </div>
             </div>
             <div
-              className="flex-grow w-full h-full flex items-center justify-center border-4 bg-fixed border-white rounded-lg relative"
+              className="flex-grow w-full h-full flex items-center justify-center border-4 object-cover border-white rounded-lg relative"
               style={{
                 backgroundImage: `url('/${map}.jpeg')`,
                 backgroundSize: "cover",
@@ -412,19 +411,8 @@ const Page = () => {
               <Avatar user={users[1]}></Avatar>
             </li>
           )}
-          {/* { isCountDownStarted && 
-            (<div className="flex flex-col items-center justify-center h-screen">
-            <h2 className="text-4xl text-white">
-              Game Starting in: {countdown}s
-            </h2>
-          </div>)
-          } */}
-          {/* <Link href={`/game/solo/maps/matchmaking/ponggame?game=${game}&map=${map}`} className="bg-blue-500 text-blue-800">
-            <button>Start</button>
-          </Link> */}
         </div>
       )}
-    </div>
     </>
 
   );
