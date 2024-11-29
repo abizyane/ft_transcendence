@@ -56,7 +56,7 @@ class Competitor(AbstractCompetitor):
     def get_info(self):
         return {
             'username' : self.username,
-            'profilePic' : self.img,
+            'profile_pic_url' : self.img,
             'lost' : self.islost,
             'id' : self._id,
         }
