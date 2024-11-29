@@ -13,6 +13,9 @@ from django.core.files.storage import default_storage
 from django.core.files.base import ContentFile
 from django.db import models
 from rest_framework.parsers import MultiPartParser, FormParser
+from datetime import datetime, timedelta
+from django.db.models import Q
+from django.utils import timezone
 
 
 class GamesHistoryView(APIView):
@@ -56,9 +59,10 @@ class GamesHistoryView(APIView):
         
 class PlayerWinRateView(APIView):
     permission_classes = [IsAuthenticated]
-    def get(self, request):
+    def post(self, request):
         try:
-            user_profile = Profile.objects.get(user_id=request.user)
+            userid = request.data.get('id')
+            user_profile = Profile.objects.get(user_id=userid)
             games = GameModel.get_all_games(user_profile.id)
             
             total_games = games.count()
@@ -99,5 +103,132 @@ class PlayerRanking(APIView):
         try:
             ranking = Profile.objects.order_by('-xp')
             return Response({'ranking': ProfileSerializer(ranking, many=True, context={'request': request}).data})
+        except Profile.DoesNotExist:
+            return Response({'error': 'Profile not found'}, status=404)
+
+            
+        
+class WeeklyStatsView(APIView):
+    permission_classes = [IsAuthenticated]
+    
+    def post(self, request):
+        try:
+            userid = request.data.get('id')
+            user_profile = Profile.objects.get(user_id=userid)
+            
+            end_date = timezone.now().replace(hour=23, minute=59, second=59)
+            start_date = (end_date - timedelta(days=6)).replace(hour=0, minute=0, second=0)
+            
+            games = GameModel.get_all_games(user_profile.id).filter(
+                created__range=(start_date, end_date)
+            )
+            
+            daily_stats = {}
+            for i in range(6, -1, -1): 
+                label = f'D-{i}' if i > 0 else 'D'
+                date = end_date - timedelta(days=i)
+                daily_stats[label] = {
+                    'wins': 0,
+                    'losses': 0,
+                    'date': date.strftime('%Y-%m-%d') 
+                }
+            
+            for game in games:
+                days_diff = (end_date - game.created).days
+                label = f'D-{days_diff}' if days_diff > 0 else 'D'
+                
+                if label in daily_stats:
+                    player_score = game.get_player_game_score(user_profile.id)
+                    opponent = game.get_opponent(user_profile)
+                    opponent_score = game.get_player_game_score(opponent.id)
+                    
+                    if player_score > opponent_score:
+                        daily_stats[label]['wins'] += 1
+                    elif player_score < opponent_score:
+                        daily_stats[label]['losses'] += 1
+            
+            return Response({
+                'dailyStats': daily_stats
+            })
+            
+        except Profile.DoesNotExist:
+            return Response({'error': 'Profile not found'}, status=404)
+
+class WeeklyXPView(APIView):
+    permission_classes = [IsAuthenticated]
+    
+    def post(self, request):
+        try:
+            userid = request.data.get('id')
+            user_profile = Profile.objects.get(user_id=userid)
+            
+            end_date = timezone.now().replace(hour=23, minute=59, second=59)
+            start_date = (end_date - timedelta(days=6)).replace(hour=0, minute=0, second=0)
+            
+            games = GameModel.get_all_games(user_profile.id).filter(
+                created__range=(start_date, end_date)
+            )
+            
+            daily_xp = {}
+            for i in range(6, -1, -1):
+                label = f'D-{i}' if i > 0 else 'D'
+                date = end_date - timedelta(days=i)
+                daily_xp[label] = {
+                    'xp_gained': 0,
+                    'date': date.strftime('%Y-%m-%d')
+                }
+            
+            for game in games:
+                days_diff = (end_date - game.created).days
+                label = f'D-{days_diff}' if days_diff > 0 else 'D'
+                
+                if label in daily_xp:
+                    xp_gained = game.get_player_game_xp(user_profile.id)
+                    daily_xp[label]['xp_gained'] += xp_gained
+            
+            return Response({
+                'dailyXP': daily_xp
+            })
+            
+        except Profile.DoesNotExist:
+            return Response({'error': 'Profile not found'}, status=404)
+        
+class DashboardView(APIView):
+    permission_classes = [IsAuthenticated]
+    def post(self, request):
+        try:
+
+            userid = request.data.get('id')
+            user_profile = Profile.objects.get(user_id=userid)
+            games = GameModel.get_all_games(user_profile.id)
+            
+            total_games = games.count()
+            wins = 0
+            losses = 0
+            draws = 0
+            
+            for game in games:
+                player_score = game.get_player_game_score(user_profile.id)
+                opponent = game.get_opponent(user_profile)
+                opponent_score = game.get_player_game_score(opponent.id)
+                
+                if player_score > opponent_score:
+                    wins += 1
+                elif player_score < opponent_score:
+                    losses += 1
+                else:
+                    draws += 1
+                    
+    
+            tournament_wins = user_profile.get_tournament_wins()
+            tournament_losses = user_profile.get_tournament_losses()
+            return Response({
+                'totalGames': total_games,
+                'wins': wins,
+                'losses': losses,
+                'draws': draws,
+                'tournamentWins': tournament_wins,
+                'tournamentLosses': tournament_losses
+            })
         except Profile.DoesNotExist:
             return Response({'error': 'Profile not found'}, status=404)

@@ -42,58 +42,8 @@ export function Chat({ children }: ChatLayoutProps) {
   const param = useParams();
   const userId = param.id;
 
-  // const fetchConversation = async () => {
-  //   try {
-  //     const response = await fetch(`http://localhost:8000/chat/conversations`, {
-  //       credentials: "include",
-  //     });
-  //     if (!response.ok) {
-  //       console.error("Fetch error:", error);
-  //     }
-  //     const data = await response.json();
-  //     data.results.map((item: any) => {
-  //       if (item.id == userId) setSelectedId(item);
-  //     });
-
-     
-  //   } catch (error) {
-  //     console.log("Fetch error:", error);
-  //   }
-  // };
-
-
-  // setUsers(() => {
-  //   return data?.results.map((User: any) => {
-  //     return {
-  //       id: User.id,
-  //       username: User.username,
-  //       profile_pic: User.profile_pic,
-  //       message: User.message,
-  //       time: User.timestamp,
-  //     };
-  //   });
-
-
-  useEffect(() => {
-    // const fetchData = async () => {
-    //   const conversations = await fetchConversations();
-    //   console.log('conv ', conversations);
-    //   Object.values(conversations).forEach((conversation) => {
-    //     setUsers((prevUsers) => [...prevUsers,
-    //       {
-    //         id: conversation.user.id,
-    //         username: conversation.user.username,
-    //         profile_pic: conversation.user.profile_pic,
-    //         message: conversation.lastMessage?.message || '',
-    //         time: conversation.lastMessage?.timestamp || ''
-    //       }
-    //     ]);
-    //   });
-    // };
-    
-    // fetchData();
-
-    const handleResize = () => {
+   useEffect(() => {
+      const handleResize = () => {
       if (window.innerWidth <= 1024) {
         setIsMobile(true);
       } else {
@@ -103,7 +53,6 @@ export function Chat({ children }: ChatLayoutProps) {
     window.addEventListener("resize", handleResize);
     handleResize();
 
-    console.log("conversations layout", conversations);
     return () => {
       window.removeEventListener("resize", handleResize);
     };
@@ -160,7 +109,6 @@ export function Chat({ children }: ChatLayoutProps) {
   // console.log("convs rendered", conversations);
 if (!conversations)
   return <div className="w-full h-full flex justify-center items-center"><Loader/></div>
- console.log("current chat layout", currentChat);
   return (
 
     <div className=" w-full flex flex-col justify-start items-start">

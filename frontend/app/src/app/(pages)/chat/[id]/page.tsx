@@ -223,42 +223,9 @@ export default function Page() {
   const [error, setError] = useState(null);
   
   useEffect(() => {
-    // const fetchChatUser = async () => {
-    //   try {
-    //     console.log("chatUserid", chatUserid);
-    //     const response = await fetch(
-    //       `http://localhost:8000/chat/room/${chatUserid.id}`,
-    //       {
-    //         method: "GET",
-    //         credentials: "include",
-    //       }
-    //     );
 
-    //     if (!response.ok) {
-    //       throw new Error("User not found or API error");
-    //     }
-
-    //     const data = await response.json();
-    //     // setChatUser(data);
-    //     console.log(data);
-    //     setCurrentChat(data.user.username);
-    //   } catch (err) {
-    //     setError(err.message);
-    //   } finally {
-    //     setLoading(false);
-    //   }
-    // };
-    
-    // fetchChatUser();
-    // console.log("chatUserid", chatUserid);
-    // console.log("conversations", conversations);
-    // let timer = setTimeout(()=>{
-
-    // },100);
-    // if (conversations)
       fetchMessages(chatUserid.id, true).then(()=>{
           setLoading(false);
-          // console.log("fetching chat user", currentChat);
         });
   }, [chatUserid.id]);
 
@@ -269,13 +236,9 @@ export default function Page() {
   if (error) {
     return <div>Error: {error}</div>;
   }
-  // console.log("current chat", currentChat);
   if ( !currentUser) {
     return <div>No user data found.</div>;
   }
-  // if (!currentChat) {
-  //   return <div>No chat data found.</div>;
-  // }
 
   return <UserChatPage currentUser={currentUser} />;
 }

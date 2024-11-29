@@ -373,7 +373,7 @@ const UserInfo: React.FC<UserInfoProps> = ({ user, setUser }) => {
               <div className="relative w-full h-full flex flex-col items-center justify-center bg-gray-800/20 rounded-xl">
                 <p className="text-white font-mont xl:font-bold xl:text-lg text-xs m-1">Win Rate</p>
                 <div className="relative w-full h-full flex items-center justify-center">
-                  <DoughnutChart winpercentage={winRatePercentage} />
+                  <DoughnutChart idUser={user.id} />
                 </div>
               </div>
             </div>

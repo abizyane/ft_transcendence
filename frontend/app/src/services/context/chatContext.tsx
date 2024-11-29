@@ -77,7 +77,6 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
       if (response.ok) {
         const data = await response.json();
         const newConversations: { [key: string]: Conversation } = {};
-        console.log("fetching conversations data", data);
         data.results.forEach((conv: any) => {
           newConversations[conv.username] = {
             user: {
@@ -143,7 +142,6 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   const addMessage = (message: Message) => {
-    console.log("adding message", message);
     const otherUser = message.sender === user?.username ? message.receiver : message.sender;
     const convSeen = message.sender === currentChat?.user.username || user.username === message.sender ? 0 : 1;
     
@@ -211,12 +209,10 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
   useEffect(() => {
     if (ws) {
       ws.onmessage = (event) => {
-        console.log(event);
         if (event.type === "message") {
           const data = JSON.parse(event.data);
           if (data.type === "chat_message") {
             addMessage(data.message);
-            console.log("current chat", data);
             setTyping(false);
             setTimeout(handleScrollToBottom, 100);
           } else if (data.type === "typing") {
@@ -241,11 +237,9 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
     const socket = new WebSocket(`ws://localhost:8000/ws/chat/room/`);
     socket.onopen = () => {
-      console.log("Connected to WebSocket");
     };
     
     socket.onclose = () => {
-      console.log("Disconnected from WebSocket");
     };
     setWs(socket);
 
