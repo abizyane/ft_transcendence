@@ -13,6 +13,7 @@ from channels.db import database_sync_to_async
 from ..models import Profile, GameModel, Scores, TournamentModel
 
 
+
 class TournamentConsumer(AsyncWebsocketConsumer):
     rm = RoomListManager()
     rooms = {}

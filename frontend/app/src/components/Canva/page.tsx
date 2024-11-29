@@ -122,6 +122,6 @@ export default function Canvas ({socketRef, callback, scoreSetter}){
     },[callback])
 
     return (
-        <canvas tabIndex={1} ref={canvasRef} className="w-full h-full "></canvas>
+        <canvas tabIndex={1} ref={canvasRef} className="w-fit h-fit "></canvas>
     );
 }
