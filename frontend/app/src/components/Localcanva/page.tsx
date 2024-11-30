@@ -101,33 +101,40 @@ class Enemy
     {
       this.game = game;
       this.canvas = game.canvas;
-      this.width =  30; 
-      this.height = 100;
+      this.width =  12; 
+      this.height = 50;
       this.rad = 10;
       this.posX= this.canvas.width - 20 - this.width;
       this.posY = this.canvas.height/2 - this.height / 2;
       this.speed = 5;
+      this.color = "red"
     }
-    draw(ctx)
-    {
-      ctx.beginPath();
-      ctx.strokeStyle = "black";
-      ctx.moveTo(this.posX,this.posY + this.rad);
-      ctx.arcTo(this.posX, this.posY + this.height,
-               this.posX + this.width, this.posY + this.height, this.rad);
-      
-      ctx.arcTo(this.posX + this.width, this.posY + this.height,
-               this.posX + this.width, this.posY, this.rad);
-      
-      ctx.arcTo(this.posX + this.width, this.posY,
-               this.posX , this.posY, this.rad);
-      
-       ctx.arcTo(this.posX, this.posY,
-               this.posX , this.posY + this.height, this.rad);
-      ctx.fillStyle = "red"
-      ctx.fill();
-      ctx.stroke();
-      ctx.closePath();
+    drawRect(ctx){
+      ctx.fillRect(this.posX, this.posY, this.width, this.height);
+      ctx.strokeRect(this.posX, this.posY, this.width, this.height );
+    }
+    draw(ctx){
+        ctx.fillStyle = this.color;
+        ctx.save()
+        const rgb = [0,0,255]
+        ctx.shadowColor = "rgb("+rgb[0]+","+rgb[1]+","+rgb[2]+")";
+        ctx.shadowBlur = 10;
+        ctx.strokeStyle= "rgba("+rgb[0]+","+rgb[1]+","+rgb[2]+",0.2)";
+        ctx.lineWidth=7.5;
+        this.drawRect(ctx);
+        ctx.strokeStyle= "rgba("+rgb[0]+","+rgb[1]+","+rgb[2]+",0.2)";
+        ctx.lineWidth=6;
+        this.drawRect(ctx);
+        ctx.strokeStyle= "rgba("+rgb[0]+","+rgb[1]+","+rgb[2]+",0.2)";
+        ctx.lineWidth=4.5;
+        this.drawRect(ctx);
+        ctx.strokeStyle= "rgba("+rgb[0]+","+rgb[1]+","+rgb[2]+",0.2)";
+        ctx.lineWidth=3;
+        this.drawRect(ctx);
+        ctx.strokeStyle= '#fff';
+        ctx.lineWidth=1;
+        this.drawRect(ctx);
+        ctx.restore()
     }
 
     predict(){
@@ -153,33 +160,40 @@ class Player
     {
       this.game = game;
       this.canvas = game.canvas
-      this.width = 30; 
-      this.height = 100;
+      this.width = 12; 
+      this.height = 50;
       this.rad = 10;
       this.posX=20;
       this.posY = this.canvas.height/2 - this.height / 2;
       this.speed = 5;
+      this.color = "blue"
     }
-    draw(ctx)
-    {
-      ctx.beginPath();
-      ctx.strokeStyle = "black";
-      ctx.moveTo(this.posX,this.posY + this.rad);
-      ctx.arcTo(this.posX, this.posY + this.height,
-               this.posX + this.width, this.posY + this.height, this.rad);
-      
-      ctx.arcTo(this.posX + this.width, this.posY + this.height,
-               this.posX + this.width, this.posY, this.rad);
-      
-      ctx.arcTo(this.posX + this.width, this.posY,
-               this.posX , this.posY, this.rad);
-      
-       ctx.arcTo(this.posX, this.posY,
-               this.posX , this.posY + this.height, this.rad);
-      ctx.fillStyle = "green"
-      ctx.fill();
-      ctx.stroke();
-      ctx.closePath();
+    drawRect(ctx){
+      ctx.fillRect(this.posX, this.posY, this.width, this.height);
+      ctx.strokeRect(this.posX, this.posY, this.width, this.height );
+    }
+    draw(ctx){
+        ctx.fillStyle = this.color;
+        ctx.save()
+        const rgb = [0,0,255]
+        ctx.shadowColor = "rgb("+rgb[0]+","+rgb[1]+","+rgb[2]+")";
+        ctx.shadowBlur = 10;
+        ctx.strokeStyle= "rgba("+rgb[0]+","+rgb[1]+","+rgb[2]+",0.2)";
+        ctx.lineWidth=7.5;
+        this.drawRect(ctx);
+        ctx.strokeStyle= "rgba("+rgb[0]+","+rgb[1]+","+rgb[2]+",0.2)";
+        ctx.lineWidth=6;
+        this.drawRect(ctx);
+        ctx.strokeStyle= "rgba("+rgb[0]+","+rgb[1]+","+rgb[2]+",0.2)";
+        ctx.lineWidth=4.5;
+        this.drawRect(ctx);
+        ctx.strokeStyle= "rgba("+rgb[0]+","+rgb[1]+","+rgb[2]+",0.2)";
+        ctx.lineWidth=3;
+        this.drawRect(ctx);
+        ctx.strokeStyle= '#fff';
+        ctx.lineWidth=1;
+        this.drawRect(ctx);
+        ctx.restore()
     }
   
     update()
@@ -238,15 +252,18 @@ class Game{
         this.mouseY = e.offsetY;
       });
     }
-    render(ctx){
-      this.player.update();
+    update(){
       this.ball.iscollide();
-      this.player.draw(ctx);
-      this.ball.update();
-      this.ball.draw(ctx);
+      this.player.update();
       this.enemy.update(this.ball);
-      this.enemy.draw(ctx);
+      this.ball.update();
       this.scoreBoard.update();
+    }
+
+    render(ctx){
+      this.player.draw(ctx);
+      this.ball.draw(ctx);
+      this.enemy.draw(ctx);
       this.scoreBoard.draw(ctx);
     }
     
@@ -266,7 +283,8 @@ class Game{
         game.render(Context.current)
         function animate(){
             if (CanvasRef.current){
-                Context.current.clearRect(0,0, CanvasRef.current.width, CanvasRef.current.height)
+              Context.current.clearRect(0,0, CanvasRef.current.width, CanvasRef.current.height)
+                game.update()
                 game.render(Context.current)
                 requestAnimationFrame(animate)
             }

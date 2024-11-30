@@ -97,108 +97,119 @@ class Ball {
 
 class Enemy
 {
-    constructor(game)
-    {
-      this.game = game;
-      this.canvas = game.canvas;
-      this.width =  30; 
-      this.height = 100;
-      this.rad = 10;
-      this.posX= this.canvas.width - 20 - this.width;
-      this.posY = this.canvas.height/2 - this.height / 2;
-      this.speed = 5;
-    }
-    draw(ctx)
-    {
-      ctx.beginPath();
-      ctx.strokeStyle = "black";
-      ctx.moveTo(this.posX,this.posY + this.rad);
-      ctx.arcTo(this.posX, this.posY + this.height,
-               this.posX + this.width, this.posY + this.height, this.rad);
-      
-      ctx.arcTo(this.posX + this.width, this.posY + this.height,
-               this.posX + this.width, this.posY, this.rad);
-      
-      ctx.arcTo(this.posX + this.width, this.posY,
-               this.posX , this.posY, this.rad);
-      
-       ctx.arcTo(this.posX, this.posY,
-               this.posX , this.posY + this.height, this.rad);
-      ctx.fillStyle = "red"
-      ctx.fill();
-      ctx.stroke();
-      ctx.closePath();
-    }
+  constructor(game)
+  {
+    this.game = game;
+    this.canvas = game.canvas;
+    this.width =  12; 
+    this.height = 50;
+    this.rad = 10;
+    this.posX= this.canvas.width - 20 - this.width;
+    this.posY = this.canvas.height/2 - this.height / 2;
+    this.speed = 5;
+    this.color = "red"
+  }
+  drawRect(ctx){
+    ctx.fillRect(this.posX, this.posY, this.width, this.height);
+    ctx.strokeRect(this.posX, this.posY, this.width, this.height );
+  }
+  draw(ctx){
+      ctx.fillStyle = this.color;
+      ctx.save()
+      const rgb = [255,0,0]
+      ctx.shadowColor = "rgb("+rgb[0]+","+rgb[1]+","+rgb[2]+")";
+      ctx.shadowBlur = 10;
+      ctx.strokeStyle= "rgba("+rgb[0]+","+rgb[1]+","+rgb[2]+",0.2)";
+      ctx.lineWidth=7.5;
+      this.drawRect(ctx);
+      ctx.strokeStyle= "rgba("+rgb[0]+","+rgb[1]+","+rgb[2]+",0.2)";
+      ctx.lineWidth=6;
+      this.drawRect(ctx);
+      ctx.strokeStyle= "rgba("+rgb[0]+","+rgb[1]+","+rgb[2]+",0.2)";
+      ctx.lineWidth=4.5;
+      this.drawRect(ctx);
+      ctx.strokeStyle= "rgba("+rgb[0]+","+rgb[1]+","+rgb[2]+",0.2)";
+      ctx.lineWidth=3;
+      this.drawRect(ctx);
+      ctx.strokeStyle= '#fff';
+      ctx.lineWidth=1;
+      this.drawRect(ctx);
+      ctx.restore()
+  }
 
-    predict(){
-
-    }
+  update(ball)
+  {
   
-    update(ball)
-    {
-    
-      // if (this.posY - ball.collisionY + this.height/2 < 0 && this.posY + this.height <= this.canvas.height)
-      // {
-      //   this.posY += this.speed;
-      // }
-      // if (this.posY - ball.collisionY + this.height/2 > 0 && this.posY >= 0){
-      //   this.posY -= this.speed;
-      // }
-      if (this.posY > 0 && this.game.keyUp)
-        {
-          this.posY -= this.speed;
-        }
-        if (this.posY < this.game.height - this.height && this.game.keyDown){
-          this.posY += this.speed;
-        }
-    }
-}
-
-class Player
-{
-    constructor(game)
-    {
-      this.game = game;
-      this.canvas = game.canvas
-      this.width = 30; 
-      this.height = 100;
-      this.rad = 10;
-      this.posX=20;
-      this.posY = this.canvas.height/2 - this.height / 2;
-      this.speed = 5;
-    }
-    draw(ctx)
-    {
-      ctx.beginPath();
-      ctx.strokeStyle = "black";
-      ctx.moveTo(this.posX,this.posY + this.rad);
-      ctx.arcTo(this.posX, this.posY + this.height,
-               this.posX + this.width, this.posY + this.height, this.rad);
-      
-      ctx.arcTo(this.posX + this.width, this.posY + this.height,
-               this.posX + this.width, this.posY, this.rad);
-      
-      ctx.arcTo(this.posX + this.width, this.posY,
-               this.posX , this.posY, this.rad);
-      
-       ctx.arcTo(this.posX, this.posY,
-               this.posX , this.posY + this.height, this.rad);
-      ctx.fillStyle = "green"
-      ctx.fill();
-      ctx.stroke();
-      ctx.closePath();
-    }
-  
-    update()
-    {
-      if (this.posY > 0 && this.game.wUp)
+    // if (this.posY - ball.collisionY + this.height/2 < 0 && this.posY + this.height <= this.canvas.height)
+    // {
+    //   this.posY += this.speed;
+    // }
+    // if (this.posY - ball.collisionY + this.height/2 > 0 && this.posY >= 0){
+    //   this.posY -= this.speed;
+    // }
+    if (this.posY > 0 && this.game.wUp)
       {
         this.posY -= this.speed;
       }
       if (this.posY < this.game.height - this.height && this.game.sUp){
         this.posY += this.speed;
       }
+  }
+}
+
+class Player
+{
+  constructor(game)
+  {
+    this.game = game;
+    this.canvas = game.canvas
+    this.width = 12; 
+    this.height = 50;
+    this.rad = 10;
+    this.posX=20;
+    this.posY = this.canvas.height/2 - this.height / 2;
+    this.speed = 5;
+    this.color = "blue"
+  }
+  drawRect(ctx){
+    ctx.fillRect(this.posX, this.posY, this.width, this.height);
+    ctx.strokeRect(this.posX, this.posY, this.width, this.height );
+  }
+  draw(ctx){
+      ctx.fillStyle = this.color;
+      ctx.save()
+      const rgb = [0,0,255]
+      ctx.shadowColor = "rgb("+rgb[0]+","+rgb[1]+","+rgb[2]+")";
+      ctx.shadowBlur = 10;
+      ctx.strokeStyle= "rgba("+rgb[0]+","+rgb[1]+","+rgb[2]+",0.2)";
+      ctx.lineWidth=7.5;
+      this.drawRect(ctx);
+      ctx.strokeStyle= "rgba("+rgb[0]+","+rgb[1]+","+rgb[2]+",0.2)";
+      ctx.lineWidth=6;
+      this.drawRect(ctx);
+      ctx.strokeStyle= "rgba("+rgb[0]+","+rgb[1]+","+rgb[2]+",0.2)";
+      ctx.lineWidth=4.5;
+      this.drawRect(ctx);
+      ctx.strokeStyle= "rgba("+rgb[0]+","+rgb[1]+","+rgb[2]+",0.2)";
+      ctx.lineWidth=3;
+      this.drawRect(ctx);
+      ctx.strokeStyle= '#fff';
+      ctx.lineWidth=1;
+      this.drawRect(ctx);
+      ctx.restore()
+  }
+  
+  update()
+  {
+    if (this.posY > 0 && this.game.wUp)
+    {
+      this.posY -= this.speed;
     }
+    if (this.posY < this.game.height - this.height && this.game.sUp){
+      this.posY += this.speed;
+    }
+  }
+
 }
 
 class Game{
@@ -255,15 +266,18 @@ class Game{
         }
       });
     }
-    render(ctx){
+    update(){
       this.player.update();
       this.ball.iscollide();
-      this.player.draw(ctx);
       this.ball.update();
-      this.ball.draw(ctx);
       this.enemy.update(this.ball);
-      this.enemy.draw(ctx);
       this.scoreBoard.update();
+    }
+
+    render(ctx){
+      this.player.draw(ctx);
+      this.ball.draw(ctx);
+      this.enemy.draw(ctx);
       this.scoreBoard.draw(ctx);
     }
     
@@ -284,6 +298,7 @@ class Game{
         function animate(){
             if (CanvasRef.current){
                 Context.current.clearRect(0,0, CanvasRef.current.width, CanvasRef.current.height)
+                game.update()
                 game.render(Context.current)
                 requestAnimationFrame(animate)
             }
