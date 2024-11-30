@@ -5,6 +5,15 @@ from .roomlister import RoomLister
 
 RoomType = Enum('RoomType', ['TWO', 'FOUR', 'EIGHT'])
 
+RoomTypes = {
+    "TWO": "TwoPlayersRoom",
+    "FOUR": "FourPlayersRoom"
+}
+RM_TYPE = {
+    2: "TWO",
+    4: "FOUR"
+}
+
 class AbstractRoomManager(ABC):
     @abstractmethod
     def get_room(self) -> Room:
@@ -64,25 +73,31 @@ class RoomManager(AbstractRoomManager):
         return (lambda room : room.ready, self.rooms)
 
 class RoomListManager(RoomManager):
-    RoomTypes = {
-        "TWO": "TwoPlayersRoom",
-        "FOUR": "FourPlayersRoom"
-    }
-    RM_TYPE = {
-        2: "TWO",
-        4: "FOUR"
-    }
+
     _id = 0
     def __init__(self):
         super().__init__()
         self.not_ready = RoomLister()
         self.ready = RoomLister()
+        self.names = {4:{}}
+
+    def name_handle(self, _type, name):
+        if _type == RM_TYPE[4] and not name:
+            raise MustHaveName
+        if name in self.names[4]:
+            raise UsedName(name)
+        if name:
+            self.names[4].add(name)
  
-    def create_room(self, _type):
-        new_room = super().create_room(_type)
-        self.not_ready.append(new_room)
-        self.naming_room(new_room)
-        return new_room
+    def create_room(self, _type, name=None):
+        try:
+            self.name_handle(_type=type, name=name)
+            new_room = super().create_room(_type)
+            self.not_ready.append(new_room)
+            self.naming_room(new_room, name=name)
+            return new_room
+        except Exception as e :
+            raise
     
     def remove_ready(self, room:Room):
         self.ready.remove(room)
@@ -98,5 +113,38 @@ class RoomListManager(RoomManager):
     def switch_to_ready(self, room:Room):
         self.ready.append(self.not_ready.remove(room))
 
-    def naming_room(self, room:Room):
-        room.name =  f'room_{RoomListManager.RoomTypes[ RoomListManager.RM_TYPE[room.size] ]}.{RoomListManager._id}'
+    def naming_room(self, room:Room, name=None):
+        room.name =  name if name else f'room_{RoomListManager.RoomTypes[ RoomListManager.RM_TYPE[room.size] ]}.{RoomListManager._id}'
+
+    class MustHaveName(Exception):
+        def __init__(self):
+            super().__init__(message="Name Your Room")
+        
+    class UsedName(Exception):
+        def __init__(self, name:str):
+            super().__init__(message=f'the room name: {name} already exist please change the room name')
+
+
+class RoomManagerNew(RoomManager):
+    def __init__(self):
+        self.type_four_name = {4:{}}
+        self.type_two = {}
+        self.type_four = {}
+        self.type_two_id = 0
+    
+    def create_room(self, _type:str, name):
+        self.room = super().create_room(_type)
+        if _type == RM_TYPE[2]:
+            self.type_two[self.type_two_id] = self.room
+            self.type_two_id += 1
+        elif _type == RM_TYPE[4] :
+            if not name:
+                raise MustHaveName
+    
+     class MustHaveName(Exception):
+        def __init__(self):
+            super().__init__(message="Name Your Room")
+        
+    class UsedName(Exception):
+        def __init__(self, name:str):
+            super().__init__(message=f'the room name: {name} already exist please change the room name')

@@ -1,6 +1,6 @@
 from channels.generic.websocket import AsyncWebsocketConsumer
 from .tournament_utils import RoomListManager
-from .competitor import Competitor,Room
+from .competitor import CompetitorNamed,Room
 import json
 from .matchHolder import MatchTreeBuilder, MatchHolder, PlayerHolder
 import asyncio
@@ -9,9 +9,13 @@ from ..game_utils import Game, Player
 import gc
 import numpy as np
 from channels.db import database_sync_to_async
-
+from enum import Enum
 from ..models import Profile, GameModel, Scores, TournamentModel
 
+class Command(Enum):
+    CREATE = 1
+    JOIN = 2
+    INPUT = 3
 
 class TournamentConsumer(AsyncWebsocketConsumer):
     rm = RoomListManager()
@@ -25,41 +29,42 @@ class TournamentConsumer(AsyncWebsocketConsumer):
     
     async def connect(self):
         user = self.scope['user']
-        if user.is_anonymous or not user.is_authenticated:
-            await self.accept()
-            await self.send(text_data=json.dumps({
-                "msg" : f"{user} is not authenticated.",
-                "type" : "error"
-            }))
-            await self.close()
-            return
+        # if user.is_anonymous or not user.is_authenticated:
+        #     await self.accept()
+        #     await self.send(text_data=json.dumps({
+        #         "msg" : f"{user} is not authenticated.",
+        #         "type" : "error"
+        #     }))
+        #     await self.close()
+        #     return
 
         await self.accept()
-        self.p_holder = PlayerHolder(Competitor(self.channel_name))
+        self.p_holder = PlayerHolder(CompetitorNamed(self.channel_name))
+        self.competitor = self.p_holder.competitor
         self.set_competitor_info(username=user.username, img=user.profile_pic, userId=user.id)
         self._type = self.scope['url_route']['kwargs']['competition_type']
-        self.game_mode = "tournament" if self._type == "tournament" else "1v1"
+        # self.game_mode = "tournament" if self._type == "tournament" else "1v1"
         self.room:Room = None
         self.match = None
         self.match_name = ''
         self.task = None
         self.game = None
         self.state = ''
-        self.access_competition(self.p_holder.competitor);
-        self.room.tournament.p_holders[self.channel_name] = self.p_holder
-        await self.channel_layer.group_add((self.room.name), self.channel_name)
-        await self.channel_layer.group_send(self.room.name, {
-            "type" : "joined.competitor",
-        })
-        if self.room.is_ready():
-            TournamentConsumer.rm.switch_to_ready(self.room)
-            competitors_gen = iter(list(self.room.tournament.p_holders.values()))
-            self.room.holder = MatchTreeBuilder.build_tree(MatchHolder(),0, 1, competitors_gen, self.room.size)
-            MatchTreeBuilder.visualize_tree(holder=self.room.holder, lvl=0, size=self.room.size)
-            await self.channel_layer.group_send(self.room.name, {
-                "type" : "init.game",
-            })
-            print(self.match)
+        self.access_competition(self.p_holder.competitor)
+        # self.room.tournament.p_holders[self.channel_name] = self.p_holder
+        # await self.channel_layer.group_add((self.room.name), self.channel_name)
+        # await self.channel_layer.group_send(self.room.name, {
+        #     "type" : "joined.competitor",
+        # })
+        # if self.room.is_ready():
+        #     TournamentConsumer.rm.switch_to_ready(self.room)
+        #     competitors_gen = iter(list(self.room.tournament.p_holders.values()))
+        #     self.room.holder = MatchTreeBuilder.build_tree(MatchHolder(),0, 1, competitors_gen, self.room.size)
+        #     MatchTreeBuilder.visualize_tree(holder=self.room.holder, lvl=0, size=self.room.size)
+        #     await self.channel_layer.group_send(self.room.name, {
+        #         "type" : "init.game",
+        #     })
+        #     print(self.match)
     
     async def init_game(self, event):
         self.match = self.room.tournament.get_player_match(self.channel_name)
@@ -232,15 +237,47 @@ class TournamentConsumer(AsyncWebsocketConsumer):
                     TournamentConsumer.rm.remove_not_ready(self.room)
         await self.channel_layer.group_discard(self.room.name, self.channel_name)
 
-    def access_competition(self, competitor:Competitor) -> None :
+    def access_competition(self, competitor:CompetitorNamed) -> None :
         competitor.set_competition_type(self._type)
         self.room = competitor.room_request(TournamentConsumer.rm)
         competitor.join_room(self.room)
+    
+    def command_switch(command) -> int:
+        return (Command.CREATE*(command == "create") + 
+                Command.JOIN*(command == "join") +
+                Command.INPUT*(command == "input")
+                )
+    
+    def create_room(self.data):
+        name = data.get('room_name')
+        try :
+            self.room = self.competitor.create_room(rm, _type=self._type, name=name)
+            self.channel_layer.group_add(self.channel_layer, name)
+        except Exception as e:
+            self.send(text_data=json.dumps({
+                'error_msg' : str(e.message)
+            }))
         
+    def join_room(self.data):
+        name = data.get('room_name')
+        self.competitor.join_room()
+    
+    def join_random_room(self):
+        self.room = self.competitor.random_room_request(TournamentConsumer.rm)
+        self.competitor.join_room(self.room)
+    
     async def receive(self, text_data):
         recv_data = json.loads(text_data)
-        if self.p_holder.paddle :
-            self.p_holder.paddle_command(recv_data['command'])
+        command = recv_data.get('command')
+        match command_switch(command) :
+            case Command.CREATE :
+                self.create_room(recv_data)
+            case Command.JOIN :
+                self.join_room(recv_data)
+            case Command.JOINRANDOM :
+                self.join_random_room()
+            case Command.INPUT:
+                self.handle_input(recv_data)
     
     async def leave_state(self, event):
         self.match.state = "LEAVE"
