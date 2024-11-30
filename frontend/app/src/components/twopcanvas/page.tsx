@@ -144,11 +144,11 @@ class Enemy
       // if (this.posY - ball.collisionY + this.height/2 > 0 && this.posY >= 0){
       //   this.posY -= this.speed;
       // }
-      if (this.posY > 0 && this.game.wUp)
+      if (this.posY > 0 && this.game.keyUp)
         {
           this.posY -= this.speed;
         }
-        if (this.posY < this.game.height - this.height && this.game.sUp){
+        if (this.posY < this.game.height - this.height && this.game.keyDown){
           this.posY += this.speed;
         }
     }

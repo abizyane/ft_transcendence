@@ -127,6 +127,7 @@ const Page = () => {
                   ...data.competitors,
                   { ...defaultCompetitors[0] },
                 ]);
+              console.log("stared countdozw")
               startCountDown();
 
               } else {
@@ -157,6 +158,9 @@ const Page = () => {
   };
 
   useEffect(() => {
+    if (!currentUser)
+      return;
+    console.log(isLocalGame, isRandomMatch, currentUser);
     if (isLocalGame) {
       setCompetitors([
         currentUser,
@@ -169,6 +173,7 @@ const Page = () => {
         currentUser,
         { ...defaultCompetitors[2], username: "Bot" },
       ]);
+      console.log("local start count")
       startCountDown();
     }
   }, [isLocalGame, isRandomMatch, currentUser]);
