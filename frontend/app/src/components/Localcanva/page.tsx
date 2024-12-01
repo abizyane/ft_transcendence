@@ -50,20 +50,19 @@ class Ball {
     iscollide(){
       if (this.posY + this.rad >= this.game.height || this.posY - this.rad <= 0 )
             this.dirY *= -1
-        if (this.posX < this.game.width * 1/4){
-            if (this.posX - this.rad <= 0){
-                this.game.enemy.score += 1
-                this.reset_ball()
-            }
-            if (this.posX - this.rad <= this.game.player.posX + this.game.player.width && (this.posY >= this.game.player.posY && this.posY <= this.game.player.posY + this.game.player.height) && ! this.game.player.isHiting)
-                {
-                  this.dirX *= -1
-                  this.posX = this.game.player.posX + this.game.player.width
-                  this.game.player.isHiting = true
-                }
-        }
-        else if (this.posX > this.game.width * 3/4){
-
+      if (this.posX < this.game.width * 1/4){
+          if (this.posX - this.rad <= 0){
+              this.game.enemy.score += 1
+              this.reset_ball()
+          }
+          if (this.posX - this.rad <= this.game.player.posX + this.game.player.width && (this.posY >= this.game.player.posY && this.posY <= this.game.player.posY + this.game.player.height) && ! this.game.player.isHiting)
+          {
+            this.dirX *= -1
+            this.posX = this.game.player.posX + this.game.player.width
+            this.game.player.isHiting = true
+          }
+      }
+      else if (this.posX > this.game.width * 3/4){
           if (this.posX + this.rad >= this.game.width){
               this.game.player.score += 1
               this.reset_ball()
@@ -74,15 +73,16 @@ class Ball {
               this.posX = this.game.enemy.posX - this.game.enemy.width
               this.game.enemy.isHiting = true
             }
-        }
-        else{
-          this.game.enemy.isHiting = false
-          this.game.player.isHiting = false
-        }
+      }
+      else{
+        this.game.enemy.isHiting = false
+        this.game.player.isHiting = false
+      }
     }
 
     reset_ball(){
       this.posX = this.game.width / 2
+      this.posY = this.game.height / 2
     }
 
     update(){
