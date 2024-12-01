@@ -10,15 +10,13 @@ class ScoreBoard{
         this.second_score = 0;
     }
     update(){
-        if (this.ball.collisionX - this.ball.rad < this.game.player.posX )
+        if (this.ball.posX - this.ball.rad < this.game.player.posX )
         {
             this.first_score++;
-            this.ball.init(-1)
         }
-        else if (this.ball.collisionX > this.game.enemy.posX + this.game.enemy.width/2)
+        else if (this.ball.posX > this.game.enemy.posX + this.game.enemy.width/2)
         {
             this.second_score++;
-            this.ball.init(1)
         }
     }
     draw(ctx){
@@ -31,16 +29,18 @@ class ScoreBoard{
 
 class Ball {
     constructor(game){
-      this.game = game;
-      this.fontFile = this.fontFile;
-      this.canvas = game.canvas;
-      this.col = 0;
-      this.rad = 15;
-      this.init(-1);
+        this.game = game
+        this.rad = 15
+        this.posX = game.width / 2
+        this.posY = game.height / 2
+        this.speed = 10
+        this.angle = 45
+        this.dirX = Math.cos(this.angle)
+        this.dirY = Math.sin(this.angle)
     }
     draw(ctx){
       ctx.beginPath();
-      ctx.arc(this.collisionX, this.collisionY, this.rad , 0,  Math.PI * 2, 1);
+      ctx.arc(this.posX, this.posY, this.rad , 0,  Math.PI * 2, 1);
       ctx.fillStyle = `rgb(255,255,255,0.5)`;
       ctx.strokeStyle = "white";
       ctx.fill();
@@ -48,49 +48,45 @@ class Ball {
       ctx.closePath();
     }
     iscollide(){
-      if (this.collisionX - this.rad >= this.game.player.posX && this.collisionX - this.rad - this.speed <= this.game.player.posX + this.game.player.width &&
-          this.collisionY >= this.game.player.posY && this.collisionY <= this.game.player.posY + this.game.player.height){
-            this.angle = ((this.collisionY - this.game.player.posY - this.game.player.height/2) * 45) / (this.game.player.height / 2);
-            this.angle = this.angle * Math.PI/180;
-            this.dirX = this.speed * Math.cos(this.angle);
-            this.dirY = this.speed * Math.sin(this.angle);
-            this.speed = 10
-      }
-
-      if (this.collisionX + this.rad >= this.game.enemy.posX && this.collisionX + this.rad + this.speed <= this.game.enemy.posX + this.game.enemy.width &&
-        this.collisionY >= this.game.enemy.posY && this.collisionY <= this.game.enemy.posY + this.game.enemy.height){
-          this.angle = ((this.collisionY - this.game.enemy.posY - this.game.enemy.height/2) * 45) / (this.game.enemy.height / 2);
-          this.speed = 10
-          this.angle = this.angle * Math.PI/180;
-          this.dirX = -this.speed * Math.cos(this.angle);
-          this.dirY = -this.speed * Math.sin(this.angle);
-      }
-
-      // if (this.collisionX - this.rad <= this.game.enemy.posX && this.collisionX - this.rad - this.speed >= this.game.enemy.posX + this.game.enemy.width &&
-      //   this.collisionY <= this.game.enemy.posY && this.collisionY >= this.game.enemy.posY + this.game.enemy.height){
-      //     this.angle = ((this.collisionY - this.game.enemy.posY - this.game.enemy.height/2) * 45) / (this.game.enemy.height / 2);
-      //     this.angle = this.angle * Math.PI/180;
-      //     this.dirX = this.speed * Math.cos(this.angle);
-      //     this.dirY = this.speed * Math.sin(this.angle);
-      // }
-    }
-    update(){
-      if ((this.collisionY + this.rad >= this.canvas.height || this.collisionY - this.rad <= 0)){
-          this.dirY *= -1;
+      if (this.posY + this.rad >= this.game.height || this.posY - this.rad <= 0 )
+            this.dirY *= -1
+        if (this.posX < this.game.width * 1/4){
+            if (this.posX - this.rad <= 0){
+                this.game.enemy.score += 1
+                this.reset_ball()
+            }
+            if (this.posX - this.rad <= this.game.player.posX + this.game.player.width && (this.posY >= this.game.player.posY && this.posY <= this.game.player.posY + this.game.player.height) && ! this.game.player.isHiting)
+                {
+                  this.dirX *= -1
+                  this.game.player.isHiting = true
+                }
         }
-      else if ((this.collisionX + this.rad >= this.canvas.width || this.collisionX - this.rad <= 0)){
-        this.dirX *= -1;
-      }
-      this.collisionX += this.dirX;
-      this.collisionY += this.dirY;
+        else if (this.posX > this.game.width * 3/4){
+
+          if (this.posX + this.rad >= this.game.width){
+              this.game.player.score += 1
+              this.reset_ball()
+          }
+          if (this.posX + this.rad >= this.game.enemy.posX && (this.posY >= this.game.enemy.posY && this.posY <= this.game.enemy.posY + this.game.enemy.height) && ! this.game.enemy.isHiting)
+            {
+              this.dirX *= -1
+              this.game.enemy.isHiting = true
+            }
+        }
+        else{
+          this.game.enemy.isHiting = false
+          this.game.player.isHiting = false
+        }
     }
-    init(yes){
-      this.collisionY = this.canvas.height / 2;
-      this.collisionX = this.canvas.width/2;
-      this.angle = Math.random() % 2;
-      this.speed = 5;
-      this.dirX = yes * this.speed * Math.cos(this.angle);
-      this.dirY = yes * this.speed * Math.sin(this.angle);
+
+    reset_ball(){
+      this.posX = this.game.width / 2
+    }
+
+    update(){
+      this.iscollide()
+      this.posX += (this.dirX * this.speed)
+      this.posY += (this.dirY * this.speed)
     }
 }
     
@@ -106,8 +102,9 @@ class Enemy
       this.rad = 10;
       this.posX= this.canvas.width - 20 - this.width;
       this.posY = this.canvas.height/2 - this.height / 2;
-      this.speed = 5;
-      this.color = "red"
+      this.speed = 10;
+      this.color = "enemy"
+      this.isHitting = false
     }
     drawRect(ctx){
       ctx.fillRect(this.posX, this.posY, this.width, this.height);
@@ -144,11 +141,11 @@ class Enemy
     update(ball)
     {
     
-      if (this.posY - ball.collisionY + this.height/2 < 0 && this.posY + this.height <= this.canvas.height)
+      if (this.posY - ball.posY + this.height/2 < 0 && this.posY + this.height <= this.canvas.height)
       {
         this.posY += this.speed;
       }
-      if (this.posY - ball.collisionY + this.height/2 > 0 && this.posY >= 0){
+      if (this.posY - ball.posY + this.height/2 > 0 && this.posY >= 0){
         this.posY -= this.speed;
       }
     }
@@ -158,6 +155,7 @@ class Player
 {
     constructor(game)
     {
+      this.isHitting = false
       this.game = game;
       this.canvas = game.canvas
       this.width = 12; 
@@ -165,8 +163,8 @@ class Player
       this.rad = 10;
       this.posX=20;
       this.posY = this.canvas.height/2 - this.height / 2;
-      this.speed = 5;
-      this.color = "blue"
+      this.speed = 10;
+      this.color = "player"
     }
     drawRect(ctx){
       ctx.fillRect(this.posX, this.posY, this.width, this.height);
@@ -253,7 +251,6 @@ class Game{
       });
     }
     update(){
-      this.ball.iscollide();
       this.player.update();
       this.enemy.update(this.ball);
       this.ball.update();
