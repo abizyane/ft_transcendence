@@ -91,12 +91,9 @@ class Ball {
       this.posY += (this.dirY * this.speed)
     }
 }
-    
 
-class Enemy
-{
-    constructor(game)
-    {
+class Paddle{
+  constructor(game){
       this.game = game;
       this.canvas = game.canvas;
       this.width =  2; 
@@ -105,42 +102,49 @@ class Enemy
       this.posX= this.canvas.width - 20 - this.width;
       this.posY = this.canvas.height/2 - this.height / 2;
       this.speed = 10;
-      this.color = "enemy"
       this.isHitting = false
       this.color = "red"
-    }
-    drawRect(ctx){
-      ctx.fillRect(this.posX, this.posY, this.width, this.height);
-      ctx.strokeRect(this.posX, this.posY, this.width, this.height );
-    }
-    draw(ctx){
-        ctx.fillStyle = this.color;
-        ctx.save()
-        const rgb = [255,0,0]
-        ctx.shadowColor = "rgb("+rgb[0]+","+rgb[1]+","+rgb[2]+")";
-        ctx.shadowBlur = 10;
-        ctx.strokeStyle= "rgba("+rgb[0]+","+rgb[1]+","+rgb[2]+",0.2)";
-        ctx.lineWidth=7.5;
-        this.drawRect(ctx);
-        ctx.strokeStyle= "rgba("+rgb[0]+","+rgb[1]+","+rgb[2]+",0.2)";
-        ctx.lineWidth=6;
-        this.drawRect(ctx);
-        ctx.strokeStyle= "rgba("+rgb[0]+","+rgb[1]+","+rgb[2]+",0.2)";
-        ctx.lineWidth=4.5;
-        this.drawRect(ctx);
-        ctx.strokeStyle= "rgba("+rgb[0]+","+rgb[1]+","+rgb[2]+",0.2)";
-        ctx.lineWidth=3;
-        this.drawRect(ctx);
-        ctx.strokeStyle= '#fff';
-        ctx.lineWidth=1;
-        this.drawRect(ctx);
-        ctx.restore()
-    }
+      this.rgb = [0,0,0]
+      this.offsetX = 10
+  }
+  drawRect(ctx){
+    ctx.fillRect(this.posX, this.posY, this.width, this.height);
+    ctx.strokeRect(this.posX, this.posY, this.width, this.height );
+  }
+  draw(ctx){
+      ctx.fillStyle = this.color;
+      ctx.save()
+      ctx.shadowColor = "rgb("+this.rgb[0]+","+this.rgb[1]+","+this.rgb[2]+")";
+      ctx.shadowBlur = 10;
+      ctx.strokeStyle= "rgba("+this.rgb[0]+","+this.rgb[1]+","+this.rgb[2]+",0.2)";
+      ctx.lineWidth=7.5;
+      this.drawRect(ctx);
+      ctx.strokeStyle= "rgba("+this.rgb[0]+","+this.rgb[1]+","+this.rgb[2]+",0.2)";
+      ctx.lineWidth=6;
+      this.drawRect(ctx);
+      ctx.strokeStyle= "rgba("+this.rgb[0]+","+this.rgb[1]+","+this.rgb[2]+",0.2)";
+      ctx.lineWidth=4.5;
+      this.drawRect(ctx);
+      ctx.strokeStyle= "rgba("+this.rgb[0]+","+this.rgb[1]+","+this.rgb[2]+",0.2)";
+      ctx.lineWidth=3;
+      this.drawRect(ctx);
+      ctx.strokeStyle= '#fff';
+      ctx.lineWidth=1;
+      this.drawRect(ctx);
+      ctx.restore()
+  }
+}
 
-    predict(){
-
+class Enemy extends Paddle
+{
+    constructor(game)
+    {
+      super(game)
+      this.posX= this.canvas.width - this.offsetX - this.width;
+      this.posY = this.canvas.height/2 - this.height / 2;
+      this.color = "red"
+      this.rgb = [255,0,0]
     }
-  
     update(ball)
     {
     
@@ -154,47 +158,16 @@ class Enemy
     }
 }
 
-class Player
+class Player extends Paddle
 {
     constructor(game)
     {
-      this.isHitting = false
-      this.game = game;
-      this.canvas = game.canvas
-      this.width = 2; 
-      this.height = 60;
-      this.rad = 10;
-      this.posX=20;
+      super(game)
+      this.posX=this.offsetX;
       this.posY = this.canvas.height/2 - this.height / 2;
       this.speed = 10;
       this.color = "blue"
-    }
-    drawRect(ctx){
-      ctx.fillRect(this.posX, this.posY, this.width, this.height);
-      ctx.strokeRect(this.posX, this.posY, this.width, this.height );
-    }
-    draw(ctx){
-        ctx.fillStyle = this.color;
-        ctx.save()
-        const rgb = [0,0,255]
-        ctx.shadowColor = "rgb("+rgb[0]+","+rgb[1]+","+rgb[2]+")";
-        ctx.shadowBlur = 10;
-        ctx.strokeStyle= "rgba("+rgb[0]+","+rgb[1]+","+rgb[2]+",0.2)";
-        ctx.lineWidth=7.5;
-        this.drawRect(ctx);
-        ctx.strokeStyle= "rgba("+rgb[0]+","+rgb[1]+","+rgb[2]+",0.2)";
-        ctx.lineWidth=6;
-        this.drawRect(ctx);
-        ctx.strokeStyle= "rgba("+rgb[0]+","+rgb[1]+","+rgb[2]+",0.2)";
-        ctx.lineWidth=4.5;
-        this.drawRect(ctx);
-        ctx.strokeStyle= "rgba("+rgb[0]+","+rgb[1]+","+rgb[2]+",0.2)";
-        ctx.lineWidth=3;
-        this.drawRect(ctx);
-        ctx.strokeStyle= '#fff';
-        ctx.lineWidth=1;
-        this.drawRect(ctx);
-        ctx.restore()
+      this.rgb = [0,0,255]
     }
   
     update()
