@@ -30,7 +30,7 @@ class ScoreBoard{
 class Ball {
     constructor(game){
         this.game = game
-        this.rad = 15
+        this.rad = 5
         this.posX = game.width / 2
         this.posY = game.height / 2
         this.speed = 10
@@ -58,6 +58,7 @@ class Ball {
             if (this.posX - this.rad <= this.game.player.posX + this.game.player.width && (this.posY >= this.game.player.posY && this.posY <= this.game.player.posY + this.game.player.height) && ! this.game.player.isHiting)
                 {
                   this.dirX *= -1
+                  this.posX = this.game.player.posX + this.game.player.width
                   this.game.player.isHiting = true
                 }
         }
@@ -70,6 +71,7 @@ class Ball {
           if (this.posX + this.rad >= this.game.enemy.posX && (this.posY >= this.game.enemy.posY && this.posY <= this.game.enemy.posY + this.game.enemy.height) && ! this.game.enemy.isHiting)
             {
               this.dirX *= -1
+              this.posX = this.game.enemy.posX - this.game.enemy.width
               this.game.enemy.isHiting = true
             }
         }
@@ -97,14 +99,15 @@ class Enemy
     {
       this.game = game;
       this.canvas = game.canvas;
-      this.width =  12; 
-      this.height = 50;
+      this.width =  2; 
+      this.height = 60;
       this.rad = 10;
       this.posX= this.canvas.width - 20 - this.width;
       this.posY = this.canvas.height/2 - this.height / 2;
       this.speed = 10;
       this.color = "enemy"
       this.isHitting = false
+      this.color = "red"
     }
     drawRect(ctx){
       ctx.fillRect(this.posX, this.posY, this.width, this.height);
@@ -113,7 +116,7 @@ class Enemy
     draw(ctx){
         ctx.fillStyle = this.color;
         ctx.save()
-        const rgb = [0,0,255]
+        const rgb = [255,0,0]
         ctx.shadowColor = "rgb("+rgb[0]+","+rgb[1]+","+rgb[2]+")";
         ctx.shadowBlur = 10;
         ctx.strokeStyle= "rgba("+rgb[0]+","+rgb[1]+","+rgb[2]+",0.2)";
@@ -158,13 +161,13 @@ class Player
       this.isHitting = false
       this.game = game;
       this.canvas = game.canvas
-      this.width = 12; 
-      this.height = 50;
+      this.width = 2; 
+      this.height = 60;
       this.rad = 10;
       this.posX=20;
       this.posY = this.canvas.height/2 - this.height / 2;
       this.speed = 10;
-      this.color = "player"
+      this.color = "blue"
     }
     drawRect(ctx){
       ctx.fillRect(this.posX, this.posY, this.width, this.height);
