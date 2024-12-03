@@ -154,8 +154,21 @@ class RoomManagerNew(RoomManager):
             return self.create_type_four_room(name)
 
     def get_room(self, room_name):
+        if not room_name :
+            raise RoomRequestNameRequired()
         if room_name not in self.type_four_name[4]:
             raise RoomNotExist(room_name)
+        return self.type_four[name]
+    
+    """
+    remove tournament name and tournament
+    """
+    def remove_tpye_four_room(self, room_name):
+        self.type_four_name[4].remove(name)
+        del self.type_four[name]
+
+    def remove_type_two_room(self, room_id):
+        del self.type_two[room_id]
     
     class RoomRestriction(Exception):
         def __init__(self, message=None):
@@ -173,3 +186,7 @@ class RoomManagerNew(RoomManager):
     class RoomNotExist(RoomRestriction):
         def __init__(self, name):
             super().__init__(message=f'room with name: {name} do not exist')
+
+    class RoomRequestNameRequired(RoomRestriction):
+        def __init__(self, message="Joining a room required a name"):
+            super().__init__(message)
