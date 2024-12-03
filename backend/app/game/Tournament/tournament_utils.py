@@ -132,19 +132,38 @@ class RoomManagerNew(RoomManager):
         self.type_four = {}
         self.type_two_id = 0
     
+    def create_type_two_room(self):
+        room = self.type_two[self.type_two_id] = self.generate_room(_type)
+        self.type_two_id += 1
+        return room
+    
+    def create_type_four_room(self, name):
+        if not name:
+            raise MustHaveName
+        if name in self.type_four_name[4]:
+            raise RoomNameAlreadyExist(name)
+        self.type_four_name[4].add(name)
+        self.type_four[name] = self.generate_room(_type)
+
+
     def create_room(self, _type:str, name):
-        self.room = super().create_room(_type)
         if _type == RM_TYPE[2]:
-            self.type_two[self.type_two_id] = self.room
-            self.type_two_id += 1
+            return create_type_two();
         elif _type == RM_TYPE[4] :
-            if not name:
-                raise MustHaveName
+            return create_type_four_room(name)
+
+    def get_room(self, room_name):
+        if room_name not in self.type_four_name[4]:
+            raise RoomNotExist(room_name)
     
      class MustHaveName(Exception):
         def __init__(self):
             super().__init__(message="Name Your Room")
         
-    class UsedName(Exception):
+    class RoomNameAlreadyExist(Exception):
         def __init__(self, name:str):
             super().__init__(message=f'the room name: {name} already exist please change the room name')
+    
+    class RoomNotExist(Exception):
+        def __init__(self, name):
+            super().__init__(message=f'room with name: {name} do not exist')
