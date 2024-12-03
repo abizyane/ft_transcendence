@@ -11,6 +11,7 @@ import numpy as np
 from channels.db import database_sync_to_async
 from enum import Enum
 from ..models import Profile, GameModel, Scores, TournamentModel
+from .room_restrict import RoomRestriction
 
 class Command(Enum):
     CREATE = 1
@@ -242,23 +243,28 @@ class TournamentConsumer(AsyncWebsocketConsumer):
         print(name, flush=True)
         try :
             self.room = self.competitor.create_room(TournamentConsumer.rm, _type=self._type, name=name)
+            self.competitor.join_room(self.room)
             self.channel_layer.group_add(self.channel_layer, name)
-            print(self.room, flush=True)
-        except TournamentConsumer.rm.RoomRestriction as e:
+            await self.send(text_data=json.dumps({
+                'InformMsg' : f'Room {name} created successfuly'
+            }))
+        except RoomRestriction as e:
             await self.send(text_data=json.dumps({
                 'error_msg' : str(e)
             }))
         
-    def join_room(self,data):
+    async def join_room(self,data):
         name = data.get('name')
         try :
             room = TournamentConsumer.rm.get_room(name)
             self.competitor.join_room(room)
             self.channel_layer.group_add(self.channel_layer, name)
             self.room = room
-            print(self.room, flush=True)
-        except Exception as e :
-            self.send(text_data=json.dumps({
+            await self.send(text_data=json.dumps({
+                'InformMsg': f'you joined room:{name} successfuly'
+            }))
+        except RoomRestriction as e :
+            await self.send(text_data=json.dumps({
                 'ErrorMsg' : str(e)
             }))
 
@@ -277,7 +283,7 @@ class TournamentConsumer(AsyncWebsocketConsumer):
                 print(command, flush=True)
                 await self.create_room(recv_data)
             case Command.JOIN.value :
-                self.join_room(recv_data)
+                await self.join_room(recv_data)
             case Command.JOINRANDOM :
                 self.join_random_room()
             case Command.INPUT.value:

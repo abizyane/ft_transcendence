@@ -2,6 +2,7 @@ from abc import ABC,abstractmethod
 from .room import *
 from enum import Enum
 from .roomlister import RoomLister
+from .room_restrict import MustHaveName, RoomNameAlreadyExist, RoomRequestNameRequired, RoomNotExist, RoomRestriction
 
 RoomType = Enum('RoomType', ['TWO', 'FOUR', 'EIGHT'])
 
@@ -139,7 +140,7 @@ class RoomManagerNew(RoomManager):
 
     def create_type_four_room(self, name):
         if not name:
-            raise RoomManagerNew.MustHaveName
+            raise MustHaveName
         if name in self.type_four_name[4]:
             raise RoomNameAlreadyExist(name)
         self.type_four_name[4].add(name)
@@ -158,7 +159,7 @@ class RoomManagerNew(RoomManager):
             raise RoomRequestNameRequired()
         if room_name not in self.type_four_name[4]:
             raise RoomNotExist(room_name)
-        return self.type_four[name]
+        return self.type_four[room_name]
     
     """
     remove tournament name and tournament
@@ -169,24 +170,3 @@ class RoomManagerNew(RoomManager):
 
     def remove_type_two_room(self, room_id):
         del self.type_two[room_id]
-    
-    class RoomRestriction(Exception):
-        def __init__(self, message=None):
-            super().__init__(message)
-        pass
-    
-    class MustHaveName(RoomRestriction):
-        def __init__(self, message="Name Your Room"):
-            super().__init__(message)
-        
-    class RoomNameAlreadyExist(RoomRestriction):
-        def __init__(self, name:str):
-            super().__init__(message=f'the room name: {name} already exist please change the room name')
-    
-    class RoomNotExist(RoomRestriction):
-        def __init__(self, name):
-            super().__init__(message=f'room with name: {name} do not exist')
-
-    class RoomRequestNameRequired(RoomRestriction):
-        def __init__(self, message="Joining a room required a name"):
-            super().__init__(message)

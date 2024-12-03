@@ -1,5 +1,6 @@
 from abc import ABC, abstractmethod 
 from .tournament import Tournament
+from .room_restrict import RoomIsFull, AlredyJoined, RoomIsEmpty
 
 class RoomAbstract(ABC):
     @abstractmethod
@@ -36,7 +37,9 @@ class Room(RoomAbstract):
 
     def add_player(self, Player) -> RoomAbstract :
         if self.ready :
-            raise Room.RoomIsFull
+            raise RoomIsFull
+        if Player in self.competitors:
+            raise AlredyJoined(Player.name, self.name)
         Player._id = self.competitor_id
         self.competitor_id += 1
         self.competitors.append(Player)
@@ -49,7 +52,7 @@ class Room(RoomAbstract):
         Player._id = -1
         self.competitor_id -= 1
         if (self.competitors_count() == 0):
-            raise Room.RoomIsEmpty;
+            raise RoomIsEmpty;
 
     def competitors_count(self) -> int:
         return len(self.competitors)
@@ -66,14 +69,6 @@ class Room(RoomAbstract):
             "competitors" : {competitor.name : competitor.get_data() for competitor in self.competitors},
              
         }
-    
-    class RoomIsFull(Exception):
-        def __init__(self, message="Room Is Full"):
-            super().__init__(message)
-
-    class RoomIsEmpty(Exception):
-        def __init__(self,message="Room Is Empty" ):
-            super().__init__(message)
 
 class TwoPlayersRoom(Room):
     def __init__(self):
