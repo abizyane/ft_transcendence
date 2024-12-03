@@ -67,21 +67,21 @@ class Competitor(AbstractCompetitor):
             res.append(competitor.get_info())
         return res
             
-class CompetitorNamed(Competitor)
+class CompetitorNamed(Competitor):
     def __init__(self, name):
         super().__init__(name)
 
-    def create_room(self, rm:RoomListManager, _type:str, name:str=None):
+    def create_room(self, rm:AbstractRoomManager, _type:str, name:str=None):
         try : 
             self.room = rm.create_room(_type, name)
             return self.room
         except Exception as e:
            raise e 
 
-    def room_request(self, rm:RoomListManager):
+    def room_request(self, rm:AbstractRoomManager):
         super().room_request(rm)
 
-    def random_room_request(self, rm:RoomListerManager):
+    def random_room_request(self, rm:AbstractRoomManager):
         if self._type == RM_TYPE[2]:
             self.room = self.room_request(rm)
         else :

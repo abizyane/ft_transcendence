@@ -127,43 +127,49 @@ class RoomListManager(RoomManager):
 
 class RoomManagerNew(RoomManager):
     def __init__(self):
-        self.type_four_name = {4:{}}
+        self.type_four_name = {4:set()}
         self.type_two = {}
         self.type_four = {}
         self.type_two_id = 0
     
     def create_type_two_room(self):
-        room = self.type_two[self.type_two_id] = self.generate_room(_type)
+        room = self.type_two[self.type_two_id] = self.generate_room(RM_TYPE[2])
         self.type_two_id += 1
         return room
-    
+
     def create_type_four_room(self, name):
         if not name:
-            raise MustHaveName
+            raise RoomManagerNew.MustHaveName
         if name in self.type_four_name[4]:
             raise RoomNameAlreadyExist(name)
         self.type_four_name[4].add(name)
-        self.type_four[name] = self.generate_room(_type)
+        self.type_four[name] = self.generate_room(RM_TYPE[4])
+        return self.type_four[name]
 
 
     def create_room(self, _type:str, name):
         if _type == RM_TYPE[2]:
-            return create_type_two();
+            return self.create_type_two();
         elif _type == RM_TYPE[4] :
-            return create_type_four_room(name)
+            return self.create_type_four_room(name)
 
     def get_room(self, room_name):
         if room_name not in self.type_four_name[4]:
             raise RoomNotExist(room_name)
     
-     class MustHaveName(Exception):
-        def __init__(self):
-            super().__init__(message="Name Your Room")
+    class RoomRestriction(Exception):
+        def __init__(self, message=None):
+            super().__init__(message)
+        pass
+    
+    class MustHaveName(RoomRestriction):
+        def __init__(self, message="Name Your Room"):
+            super().__init__(message)
         
-    class RoomNameAlreadyExist(Exception):
+    class RoomNameAlreadyExist(RoomRestriction):
         def __init__(self, name:str):
             super().__init__(message=f'the room name: {name} already exist please change the room name')
     
-    class RoomNotExist(Exception):
+    class RoomNotExist(RoomRestriction):
         def __init__(self, name):
             super().__init__(message=f'room with name: {name} do not exist')

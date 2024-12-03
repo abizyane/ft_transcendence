@@ -1,5 +1,5 @@
 from channels.generic.websocket import AsyncWebsocketConsumer
-from .tournament_utils import RoomListManager
+from .tournament_utils import RoomManagerNew
 from .competitor import CompetitorNamed,Room
 import json
 from .matchHolder import MatchTreeBuilder, MatchHolder, PlayerHolder
@@ -16,9 +16,10 @@ class Command(Enum):
     CREATE = 1
     JOIN = 2
     INPUT = 3
+    JOINRANDOM = 4
 
 class TournamentConsumer(AsyncWebsocketConsumer):
-    rm = RoomListManager()
+    rm = RoomManagerNew()
     rooms = {}
     i = 0
     _id = 0
@@ -29,28 +30,16 @@ class TournamentConsumer(AsyncWebsocketConsumer):
     
     async def connect(self):
         user = self.scope['user']
-        # if user.is_anonymous or not user.is_authenticated:
-        #     await self.accept()
-        #     await self.send(text_data=json.dumps({
-        #         "msg" : f"{user} is not authenticated.",
-        #         "type" : "error"
-        #     }))
-        #     await self.close()
-        #     return
-
         await self.accept()
         self.p_holder = PlayerHolder(CompetitorNamed(self.channel_name))
         self.competitor = self.p_holder.competitor
-        self.set_competitor_info(username=user.username, img=user.profile_pic, userId=user.id)
         self._type = self.scope['url_route']['kwargs']['competition_type']
-        # self.game_mode = "tournament" if self._type == "tournament" else "1v1"
         self.room:Room = None
         self.match = None
         self.match_name = ''
         self.task = None
         self.game = None
         self.state = ''
-        self.access_competition(self.p_holder.competitor)
         # self.room.tournament.p_holders[self.channel_name] = self.p_holder
         # await self.channel_layer.group_add((self.room.name), self.channel_name)
         # await self.channel_layer.group_send(self.room.name, {
@@ -242,25 +231,38 @@ class TournamentConsumer(AsyncWebsocketConsumer):
         self.room = competitor.room_request(TournamentConsumer.rm)
         competitor.join_room(self.room)
     
-    def command_switch(command) -> int:
-        return (Command.CREATE*(command == "create") + 
-                Command.JOIN*(command == "join") +
-                Command.INPUT*(command == "input")
+    def command_switch(self,command) -> int:
+        return (Command.CREATE.value * int(command == "create") + 
+                Command.JOIN.value * int(command == "join") +
+                Command.INPUT.value * int(command == "input")
                 )
     
-    def create_room(self.data):
-        name = data.get('room_name')
+    async def create_room(self,data):
+        name = data.get('name')
+        print(name, flush=True)
         try :
-            self.room = self.competitor.create_room(rm, _type=self._type, name=name)
+            self.room = self.competitor.create_room(TournamentConsumer.rm, _type=self._type, name=name)
             self.channel_layer.group_add(self.channel_layer, name)
-        except Exception as e:
-            self.send(text_data=json.dumps({
-                'error_msg' : str(e.message)
+            print(self.room, flush=True)
+        except TournamentConsumer.rm.RoomRestriction as e:
+            await self.send(text_data=json.dumps({
+                'error_msg' : str(e)
             }))
         
-    def join_room(self.data):
-        name = data.get('room_name')
-        self.competitor.join_room()
+    def join_room(self,data):
+        name = data.get('name')
+        try :
+            room = TournamentConsumer.rm.get_room(name)
+            self.competitor.join_room(room)
+            self.channel_layer.group_add(self.channel_layer, name)
+            self.room = room
+            print(self.room, flush=True)
+        except Exception as e :
+            self.send(text_data=json.dumps({
+                'ErrorMsg' : str(e)
+            }))
+
+
     
     def join_random_room(self):
         self.room = self.competitor.random_room_request(TournamentConsumer.rm)
@@ -269,14 +271,16 @@ class TournamentConsumer(AsyncWebsocketConsumer):
     async def receive(self, text_data):
         recv_data = json.loads(text_data)
         command = recv_data.get('command')
-        match command_switch(command) :
-            case Command.CREATE :
-                self.create_room(recv_data)
-            case Command.JOIN :
+
+        match self.command_switch(command) :
+            case Command.CREATE.value :
+                print(command, flush=True)
+                await self.create_room(recv_data)
+            case Command.JOIN.value :
                 self.join_room(recv_data)
             case Command.JOINRANDOM :
                 self.join_random_room()
-            case Command.INPUT:
+            case Command.INPUT.value:
                 self.handle_input(recv_data)
     
     async def leave_state(self, event):
