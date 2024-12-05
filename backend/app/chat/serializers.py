@@ -32,7 +32,7 @@ class MessageConsumerSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Message
-        fields = ['message_id', 'sender', 'receiver', 'message', 'timestamp', 'seen']
+        fields = ['message_id', 'sender', 'receiver', 'sender_id', 'receiver_id', 'message', 'timestamp', 'seen']
 
 class MessageSerializer(serializers.ModelSerializer):
     sender = UserSerializer(read_only=True)

@@ -109,6 +109,7 @@ export function Chat({ children }: ChatLayoutProps) {
   // console.log("convs rendered", conversations);
 if (!conversations)
   return <div className="w-full h-full flex justify-center items-center"><Loader/></div>
+
   return (
 
     <div className=" w-full flex flex-col justify-start items-start">
@@ -170,16 +171,18 @@ if (!conversations)
                         <div className="flex-auto min-w-0 ml-4 mr-6">
                           <p className="font-bold">{conv.user.username}</p>
                           <div className="flex justify-between items-center text-sm text-gray-600">
-                            <p className={`truncate ${conv.unreadCount > 0 ? "font-bold text-white" : ""}`}>{conv.lastMessage?.message}</p>
-                            <p className="ml-4 text-white-primary whitespace-nowrap">
-                              {isToday(new Date(conv.lastMessage?.timestamp))
-                                ? formatDistanceToNow(new Date(conv.lastMessage?.timestamp), {
-                                    addSuffix: true,
-                                  })
-                                : isYesterday(new Date(conv.lastMessage?.timestamp))
-                                ? "Yesterday"
-                                : format(new Date(conv.lastMessage?.timestamp), "yyyy-MM-dd")}
-                            </p>
+                            {conv.lastMessage ? <>
+                              <p className={`truncate ${conv.unreadCount > 0 ? "font-bold text-white" : ""}`}>{conv.lastMessage?.message}</p>
+                                <p className="ml-4 text-white-primary whitespace-nowrap">
+                                  {isToday(new Date(conv.lastMessage?.timestamp))
+                                    ? formatDistanceToNow(new Date(conv.lastMessage?.timestamp), {
+                                        addSuffix: true,
+                                      })
+                                    : isYesterday(new Date(conv.lastMessage?.timestamp))
+                                    ? "Yesterday"
+                                    : format(new Date(conv.lastMessage?.timestamp), "yyyy-MM-dd")}
+                                </p>
+                            </> : <></>}
                           </div>
                         </div>
                       </div>
