@@ -1,11 +1,12 @@
 import React, { useEffect, useState } from "react";
 import DoughnutChart from "../Charts/Winrate";
-import Image from "next/image";
 import { useUser } from "@/services/context/usercontext";
 import { MdOutlinePersonAddAlt1, MdPersonAddAlt1 } from "react-icons/md";
 import { ImBlocked, ImEyeBlocked } from "react-icons/im";
 import { IoIosRemoveCircleOutline } from "react-icons/io";
 import Link from "next/link";
+import toast from 'react-hot-toast';
+import { useRouter } from 'next/navigation';
 
 type User = {
   id: string;
@@ -25,17 +26,16 @@ type UserInfoProps = {
 
 const UserInfo: React.FC<UserInfoProps> = ({ user, setUser }) => {
   const { user: currentUser } = useUser();
-  const { name, profile_pic_url, xp, wins, totalGames, id } = user;
+  const { name, profile_pic_url, xp, level, id } = user;
   const maxXPPerLevel = 1000;
-  const level = Math.floor(xp / maxXPPerLevel);
   const remainingXP = ((xp % maxXPPerLevel) / maxXPPerLevel) * 100;
-  const calculateWinRate = (wins: number, totalGames: number) => {
-    return totalGames === 0 ? 20 : (wins / totalGames) * 100;
-  };
-  const winRatePercentage = calculateWinRate(20, 100);
+  // const calculateWinRate = (xp:number) => {
+  //   return totalGames === 0 ? 20 : (xp / 100);
+  // };
+  // const winRatePercentage = calculateWinRate(20, 100);
 
   const [loading, setLoading] = useState(false);
-
+  const Router = useRouter ();
   const fetchUser = async () => {
     fetch(`http://localhost:8000/api/userid`, {
       method: 'POST',
@@ -51,8 +51,8 @@ const UserInfo: React.FC<UserInfoProps> = ({ user, setUser }) => {
           if (response.status == 400)
             {
               throw new Error("You cannot see this profile");
-              // alert with the package
-              // redirect to dashboard
+              toast.error('you cannot see this profile');
+              Router.push('dashboard');
             }
         }
         return response.json();
@@ -271,7 +271,7 @@ const UserInfo: React.FC<UserInfoProps> = ({ user, setUser }) => {
               />
             </div>
             <div className="flex flex-col border-[2px] border-violet-primary rounded-xl m-1 h-auto w-full p-2">
-              <p className="text-white font-semibold text-xs justify-start flex">Level {level}</p>
+              <p className="text-white font-semibold text-xs justify-start flex">Level {user.level}</p>
               <div className="flex items-center h-2 w-full rounded-xl bg-white">
                 <div
                   className="bg-violet-primary h-2 rounded-xl"

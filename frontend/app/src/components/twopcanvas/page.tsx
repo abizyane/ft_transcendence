@@ -3,11 +3,12 @@ import { useEffect, useState,useRef } from "react"
 import Game_Front from "./gameFront"
 
 class ScoreBoard{
-    constructor(game){
+    constructor(game,setScores){
         this.game = game;
         this.ball = game.ball;
         this.first_score = 0;
         this.second_score = 0;
+        this.scoreSetter = setScores;
     }
     update(){
         if (this.ball.collisionX - this.ball.rad < this.game.player.posX )
@@ -20,13 +21,14 @@ class ScoreBoard{
             this.second_score++;
             this.ball.init(1)
         }
+        this.scoreSetter ({one : this.first_score , two : this.second_score}) 
     }
-    draw(ctx){
-        ctx.beginPath();
-        ctx.fillStyle = 'black'
-        ctx.fillText(this.first_score +"-" + this.second_score, this.game.canvas.width / 2 - 50/2, 50)
-        ctx.closePath();
-    }
+    // draw(ctx){
+    //     ctx.beginPath();
+    //     ctx.fillStyle = 'black'
+    //     ctx.fillText(this.first_score +"-" + this.second_score, this.game.canvas.width / 2 - 50/2, 50)
+    //     ctx.closePath();
+    // }
 }
 
 class Ball {
@@ -213,14 +215,14 @@ class Player
 }
 
 class Game{
-    constructor(canvas){
+    constructor(canvas,setScores){
       this.width = canvas.width;
       this.height = canvas.height;
       this.canvas= canvas;
       this.player = new Player(this);
       this.enemy = new Enemy(this);
       this.ball = new Ball(this);
-      this.scoreBoard = new ScoreBoard(this);
+      this.scoreBoard = new ScoreBoard(this,setScores);
       this.keyUp = 0;
       this.keyDown = 0;
       this.speed = 5;
@@ -278,12 +280,12 @@ class Game{
       this.player.draw(ctx);
       this.ball.draw(ctx);
       this.enemy.draw(ctx);
-      this.scoreBoard.draw(ctx);
+      // this.scoreBoard.draw(ctx);
     }
     
   }
   
-  export default function Twopcanvas (){
+  export default function Twopcanvas ({setScores}){
     const CanvasRef = useRef(null)
     const Context = useRef(null)
     useEffect(()=>{
@@ -293,7 +295,7 @@ class Game{
     }, [])
     
     useEffect(()=>{
-        let game = new Game(CanvasRef.current);
+        let game = new Game(CanvasRef.current,setScores);
         game.render(Context.current)
         function animate(){
             if (CanvasRef.current){
@@ -307,6 +309,6 @@ class Game{
     }, [])
     
     return (
-        <canvas tabIndex={1} ref={CanvasRef} className="w-fit h-fit "></canvas>
+        <canvas tabIndex={1}  ref={CanvasRef} className="w-full h-full "></canvas>
     );
 }

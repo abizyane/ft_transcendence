@@ -83,6 +83,7 @@ const Page = () => {
   const isVsBot = game === "vsbot";
   const  [isCountDownStarted , setCountDownStarted] = useState(false);
   const  [timer , setTimer] = useState(null);
+
   let startCountDown = ()=>{
 
     if (timer == null)
@@ -214,8 +215,8 @@ const Page = () => {
         <h3 className="justify-center items-center w-full h-full flex text-center text-3xl text-white text-nowrap font-extrabold">Game Starting in: {countdown}s</h3>
       </div>)}
       {gameready && isRandomMatch && countdown === 0 ? (
-        <div className="min-w-[300px] w-full h-full flex flex-col items-center justify-between p-2">
-          <div className="w-full  h-full border-violet-primary backdrop-blur-lg border-2 p-2 rounded-lg flex flex-col mb-24 lg:mb-0">
+        <div className="max-w-[1200px] w-full h-fit flex flex-col items-center justify-between p-2">
+          <div className="max-w-[1200px] w-full  h-fit border-violet-primary backdrop-blur-lg border-2 p-2 rounded-lg flex flex-col mb-24 lg:mb-0">
             <div className="flex justify-between items-center w-full bg-transparent p-2 rounded-lg mb-2">
               <div className="flex items-center space-x-2 bg-gray-700 p-1 lg:p-3 rounded-full w-36 lg:w-1/3 lg:h-14 justify-center lg:justify-start">
                 <Image
@@ -227,9 +228,6 @@ const Page = () => {
                 />
                 <div className="text-white">
                   <div className="text-xs font-bold">{users[0].username}</div>
-                  <div className="text-[10px] text-gray-300">
-                    @{users[0].username}
-                  </div>
                 </div>
               </div>
               <div className="flex items-center space-x-2 m-2">
@@ -245,9 +243,6 @@ const Page = () => {
                 <div className="text-white">
                   <div className="text-xs font-bold text-right">
                     {users[1].username}
-                  </div>
-                  <div className="text-[10px] text-gray-300 text-right">
-                    @{users[1].username}
                   </div>
                 </div>
                 <Image
@@ -268,13 +263,13 @@ const Page = () => {
                 opacity: 0.7,
               }}
             >
-             <Canvas socketRef={socketRef} callback={setReady} scoreSetter={setScores}></Canvas>
+                <Canvas socketRef={socketRef} callback={setReady} scoreSetter={setScores}></Canvas>
             </div>
           </div>
         </div>
       ) : isVsBot && countdown === 0 ? (
-        <div className="max-h-[900px] w-full h-full flex flex-col items-center justify-between p-2">
-          <div className="w-full h-full border-violet-primary backdrop-blur-lg border-2 p-2 rounded-lg flex flex-col mb-24 lg:mb-0">
+        <div className="max-w-[1200px] w-full  h-fit flex flex-col items-center justify-between p-2">
+          <div className="max-w-[1200px] w-full h-fit border-violet-primary backdrop-blur-lg border-2 p-2 rounded-lg flex flex-col mb-24 lg:mb-0">
             <div className="flex justify-between items-center w-full bg-transparent p-2 rounded-lg mb-2">
               <div className="flex items-center space-x-2 bg-gray-700 p-1 lg:p-3 rounded-full w-36 lg:w-1/3 lg:h-14 justify-center lg:justify-start">
                 <Image
@@ -286,9 +281,6 @@ const Page = () => {
                 />
                 <div className="text-white">
                   <div className="text-xs font-bold">{users[0].username}</div>
-                  <div className="text-[10px] text-gray-300">
-                    @{users[0].username}
-                  </div>
                 </div>
               </div>
               <div className="flex items-center space-x-2 m-2">
@@ -304,9 +296,6 @@ const Page = () => {
                 <div className="text-white">
                   <div className="text-xs font-bold text-right">
                     {users[1].username}
-                  </div>
-                  <div className="text-[10px] text-gray-300 text-right">
-                    @{users[1].username}
                   </div>
                 </div>
                 <Image
@@ -327,13 +316,13 @@ const Page = () => {
                 opacity: 0.7,
               }}
             >
-              <Localcanva></Localcanva>
+              <Localcanva scoreSetter={setScores}></Localcanva>
             </div>
           </div>
         </div>
       ) : isLocalGame && countdown === 0 ? (
-        <div className="min-w-[320px] w-full h-full flex flex-col items-center justify-between p-2">
-          <div className="w-full max-w-full h-full border-violet-primary backdrop-blur-lg border-2 p-2 rounded-lg flex flex-col mb-24 lg:mb-0">
+        <div className="max-w-[1200px] w-full h-fit flex flex-col items-center justify-between p-2">
+          <div className="max-w-[1200px] w-full h-fit border-violet-primary backdrop-blur-lg border-2 p-2 rounded-lg flex flex-col mb-24 lg:mb-0">
             <div className="flex justify-between items-center w-full bg-transparent p-2 rounded-lg mb-2">
               <div className="flex items-center space-x-2 bg-gray-700 p-1 lg:p-3 rounded-full w-36 lg:w-1/3 lg:h-14 justify-center lg:justify-start">
                 <Image
@@ -345,9 +334,6 @@ const Page = () => {
                 />
                 <div className="text-white">
                   <div className="text-xs font-bold">{users[0].username}</div>
-                  <div className="text-[10px] text-gray-300">
-                    @{users[0].username}
-                  </div>
                 </div>
               </div>
               <div className="flex items-center space-x-2 m-2">
@@ -363,9 +349,6 @@ const Page = () => {
                 <div className="text-white">
                   <div className="text-xs font-bold text-right">
                     {users[1].username}
-                  </div>
-                  <div className="text-[10px] text-gray-300 text-right">
-                    @{users[1].username}
                   </div>
                 </div>
                 <Image
@@ -386,7 +369,7 @@ const Page = () => {
                 opacity: 0.7,
               }}
             >
-              <Twopcanvas></Twopcanvas>
+              <Twopcanvas setScores={setScores}></Twopcanvas>
             </div>
           </div>
         </div>

@@ -114,7 +114,7 @@ export default function Canvas ({socketRef, callback, scoreSetter}){
                     requestAnimationFrame(game_loop)
                 }
             }
-            animationFrameId = requestAnimationFrame(game_loop); 
+            animationFrameId = requestAnimationFrame(game_loop);
             return () => {
                 cancelAnimationFrame(animationFrameId);
             };
@@ -122,6 +122,6 @@ export default function Canvas ({socketRef, callback, scoreSetter}){
     },[callback])
 
     return (
-        <canvas tabIndex={1} ref={canvasRef} className="w-fit h-fit "></canvas>
+        <canvas tabIndex={1} ref={canvasRef} className="w-full h-full"></canvas>
     );
 }
