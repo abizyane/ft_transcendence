@@ -26,6 +26,7 @@ class Competitor(AbstractCompetitor):
         self.img = ''
         self.user_id = None
         self.islost = False
+        self.is_host = False
     """
         Comptitor should ask manager for Type of Tournament He wanna join
         1/2, 1/4, 1/8 , manager will search for type of room if available
@@ -33,7 +34,10 @@ class Competitor(AbstractCompetitor):
     """
     def join_room(self, room:Room) -> Room:
         self.room = room
-        return room.add_player(self)
+        try :
+            return room.add_player(self)
+        except RoomIsFull as e:
+            raise
 
     def exit_room(self, room:Room) -> None:
         room.remove_player(self)

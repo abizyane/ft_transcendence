@@ -145,6 +145,7 @@ class RoomManagerNew(RoomManager):
             raise RoomNameAlreadyExist(name)
         self.type_four_name[4].add(name)
         self.type_four[name] = self.generate_room(RM_TYPE[4])
+        self.type_four[name].name = name
         return self.type_four[name]
 
 

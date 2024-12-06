@@ -18,6 +18,7 @@ class Command(Enum):
     JOIN = 2
     INPUT = 3
     JOINRANDOM = 4
+    PLAY = 5
 
 class TournamentConsumer(AsyncWebsocketConsumer):
     rm = RoomManagerNew()
@@ -41,20 +42,7 @@ class TournamentConsumer(AsyncWebsocketConsumer):
         self.task = None
         self.game = None
         self.state = ''
-        # self.room.tournament.p_holders[self.channel_name] = self.p_holder
-        # await self.channel_layer.group_add((self.room.name), self.channel_name)
-        # await self.channel_layer.group_send(self.room.name, {
-        #     "type" : "joined.competitor",
-        # })
-        # if self.room.is_ready():
-        #     TournamentConsumer.rm.switch_to_ready(self.room)
-        #     competitors_gen = iter(list(self.room.tournament.p_holders.values()))
-        #     self.room.holder = MatchTreeBuilder.build_tree(MatchHolder(),0, 1, competitors_gen, self.room.size)
-        #     MatchTreeBuilder.visualize_tree(holder=self.room.holder, lvl=0, size=self.room.size)
-        #     await self.channel_layer.group_send(self.room.name, {
-        #         "type" : "init.game",
-        #     })
-        #     print(self.match)
+        self.competitor.set_competition_type(self._type)
     
     async def init_game(self, event):
         self.match = self.room.tournament.get_player_match(self.channel_name)
@@ -235,19 +223,22 @@ class TournamentConsumer(AsyncWebsocketConsumer):
     def command_switch(self,command) -> int:
         return (Command.CREATE.value * int(command == "create") + 
                 Command.JOIN.value * int(command == "join") +
-                Command.INPUT.value * int(command == "input")
+                Command.INPUT.value * int(command == "input") +
+                Command.JOINRANDOM.value * int(command == "join_random") +
+                Command.PLAY.value * int(command == "play")
                 )
     
     async def create_room(self,data):
         name = data.get('name')
-        print(name, flush=True)
         try :
             self.room = self.competitor.create_room(TournamentConsumer.rm, _type=self._type, name=name)
             self.competitor.join_room(self.room)
-            self.channel_layer.group_add(self.channel_layer, name)
+            await self.channel_layer.group_add(name, self.channel_name)
             await self.send(text_data=json.dumps({
                 'InformMsg' : f'Room {name} created successfuly'
             }))
+            self.competitor.is_host = True
+            self.room.p_holders[self.channel_name] = self.p_holder
         except RoomRestriction as e:
             await self.send(text_data=json.dumps({
                 'error_msg' : str(e)
@@ -257,12 +248,15 @@ class TournamentConsumer(AsyncWebsocketConsumer):
         name = data.get('name')
         try :
             room = TournamentConsumer.rm.get_room(name)
-            self.competitor.join_room(room)
-            self.channel_layer.group_add(self.channel_layer, name)
-            self.room = room
+            self.room = self.competitor.join_room(room)
+            await self.channel_layer.group_add(self.room.name, self.channel_name)
             await self.send(text_data=json.dumps({
-                'InformMsg': f'you joined room:{name} successfuly'
+                'InformMsg': f'you joined room:{self.room.name} successfuly'
             }))
+            await self.channel_layer.group_send(self.room.name, {
+                'type' : 'joined.competitor'
+            })
+            self.room.p_holders[self.channel_name] = self.p_holder
         except RoomRestriction as e :
             await self.send(text_data=json.dumps({
                 'ErrorMsg' : str(e)
@@ -274,6 +268,24 @@ class TournamentConsumer(AsyncWebsocketConsumer):
         self.room = self.competitor.random_room_request(TournamentConsumer.rm)
         self.competitor.join_room(self.room)
     
+    async def play(self):
+        if self.room.is_ready() and self.competitor.is_host:
+            print(list(self.room.p_holders.values()) , flush=True)
+            competitors_gen = iter(list(self.room.p_holders.values()))
+            self.room.holder = MatchTreeBuilder.build_tree(MatchHolder(),0, 1, competitors_gen, self.room.size)
+            MatchTreeBuilder.visualize_tree(holder=self.room.holder, lvl=0, size=self.room.size)
+            self.room.tournament.p_holders = self.room.p_holders
+            await self.channel_layer.group_send(self.room.name, {
+                "type" : "init.game",
+            })
+            await self.send(text_data=json.dumps({
+                'debug' : str(self.room.size),
+                'msg' : str(self.room.competitors)
+            }))
+        else :
+            await self.send(text_data=json.dumps({
+                'ErrorMsg' : "Game Not Ready Yet"
+            }))
     async def receive(self, text_data):
         recv_data = json.loads(text_data)
         command = recv_data.get('command')
@@ -282,12 +294,18 @@ class TournamentConsumer(AsyncWebsocketConsumer):
             case Command.CREATE.value :
                 print(command, flush=True)
                 await self.create_room(recv_data)
+            
             case Command.JOIN.value :
                 await self.join_room(recv_data)
+            
             case Command.JOINRANDOM :
-                self.join_random_room()
-            case Command.INPUT.value:
+                await self.join_random_room()
+        
+            case Command.INPUT.value :
                 self.handle_input(recv_data)
+    
+            case Command.PLAY.value :
+                await self.play()
     
     async def leave_state(self, event):
         self.match.state = "LEAVE"
