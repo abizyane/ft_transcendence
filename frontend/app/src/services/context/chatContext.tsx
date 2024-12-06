@@ -18,6 +18,7 @@ interface ChatUser {
   username: string;
   profile_pic: string;
   is_online: boolean;
+  relationship: string;
 }
 
 interface Conversation {
@@ -43,6 +44,7 @@ interface ChatContextType {
   fetchConversations: () => Promise<void>;
   fetchMessages: (userId: number, resetPage: boolean) => Promise<void>;
   setNewChat: (user: ChatUser) => void;
+  handleBlockUser: (username:string, relationship:string) => void;
 }
 
 const ChatContext = createContext<ChatContextType | undefined>(undefined);
@@ -86,6 +88,7 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
               id: conv.id,
               username: conv.username,
               profile_pic: conv.profile_pic,
+              relationship: conv.relationship,
               is_online: conv.is_online
             },
             messages: [],
@@ -94,6 +97,8 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
               sender: user?.username || '',
               receiver: conv.username,
               message: conv.message,
+              sender_id: conv.sender_id,
+              receiver_id: conv.receiver_id,
               timestamp: conv.timestamp,
               seen: conv.seen
             },
@@ -106,6 +111,27 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
       console.error('Failed to fetch conversations:', error);
     }
   };
+
+  const handleBlockUser = (username:string, relationship:string) => {
+    setConversations(prev => ({
+      ...prev,
+      [username]: {
+        ...prev[username],
+        user: {
+          ...prev[username].user,
+          relationship: relationship
+        }
+      }
+    }));
+
+    setCurrentChat(prev => prev ? {
+      ...prev,
+      user: {
+        ...prev.user,
+        relationship: relationship
+      }
+    } : undefined);
+  }
 
   const fetchMessages = async (userId: number, resetPage: boolean = false) => {
     try {
@@ -209,13 +235,16 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
           id: user.id,
           username: user.username,
           profile_pic: user.profile_pic,
+          relationship: user.relationship,
           is_online: user.is_online
         },
         messages: [],
         lastMessage: {
           message_id: 0,
           sender: user?.username || '',
+          sender_id: user.id,
           receiver: user.username,
+          receiver_id: user.id,
           message: '',
           timestamp: '',
           seen: false
@@ -307,7 +336,8 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
       updateUserStatus,
       fetchConversations,
       fetchMessages,
-      setNewChat
+      setNewChat,
+      handleBlockUser
     }}>
       {children}
     </ChatContext.Provider>

@@ -6,7 +6,7 @@ import { useParams, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { useFormState } from "react-dom";
 
-const Newchat = ({ isOpen, closeModal }) => {
+const Newchat = ({ isOpen, closeModal, handleUserClick }) => {
   const [input1, setInput1] = useState('');
   const [input2, setInput2] = useState('');
 
@@ -68,8 +68,9 @@ const Newchat = ({ isOpen, closeModal }) => {
 
   };
 
-  const handleUserClick = (user) => {
-    router.push(`/chat/${user.id}`);
+  const childHandleUserClick = (user) => {
+    if (handleUserClick) handleUserClick(user);
+    else router.push(`/chat/${user.id}`);
     closeModal();
   }
 
@@ -85,7 +86,7 @@ const Newchat = ({ isOpen, closeModal }) => {
         >
           ✖
         </button>
-        <h2 className="text-xl font-semibold mb-4">Create New Chat</h2>
+        <h2 className="text-xl text-white font-semibold mb-4">Create New Chat</h2>
         <form onSubmit={handleSubmit}>
           <div className="mb-4">
             <label className="block text-sm font-medium text-white" htmlFor="input1">
@@ -107,7 +108,7 @@ const Newchat = ({ isOpen, closeModal }) => {
                 filteredUsers.map((user) => (
                   <div className="flex items-center p-2 hover:bg-gray-100 cursor-pointer space-x-4"
                     key={user.id}
-                    onClick={() => handleUserClick(user)}
+                    onClick={() => childHandleUserClick(user)}
                   >
                     <img
                       src={user.profile_pic_url || "default-image-url.jpg"}

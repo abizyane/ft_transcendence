@@ -180,15 +180,28 @@ const Page = () => {
       {
         setCountDownStarted(true);
         setTimer(setInterval(() => {
-          setCountdown((prev) => prev - 1);
+           setCountdown((prev) => {
+            if (prev > 0)
+              return prev - 1
+            return 0
+           });
         }, 1000));
       }
       
     };
-    if (countdown === 0) {
-      setReady(true);
-      if (timer)
+    // if (countdown === 0) {
+    //   setReady(true);
+    //   if (timer)
+    //   {
+    //     clearInterval(timer)
+    //     setTimer(null);
+    //   }
+    // }
+    console.log("countdown", countdown);
+    return () => {
+      if (timer && countdown === 0)
       {
+        setReady(true);
         clearInterval(timer)
         setTimer(null);
       }
@@ -204,7 +217,7 @@ const Page = () => {
   }
   return (
     <>
-    {timer && (
+    {timer && countdown > 0 && (
       <div className="w-full h-full absolute text-center inset-0 bg-black/20 backdrop-blur-md  z-[100] ">
         <h3 className="justify-center items-center w-full h-full flex text-center text-3xl text-white text-nowrap font-extrabold">Game Starting in: {countdown}s</h3>
       </div>)}
@@ -268,7 +281,7 @@ const Page = () => {
             </div>
           </div>
         </div>
-      ) : isVsBot && countdown === 0 ? (
+      ) : isVsBot && countdown <= 0 ? (
         <div className="min-w-[320px] w-full h-full flex flex-col items-center justify-between p-2">
           <div className="w-full max-w-full h-full border-violet-primary backdrop-blur-lg border-2 p-2 rounded-lg flex flex-col mb-24 lg:mb-0">
             <div className="flex justify-between items-center w-full bg-transparent p-2 rounded-lg mb-2">
@@ -327,7 +340,7 @@ const Page = () => {
             </div>
           </div>
         </div>
-      ) : isLocalGame && countdown === 0 ? (
+      ) : isLocalGame && countdown <= 0 ? (
         <div className="min-w-[320px] w-full h-full flex flex-col items-center justify-between p-2">
           <div className="w-full max-w-full h-full border-violet-primary backdrop-blur-lg border-2 p-2 rounded-lg flex flex-col mb-24 lg:mb-0">
             <div className="flex justify-between items-center w-full bg-transparent p-2 rounded-lg mb-2">

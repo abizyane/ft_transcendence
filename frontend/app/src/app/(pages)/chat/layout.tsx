@@ -30,7 +30,10 @@ interface User {
 }
 
 export function Chat({ children }: ChatLayoutProps) {
-  const { conversations, currentChat, fetchConversations, searchConversations, setSearchConversations } = useChat();
+  const { conversations, currentChat, fetchConversations, searchConversations, setSearchConversations,  
+    handleBlockUser: contextBlockUser
+
+  } = useChat();
   const [users, setUsers] = useState<User[]>([]);
   const [isSliderOpen, setIsSliderOpen] = useState(false);
   // const [selectedId, setSelectedId] = useState<User | undefined>();
@@ -105,6 +108,45 @@ export function Chat({ children }: ChatLayoutProps) {
   const handleViewProfileClick = (userId: number) => {
     router.push(`/profile/${userId}`);
   };
+
+  const apiBlockUser = async (userid:number) => {
+    try {
+      const response = await fetch('http://localhost:8000/api/block', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          user_id: userid,
+        }),
+        credentials: 'include',
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        console.log('Friend blocked successfully:', data);
+        return true;
+
+      } else {
+        const errorData = await response.json();
+        console.log('Failed to block friend:', errorData);
+        return false;
+      }
+    } catch (error) {
+      console.log('Error during the request:', error);
+      return false;
+    } finally {
+    }
+  };
+
+  const handleBlockUser = (user:User, relationship:string) => {
+    console.log("blocking user", user);
+    apiBlockUser(user.id).then((success) => {
+      if (success === true) {
+        contextBlockUser(user.username, relationship);
+      }
+    });
+  }
   // console.log("current chat", currentChat);
   // console.log("convs rendered", conversations);
 if (!conversations)
@@ -115,6 +157,7 @@ if (!conversations)
     <div className=" w-full flex flex-col justify-start items-start">
       <div className="w-full flex lg:flex-row h-full flex-col-reverse">
         {/* Main content */}
+        <Newchat isOpen={isModalOpen} closeModal={closeModal} handleUserClick={handleUserClick} />
         <div className="w-full h-full lg:h-full flex flex-col justify-center items-center p-2">
           <div className="bg-gray-800/60 h-[800px]   w-full text-gray-200 rounded-xl border-2 border-violet-primary flex">
             <div className="w-full lg:w-96 backdrop-blur-md rounded-xl">
@@ -194,7 +237,6 @@ if (!conversations)
 
             {/* Main Content (Children) */}
             <div className="flex-1 hidden lg:block ">
-            <Newchat isOpen={isModalOpen} closeModal={closeModal} />
               {currentChat && (
                 <div className="px-6 py-4 flex  bg-gray-800/60 rounded-xl flex-row flex-none justify-start gap-4 items-center shadow">
                   <div className="flex">
@@ -225,8 +267,17 @@ if (!conversations)
                             <span className="text-white">Invite friend</span>
                           </DropdownMenuItem>
                           <DropdownMenuSeparator className="bg-black" />
-                          <DropdownMenuItem>
-                            <span className="text-white">Block</span>
+                          <DropdownMenuItem onClick={() => {
+                            if (currentChat.user.relationship === "Blocked") {
+                              handleBlockUser(currentChat.user, "Unknown");
+                            } else {
+                              handleBlockUser(currentChat.user, "Blocked");
+                            }
+                          }}>
+                            {currentChat.user.relationship === "Blocked" ?
+                                <span className="text-white">Unblock</span>
+                                  : <span className="text-white">Block</span>
+                            }
                           </DropdownMenuItem>
                         </DropdownMenuContent>
                       </DropdownMenu>
@@ -285,8 +336,17 @@ if (!conversations)
                       <span className="text-white">Invite friend</span>
                     </DropdownMenuItem>
                     <DropdownMenuSeparator className="bg-black" />
-                    <DropdownMenuItem>
-                      <span className="text-white">Block</span>
+                    <DropdownMenuItem onClick={() => {
+                      if (currentChat.user.relationship === "Blocked") {
+                        handleBlockUser(currentChat.user, "Unknown");
+                      } else {
+                        handleBlockUser(currentChat.user, "Blocked");
+                      }
+                    }}>
+                      {currentChat.user.relationship === "Blocked" ?
+                          <span className="text-white">Unblock</span>
+                            : <span className="text-white">Block</span>
+                      }
                     </DropdownMenuItem>
                   </DropdownMenuContent>
                 </DropdownMenu>

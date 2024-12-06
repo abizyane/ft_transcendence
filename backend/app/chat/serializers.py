@@ -1,6 +1,8 @@
+from django.db import models
+from astropong.serializers.UserSerializer import FriendSerializer
 from rest_framework import serializers
 from .models import Message
-from astropong.models.UserModel import User
+from astropong.models.UserModel import Relationship, User
 from urllib.parse import urljoin
 from django.conf import settings
 
@@ -66,22 +68,34 @@ class ChatRoomSerializer(serializers.Serializer):
 class ConversationSerializer(serializers.ModelSerializer):
     sender = serializers.SerializerMethodField()
     receiver = serializers.SerializerMethodField()
-
+    relationship = serializers.SerializerMethodField()
     def get_sender(self, obj):
         return UserSerializer(obj.sender, context=self.context).data
     
     def get_receiver(self, obj):
         return UserSerializer(obj.receiver, context=self.context).data
+    
+    # def get_relationship(self, obj):
+    #     current_user = self.context['request'].user
+    #     other_user = obj.sender if obj.sender.id != current_user.id else obj.receiver
+    #     user = User.objects.filter(id=other_user.id).first()
+    #     query = models.Q(user1=user, user2=current_user) | models.Q(user1=current_user, user2=user)
+    #     relation = Relationship.objects.filter(query).first()
+    #     return FriendSerializer(other_user, context={'request': self.context['request'], 'relationships': relation}).data['relationship']
 
     def to_representation(self, instance):
         current_user = self.context['request'].user
         other_user = instance.sender if instance.sender.id != current_user.id else instance.receiver
+        user = User.objects.filter(id=other_user.id).first()
+        query = models.Q(user1=user, user2=current_user) | models.Q(user1=current_user, user2=user)
+        relation = Relationship.objects.filter(query).first()
         
         return {
             'id': other_user.id,
             'username': other_user.username,
             'profile_pic': UserSerializer(other_user, context=self.context).data['profile_pic'],
             'is_online': other_user.is_online,
+            'relationship': FriendSerializer(other_user, context={'request': self.context['request'], 'relationships': relation}).data['relationship'],
             'message': instance.message,
             'timestamp': instance.timestamp,
             'seen': instance.seen
