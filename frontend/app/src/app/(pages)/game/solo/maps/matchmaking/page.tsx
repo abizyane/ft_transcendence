@@ -186,15 +186,28 @@ const Page = () => {
       {
         setCountDownStarted(true);
         setTimer(setInterval(() => {
-          setCountdown((prev) => prev - 1);
+           setCountdown((prev) => {
+            if (prev > 0)
+              return prev - 1
+            return 0
+           });
         }, 1000));
       }
       
     };
-    if (countdown === 0) {
-      setReady(true);
-      if (timer)
+    // if (countdown === 0) {
+    //   setReady(true);
+    //   if (timer)
+    //   {
+    //     clearInterval(timer)
+    //     setTimer(null);
+    //   }
+    // }
+    console.log("countdown", countdown);
+    return () => {
+      if (timer && countdown === 0)
       {
+        setReady(true);
         clearInterval(timer)
         setTimer(null);
       }
@@ -210,7 +223,7 @@ const Page = () => {
   }
   return (
     <>
-    {timer && (
+    {timer && countdown > 0 && (
       <div className="w-full h-full absolute text-center inset-0 bg-black/20 backdrop-blur-md  z-[100] ">
         <h3 className="justify-center items-center w-full h-full flex text-center text-3xl text-white text-nowrap font-extrabold">Game Starting in: {countdown}s</h3>
       </div>)}

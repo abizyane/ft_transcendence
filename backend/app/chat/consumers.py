@@ -89,6 +89,8 @@ class ChatRoomConsumer(AsyncWebsocketConsumer):
                 'message': MessageConsumerSerializer(message).data,
                 'sender': self.sender.username,
                 'receiver': self.receiver.username,
+                'sender_id': self.sender.id,
+                'receiver_id': self.receiver.id,
             }
         )
 
@@ -101,6 +103,8 @@ class ChatRoomConsumer(AsyncWebsocketConsumer):
                 'type': 'typing',
                 'sender': self.sender.username,
                 'receiver': self.receiver.username,
+                'sender_id': self.sender.id,
+                'receiver_id': self.receiver.id,
             }
         )
 
@@ -111,6 +115,8 @@ class ChatRoomConsumer(AsyncWebsocketConsumer):
                 'type': 'stop_typing',
                 'sender': self.sender.username,
                 'receiver': self.receiver.username,
+                'sender_id': self.sender.id,
+                'receiver_id': self.receiver.id,
             }
         )
 

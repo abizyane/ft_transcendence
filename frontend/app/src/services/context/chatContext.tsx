@@ -5,7 +5,9 @@ import { toast } from 'react-hot-toast';
 interface Message {
   message_id: number;
   sender: string;
+  sender_id: number;
   receiver: string;
+  receiver_id: number;
   message: string;
   timestamp: string;
   seen: boolean;
@@ -16,6 +18,7 @@ interface ChatUser {
   username: string;
   profile_pic: string;
   is_online: boolean;
+  relationship: string;
 }
 
 interface Conversation {
@@ -40,6 +43,8 @@ interface ChatContextType {
   updateUserStatus: (username: string, isOnline: boolean) => void;
   fetchConversations: () => Promise<void>;
   fetchMessages: (userId: number, resetPage: boolean) => Promise<void>;
+  setNewChat: (user: ChatUser) => void;
+  handleBlockUser: (username:string, relationship:string) => void;
 }
 
 const ChatContext = createContext<ChatContextType | undefined>(undefined);
@@ -83,6 +88,7 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
               id: conv.id,
               username: conv.username,
               profile_pic: conv.profile_pic,
+              relationship: conv.relationship,
               is_online: conv.is_online
             },
             messages: [],
@@ -91,6 +97,8 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
               sender: user?.username || '',
               receiver: conv.username,
               message: conv.message,
+              sender_id: conv.sender_id,
+              receiver_id: conv.receiver_id,
               timestamp: conv.timestamp,
               seen: conv.seen
             },
@@ -103,6 +111,27 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
       console.error('Failed to fetch conversations:', error);
     }
   };
+
+  const handleBlockUser = (username:string, relationship:string) => {
+    setConversations(prev => ({
+      ...prev,
+      [username]: {
+        ...prev[username],
+        user: {
+          ...prev[username].user,
+          relationship: relationship
+        }
+      }
+    }));
+
+    setCurrentChat(prev => prev ? {
+      ...prev,
+      user: {
+        ...prev.user,
+        relationship: relationship
+      }
+    } : undefined);
+  }
 
   const fetchMessages = async (userId: number, resetPage: boolean = false) => {
     try {
@@ -122,13 +151,13 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
         newMessages.push(...data.messages);
         
         const updatedConversation = {
+          user: data.user,
           ...conversations[username],
           messages: newMessages,
           unreadCount: newMessages.filter((msg: Message) => 
             !msg.seen && msg.sender === username
           ).length
         };
-
         setConversations(prev => ({
           ...prev,
           [username]: updatedConversation
@@ -144,16 +173,22 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const addMessage = (message: Message) => {
     const otherUser = message.sender === user?.username ? message.receiver : message.sender;
     const convSeen = message.sender === currentChat?.user.username || user.username === message.sender ? 0 : 1;
+    const otherUserId = message.sender === user?.username ? message.receiver_id : message.sender_id;
     
-    setConversations(prev => ({
-      ...prev,
-      [otherUser]: {
-        ...prev[otherUser],
-        messages: [message, ...(prev[otherUser]?.messages || [])],
-        lastMessage: message,
-        unreadCount: convSeen
-      }
-    }));
+    if (conversations && conversations[otherUser]) {
+      setConversations(prev => ({
+        ...prev,
+        [otherUser]: {
+          ...prev[otherUser],
+          messages: [message, ...(prev[otherUser]?.messages || [])],
+          lastMessage: message,
+          unreadCount: convSeen
+        }
+      }));
+    }
+    else {
+      fetchMessages(otherUserId, true);
+    }
 
     if (currentChat?.user.username === otherUser) {
       sendSeenMessage(message.sender, message.receiver);
@@ -187,6 +222,38 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
         }
       }
     }));
+  };
+
+  const setNewChat = (user: ChatUser) => {
+    if (conversations[user.username]) {
+      setCurrentChat(conversations[user.username]);
+    }
+    else {
+      let newConversations: { [key: string]: Conversation } = {};
+      newConversations[user.username] = {
+        user: {
+          id: user.id,
+          username: user.username,
+          profile_pic: user.profile_pic,
+          relationship: user.relationship,
+          is_online: user.is_online
+        },
+        messages: [],
+        lastMessage: {
+          message_id: 0,
+          sender: user?.username || '',
+          sender_id: user.id,
+          receiver: user.username,
+          receiver_id: user.id,
+          message: '',
+          timestamp: '',
+          seen: false
+        },
+        unreadCount: 0,
+      };
+
+      setCurrentChat(newConversations[user.username]);
+    }
   };
 
   const handleSetCurrentChat = (username: string, conversation?: Conversation, resetPage: boolean = false) => {
@@ -231,10 +298,15 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
   }, [user, currentChat, ws, messageContainerRef]);
 
   useEffect(() => {
+    setConversations({});
+
+  }, []);
+
+
+  useEffect(() => {
     if (user) {
       fetchConversations();
     }
-
     const socket = new WebSocket(`ws://localhost:8000/ws/chat/room/`);
     socket.onopen = () => {
     };
@@ -263,7 +335,9 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
       setMessageContainerRef,
       updateUserStatus,
       fetchConversations,
-      fetchMessages
+      fetchMessages,
+      setNewChat,
+      handleBlockUser
     }}>
       {children}
     </ChatContext.Provider>

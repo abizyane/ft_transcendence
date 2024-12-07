@@ -17,7 +17,7 @@ class OAuth(APIView):
     TOKEN_URL = "https://api.intra.42.fr/oauth/token"
     REDIRECT_URI = "http://localhost:3000/auth/oauth"
     CLIENT_ID = "u-s4t2ud-e86add016b6a41e208d53d0c011abdc53a93f6e1ba65ba9605a37be5a8997a17"
-    CLIENT_SECRET="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"
+    CLIENT_SECRET="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"
     def get(self, request, *args, **kwargs):
         payload = {
             'client_id': self.CLIENT_ID,
@@ -42,9 +42,7 @@ class OAuthCallback(APIView):
             "redirect_uri": OAuth.REDIRECT_URI
         }
         response = requests.post(OAuth.TOKEN_URL, data=payload)
-        print(response.json(), flush=True)
         if response.status_code != 200:
-            print("Error", response.json(), flush=True)
             return Response("Invalid request", status=status.HTTP_401_UNAUTHORIZED)
         resp = response.json()
         access_token = resp['access_token']
@@ -55,7 +53,6 @@ class OAuthCallback(APIView):
 
     def createUserInfo(self, user, code):
         try:
-            print("image ; ", user['image']['versions']['small'])
             serializer = UserSerializer(data={
                 'email': user['email'],
                 'username': user['login'],
@@ -65,22 +62,15 @@ class OAuthCallback(APIView):
                 'password' : code
             })
             serializer.is_valid(raise_exception=True)
-            print("Serializer valid", flush=True)
             serializer.save()
-            print("User saved", flush=True)
             return self.loginUser(serializer.instance, self.request)
         except Exception as e:
-            print("Error", str(e), flush=True)
             return Response({'error': str(e)}, status=status.HTTP_401_UNAUTHORIZED)
     
     def loginUser(self, user_instance, request):
-        print("user instance", user_instance, flush=True)
-
         refresh = RefreshToken.for_user(user_instance)
         user_data = UserSerializer(user_instance, context={'request': self.request}).data
         
-        print("Serialized data:", user_data, flush=True)
-        print("User model instance:", user_instance, flush=True) 
         response = Response(user_data)
         
         response.set_cookie(key='refresh', value=str(refresh),samesite='None', httponly=True, secure=True)
@@ -97,10 +87,8 @@ class OAuthCallback(APIView):
             user = resp.json()
             if self.is_email_existing(user['email']):
                 user = User.objects.filter(email=user['email']).get()
-                print("User found", user, flush=True)
                 return self.loginUser(user, self.request)
             else:
-                print("User not found", user, flush=True)
                 return self.createUserInfo(user, code)    
         else:
             return Response({'error': "An error has occured"}, status=status.HTTP_401_UNAUTHORIZED)
