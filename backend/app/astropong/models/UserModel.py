@@ -22,6 +22,7 @@ class User(AbstractUser):
 
     mfa_secret = models.CharField(max_length=500, null=True)
     mfa_enabled = models.BooleanField(default=False)
+    tournament_alias = models.CharField(max_length=100, null=True)
 
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = ['username']

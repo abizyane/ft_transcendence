@@ -7,6 +7,7 @@ from rest_framework.decorators import api_view, permission_classes
 from rest_framework.response import Response
 from django.contrib.auth import get_user_model
 from rest_framework import status
+from rest_framework.permissions import IsAuthenticated
 
 from chat.serializers import UserSerializer as MinUserSerializer
 from rest_framework import generics
@@ -17,6 +18,8 @@ User = get_user_model()
 
 
 class AddFriendView(APIView):
+    permission_classes = [IsAuthenticated]
+
     def post(self, request):
         friendId = request.data.get('friend_id')
         if friendId is None:
@@ -37,6 +40,7 @@ class AddFriendView(APIView):
             }, status=404)
 
 class RemoveFriendView(APIView):
+    permission_classes = [IsAuthenticated]
     def post(self,request):
         friendId = request.data.get('friend_id')
         if friendId is None:
@@ -54,6 +58,7 @@ class RemoveFriendView(APIView):
             }, status=404)
 
 class AcceptFriendRequestView(APIView):
+    permission_classes = [IsAuthenticated]
     def post(self,request):
         friendId = request.data.get('friend_id')
         if friendId is None:
@@ -70,6 +75,7 @@ class AcceptFriendRequestView(APIView):
                 "error": "User not found"
             }, status=404)
 class RejectFriendRequestView(APIView):
+    permission_classes = [IsAuthenticated]
     def post(self,request):
         friendId = request.data.get('friend_id')
         if friendId is None:
@@ -87,6 +93,7 @@ class RejectFriendRequestView(APIView):
             }, status=404)
         
 class BlockFriendView(APIView):
+    permission_classes = [IsAuthenticated]
     def post(self,request):
         friendId = request.data.get('user_id')
         if friendId is None:
@@ -106,6 +113,7 @@ class BlockFriendView(APIView):
             }, status=404)
         
 class UnblockFriendView(APIView):
+    permission_classes = [IsAuthenticated]
     def post(self,request):
         friendId = request.data.get('user_id')
         if friendId is None:
@@ -127,6 +135,8 @@ class UnblockFriendView(APIView):
 #     page_size = 50
 
 class BlockedUsersList(generics.ListAPIView):
+    
+    permission_classes = [IsAuthenticated]
     serializer_class = MinUserSerializer
     # pagination_class = BlockedUsersPageNumberPagination
 
@@ -144,6 +154,8 @@ class BlockedUsersList(generics.ListAPIView):
         return blocked_users
     
 class FriendsOfView(APIView):
+    permission_classes = [IsAuthenticated]
+
     def get(self, request, user_id):
         try:
             user = User.objects.get(id=user_id)
@@ -170,6 +182,8 @@ class FriendsOfView(APIView):
             }, status=404)
     
 class ListFriendView(APIView):
+    permission_classes = [IsAuthenticated]
+
     def get(self, request, relationship_type=None):
         user = request.user
         friends_with_relationship = []

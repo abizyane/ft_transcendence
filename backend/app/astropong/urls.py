@@ -1,5 +1,7 @@
 from django.contrib import admin
 from django.urls import path, include
+
+from .views.Tournament.TournamentView import GetTournamentView, JoinTournamentView, PublicTournamentView, CreateTournamentView, SetTournamentAliasView
 from .views.auth.register import RegisterView
 from .views.auth.login import LoginView ,UserListView
 from .views.auth.logout import LogoutView
@@ -44,4 +46,11 @@ urlpatterns = [
     path('weekly_stats', WeeklyStatsView.as_view(), name='weekly_stats'),
     path('weekly_experience', WeeklyXPView.as_view(), name='weekly_experience'),
     path('dashboard', DashboardView.as_view(), name='dashboard'),
+
+    path('public_tournament', PublicTournamentView.as_view(), name='public_tournament'),
+    path('create_tournament', CreateTournamentView.as_view(), name='create_tournament'),
+    path('join_tournament', JoinTournamentView.as_view(), name='join_tournament'),
+    path('get_tournament/<int:tournament_id>', GetTournamentView.as_view(), name='get_tournament'),
+    path('set_tournament_alias', SetTournamentAliasView.as_view(), name='set_tournament_alias'),
 ]
+    
