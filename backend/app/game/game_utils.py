@@ -4,7 +4,7 @@ import json
 class Ball:
     def __init__(self, game):
         self.game = game
-        self.rad = 15
+        self.rad = 5
         self.posX = game.width / 2
         self.posY = game.height / 2
         self.speed = 10
@@ -50,8 +50,8 @@ class Player:
         # self.user = username
         self.id = id
         self.score = 0
-        self.width = 12
-        self.height = 50
+        self.width = 2
+        self.height = 60
         self.x = 0
         self.y = game.height/ 2
         self.color = ''
