@@ -2,14 +2,14 @@
 
 import Image from "next/image";
 import Mars from "../../../../../../../public/Mars.jpeg";
+import { useEffect, useRef, useState } from "react";
 import VS from "../../../../../../../public/VS.jpeg";
 import Link from "next/link";
-import { useEffect, useRef, useState } from "react";
 import { useUser } from "@/services/context/usercontext";
 import { useSearchParams } from "next/navigation";
 import Loader from "../../../../../../components/loader/loader";
-import Localcanva from "@/components/Localcanva/page";
-import Twopcanvas from "@/components/twopcanvas/page";
+import Vsbotcanva from "@/components/Localcanva/page";
+import Localgamecanva from "@/components/twopcanvas/page";
 import Canvas from "@/components/Canva/page";
 // Default competitors and user data
 const defaultCompetitors = [
@@ -86,7 +86,7 @@ const Page = () => {
 
   let startCountDown = ()=>{
 
-    if (timer == null)
+    if (timer === null)
     {
       setCountDownStarted(true);
       setTimer(setInterval(() => {
@@ -161,7 +161,7 @@ const Page = () => {
   useEffect(() => {
     if (!currentUser)
       return;
-    console.log(isLocalGame, isRandomMatch, currentUser);
+    // console.log(isLocalGame, isRandomMatch, currentUser);
     if (isLocalGame) {
       setCompetitors([
         currentUser,
@@ -169,6 +169,7 @@ const Page = () => {
       ]);
       startCountDown();
     } else if (isRandomMatch) {
+
     } else {
       setCompetitors([
         currentUser,
@@ -186,15 +187,28 @@ const Page = () => {
       {
         setCountDownStarted(true);
         setTimer(setInterval(() => {
-          setCountdown((prev) => prev - 1);
+           setCountdown((prev) => {
+            if (prev > 0)
+              return prev - 1
+            return 0
+           });
         }, 1000));
       }
       
     };
-    if (countdown === 0) {
-      setReady(true);
-      if (timer)
+    // if (countdown === 0) {
+    //   setReady(true);
+    //   if (timer)
+    //   {
+    //     clearInterval(timer)
+    //     setTimer(null);
+    //   }
+    // }
+    console.log("countdown", countdown);
+    return () => {
+      if (timer && countdown === 0)
       {
+        setReady(true);
         clearInterval(timer)
         setTimer(null);
       }
@@ -210,11 +224,11 @@ const Page = () => {
   }
   return (
     <>
-    {timer && (
+    {timer  && (
       <div className="w-full h-full absolute text-center inset-0 bg-black/20 backdrop-blur-md  z-[100] ">
         <h3 className="justify-center items-center w-full h-full flex text-center text-3xl text-white text-nowrap font-extrabold">Game Starting in: {countdown}s</h3>
       </div>)}
-      {gameready && isRandomMatch && countdown === 0 ? (
+      {gameready && isRandomMatch && countdown <= 0 ? (
         <div className="max-w-[1200px] w-full h-fit flex flex-col items-center justify-between p-2">
           <div className="max-w-[1200px] w-full  h-fit border-violet-primary backdrop-blur-lg border-2 p-2 rounded-lg flex flex-col mb-24 lg:mb-0">
             <div className="flex justify-between items-center w-full bg-transparent p-2 rounded-lg mb-2">
@@ -267,7 +281,7 @@ const Page = () => {
             </div>
           </div>
         </div>
-      ) : isVsBot && countdown === 0 ? (
+      ) : isVsBot && countdown <= 0 ? (
         <div className="max-w-[1200px] w-full  h-fit flex flex-col items-center justify-between p-2">
           <div className="max-w-[1200px] w-full h-fit border-violet-primary backdrop-blur-lg border-2 p-2 rounded-lg flex flex-col mb-24 lg:mb-0">
             <div className="flex justify-between items-center w-full bg-transparent p-2 rounded-lg mb-2">
@@ -316,11 +330,11 @@ const Page = () => {
                 opacity: 0.7,
               }}
             >
-              <Localcanva scoreSetter={setScores}></Localcanva>
+              <Vsbotcanva scoreSetter={setScores}></Vsbotcanva>
             </div>
           </div>
         </div>
-      ) : isLocalGame && countdown === 0 ? (
+      ) : isLocalGame && countdown <= 0 ? (
         <div className="max-w-[1200px] w-full h-fit flex flex-col items-center justify-between p-2">
           <div className="max-w-[1200px] w-full h-fit border-violet-primary backdrop-blur-lg border-2 p-2 rounded-lg flex flex-col mb-24 lg:mb-0">
             <div className="flex justify-between items-center w-full bg-transparent p-2 rounded-lg mb-2">
@@ -369,7 +383,7 @@ const Page = () => {
                 opacity: 0.7,
               }}
             >
-              <Twopcanvas setScores={setScores}></Twopcanvas>
+              <Localgamecanva setScores={setScores}></Localgamecanva>
             </div>
           </div>
         </div>

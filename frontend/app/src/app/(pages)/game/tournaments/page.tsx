@@ -2,6 +2,9 @@
 
 import Profil from "../../../../../public/Profil.jpg";
 import { useState } from 'react';
+import Link from 'next/link';
+
+
 
 const Page = () => {
   const [confirmation, setConfirmation] = useState(false);
@@ -30,7 +33,6 @@ const Page = () => {
 
   return (
     <div className="flex flex-col justify-start items-center px-4 w-full h-full py-8">
-      {/* Alias Zone (Initially at the top) */}
       {!confirmation ? (
         <div className="bg-gray-700/50 shadow-lg border border-violet-primary max-w-lg w-full p-6 rounded-lg mb-8">
           <h1 className="text-xl text-white font-semibold text-center">Enter Your Alias</h1>
@@ -79,12 +81,15 @@ const Page = () => {
                     <label className="text-white">Private Tournament</label>
                   </div>
                   <div className="flex justify-center mt-4">
+                    <Link href="/game/tournaments/tournament_map">
+
                     <button
                       type="submit"
                       className="w-full bg-green-500 py-2 rounded-md"
-                    >
+                      >
                       Create Tournament
                     </button>
+                    </Link>
                   </div>
                 </form>
               </div>
