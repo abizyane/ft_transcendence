@@ -6,11 +6,12 @@ import { useEffect, useRef, useState } from "react";
 import VS from "../../../../../../../public/VS.jpeg";
 import Link from "next/link";
 import { useUser } from "@/services/context/usercontext";
-import { useSearchParams } from "next/navigation";
+import { useSearchParams, useRouter } from "next/navigation";
 import Loader from "../../../../../../components/loader/loader";
 import Vsbotcanva from "@/components/Localcanva/page";
 import Localgamecanva from "@/components/twopcanvas/page";
 import Canvas from "@/components/Canva/page";
+
 // Default competitors and user data
 const defaultCompetitors = [
   {
@@ -72,47 +73,51 @@ const Page = () => {
   const [users, setCompetitors] = useState(defaultCompetitors);
   const [scores, setScores] = useState({ one: 0, two: 0 });
   const { user: currentUser } = useUser();
-  const [countdown, setCountdown] = useState(5);
+  const [countdown, setCountdown] = useState(3);
   // Retrieve the 'game' and 'map' query params
   const searchParams = useSearchParams();
   const game = searchParams.get("game");
   const map = searchParams.get("map");
-  let indexUser = 0;
   const isLocalGame = game === "localgame";
   const isRandomMatch = game === "randommatch";
   const isVsBot = game === "vsbot";
-  const  [isCountDownStarted , setCountDownStarted] = useState(false);
-  const  [timer , setTimer] = useState(null);
+  const [isCountDownStarted, setCountDownStarted] = useState(false);
+  const [timer, setTimer] = useState(null);
+  const [winner, setWinner] = useState(false);
+  const [looser, setLooser] = useState(false);
+  const router = useRouter();
+  const IsConnected = useRef(false);
 
-  let startCountDown = ()=>{
-
-    if (timer === null)
-    {
+  let startCountDown = () => {
+    if (timer === null) {
       setCountDownStarted(true);
-      setTimer(setInterval(() => {
-        setCountdown((prev) => prev - 1);
-      }, 1000));
+      setTimer(
+        setInterval(() => {
+          setCountdown((prev) => prev - 1);
+        }, 1000)
+      );
     }
-    
   };
 
   // WebSocket connection for random matchmaking
   useEffect(() => {
-    if (isRandomMatch) {
+    console.log("isRandomMatch", isRandomMatch);
+    if (isRandomMatch && socketRef.current === null) {
       socketRef.current = new WebSocket(
         "ws://localhost:8000/ws/tournament/TWO/"
       );
       socketRef.current.onopen = () => {
+        IsConnected.current = true;
         console.log("WebSocket connected");
       };
 
       socketRef.current.onclose = () => {
+        IsConnected.current = false;
         console.log("WebSocket closed");
       };
 
       socketRef.current.onmessage = (e) => {
-        if (e.data instanceof Blob) {
-        } else {
+        if (!(e.data instanceof Blob)) {
           const data = JSON.parse(e.data);
           if (data.type === "room") {
             if (data.command === "setReady") {
@@ -123,29 +128,31 @@ const Page = () => {
 
             // Update competitors from WebSocket data
             if (data.competitors) {
-              if (data.competitors.length > 1) {
-                setCompetitors([
-                  ...data.competitors,
-                  { ...defaultCompetitors[0] },
-                ]);
-              console.log("stared countdozw")
-              startCountDown();
-
-              } else {
-                setCompetitors(data.competitors);
+              if (data.competitors.length == 2) {
+                startCountDown();
               }
+              setCompetitors([...data.competitors]);
             }
           }
         }
       };
-
-      return () => {
-        socketRef.current.close();
-      };
     }
-  }, [isRandomMatch]);
 
-  // Get the current user from context
+    return () => {
+      if (socketRef.current && IsConnected.current) {
+        socketRef.current.close();
+        socketRef.current = null;
+      }
+    };
+  }, [isRandomMatch,IsConnected]);
+
+  useEffect(() => {
+    if (winner || looser) {
+      router.push("/game/solo");
+      return;
+    }
+  }, [winner, looser]);
+
   const updateCompetitors = (competitors) => {
     const nextCompetitors = users.map((c) => {
       if (c.id == competitors.id) {
@@ -153,67 +160,48 @@ const Page = () => {
         return competitors;
       } else return c;
     });
-    // indexUser++
-    console.log(nextCompetitors);
-    // setCompetitors(competitors)
   };
 
   useEffect(() => {
-    if (!currentUser)
-      return;
-    // console.log(isLocalGame, isRandomMatch, currentUser);
+    if (!currentUser) return;
     if (isLocalGame) {
       setCompetitors([
         currentUser,
         { ...defaultCompetitors[0], username: "Player2" },
       ]);
       startCountDown();
-    } else if (isRandomMatch) {
-
-    } else {
+    } else if (isVsBot) {
       setCompetitors([
         currentUser,
         { ...defaultCompetitors[2], username: "Bot" },
       ]);
-      console.log("local start count")
+      console.log("local start count");
       startCountDown();
     }
-  }, [isLocalGame, isRandomMatch, currentUser]);
+  }, [isLocalGame, isVsBot, currentUser]);
 
   useEffect(() => {
-    startCountDown = ()=>{
-
-      if (timer == null)
-      {
+    startCountDown = () => {
+      if (timer == null) {
         setCountDownStarted(true);
-        setTimer(setInterval(() => {
-           setCountdown((prev) => {
-            if (prev > 0)
-              return prev - 1
-            return 0
-           });
-        }, 1000));
+        setTimer(
+          setInterval(() => {
+            setCountdown((prev) => {
+              if (prev > 0) return prev - 1;
+              return 0;
+            });
+          }, 1000)
+        );
       }
-      
     };
-    // if (countdown === 0) {
-    //   setReady(true);
-    //   if (timer)
-    //   {
-    //     clearInterval(timer)
-    //     setTimer(null);
-    //   }
-    // }
     console.log("countdown", countdown);
     return () => {
-      if (timer && countdown === 0)
-      {
-        setReady(true);
-        clearInterval(timer)
+      if (timer && countdown === 0) {
+        clearInterval(timer);
         setTimer(null);
       }
-    }
-  }, [gameready, countdown,timer]);
+    };
+  }, [countdown, timer, gameready]);
 
   if (!currentUser) {
     return (
@@ -224,10 +212,13 @@ const Page = () => {
   }
   return (
     <>
-    {timer  && (
-      <div className="w-full h-full absolute text-center inset-0 bg-black/20 backdrop-blur-md  z-[100] ">
-        <h3 className="justify-center items-center w-full h-full flex text-center text-3xl text-white text-nowrap font-extrabold">Game Starting in: {countdown}s</h3>
-      </div>)}
+      {timer && countdown >= 0 && (
+        <div className="w-full h-full absolute text-center inset-0 bg-black/20 backdrop-blur-md  z-[100] ">
+          <h3 className="justify-center items-center w-full h-full flex text-center text-3xl text-white text-nowrap font-extrabold">
+            Game Starting in: {countdown}s
+          </h3>
+        </div>
+      )}
       {gameready && isRandomMatch && countdown <= 0 ? (
         <div className="max-w-[1200px] w-full h-fit flex flex-col items-center justify-between p-2">
           <div className="max-w-[1200px] w-full  h-fit border-violet-primary backdrop-blur-lg border-2 p-2 rounded-lg flex flex-col mb-24 lg:mb-0">
@@ -277,7 +268,13 @@ const Page = () => {
                 opacity: 0.7,
               }}
             >
-                <Canvas socketRef={socketRef} callback={setReady} scoreSetter={setScores}></Canvas>
+              <Canvas
+                socketRef={socketRef}
+                setWinner={setWinner}
+                setLooser={setLooser}
+                callback={setReady}
+                scoreSetter={setScores}
+              ></Canvas>
             </div>
           </div>
         </div>
@@ -285,18 +282,14 @@ const Page = () => {
         <div className="max-w-[1200px] w-full  h-fit flex flex-col items-center justify-between p-2">
           <div className="max-w-[1200px] w-full h-fit border-violet-primary backdrop-blur-lg border-2 p-2 rounded-lg flex flex-col mb-24 lg:mb-0">
             <div className="flex justify-between items-center w-full bg-transparent p-2 rounded-lg mb-2">
-              <div className="flex items-center space-x-2 bg-gray-700 p-1 lg:p-3 rounded-full w-36 lg:w-1/3 lg:h-14 justify-center lg:justify-start">
-                <Image
-                  src={Mars}
-                  alt="First User"
-                  width={30}
-                  height={30}
-                  className="rounded-full"
-                />
-                <div className="text-white">
-                  <div className="text-xs font-bold">{users[0].username}</div>
-                </div>
+            <div className="flex items-center space-x-2 bg-gray-700 p-1 lg:p-3 rounded-full w-36 lg:w-1/3 lg:h-14 justify-center lg:justify-start">
+              <div className=" w-12 h-12 lg:w-14 lg:h-14">
+                <img src={users[0].profile_pic_url} alt="player 1 pic" className="rounded-full object-cover w-full h-full p-1" />
               </div>
+              <div className="text-white">
+                <div className="text-xs font-bold">{users[0].username}</div>
+              </div>
+            </div>
               <div className="flex items-center space-x-2 m-2">
                 <div className="text-xl lg:text-3xl text-white font-bold">
                   {scores.one}
@@ -346,6 +339,7 @@ const Page = () => {
                   height={30}
                   className="rounded-full"
                 />
+                <img src={users[0].profile_pic_url} alt="player 1 pic" />
                 <div className="text-white">
                   <div className="text-xs font-bold">{users[0].username}</div>
                 </div>
@@ -416,7 +410,6 @@ const Page = () => {
         </div>
       )}
     </>
-
   );
 };
 

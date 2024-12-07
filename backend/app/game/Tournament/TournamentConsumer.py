@@ -26,6 +26,7 @@ def build_absolute_image_uri(scope, relative_path):
     return urljoin(base_url, relative_path)
 class TournamentConsumer(AsyncWebsocketConsumer):
     rm = RoomListManager()
+    connected_users = set()
     rooms = {}
     i = 0
     _id = 0
@@ -35,6 +36,7 @@ class TournamentConsumer(AsyncWebsocketConsumer):
         self.p_holder.competitor.user_id = userId
     
     async def connect(self):
+        self.user = None
         user = self.scope['user']
         if user.is_anonymous or not user.is_authenticated:
             await self.accept()
@@ -44,8 +46,19 @@ class TournamentConsumer(AsyncWebsocketConsumer):
             }))
             await self.close()
             return
-
+        
+        if user.username in TournamentConsumer.connected_users :
+            await self.accept()
+            await self.send(text_data=json.dumps({
+                "msg" : f"{user} user already connected.",
+                "type" : "error"
+            }))
+            await self.close()
+            return
+            
         await self.accept()
+        self.user = user
+        TournamentConsumer.connected_users.add(self.user.username)
         self.p_holder = PlayerHolder(Competitor(self.channel_name))
         self.set_competitor_info(username=user.username, img=build_absolute_image_uri(self.scope, user.profile_pic), userId=user.id)
         self._type = self.scope['url_route']['kwargs']['competition_type']
@@ -184,6 +197,7 @@ class TournamentConsumer(AsyncWebsocketConsumer):
             await self.send(text_data=json.dumps({
                 'msg': 'You Lost'
             }))
+        rm = None
        
         
 
@@ -226,10 +240,17 @@ class TournamentConsumer(AsyncWebsocketConsumer):
         
 
     async def disconnect(self, error_code):
+        if self.user:
+            TournamentConsumer.connected_users.remove(self.user.username)
         if self.room:
-            if self.room.is_ready():
+            if  self.room.is_ready():
                 #set other player to winner
-                if self.match.is_ready():
+                if self.match and self.match.is_ready():
+                    try:
+                        self.p_holder.competitor.exit_room(self.room)
+                    # del self.room.tournament.p_holders[self.channel_name]
+                    except self.room.RoomIsEmpty:
+                        TournamentConsumer.rm.remove_not_ready(self.room)
                     await self.channel_layer.group_send(self.match_name, {
                         'type' : 'leave.state',
                         'player' : f'{self.channel_name}'
@@ -286,6 +307,7 @@ class TournamentConsumer(AsyncWebsocketConsumer):
             score_1=score_1,
             score_2=score_2
         )
+
 
     @database_sync_to_async
     def award_xp(self, won: bool):

@@ -11,17 +11,25 @@ class ScoreBoard{
         this.scoreSetter = setScores;
     }
     update(){
-        if (this.ball.collisionX - this.ball.rad < this.game.player.posX )
+        if (this.ball.posX - this.ball.rad < this.game.player.posX )
         {
-            this.first_score++;
-            this.ball.init(-1)
+          this.first_score++;
+          this.ball.reset_ball() 
+          console.log("update score")
+            // this.ball.init(-1)
         }
-        else if (this.ball.collisionX > this.game.enemy.posX + this.game.enemy.width/2)
+        else if (this.ball.posX > this.game.enemy.posX + this.game.enemy.width/2)
         {
+            console.log("update score")
             this.second_score++;
-            this.ball.init(1)
+            // this.ball.init(1)
+            this.ball.reset_ball()
         }
-        this.scoreSetter ({one : this.first_score , two : this.second_score}) 
+        if (this.first_score === 10 || this.second_score === 10)
+          {
+              this.game.status = 0;
+          }
+        this.scoreSetter({one : this.first_score , two : this.second_score})
     }
     // draw(ctx){
     //     ctx.beginPath();
@@ -37,7 +45,7 @@ class Ball {
       this.rad = 5
       this.posX = game.width / 2
       this.posY = game.height / 2
-      this.speed = 10
+      this.speed = 7
       this.angle = 45
       this.dirX = Math.cos(this.angle)
       this.dirY = Math.sin(this.angle)
@@ -150,17 +158,17 @@ class Enemy extends Paddle
     this.rgb = [255,0,0]
   }
 
-  update(ball)
+  update()
   {
-  
-    if (this.posY > 0 && this.game.wUp)
-      {
-        this.posY -= this.speed;
-      }
-      if (this.posY < this.game.height - this.height && this.game.sUp){
-        this.posY += this.speed;
-      }
+    if (this.posY > 0 && this.game.keyUp)
+    {
+      this.posY -= this.speed;
+    }
+    if (this.posY < this.game.height - this.height && this.game.keyDown){
+      this.posY += this.speed;
+    }
   }
+ 
 }
 
 class Player extends Paddle
@@ -174,15 +182,16 @@ class Player extends Paddle
       this.color = "blue"
       this.rgb = [0,0,255]
   }
-  update()
+  update(ball)
   {
-    if (this.posY > 0 && this.game.keyUp)
-    {
-      this.posY -= this.speed;
-    }
-    if (this.posY < this.game.height - this.height && this.game.keyDown){
-      this.posY += this.speed;
-    }
+  
+    if (this.posY > 0 && this.game.wUp)
+      {
+        this.posY -= this.speed;
+      }
+      if (this.posY < this.game.height - this.height && this.game.sUp){
+        this.posY += this.speed;
+      }
   }
 
 }
@@ -199,8 +208,9 @@ class Game{
       this.keyUp = 0;
       this.keyDown = 0;
       this.speed = 5;
-      this.wUp = 0
-      this.sUp = 0
+      this.wUp = 0;
+      this.sUp = 0;
+      this.status = 1;
     //   loadFonts();
 
       window.addEventListener('keydown', (e) => {
@@ -274,6 +284,9 @@ class Game{
                 Context.current.clearRect(0,0, CanvasRef.current.width, CanvasRef.current.height)
                 game.update()
                 game.render(Context.current)
+                if (game.status === 0 ){
+                  return;
+                }
                 requestAnimationFrame(animate)
             }
         }
