@@ -16,6 +16,7 @@ import {
   DropdownMenuSeparator,
 } from "@/components/ui/dropdown-menu";
 import Loader from "components/loader/loader";
+import { useUser } from "@/services/context/usercontext";
 
 interface ChatLayoutProps {
   children: ReactNode;
@@ -34,6 +35,7 @@ export function Chat({ children }: ChatLayoutProps) {
     handleBlockUser: contextBlockUser
 
   } = useChat();
+  const { user } = useUser();
   const [users, setUsers] = useState<User[]>([]);
   const [isSliderOpen, setIsSliderOpen] = useState(false);
   // const [selectedId, setSelectedId] = useState<User | undefined>();
@@ -149,7 +151,7 @@ export function Chat({ children }: ChatLayoutProps) {
   }
   // console.log("current chat", currentChat);
   // console.log("convs rendered", conversations);
-if (!conversations)
+if (!conversations || !user)
   return <div className="w-full h-full flex justify-center items-center"><Loader/></div>
 
   return (
@@ -215,7 +217,7 @@ if (!conversations)
                           <p className="font-bold">{conv.user.username}</p>
                           <div className="flex justify-between items-center text-sm text-gray-600">
                             {conv.lastMessage ? <>
-                              <p className={`truncate ${conv.unreadCount > 0 ? "font-bold text-white" : ""}`}>{conv.lastMessage?.message}</p>
+                              <p className={`truncate ${conv.unreadCount > 0 && conv.lastMessage.sender !== user?.username ? "font-bold text-white" : ""}`}>{conv.lastMessage?.message}</p>
                                 <p className="ml-4 text-white-primary whitespace-nowrap">
                                   {isToday(new Date(conv.lastMessage?.timestamp))
                                     ? formatDistanceToNow(new Date(conv.lastMessage?.timestamp), {

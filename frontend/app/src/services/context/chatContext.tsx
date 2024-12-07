@@ -94,8 +94,8 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
             messages: [],
             lastMessage: {
               message_id: 0,
-              sender: user?.username || '',
-              receiver: conv.username,
+              sender: conv.sender,
+              receiver: conv.receiver,
               message: conv.message,
               sender_id: conv.sender_id,
               receiver_id: conv.receiver_id,
@@ -149,7 +149,7 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
         
         const newMessages = resetPage ? [] : conversations[username]?.messages || [];
         newMessages.push(...data.messages);
-        
+        newMessages.sort((a, b) => new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime());
         const updatedConversation = {
           user: data.user,
           ...conversations[username],
@@ -158,15 +158,29 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
             !msg.seen && msg.sender === username
           ).length
         };
+        if (newMessages.length > 0) {
+          updatedConversation.lastMessage = {
+            message_id: 0,
+            sender: newMessages[newMessages.length - 1].sender,
+            sender_id: newMessages[newMessages.length - 1].sender_id,
+            receiver: newMessages[newMessages.length - 1].receiver,
+            receiver_id: newMessages[newMessages.length - 1].receiver_id,
+            message: newMessages[newMessages.length - 1].message,
+            timestamp: newMessages[newMessages.length - 1].timestamp,
+            seen: newMessages[newMessages.length - 1].seen
+          };
+        }
         setConversations(prev => ({
           ...prev,
           [username]: updatedConversation
         }));
+        sendSeenMessage(username, user?.username);
 
         handleSetCurrentChat(username, updatedConversation);
       }
     } catch (error) {
       console.error('Failed to fetch messages:', error);
+      console.error(error);
     }
   };
 
@@ -185,25 +199,37 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
           unreadCount: convSeen
         }
       }));
+      if (currentChat?.user.username === otherUser) {
+        sendSeenMessage(message.sender, message.receiver);
+        setCurrentChat(prev => prev ? {
+          ...prev,
+          unreadCount: convSeen,
+          messages: [message, ...prev.messages],
+          lastMessage: message
+        } : undefined);
+      }
     }
     else {
-      fetchMessages(otherUserId, true);
+      fetchConversations().then(() => {
+        if (currentChat?.user.username === otherUser) {
+          sendSeenMessage(message.sender, message.receiver);
+          setCurrentChat(prev => prev ? {
+            ...prev,
+            unreadCount: convSeen,
+            messages: [message, ...prev.messages],
+            lastMessage: message
+          } : undefined);
+        }
+      });
     }
 
-    if (currentChat?.user.username === otherUser) {
-      sendSeenMessage(message.sender, message.receiver);
-      setCurrentChat(prev => prev ? {
-        ...prev,
-        unreadCount: convSeen,
-        messages: [message, ...prev.messages],
-        lastMessage: message
-      } : undefined);
-    }
+    
     
     setTimeout(handleScrollToBottom, 100);
   };
 
   const sendSeenMessage = (senderUser:string, receiverUser:string) => {
+    if (senderUser === user?.username) return;
     ws.send(JSON.stringify({
       type: "read_message",
       sender: senderUser,
@@ -262,7 +288,7 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
     if (conversation) {
       setCurrentChat(conversation);
-      // sendSeenMessage(user.username, username);
+      sendSeenMessage(user.username, username);
       setConversations(prev => ({
         ...prev,
         [username]: {
@@ -306,6 +332,10 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
   useEffect(() => {
     if (user) {
       fetchConversations();
+    }
+    if (ws) {
+      ws.close();
+      setWs(null);
     }
     const socket = new WebSocket(`ws://localhost:8000/ws/chat/room/`);
     socket.onopen = () => {

@@ -97,6 +97,7 @@ class ConversationSerializer(serializers.ModelSerializer):
             'is_online': other_user.is_online,
             'relationship': FriendSerializer(other_user, context={'request': self.context['request'], 'relationships': relation}).data['relationship'],
             'message': instance.message,
+            'sender': instance.sender.username,
             'timestamp': instance.timestamp,
             'seen': instance.seen
         }
