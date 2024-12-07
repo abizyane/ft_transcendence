@@ -26,6 +26,7 @@ def build_absolute_image_uri(scope, relative_path):
     return urljoin(base_url, relative_path)
 class TournamentConsumer(AsyncWebsocketConsumer):
     rm = RoomListManager()
+    connected_users = set()
     rooms = {}
     i = 0
     _id = 0
@@ -44,8 +45,18 @@ class TournamentConsumer(AsyncWebsocketConsumer):
             }))
             await self.close()
             return
-
+        
+        if user.username in TournamentConsumer.connected_users :
+            await self.accept()
+            await self.send(text_data=json.dumps({
+                "msg" : f"{user} user already connected.",
+                "type" : "error"
+            }))
+            await self.close()
+            return
         await self.accept()
+        self.user = user
+        TournamentConsumer.connected_users.add(self.user.username)
         self.p_holder = PlayerHolder(Competitor(self.channel_name))
         self.set_competitor_info(username=user.username, img=build_absolute_image_uri(self.scope, user.profile_pic), userId=user.id)
         self._type = self.scope['url_route']['kwargs']['competition_type']
@@ -226,6 +237,8 @@ class TournamentConsumer(AsyncWebsocketConsumer):
         
 
     async def disconnect(self, error_code):
+        if self.user:
+            TournamentConsumer.connected_users.remove(self.user.username)
         if self.room:
             if self.room.is_ready():
                 #set other player to winner
