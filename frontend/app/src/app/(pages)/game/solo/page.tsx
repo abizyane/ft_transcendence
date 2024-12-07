@@ -27,7 +27,7 @@ const Page = () => {
           >
             <div className="h-full w-full bg-cover bg-center" style={{ backgroundImage: `url(${Vsbot.src})`, backgroundSize: 'cover', backgroundPosition: 'center' }}>
               <div className="absolute bottom-0 left-0 right-0 bg-black/50 text-center text-lg md:text-xl lg:text-2xl font-bold text-white flex items-center justify-center">
-                VS AI
+                VS Bot
               </div>
             </div>
           </Link>
