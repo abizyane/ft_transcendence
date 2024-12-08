@@ -67,12 +67,14 @@ const Friends = ({user}) => {
                 </div>
                 <div className="flex items-center justify-center space-x-2 ">
                   <div className="bg-black rounded-full p-2 w-12 h-12 flex items-center justify-center">
+                    <Link href={`/chat/${friend.id}`}>
                     <button
                       aria-label="Chat"
                       className="hover:text-blue-500 text-white transition-colors"
                     >
                       <IoChatbubbleEllipsesSharp className="w-6 h-6 rounded-full text-blue-600 hover:text-blue-900" />
                     </button>
+                    </Link>
                   </div>
                   <div className="bg-black rounded-full p-2 w-12 h-12 flex items-center justify-center">
                     <button

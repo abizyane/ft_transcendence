@@ -111,7 +111,7 @@ class SetTournamentAliasView(APIView):
 
     def post(self, request):
         alias = request.data.get('alias')
-        if alias is None:
+        if alias is None or alias == '':
             return Response({"message": "Alias is required"}, status=status.HTTP_400_BAD_REQUEST)
         if User.objects.filter(tournament_alias=alias).exists() and request.user.tournament_alias != alias:
             return Response({"message": "Alias is already taken"}, status=status.HTTP_400_BAD_REQUEST)
