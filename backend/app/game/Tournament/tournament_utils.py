@@ -135,6 +135,7 @@ class RoomManagerNew(RoomManager):
     
     def create_type_two_room(self):
         room = self.type_two[self.type_two_id] = self.generate_room(RM_TYPE[2])
+        room.name = self.type_two_id
         self.type_two_id += 1
         return room
 
@@ -155,7 +156,7 @@ class RoomManagerNew(RoomManager):
         elif _type == RM_TYPE[4] :
             return self.create_type_four_room(name)
 
-    def get_room(self, room_name):
+    def get_room(self, _type ,room_name):
         if not room_name :
             raise RoomRequestNameRequired()
         if room_name not in self.type_four_name[4]:
@@ -165,7 +166,13 @@ class RoomManagerNew(RoomManager):
     """
     remove tournament name and tournament
     """
-    def remove_tpye_four_room(self, room_name):
+    def remove_room(self, _type, _id):
+        if _type == RM_TYPE[2]:
+            self.remove_type_two_room(_id)
+        elif _type == RM_TYPE[4]:
+            self.remove_type_four_room(_id)
+    
+    def remove_type_four_room(self, room_name):
         self.type_four_name[4].remove(name)
         del self.type_four[name]
 

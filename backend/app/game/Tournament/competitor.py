@@ -83,7 +83,7 @@ class CompetitorNamed(Competitor):
            raise e 
 
     def room_request(self, rm:AbstractRoomManager):
-        super().room_request(rm)
+        raise NotImplementedError
 
     def random_room_request(self, rm:AbstractRoomManager):
         if self._type == RM_TYPE[2]:

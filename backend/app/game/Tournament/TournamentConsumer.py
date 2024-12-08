@@ -16,9 +16,10 @@ from .room_restrict import RoomRestriction
 class Command(Enum):
     CREATE = 1
     JOIN = 2
-    INPUT = 3
-    JOINRANDOM = 4
-    PLAY = 5
+    LEAVE = 3
+    INPUT = 4
+    JOINRANDOM = 5
+    PLAY = 6
 
 class TournamentConsumer(AsyncWebsocketConsumer):
     rm = RoomManagerNew()
@@ -207,12 +208,11 @@ class TournamentConsumer(AsyncWebsocketConsumer):
                         'player' : f'{self.channel_name}'
                     })
                 pass
-            else :
-                try:
-                    self.p_holder.competitor.exit_room(self.room)
-                    # del self.room.tournament.p_holders[self.channel_name]
-                except self.room.RoomIsEmpty:
-                    TournamentConsumer.rm.remove_not_ready(self.room)
+            try:
+                self.p_holder.competitor.exit_room(self.room)
+                # del self.room.tournament.p_holders[self.channel_name]
+            except self.room.RoomIsEmpty:
+                TournamentConsumer.rm.remove_not_ready(self.room)
         await self.channel_layer.group_discard(self.room.name, self.channel_name)
 
     def access_competition(self, competitor:CompetitorNamed) -> None :
@@ -223,6 +223,7 @@ class TournamentConsumer(AsyncWebsocketConsumer):
     def command_switch(self,command) -> int:
         return (Command.CREATE.value * int(command == "create") + 
                 Command.JOIN.value * int(command == "join") +
+                Command.LEAVE.value * int(command == "leave") +
                 Command.INPUT.value * int(command == "input") +
                 Command.JOINRANDOM.value * int(command == "join_random") +
                 Command.PLAY.value * int(command == "play")
@@ -244,6 +245,32 @@ class TournamentConsumer(AsyncWebsocketConsumer):
                 'error_msg' : str(e)
             }))
         
+    async def leave_room(self):
+        if self.competitor and self.room :
+            try :
+                self.competitor.exit_room(self.room)
+                await self.group_send(self.room.name, {
+                    'type' : 'left.msg',
+                    'left_player' : self.competitor.username
+                }) 
+            except RoomRestriction as e:
+                TournamentConsumer.rm.remove_room(self.room._id)
+                #broadcast room deletion
+        else :
+            await self.send(text_data=json.dumps({
+                'ErrorMsg' : 'You are not in a room'
+            }))
+
+    async def left_msg(self, event):
+        comp_info = self.p_holder.competitor.get_allroom_info()
+        user_left = event['left_player']
+        await self.send(text_data=json.dumps({
+            "type" : "room",
+            "msg" : f'user {left_player} has left', #alias later (!attention)
+            "competitors" : comp_info,
+            "command" : "setCompetitors"
+        }))
+        
     async def join_room(self,data):
         name = data.get('name')
         try :
@@ -264,7 +291,7 @@ class TournamentConsumer(AsyncWebsocketConsumer):
 
 
     
-    def join_random_room(self):
+    def join_random_room(self, _type):
         self.room = self.competitor.random_room_request(TournamentConsumer.rm)
         self.competitor.join_room(self.room)
     
@@ -297,6 +324,9 @@ class TournamentConsumer(AsyncWebsocketConsumer):
             
             case Command.JOIN.value :
                 await self.join_room(recv_data)
+
+            case Command.LEAVE.value :
+                await self.leave_room()
             
             case Command.JOINRANDOM :
                 await self.join_random_room()
