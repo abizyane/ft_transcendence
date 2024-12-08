@@ -34,6 +34,7 @@ class Room(RoomAbstract):
         self.p_holders = {}
         self.holder = None
         self.ready = False
+        self.started = False
         self.tournament = Tournament()
 
     def add_player(self, Player) -> RoomAbstract :
@@ -67,8 +68,10 @@ class Room(RoomAbstract):
     def get_data(self) :
         return {
             "id": self._id,
+            "name" : self.name,
             "competitors" : {competitor.name : competitor.get_data() for competitor in self.competitors},
-             
+            "size": self.competitors_count(),
+            "started" : self.started
         }
 
 class TwoPlayersRoom(Room):

@@ -162,6 +162,13 @@ class RoomManagerNew(RoomManager):
         if room_name not in self.type_four_name[4]:
             raise RoomNotExist(room_name)
         return self.type_four[room_name]
+
+    """
+    get all in type four rooms needed data
+    """
+    def rooms_data(self){
+        return list(room.get_data() for room in self.type_four.values())
+    }
     
     """
     remove tournament name and tournament

@@ -37,6 +37,8 @@ class TournamentConsumer(AsyncWebsocketConsumer):
         self.p_holder = PlayerHolder(CompetitorNamed(self.channel_name))
         self.competitor = self.p_holder.competitor
         self._type = self.scope['url_route']['kwargs']['competition_type']
+        if self._type == "FOUR" :
+            self.channel_layer.group_add("FOUR", self.channel_name)
         self.room:Room = None
         self.match = None
         self.match_name = ''
@@ -240,11 +242,22 @@ class TournamentConsumer(AsyncWebsocketConsumer):
             }))
             self.competitor.is_host = True
             self.room.p_holders[self.channel_name] = self.p_holder
+            if _type == "FOUR":
+                self.channel_layer.group_send("FOUR", {
+                    'type' : 'broadcast.room.state',
+                    'room' : self.room.get_data()
+                })
         except RoomRestriction as e:
             await self.send(text_data=json.dumps({
                 'error_msg' : str(e)
             }))
-        
+    
+    async def broadcast_room_state(self, event):
+        await self.send(text_data=json.dumps({
+            'type' : 'created_room',
+            'room' : event['room']
+        }))
+    
     async def leave_room(self):
         if self.competitor and self.room :
             try :
@@ -284,6 +297,11 @@ class TournamentConsumer(AsyncWebsocketConsumer):
                 'type' : 'joined.competitor'
             })
             self.room.p_holders[self.channel_name] = self.p_holder
+            if _type == "FOUR":
+                self.channel_layer.group_send("FOUR", {
+                    'type' : 'broadcast.room.state',
+                    'room' : self.room.get_data()
+                })
         except RoomRestriction as e :
             await self.send(text_data=json.dumps({
                 'ErrorMsg' : str(e)
