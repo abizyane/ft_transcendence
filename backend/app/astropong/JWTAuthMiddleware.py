@@ -47,6 +47,8 @@ class JWTAuthMiddleware(BaseMiddleware):
         Parse cookies from the cookie header string into a dictionary.
         """
         cookies = {}
+        if not cookie_header:
+            return None
         if cookie_header:
             cookie_pairs = cookie_header.split(';')
             for pair in cookie_pairs:
@@ -61,9 +63,10 @@ class JWTAuthMiddleware(BaseMiddleware):
         cookie_header = headers.get(b'cookie', b'').decode('utf-8')
         
         cookies = self.parse_cookies(cookie_header)
-
-        token = cookies.get(token_type)
-        return token
+        if cookies:
+            token = cookies.get(token_type)
+            return token
+        return None
         
     @database_sync_to_async
     def get_user_from_token(self, token):
