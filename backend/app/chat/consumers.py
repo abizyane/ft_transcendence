@@ -166,9 +166,21 @@ class ChatRoomConsumer(AsyncWebsocketConsumer):
             'receiver': event['receiver'],
         }))
 
+    async def user_status(self, event):
+        receiver = event['receiver']
+        # if receiver != self.scope['user'].username:
+        #     return
+
+        await self.send(text_data=json.dumps({
+            'type': 'user_status',
+            'username': receiver,
+            'user_id': event['user_id'],
+            'is_online': event['is_online']
+        }))
+
     async def send_notification(self, sender, receiver):
         await self.channel_layer.group_send(
-            'notifications_' + receiver.username,
+            'notifications',
             {
                 'type': 'notification',
                 'content': f'New message from {sender.username}',
