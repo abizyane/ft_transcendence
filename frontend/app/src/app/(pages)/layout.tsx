@@ -4,6 +4,7 @@ import "../globals.css";
 import Sidebar from "@/components/Sidebar/Sidebar";
 import Navbar from "@/components/Navbar/Navbar";
 import { UserProvider } from "@/services/context/usercontext";
+import { NotifProvider } from "@/services/context/notifContext";
 
 interface DashboardLayoutProps {
   children: ReactNode;
@@ -12,6 +13,7 @@ interface DashboardLayoutProps {
 export default function DashboardLayout({ children }: DashboardLayoutProps) {
   return (
     <UserProvider>
+      <NotifProvider>
       <div className="w-full min-h-screen flex flex-col justify-start items-start">
         <div className="absolute w-full z-50"><Navbar /></div>
 
@@ -27,6 +29,7 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
           </div>
         </div>
       </div>
+    </NotifProvider>
     </UserProvider>
   );
 }
