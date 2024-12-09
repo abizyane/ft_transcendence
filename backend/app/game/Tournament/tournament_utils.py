@@ -166,9 +166,8 @@ class RoomManagerNew(RoomManager):
     """
     get all in type four rooms needed data
     """
-    def rooms_data(self){
+    def rooms_data(self) :
         return list(room.get_data() for room in self.type_four.values())
-    }
     
     """
     remove tournament name and tournament

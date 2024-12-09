@@ -66,13 +66,11 @@ class Room(RoomAbstract):
         return (self.competitors_count() <= 0)
 
     def get_data(self) :
-        return {
-            "id": self._id,
+        return dict({
             "name" : self.name,
-            "competitors" : {competitor.name : competitor.get_data() for competitor in self.competitors},
             "size": self.competitors_count(),
             "started" : self.started
-        }
+        })
 
 class TwoPlayersRoom(Room):
     def __init__(self):

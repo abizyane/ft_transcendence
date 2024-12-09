@@ -32,13 +32,16 @@ class TournamentConsumer(AsyncWebsocketConsumer):
         self.p_holder.competitor.user_id = userId
     
     async def connect(self):
-        user = self.scope['user']
+        # user = self.scope['user']
         await self.accept()
         self.p_holder = PlayerHolder(CompetitorNamed(self.channel_name))
         self.competitor = self.p_holder.competitor
         self._type = self.scope['url_route']['kwargs']['competition_type']
         if self._type == "FOUR" :
-            self.channel_layer.group_add("FOUR", self.channel_name)
+            await self.channel_layer.group_add("FOUR", self.channel_name)
+            await self.channel_layer.group_send("FOUR", {
+                'type' : 'broadcast.room.state'
+            })
         self.room:Room = None
         self.match = None
         self.match_name = ''
@@ -209,12 +212,17 @@ class TournamentConsumer(AsyncWebsocketConsumer):
                         'type' : 'leave.state',
                         'player' : f'{self.channel_name}'
                     })
-                pass
             try:
                 self.p_holder.competitor.exit_room(self.room)
+                self.room.competitors[0].is_host = True
                 # del self.room.tournament.p_holders[self.channel_name]
             except self.room.RoomIsEmpty:
                 TournamentConsumer.rm.remove_not_ready(self.room)
+            if self._type == "FOUR":
+                await self.channel_layer.group_send("FOUR", {
+                    'type' : 'broadcast.room.state'
+                })
+                await self.channel_layer.group_discard("FOUR", self.channel_name)
         await self.channel_layer.group_discard(self.room.name, self.channel_name)
 
     def access_competition(self, competitor:CompetitorNamed) -> None :
@@ -232,7 +240,8 @@ class TournamentConsumer(AsyncWebsocketConsumer):
                 )
     
     async def create_room(self,data):
-        name = data.get('name')
+        name = data.get('roomName')
+        print('ss '+name, flush=True)
         try :
             self.room = self.competitor.create_room(TournamentConsumer.rm, _type=self._type, name=name)
             self.competitor.join_room(self.room)
@@ -242,10 +251,9 @@ class TournamentConsumer(AsyncWebsocketConsumer):
             }))
             self.competitor.is_host = True
             self.room.p_holders[self.channel_name] = self.p_holder
-            if _type == "FOUR":
-                self.channel_layer.group_send("FOUR", {
+            if self._type == "FOUR":
+                await self.channel_layer.group_send("FOUR", {
                     'type' : 'broadcast.room.state',
-                    'room' : self.room.get_data()
                 })
         except RoomRestriction as e:
             await self.send(text_data=json.dumps({
@@ -255,7 +263,7 @@ class TournamentConsumer(AsyncWebsocketConsumer):
     async def broadcast_room_state(self, event):
         await self.send(text_data=json.dumps({
             'type' : 'created_room',
-            'room' : event['room']
+            'room' : [room.get_data() for room in TournamentConsumer.rm.type_four.values()]
         }))
     
     async def leave_room(self):
@@ -285,9 +293,10 @@ class TournamentConsumer(AsyncWebsocketConsumer):
         }))
         
     async def join_room(self,data):
-        name = data.get('name')
+        name = data.get('roomName')
+        print(name, flush=True)
         try :
-            room = TournamentConsumer.rm.get_room(name)
+            room = TournamentConsumer.rm.get_room(self._type, name)
             self.room = self.competitor.join_room(room)
             await self.channel_layer.group_add(self.room.name, self.channel_name)
             await self.send(text_data=json.dumps({
@@ -297,8 +306,8 @@ class TournamentConsumer(AsyncWebsocketConsumer):
                 'type' : 'joined.competitor'
             })
             self.room.p_holders[self.channel_name] = self.p_holder
-            if _type == "FOUR":
-                self.channel_layer.group_send("FOUR", {
+            if self._type == "FOUR":
+                await self.channel_layer.group_send("FOUR", {
                     'type' : 'broadcast.room.state',
                     'room' : self.room.get_data()
                 })
@@ -331,6 +340,7 @@ class TournamentConsumer(AsyncWebsocketConsumer):
             await self.send(text_data=json.dumps({
                 'ErrorMsg' : "Game Not Ready Yet"
             }))
+    
     async def receive(self, text_data):
         recv_data = json.loads(text_data)
         command = recv_data.get('command')
