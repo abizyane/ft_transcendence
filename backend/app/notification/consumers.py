@@ -3,6 +3,7 @@ from channels.generic.websocket import AsyncWebsocketConsumer
 from .models import Notifications
 from channels.db import database_sync_to_async
 from django.contrib.auth import get_user_model
+from astropong.models.UserModel import User
 
 class NotificationConsumer(AsyncWebsocketConsumer):
     async def connect(self):
@@ -13,8 +14,9 @@ class NotificationConsumer(AsyncWebsocketConsumer):
             await self.send_error(f"{user} is not authenticated.")
             await self.close()
             return
-        
-        self.group_name += "_" + user.username
+        await self.set_user_online(user.username, True)
+        # await self.notify_online_user(user.username, True)
+        # self.group_name += "_" + user.username
         await self.channel_layer.group_add(
             self.group_name,
             self.channel_name
@@ -22,6 +24,8 @@ class NotificationConsumer(AsyncWebsocketConsumer):
         await self.accept()
 
     async def disconnect(self, close_code):
+        await self.set_user_online(self.scope['user'].username, False)
+        # await self.notify_online_user(self.scope['user'].username, False)
         await self.channel_layer.group_discard(
             self.group_name,
             self.channel_name
@@ -40,6 +44,35 @@ class NotificationConsumer(AsyncWebsocketConsumer):
             await self.mark_all_notifications_as_seen()
         else:
             await self.send_error(f"Invalid message type: {text_data_json['type']}")
+
+    async def notify_online_user(self, username, online):
+        # await self.channel_layer.group_send(
+        #         'chat_room',
+        #         {
+        #             'type': 'user_status',
+        #             'username': username,
+        #             'is_online': online
+        #         }
+        #     )
+        print(f"Sending to chat_room", flush=True)
+        await self.channel_layer.group_send(
+            self.group_name,
+            {
+                'type': 'user_status',
+                'username': username,
+                'is_online': online
+            }
+        )
+
+    @database_sync_to_async
+    def set_user_online(self, username, online):
+        try:
+            user = User.objects.get(username=username)
+            user.is_online = online
+            user.save()
+            
+        except Exception as e:
+            print(f"Error setting user {username} to {online}: {e}", flush=True)
 
     @database_sync_to_async
     def mark_notification_as_seen(self, notification_id):
