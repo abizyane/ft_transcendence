@@ -1,18 +1,20 @@
 'use client'; // Ensure this is at the top for Next.js 13+ with the `app` directory
 
 import Profil from "../../../../../public/Profil.jpg";
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 
 
 
 const Page = () => {
   const [confirmation, setConfirmation] = useState(false);
-  const [tournamentName, setTournamentName] = useState('');
+  const [roomName, setTournamentName] = useState('');
   const [tournamentImage, setTournamentImage] = useState(null);
+  const [alias, setAlias] = useState()
   const [isPrivate, setIsPrivate] = useState(false);
+  const WebSocketRef = useRef(null)
   const [availableTournaments, setAvailableTournaments] = useState([
-    { name: 'Tournament 1', img: '/tournament1.jpg' },
+    { name: 'Tournament', img: '/tournament1.jpg' },
     { name: 'Tournament 2', img: '/tournament2.jpg' },
     { name: 'Tournament 3', img: '/tournament2.jpg' },
     { name: 'Tournament 4', img: '/tournament2.jpg' },
@@ -22,13 +24,74 @@ const Page = () => {
     { name: 'Tournament 8', img: '/tournament2.jpg' },
   ]);
 
-  const handleCreateTournament = (e) => {
-    e.preventDefault();
-    console.log('Creating Tournament:', tournamentName, isPrivate);
+  useEffect(() => {
+    let isConnected = false
+    if (!WebSocketRef.current)
+      WebSocketRef.current = new WebSocket('ws://localhost:8000/ws/tournament/FOUR/');
+    
+    WebSocketRef.current.onopen = () => {
+      isConnected = true
+      console.log('WebSocket connection established');
+    };
+
+    WebSocketRef.current.onmessage = (event) => {
+      console.log('Message from server:', event.data);
+    };
+
+    WebSocketRef.current.onerror = (error) => {
+      isConnected = false
+      console.error('WebSocket error:', error);
+    };
+
+    WebSocketRef.current.onclose = () => {
+      console.log('WebSocket connection closed');
+    };
+
+    return () => {
+      // Cleanup the WebSocket connection when component unmounts
+      if (isConnected) {
+        WebSocketRef.current.close();
+      }
+    };
+  }, []);
+
+
+  const handleCreateTournament = (event) => {
+    event.preventDefault();
+
+    // if (!alias || !roomName) {
+    //   alert("Please fill in all fields.");
+    //   return;
+    // }
+
+    const command = 'create';
+    // Prepare the data to send
+    const roomData = {
+      command,
+      alias,
+      roomName,
+    // You can send a URL or base64 image here
+    };
+
+    // Send data via WebSocket
+    if (WebSocketRef.current && WebSocketRef.current.readyState === WebSocket.OPEN) {
+      WebSocketRef.current.send(JSON.stringify(roomData));
+      console.log('Data sent:', roomData);
+    } else {
+      console.error('WebSocket is not connected');
+    }
   };
 
+
   const handleJoinTournament = (tournament) => {
+    tournament.command = "join";
     console.log('Joining Tournament:', tournament);
+    if (WebSocketRef.current && WebSocketRef.current.readyState === WebSocket.OPEN) {
+      WebSocketRef.current.send(JSON.stringify(tournament));
+      console.log('Data sent:', tournament);
+    } else {
+      console.error('WebSocket is not connected');
+    }
   };
 
   return (
@@ -60,7 +123,7 @@ const Page = () => {
                   <input
                     type="text"
                     placeholder="Tournament Name"
-                    value={tournamentName}
+                    value={roomName}
                     onChange={(e) => setTournamentName(e.target.value)}
                     className="w-full p-3 border rounded-md bg-gray-500/40 text-white"
                   />
@@ -81,7 +144,7 @@ const Page = () => {
                     <label className="text-white">Private Tournament</label>
                   </div>
                   <div className="flex justify-center mt-4">
-                    <Link href="/game/tournaments/tournament_map">
+                    {/* <Link href="/game/tournaments/tournament_map"> */}
 
                     <button
                       type="submit"
@@ -89,7 +152,7 @@ const Page = () => {
                       >
                       Create Tournament
                     </button>
-                    </Link>
+                    {/* </Link> */}
                   </div>
                 </form>
               </div>

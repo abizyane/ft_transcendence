@@ -1,7 +1,7 @@
 from .tournament_utils import AbstractRoomManager
 from .room import Room
 from abc import ABC, abstractmethod
-from .room_restrict import RoomIsEmpty
+from .room_restrict import RoomIsEmpty, RoomIsFull
 
 class AbstractCompetitor(ABC):
     @abstractmethod

@@ -4,6 +4,8 @@ from .competitor import CompetitorNamed,Room
 import json
 from .matchHolder import MatchTreeBuilder, MatchHolder, PlayerHolder
 import asyncio
+from urllib.parse import urljoin
+from django.conf import settings
 from .tournament import Tournament
 from ..game_utils import Game, Player
 import gc
@@ -204,6 +206,8 @@ class TournamentConsumer(AsyncWebsocketConsumer):
         
 
     async def disconnect(self, error_code):
+        if self.user:
+            TournamentConsumer.connected_users.remove(self.user.username)
         if self.room:
             if self.room.is_ready():
                 #set other player to winner
@@ -241,7 +245,7 @@ class TournamentConsumer(AsyncWebsocketConsumer):
     
     async def create_room(self,data):
         name = data.get('roomName')
-        print('ss '+name, flush=True)
+        print(f'ss {name}', flush=True)
         try :
             self.room = self.competitor.create_room(TournamentConsumer.rm, _type=self._type, name=name)
             self.competitor.join_room(self.room)
@@ -293,7 +297,7 @@ class TournamentConsumer(AsyncWebsocketConsumer):
         }))
         
     async def join_room(self,data):
-        name = data.get('roomName')
+        name = data.get('name')
         print(name, flush=True)
         try :
             room = TournamentConsumer.rm.get_room(self._type, name)
