@@ -179,8 +179,8 @@ class RoomManagerNew(RoomManager):
             self.remove_type_four_room(_id)
     
     def remove_type_four_room(self, room_name):
-        self.type_four_name[4].remove(name)
-        del self.type_four[name]
+        self.type_four_name[4].remove(room_name)
+        del self.type_four[room_name]
 
     def remove_type_two_room(self, room_id):
         del self.type_two[room_id]

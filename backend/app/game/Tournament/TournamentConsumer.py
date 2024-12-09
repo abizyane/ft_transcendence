@@ -11,7 +11,7 @@ import numpy as np
 from channels.db import database_sync_to_async
 from enum import Enum
 from ..models import Profile, GameModel, Scores, TournamentModel
-from .room_restrict import RoomRestriction
+from .room_restrict import RoomRestriction, RoomIsEmpty
 
 class Command(Enum):
     CREATE = 1
@@ -216,14 +216,14 @@ class TournamentConsumer(AsyncWebsocketConsumer):
                 self.p_holder.competitor.exit_room(self.room)
                 self.room.competitors[0].is_host = True
                 # del self.room.tournament.p_holders[self.channel_name]
-            except self.room.RoomIsEmpty:
-                TournamentConsumer.rm.remove_not_ready(self.room)
+            except RoomIsEmpty as e:
+                TournamentConsumer.rm.remove_room(self._type, self.room.name)
             if self._type == "FOUR":
                 await self.channel_layer.group_send("FOUR", {
                     'type' : 'broadcast.room.state'
                 })
                 await self.channel_layer.group_discard("FOUR", self.channel_name)
-        await self.channel_layer.group_discard(self.room.name, self.channel_name)
+            await self.channel_layer.group_discard(self.room.name, self.channel_name)
 
     def access_competition(self, competitor:CompetitorNamed) -> None :
         competitor.set_competition_type(self._type)

@@ -1,6 +1,7 @@
 from .tournament_utils import AbstractRoomManager
 from .room import Room
 from abc import ABC, abstractmethod
+from .room_restrict import RoomIsEmpty
 
 class AbstractCompetitor(ABC):
     @abstractmethod
@@ -40,7 +41,10 @@ class Competitor(AbstractCompetitor):
             raise
 
     def exit_room(self, room:Room) -> None:
-        room.remove_player(self)
+        try :
+            room.remove_player(self)
+        except RoomIsEmpty as e:
+            raise e
 
     def set_competition_type(self, _type:str):
         self._type = _type
