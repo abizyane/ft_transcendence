@@ -5,7 +5,9 @@ import { toast } from 'react-hot-toast';
 interface Message {
   message_id: number;
   sender: string;
+  sender_id: number;
   receiver: string;
+  receiver_id: number;
   message: string;
   timestamp: string;
   seen: boolean;
@@ -16,6 +18,7 @@ interface ChatUser {
   username: string;
   profile_pic: string;
   is_online: boolean;
+  relationship: string;
 }
 
 interface Conversation {
@@ -31,15 +34,17 @@ interface ChatContextType {
   ws: WebSocket | null;
   typing: boolean;
   searchConversations: { [key: string]: Conversation };
+  messageContainerRef: React.RefObject<HTMLDivElement> | null;
   setSearchConversations: (searchConversations: { [key: string]: Conversation }) => void;
   setCurrentChat: (username: string, conversation?: Conversation) => void;
-  setScrollToBottom: (callback: () => void) => void;
   setMessageContainerRef: (ref: React.RefObject<HTMLDivElement> | null) => void;
   setTyping: (typing: boolean) => void;
   addMessage: (message: Message) => void;
   updateUserStatus: (username: string, isOnline: boolean) => void;
   fetchConversations: () => Promise<void>;
   fetchMessages: (userId: number, resetPage: boolean) => Promise<void>;
+  setNewChat: (user: ChatUser) => void;
+  handleBlockUser: (username:string, relationship:string) => void;
 }
 
 const ChatContext = createContext<ChatContextType | undefined>(undefined);
@@ -57,11 +62,16 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [searchConversations, setSearchConversations] = useState<{ [key: string]: Conversation }>(undefined);
   const [nextPage, setNextPage] = useState<string | null>(null);
   const [currentChat, setCurrentChat] = useState<Conversation>(undefined);
-  const [scrollToBottom, setScrollToBottom] = useState<(() => void) | null>(null);
   const [ws, setWs] = useState<WebSocket | null>(null);
   const [typing, setTyping] = useState(false);
   const [messageContainerRef, setMessageContainerRef] = useState<React.RefObject<HTMLDivElement> | null>(null);
   const { user } = useUser();
+
+  const handleScrollToBottom = () => {
+    if (messageContainerRef?.current) {
+      messageContainerRef.current.scrollTop = messageContainerRef.current.scrollHeight;
+    }
+  };
 
   const fetchConversations = async () => {
     try {
@@ -72,13 +82,13 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
       if (response.ok) {
         const data = await response.json();
         const newConversations: { [key: string]: Conversation } = {};
-        console.log("fetching conversations data", data);
         data.results.forEach((conv: any) => {
           newConversations[conv.username] = {
             user: {
               id: conv.id,
               username: conv.username,
               profile_pic: conv.profile_pic,
+              relationship: conv.relationship,
               is_online: conv.is_online
             },
             messages: [],
@@ -87,6 +97,8 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
               sender: user?.username || '',
               receiver: conv.username,
               message: conv.message,
+              sender_id: conv.sender_id,
+              receiver_id: conv.receiver_id,
               timestamp: conv.timestamp,
               seen: conv.seen
             },
@@ -99,6 +111,27 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
       console.error('Failed to fetch conversations:', error);
     }
   };
+
+  const handleBlockUser = (username:string, relationship:string) => {
+    setConversations(prev => ({
+      ...prev,
+      [username]: {
+        ...prev[username],
+        user: {
+          ...prev[username].user,
+          relationship: relationship
+        }
+      }
+    }));
+
+    setCurrentChat(prev => prev ? {
+      ...prev,
+      user: {
+        ...prev.user,
+        relationship: relationship
+      }
+    } : undefined);
+  }
 
   const fetchMessages = async (userId: number, resetPage: boolean = false) => {
     try {
@@ -113,28 +146,24 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
         const data = await response.json();
         setNextPage(data.next);
         const username = data.user.username;
-        setConversations(prev => {
-          console.log("prev", prev);
-          console.log("data", data.message);
-          let newMessages = [];
-          if (!resetPage) {
-            newMessages = prev[username].messages;
-          }
-          newMessages.push(...data.messages);
-          // newMessages = data.messages;
-          const newState = {
-            ...prev,
-            [username]: {
-              ...prev[username],
-              messages: newMessages,
-              unreadCount: data.messages.filter((msg: Message) => 
-                !msg.seen && msg.sender === username
-              ).length
-            }
-          };
-          handleSetCurrentChat(username, newState[username]);
-          return newState;
-        });
+        
+        const newMessages = resetPage ? [] : conversations[username]?.messages || [];
+        newMessages.push(...data.messages);
+        
+        const updatedConversation = {
+          user: data.user,
+          ...conversations[username],
+          messages: newMessages,
+          unreadCount: newMessages.filter((msg: Message) => 
+            !msg.seen && msg.sender === username
+          ).length
+        };
+        setConversations(prev => ({
+          ...prev,
+          [username]: updatedConversation
+        }));
+
+        handleSetCurrentChat(username, updatedConversation);
       }
     } catch (error) {
       console.error('Failed to fetch messages:', error);
@@ -142,18 +171,24 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   const addMessage = (message: Message) => {
-    console.log("adding message", message);
     const otherUser = message.sender === user?.username ? message.receiver : message.sender;
-    const convSeen = message.sender === currentChat?.user.username  || user.username === message.sender ? 0 : 1;
-    setConversations(prev => ({
-      ...prev,
-      [otherUser]: {
-        ...prev[otherUser],
-        messages: [message, ...(prev[otherUser]?.messages || [])],
-        lastMessage: message,
-        unreadCount: convSeen
-      }
-    }));
+    const convSeen = message.sender === currentChat?.user.username || user.username === message.sender ? 0 : 1;
+    const otherUserId = message.sender === user?.username ? message.receiver_id : message.sender_id;
+    
+    if (conversations && conversations[otherUser]) {
+      setConversations(prev => ({
+        ...prev,
+        [otherUser]: {
+          ...prev[otherUser],
+          messages: [message, ...(prev[otherUser]?.messages || [])],
+          lastMessage: message,
+          unreadCount: convSeen
+        }
+      }));
+    }
+    else {
+      fetchMessages(otherUserId, true);
+    }
 
     if (currentChat?.user.username === otherUser) {
       sendSeenMessage(message.sender, message.receiver);
@@ -164,10 +199,8 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
         lastMessage: message
       } : undefined);
     }
-    if (scrollToBottom) {
-      console.log("addMessage scrollToBottom");
-      scrollToBottom();
-    }
+    
+    setTimeout(handleScrollToBottom, 100);
   };
 
   const sendSeenMessage = (senderUser:string, receiverUser:string) => {
@@ -191,6 +224,38 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }));
   };
 
+  const setNewChat = (user: ChatUser) => {
+    if (conversations[user.username]) {
+      setCurrentChat(conversations[user.username]);
+    }
+    else {
+      let newConversations: { [key: string]: Conversation } = {};
+      newConversations[user.username] = {
+        user: {
+          id: user.id,
+          username: user.username,
+          profile_pic: user.profile_pic,
+          relationship: user.relationship,
+          is_online: user.is_online
+        },
+        messages: [],
+        lastMessage: {
+          message_id: 0,
+          sender: user?.username || '',
+          sender_id: user.id,
+          receiver: user.username,
+          receiver_id: user.id,
+          message: '',
+          timestamp: '',
+          seen: false
+        },
+        unreadCount: 0,
+      };
+
+      setCurrentChat(newConversations[user.username]);
+    }
+  };
+
   const handleSetCurrentChat = (username: string, conversation?: Conversation, resetPage: boolean = false) => {
     if (resetPage) {
       setNextPage(null);
@@ -211,45 +276,42 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
   useEffect(() => {
     if (ws) {
       ws.onmessage = (event) => {
-        console.log(event);
-      if (event.type === "message") {
-        const data = JSON.parse(event.data);
-        if (data.type === "chat_message") {
-          addMessage(data.message);
-          console.log("current chat", data);
-          setTyping(false);
-          if (scrollToBottom) {
-            scrollToBottom();
-          }
-        } else if (data.type === "typing") {
-          if (user.username === data.receiver && currentChat?.user.username === data.sender) {
-            setTyping(true);
-            if (scrollToBottom) {
-              scrollToBottom();
+        if (event.type === "message") {
+          const data = JSON.parse(event.data);
+          if (data.type === "chat_message") {
+            addMessage(data.message);
+            setTyping(false);
+            setTimeout(handleScrollToBottom, 100);
+          } else if (data.type === "typing") {
+            if (user.username === data.receiver && currentChat?.user.username === data.sender) {
+              setTyping(true);
+              setTimeout(handleScrollToBottom, 100);
             }
+          } else if (data.type === "stop_typing") {
+            setTyping(false);
+          } else if (data.message === "You must be friends in order to chat.") {
+            toast.error("You must be friends in order to chat.");
           }
-        } else if (data.type === "stop_typing") {
-          setTyping(false);
-        } else if (data.message === "You must be friends in order to chat.") {
-          toast.error("You must be friends in order to chat.");
         }
-      }
-    };
-  }
-  }, [user, currentChat, ws]);
+      };
+    }
+  }, [user, currentChat, ws, messageContainerRef]);
+
+  useEffect(() => {
+    setConversations({});
+
+  }, []);
+
 
   useEffect(() => {
     if (user) {
       fetchConversations();
     }
-
     const socket = new WebSocket(`ws://localhost:8000/ws/chat/room/`);
     socket.onopen = () => {
-      console.log("Connected to WebSocket");
     };
     
     socket.onclose = () => {
-      console.log("Disconnected from WebSocket");
     };
     setWs(socket);
 
@@ -267,13 +329,15 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
       setTyping,
       searchConversations,
       setSearchConversations,
-      setScrollToBottom,
+      messageContainerRef,
       setCurrentChat: handleSetCurrentChat,
       addMessage,
       setMessageContainerRef,
       updateUserStatus,
       fetchConversations,
-      fetchMessages
+      fetchMessages,
+      setNewChat,
+      handleBlockUser
     }}>
       {children}
     </ChatContext.Provider>

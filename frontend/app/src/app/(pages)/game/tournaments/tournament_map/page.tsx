@@ -1,6 +1,6 @@
 import Profil from "../../../../../../public/Profil.jpg";
-import Line from "../../../../../../public/Group 1171275822.svg";
-import Line1 from "../../../../../../public/Group 1171275820.svg";
+import Line from "../../../../../../public/tournamentline.svg";
+import Line1 from "../../../../../../public/tournementline2.svg";
 import Trophy from "../../../../../../public/Trophy.png";
 
 export default function AstroTournament() {

@@ -9,7 +9,11 @@ import { useParams, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { useUser } from "@/services/context/usercontext";
 import Loader from "components/loader/loader";
-import Legend from "../../../../../public/Legend.svg"
+import Rookie from "../../../../../public/Rookie.svg";
+import Challenger from "../../../../../public/Challenger.svg";
+import Legend from "../../../../../public/Legend.svg";
+import Expert from "../../../../../public/expert.svg";
+import Grandmaster from "../../../../../public/Grandmaster.svg";
 import ProfileChart from "@/components/Charts/profileChart";
 
 const user = data.user;
@@ -23,6 +27,16 @@ const Page = () => {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [userLevel, setUserLevel] = useState(1);
+
+  const levelImages = {
+    1: Rookie.src,
+    2: Challenger.src,
+    3: Legend.src,
+    4: Expert.src,
+    5: Grandmaster.src,
+  };
+  
 
   useEffect(() => {
     if (!userId) return;
@@ -51,6 +65,18 @@ const Page = () => {
         .finally(() => setLoading(false));
     }
   }, [userId, currentUser]);
+  useEffect(() => {
+    if (user && user.level !== undefined) {
+      const level = Math.floor(user.level / 5) + 1;
+      setUserLevel(level);
+    }
+  }, [user]);
+
+
+  const getLevelImage = (level) => {
+    if (levelImages[level]) return levelImages[level];
+    return Rookie;
+  };
 
   if (userloading) return (<div className="w-full h-full flex justify-center items-center"><Loader/></div>);
   if (loading) return (<div className="w-full h-full flex justify-center items-center"><Loader/></div>);
@@ -69,7 +95,7 @@ const Page = () => {
           </p>
           <div className="h-64  flex justify-center items-center">
           <img
-            src={Legend.src}
+            src={getLevelImage(userLevel)}
             alt="User Rank"
             className="w-full h-full object-contain rounded-2xl"
           />
@@ -88,3 +114,4 @@ const Page = () => {
 }
 
 export default Page
+

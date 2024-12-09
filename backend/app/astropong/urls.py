@@ -7,7 +7,7 @@ from .views.auth.OAuth import OAuth, OAuthCallback
 from .views.auth.auth_user import UserView,MFAView, UsersView, ChangePasswordView, UserIdView, UploadProfilePicView
 from .views.auth.refresh import RefreshTokenView
 from .views.friends.friends import AddFriendView, ListFriendView, AcceptFriendRequestView, RemoveFriendView, RejectFriendRequestView,FriendsOfView, BlockFriendView,UnblockFriendView, BlockedUsersList
-from .views.dashboard.dashboard import GamesHistoryView, PlayerRanking, PlayerWinRateView, TopPlayersView
+from .views.dashboard.dashboard import GamesHistoryView, PlayerRanking, PlayerWinRateView, TopPlayersView, WeeklyStatsView, WeeklyXPView, DashboardView
 
 urlpatterns = [
     path('register', RegisterView.as_view(), name='register'),
@@ -41,5 +41,7 @@ urlpatterns = [
     path('win_rate', PlayerWinRateView.as_view(), name='win_rate'),
     path('top_players', TopPlayersView.as_view(), name='top_players'),
     path('ranking', PlayerRanking.as_view(), name='ranking'),
-
+    path('weekly_stats', WeeklyStatsView.as_view(), name='weekly_stats'),
+    path('weekly_experience', WeeklyXPView.as_view(), name='weekly_experience'),
+    path('dashboard', DashboardView.as_view(), name='dashboard'),
 ]

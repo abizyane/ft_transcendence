@@ -12,6 +12,8 @@ import {
   Filler,
   ChartOptions,
 } from "chart.js";
+import { useEffect, useState } from "react";
+import Loader from "../loader/loader";
 
 ChartJS.register(
   LineElement,
@@ -23,16 +25,63 @@ ChartJS.register(
   Legend
 );
 interface LineChartProps {
-  data: number[];
+  userid: number;
 }
 
-const LineChart: React.FC<LineChartProps> = ({data}) => {
+const LineChart: React.FC<LineChartProps> = ({userid}) => {
+  const [loading, setLoading] = useState(false);
+  const [stats, setStats] = useState(null);
+
+  const fetchExperience = async () => {
+    try {
+      setLoading(true);
+      const response = await fetch('http://localhost:8000/api/weekly_experience', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          id: userid,
+        }),
+        credentials: 'include',
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        let newStats = {
+          labels: [],
+          xp_gained: [],
+        };
+        
+        console.log("data dailyXP" , data);
+        Object.keys(data.dailyXP).reverse().forEach(key => {
+          console.log("key" , key);
+          const dayStats = data.dailyXP[key];
+          newStats.labels.push(key);
+          newStats.xp_gained.push(dayStats.xp_gained);
+        });
+        
+        setStats(newStats);
+      } else {
+        console.log('Failed to fetch stats:', await response.json());
+      }
+    } catch (error) {
+      console.log('Error during the request:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchExperience();
+  }, []);
+  console.log("stats" , stats);
   const ChartData: ChartData<"line", number[]> = {
-    labels: ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"],
+    labels: stats?.labels || ['D-6', 'D-5', 'D-4', 'D-3', 'D-2', 'D-1', 'D'],
     datasets: [
       {
         label: "Days Experience",
-        data: data, // Example data
+        data: stats?.xp_gained || [0, 0, 0, 0, 0, 0, 0],
         borderColor: "#8A2BE2",
         backgroundColor: "rgba(138, 43, 226, 0.2)",
         fill: true,
@@ -63,7 +112,7 @@ const LineChart: React.FC<LineChartProps> = ({data}) => {
       tooltip: {
         callbacks: {
           label: function (tooltipItem) {
-            return `Sales: ${tooltipItem.raw}`;
+            return `Xp gained: ${tooltipItem.raw}`;
           },
         },
       },
@@ -72,8 +121,7 @@ const LineChart: React.FC<LineChartProps> = ({data}) => {
 
   return (
     <div className=" w-full p-1 h-72  lg:h-[18vh] xl:h-[22vh] 2xl:h-[24vh]">
-      <Line data={ChartData} options={options} style={{width:"99%",height:"99%"}} />
-      &nbsp;
+      {loading ? <div className="w-full h-full flex justify-center items-center"><Loader/></div> : <Line data={ChartData} options={options} style={{width:"99%",height:"99%"}} />}
     </div>
   );
 };

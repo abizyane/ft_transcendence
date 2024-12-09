@@ -97,10 +97,10 @@ const TopPlayers: React.FC = () => {
                     <img
                       src={
                         index === 0
-                          ? "GoldBadge.svg"
+                          ? "/GoldBadge.svg"
                           : index === 1
-                          ? "SilverBadge.svg"
-                          : "BronzeBadge.svg"
+                          ? "/SilverBadge.svg"
+                          : "/BronzeBadge.svg"
                       }
                       alt={`${
                         index === 0 ? "Gold" : index === 1 ? "Silver" : "Bronze"

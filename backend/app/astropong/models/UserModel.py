@@ -117,6 +117,8 @@ class User(AbstractUser):
             ).first()
             if relationship is None:
                 raise Relationship.DoesNotExist
+            if relationship.status == Relationship.Status.BLOCKED:
+                raise ValidationError("You already blocked this user.")
             relationship.userWhoBlocked = self
             relationship.status = Relationship.Status.BLOCKED
             relationship.save()

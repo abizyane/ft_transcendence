@@ -99,7 +99,7 @@ export default function Canvas ({socketRef, callback, scoreSetter}){
             canvas.height = 720
             Context.current = canvas.getContext('2d');
             if (!GameRef.current)
-                GameRef.current = new Game_Front(canvas, {player_one: {posX:bluePosRef.current.x, posY: 3, width: 12, height:50, color: 'blue'}, player_two:{posX:redPosRef.current.x, posY: 3, width: 12, height:50, color: 'red'}, ball:{}})
+                GameRef.current = new Game_Front(canvas, {player_one: {posX:bluePosRef.current.x, posY: 3, width: 2, height:60, color: 'blue'}, player_two:{posX:redPosRef.current.x, posY: 3, width: 2, height:60, color: 'red'}, ball:{}})
         }
 
         }, [callback])
@@ -114,7 +114,7 @@ export default function Canvas ({socketRef, callback, scoreSetter}){
                     requestAnimationFrame(game_loop)
                 }
             }
-            animationFrameId = requestAnimationFrame(game_loop); 
+            animationFrameId = requestAnimationFrame(game_loop);
             return () => {
                 cancelAnimationFrame(animationFrameId);
             };
@@ -122,6 +122,6 @@ export default function Canvas ({socketRef, callback, scoreSetter}){
     },[callback])
 
     return (
-        <canvas tabIndex={1} ref={canvasRef} className="w-full h-full "></canvas>
+        <canvas tabIndex={1} ref={canvasRef} className="w-full h-full"></canvas>
     );
 }
