@@ -51,7 +51,7 @@ class Player:
         self.id = id
         self.score = 0
         self.width = 2
-        self.height = 60
+        self.height = 70
         self.x = 0
         self.y = game.height/ 2
         self.color = ''
@@ -85,7 +85,7 @@ class Game:
         self.ball = Ball(self)
         self.blue = None
         self.red = None
-        self.max_score = 2
+        self.max_score = 10
 
     def is_full(self):
         if len(self.players) == 2:

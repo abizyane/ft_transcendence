@@ -11,46 +11,29 @@ export default function Canvas ({socketRef, callback, scoreSetter , setWinner, s
     const redPosRef = useRef({ x: 0, y: 0 });
     const ballRef = useRef({ x: 0, y: 0 });
     const {gameCustomization} = useGame();
+    const [keyDown, setKeyDown] = useState(false);
+    const [keyUp, setKeyUp] = useState(false);
     
     const keyDownHandler = (e) =>{
+
         if (e.key === 'w'){
-            socketRef.current.send(JSON.stringify(
-                {
-                    type: 'input',
-                    command: 'keyW_down',
-                    w : 'true'
-                }
-            ))
+            setKeyUp(true)
+
         }
         else if (e.key === 's'){
-            socketRef.current.send(JSON.stringify(
-                {
-                    type: 'input',
-                    command: 'keyS_down',
-                    s: 'true'
-                }
-            ))
+            setKeyDown(true)
+
         }
     }
 
     const keyUpHandler = (e) =>{
+        console.log("keyUpHandler")
         if (e.key === 'w'){
-            socketRef.current.send(JSON.stringify(
-                {
-                    type: 'input',
-                    command : 'keyW_up',
-                    w: 'false'
-                }
-            ))
+            setKeyUp(false)
+
         }
         else if (e.key === 's'){
-            socketRef.current.send(JSON.stringify(
-                {
-                    type: 'input',
-                    command: 'keyS_up',
-                    s: 'false'
-                }
-            ))
+            setKeyDown(false)
         }
     }
     
@@ -91,9 +74,10 @@ export default function Canvas ({socketRef, callback, scoreSetter , setWinner, s
         window.addEventListener('keyup', keyUpHandler);
     
         return () => {
-          window.removeEventListener('keydown', keyDownHandler);
-          window.removeEventListener('keyup', keyUpHandler);
+            window.removeEventListener('keydown', keyDownHandler);
+            window.removeEventListener('keyup', keyUpHandler);
         };
+
       }, [socketRef]);
 
     /*Canvas Function */
@@ -107,25 +91,68 @@ export default function Canvas ({socketRef, callback, scoreSetter , setWinner, s
             if (!GameRef.current)
                 GameRef.current = new Game_Front(canvas, {player_one: {posX:bluePosRef.current.x, posY: 3, width: 2, height:60, color: gameCustomization.user_paddle_color  }, player_two:{posX:redPosRef.current.x, posY: 3, width: 2, height:60, color: gameCustomization.opponent_paddle_color}, ball:{color: gameCustomization.ball_color}})
         }
-
-        }, [callback])
-        
+    }, [callback])
+    
     useEffect(() => {
-        let animationFrameId = null
-        const game_loop = () =>{
-                if (canvasRef.current != null && Context.current != null){
-                    Context.current.clearRect(0,0, canvasRef.current.width, canvasRef.current.height)
-                    GameRef.current.update({player_1: bluePosRef.current, player_2: redPosRef.current, ball: ballRef.current})
-                    GameRef.current.render(Context.current)
-                    requestAnimationFrame(game_loop)
+        let lastTime = 0;
+    const FPS = 60;
+    const interval = 1000 / FPS;
+    let animationFrameId = null;
+        const game_loop = (timestamp) =>{
+            if (canvasRef.current && Context.current) {
+                const deltaTime = timestamp - lastTime;
+                
+                if (deltaTime >= interval) {
+
+                    Context.current.clearRect(0, 0, canvasRef.current.width, canvasRef.current.height);
+    
+                    if (keyUp) {
+                        socketRef.current.send(JSON.stringify({
+                            type: 'input',
+                            command: 'keyW_down',
+                            w: 'true',
+                        }));
+                    } else {
+                        socketRef.current.send(JSON.stringify({
+                            type: 'input',
+                            command: 'keyW_up',
+                            w: 'false',
+                        }));
+                    }
+    
+                    if (keyDown) {
+                        socketRef.current.send(JSON.stringify({
+                            type: 'input',
+                            command: 'keyS_down',
+                            s: 'true',
+                        }));
+                    } else {
+                        socketRef.current.send(JSON.stringify({
+                            type: 'input',
+                            command: 'keyS_up',
+                            s: 'false',
+                        }));
+                    }
+    
+                    GameRef.current.update({ 
+                        player_1: bluePosRef.current, 
+                        player_2: redPosRef.current, 
+                        ball: ballRef.current 
+                    });
+    
+                    GameRef.current.render(Context.current);
+                    lastTime = timestamp;
                 }
             }
             animationFrameId = requestAnimationFrame(game_loop);
+        }
+            animationFrameId = requestAnimationFrame(game_loop);
+            console.log("updating canvas 2")
             return () => {
                 cancelAnimationFrame(animationFrameId);
             };
         
-    },[callback])
+    },[callback, keyDown, keyUp])
 
     return (
         <canvas tabIndex={1} ref={canvasRef} className="w-full h-full"></canvas>
