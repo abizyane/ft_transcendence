@@ -4,7 +4,13 @@ import Profil from "../../../../../public/Profil.jpg";
 import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 
-
+function TournamentList(){
+  return (
+  <div>
+    
+  </div>
+  )
+}
 
 const Page = () => {
   const [confirmation, setConfirmation] = useState(false);
@@ -14,15 +20,21 @@ const Page = () => {
   const [isPrivate, setIsPrivate] = useState(false);
   const WebSocketRef = useRef(null)
   const [availableTournaments, setAvailableTournaments] = useState([
-    { name: 'Tournament', img: '/tournament1.jpg' },
-    { name: 'Tournament 2', img: '/tournament2.jpg' },
-    { name: 'Tournament 3', img: '/tournament2.jpg' },
-    { name: 'Tournament 4', img: '/tournament2.jpg' },
-    { name: 'Tournament 5', img: '/tournament2.jpg' },
-    { name: 'Tournament 6', img: '/tournament2.jpg' },
-    { name: 'Tournament 7', img: '/tournament2.jpg' },
-    { name: 'Tournament 8', img: '/tournament2.jpg' },
+    { name: 'Tournament', img: '/tournament1.jpg', size: 0 },
   ]);
+
+  const defaObj = {
+    name: 'Tournament', img: '/tournament1.jpg', size: 0 
+  }
+
+  const handleTournamentList = (tournaments) => {
+    const rooms = tournaments.room.map((room) => ({
+      ...room,
+      img: '/tournament1.jpg',
+    }))
+    console.log(rooms)
+    setAvailableTournaments((prevlst) => [defaObj, ...rooms]);
+  }
 
   useEffect(() => {
     let isConnected = false
@@ -36,6 +48,11 @@ const Page = () => {
 
     WebSocketRef.current.onmessage = (event) => {
       console.log('Message from server:', event.data);
+      const received_data = JSON.parse(event.data);
+
+      if (received_data.type == "tournament_state")
+        handleTournamentList(received_data);
+
     };
 
     WebSocketRef.current.onerror = (error) => {
@@ -73,7 +90,6 @@ const Page = () => {
     // You can send a URL or base64 image here
     };
 
-    // Send data via WebSocket
     if (WebSocketRef.current && WebSocketRef.current.readyState === WebSocket.OPEN) {
       WebSocketRef.current.send(JSON.stringify(roomData));
       console.log('Data sent:', roomData);
@@ -173,6 +189,7 @@ const Page = () => {
                         className="w-12 h-12 object-cover rounded-full"
                       />
                       <span className="font-medium text-white">{tournament.name}</span>
+                      <span className="font-[5px] text-white">{tournament.size}/4</span>
                     </div>
                   ))}
                 </div>
