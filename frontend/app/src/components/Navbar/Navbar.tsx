@@ -22,6 +22,7 @@ import {
   DropdownMenuTrigger,
   DropdownMenuShortcut,
 } from "@/components/ui/dropdown-menu";
+import { IoNotifications } from "react-icons/io5";
 
 
 const Navbar = () => {
@@ -43,11 +44,17 @@ const Navbar = () => {
           <div className="mt-3 p-4 flex-none">
               <Searchusers/>
           </div>
-
+          
           <div className="md:justify-end md:p-1">
             <div className=" lg:flex items-center">
+            <div className= " mx-4 ">
+
+              <IoNotifications className="w-7 h-7 text-gray-600"  />
+            </div>
               <div className=" lg:relative w-12 h-12">
-                <span className=" h-3 w-3 bg-green-500 absolute bottom-0 right-1  rounded-full z-0" />
+
+
+                        <span className=" h-3 w-3 bg-green-500 absolute bottom-0 right-1  rounded-full z-0" />
                 <img
                   src={user.profile_pic_url}
                   alt="User Profile"

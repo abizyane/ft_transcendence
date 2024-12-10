@@ -105,7 +105,11 @@ const Page = () => {
       <div className="flex flex-col lg:flex-row w-full space-y-4 lg:space-y-0 lg:space-x-4">
         {/* <History /> */}
         <ProfileChart user={user} />
-        <TopPlayers />
+        {currentUser?.id !== userId ? 
+        <div className="w-full lg:w-1/3 py-4 lg:h-full">
+        <History  /> 
+        </div>
+        : <TopPlayers />}
         <Friends user={user}/>
       </div>
     </div>

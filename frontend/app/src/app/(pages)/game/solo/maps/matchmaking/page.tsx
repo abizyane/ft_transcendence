@@ -332,14 +332,9 @@ const Page = () => {
           <div className="max-w-[1200px] w-full h-fit border-violet-primary backdrop-blur-lg border-2 p-2 rounded-lg flex flex-col mb-24 lg:mb-0">
             <div className="flex justify-between items-center w-full bg-transparent p-2 rounded-lg mb-2">
               <div className="flex items-center space-x-2 bg-gray-700 p-1 lg:p-3 rounded-full w-36 lg:w-1/3 lg:h-14 justify-center lg:justify-start">
-                <Image
-                  src={Mars}
-                  alt="First User"
-                  width={30}
-                  height={30}
-                  className="rounded-full"
-                />
-                <img src={users[0].profile_pic_url} alt="player 1 pic" />
+              <div className=" w-12 h-12 lg:w-14 lg:h-14">
+                <img src={users[0].profile_pic_url} alt="player 1 pic" className="rounded-full object-cover w-full h-full p-1" />
+              </div>
                 <div className="text-white">
                   <div className="text-xs font-bold">{users[0].username}</div>
                 </div>
