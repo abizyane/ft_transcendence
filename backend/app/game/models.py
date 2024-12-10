@@ -10,9 +10,9 @@ class Profile(models.Model):
     xp = models.IntegerField()
     created = models.DateTimeField(default=timezone.now, null=False)
     updated = models.DateTimeField(default=timezone.now, null=False)
-    user_paddle_color = models.CharField(max_length=100, null=False, default="255,0,0")
-    opponent_paddle_color = models.CharField(max_length=100, null=False, default="0,255,0")
-    ball_color = models.CharField(max_length=100, null=False, default="0,0,255")
+    user_paddle_color = models.CharField(max_length=100, null=False, default="#0000ff")
+    opponent_paddle_color = models.CharField(max_length=100, null=False, default="#fc0303")
+    ball_color = models.CharField(max_length=100, null=False, default="#d400ff")
     created.editable = False
 
     def __str__(self):

@@ -1,6 +1,7 @@
 "use client"
 import { useEffect, useState,useRef } from "react"
 import Game_Front from "./gameFront"
+import { useGame } from "@/services/context/gameContext";
 
 export default function Canvas ({socketRef, callback, scoreSetter , setWinner, setLooser}){
     const canvasRef = useRef(null);
@@ -9,6 +10,7 @@ export default function Canvas ({socketRef, callback, scoreSetter , setWinner, s
     const bluePosRef = useRef({ x: 0, y: 0 });
     const redPosRef = useRef({ x: 0, y: 0 });
     const ballRef = useRef({ x: 0, y: 0 });
+    const {gameCustomization} = useGame();
     
     const keyDownHandler = (e) =>{
         if (e.key === 'w'){
@@ -103,7 +105,7 @@ export default function Canvas ({socketRef, callback, scoreSetter , setWinner, s
             canvas.height = 720
             Context.current = canvas.getContext('2d');
             if (!GameRef.current)
-                GameRef.current = new Game_Front(canvas, {player_one: {posX:bluePosRef.current.x, posY: 3, width: 2, height:60, color: 'blue'}, player_two:{posX:redPosRef.current.x, posY: 3, width: 2, height:60, color: 'red'}, ball:{}})
+                GameRef.current = new Game_Front(canvas, {player_one: {posX:bluePosRef.current.x, posY: 3, width: 2, height:60, color: gameCustomization.user_paddle_color  }, player_two:{posX:redPosRef.current.x, posY: 3, width: 2, height:60, color: gameCustomization.opponent_paddle_color}, ball:{color: gameCustomization.ball_color}})
         }
 
         }, [callback])

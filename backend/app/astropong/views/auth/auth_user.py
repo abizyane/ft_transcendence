@@ -143,9 +143,16 @@ class GameCustomizationView(APIView):
     permission_classes = [IsAuthenticated]
 
     def validate_color(self, color):
-        if not re.match(r'^[0-9]+,[0-9]+,[0-9]+$', color):
+        if not color:
             return False
-        return True
+        color = color.lstrip('#')
+        if len(color) not in [6, 8]:
+            return False
+        try:
+            int(color, 16)
+            return True
+        except ValueError:
+            return False
     
     def get(self, request):
         user = request.user

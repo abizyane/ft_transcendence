@@ -24,11 +24,12 @@ class Ball{
         this.rad = 5
         this.posX = init.x
         this.posY = init.y
+        this.color = init.color
     }
     draw(ctx){
         ctx.beginPath();
         ctx.arc(this.posX, this.posY, this.rad,0, 2* Math.PI)
-        ctx.fillStyle = 'white'
+        ctx.fillStyle = this.color
         ctx.fill()
         ctx.stroke()
     }
@@ -56,18 +57,18 @@ class Player
         ctx.fillStyle = this.color;
         ctx.save()
         const rgb = [0,0,255]
-        ctx.shadowColor = "rgb("+rgb[0]+","+rgb[1]+","+rgb[2]+")";
+        ctx.shadowColor = this.color;
         ctx.shadowBlur = 10;
-        ctx.strokeStyle= "rgba("+rgb[0]+","+rgb[1]+","+rgb[2]+",0.2)";
+        ctx.strokeStyle= this.color;
         ctx.lineWidth=7.5;
         this.drawRect(ctx);
-        ctx.strokeStyle= "rgba("+rgb[0]+","+rgb[1]+","+rgb[2]+",0.2)";
+        ctx.strokeStyle= this.color;
         ctx.lineWidth=6;
         this.drawRect(ctx);
-        ctx.strokeStyle= "rgba("+rgb[0]+","+rgb[1]+","+rgb[2]+",0.2)";
+        ctx.strokeStyle= this.color;
         ctx.lineWidth=4.5;
         this.drawRect(ctx);
-        ctx.strokeStyle= "rgba("+rgb[0]+","+rgb[1]+","+rgb[2]+",0.2)";
+        ctx.strokeStyle= this.color;
         ctx.lineWidth=3;
         this.drawRect(ctx);
         ctx.strokeStyle= '#fff';

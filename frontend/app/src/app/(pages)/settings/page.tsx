@@ -4,6 +4,9 @@ import { useForm } from 'react-hook-form';
 import { useState } from 'react';
 import { Switch } from "@/components/ui/switch"
 import { useUser } from "@/services/context/usercontext";
+import Loader from "@/components/loader/loader";
+import { useGame } from '@/services/context/gameContext';
+
 
 const SettingsPage = () => {
   const [activeTab, setActiveTab] = useState<'profile' | 'game'>('profile');
@@ -48,7 +51,11 @@ const ProfileSettings = () => {
   const [profileImage, setProfileImage] = useState<File | null>(null);
   const [otpValue, setOtpValue] = useState('');
   const { user, fetchUser } = useUser();
-  if (!user) return null;
+  if (!user) return (
+    <div className="w-full h-full flex items-center justify-center">
+      <Loader />
+    </div>
+  );
 
   const onSubmit = (data: any) => {
     console.log("Form Data:", data);
@@ -210,9 +217,10 @@ const ProfileSettings = () => {
 
 
 const GameSettings = () => {
-  const [paddleColor, setPaddleColor] = useState('#0015ff');
-  const [opponentColor, setOpponentColor] = useState('#ff0000');
-  const [ballColor, setBallColor] = useState('#ffffffff');
+  const {gameCustomization,isLoading, updateGameCustomization} = useGame();
+  const [paddleColor, setPaddleColor] = useState(gameCustomization.user_paddle_color);
+  const [opponentColor, setOpponentColor] = useState(gameCustomization.opponent_paddle_color);
+  const [ballColor, setBallColor] = useState(gameCustomization.ball_color);
 
   const changeColor = (type, color) => {
     if (type === 'paddle') {
@@ -224,6 +232,12 @@ const GameSettings = () => {
     }
   };
 
+  const loadColors = () => {
+    setPaddleColor(gameCustomization.user_paddle_color);
+    setOpponentColor(gameCustomization.opponent_paddle_color);
+    setBallColor(gameCustomization.ball_color);
+  };
+
   const resetColors = () => {
     setPaddleColor('#0015ff');
     setOpponentColor('#ff0000');
@@ -231,9 +245,22 @@ const GameSettings = () => {
   };
 
   const saveSettings = () => {
-    alert('Settings Saved!');
+    updateGameCustomization({
+      user_paddle_color: paddleColor,
+      opponent_paddle_color: opponentColor,
+      ball_color: ballColor
+    }).then((res) => {
+      if (!res) {
+        loadColors();
+      }
+    });
   };
 
+  if (isLoading) return (
+    <div className="w-full h-full flex items-center justify-center">
+      <Loader />
+    </div>
+  );
   return (
     <div className="max-w-xl mx-auto p-6">
 
