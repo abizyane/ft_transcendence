@@ -10,6 +10,7 @@ class LogoutView(APIView):
         response = Response()
         response.delete_cookie('access')
         response.delete_cookie('refresh')
+        response.delete_cookie('isLoggedIn')
         response.data = {
             'message': 'success'
         }

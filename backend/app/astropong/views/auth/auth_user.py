@@ -180,3 +180,8 @@ class GameCustomizationView(APIView):
         user.profile.save()
         return Response({'message': 'Game customization updated successfully'}, status=200)
         
+
+class PingView(APIView):
+    permission_classes = [IsAuthenticated]
+    def get(self, request):
+        return Response({'message': 'pong'}, status=200)

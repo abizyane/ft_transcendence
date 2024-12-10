@@ -51,11 +51,11 @@ class Player:
         self.id = id
         self.score = 0
         self.width = 2
-        self.height = 70
+        self.height = 60
         self.x = 0
         self.y = game.height/ 2
         self.color = ''
-        self.speed = 5
+        self.speed = 8
         self.isW = False
         self.isS = False
         self.isHiting = False

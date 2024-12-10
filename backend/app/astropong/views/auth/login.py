@@ -45,6 +45,7 @@ class LoginView(APIView):
         response = Response(user_data)
         response.set_cookie(key='refresh', value=str(refresh), httponly=True, secure=True)
         response.set_cookie(key='access', value=str(refresh.access_token), httponly=True, secure=True)
+        response.set_cookie(key='isLoggedIn', value=str(True), httponly=True, secure=True)
         if user.mfa_enabled:
             response.status_code = 403
             request.session['2fa_verified'] = False
