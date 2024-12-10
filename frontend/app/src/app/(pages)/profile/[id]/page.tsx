@@ -24,7 +24,7 @@ const gameHistory = user.history;
 const Page = () => {
   const { id: userId } = useParams();
   const { user: currentUser, userloading } = useUser();
-  const [user, setUser] = useState<User | null>(null);
+  const [user, setUser] = useState< User | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [userLevel, setUserLevel] = useState(1);
@@ -72,7 +72,6 @@ const Page = () => {
     }
   }, [user]);
 
-
   const getLevelImage = (level) => {
     if (levelImages[level]) return levelImages[level];
     return Rookie;
@@ -103,13 +102,13 @@ const Page = () => {
         </div>
       </div>
       <div className="flex flex-col lg:flex-row w-full space-y-4 lg:space-y-0 lg:space-x-4">
-        {/* <History /> */}
         <ProfileChart user={user} />
-        {currentUser?.id !== userId ? 
+        {currentUser?.id == userId ? 
+         <TopPlayers /> :
         <div className="w-full lg:w-1/3 py-4 lg:h-full">
-        <History  /> 
+        <History/> 
         </div>
-        : <TopPlayers />}
+        }
         <Friends user={user}/>
       </div>
     </div>

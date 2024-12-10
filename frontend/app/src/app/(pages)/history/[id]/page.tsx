@@ -1,5 +1,5 @@
 import React from "react";
-import Profil from "../../../../public/Profil.jpg";
+import Profil from "../../../../../public/Profil.jpg";
 
 const MatchDetails = ({ player1, player2, score }: { player1: string; player2: string; score: string }) => {
   return (

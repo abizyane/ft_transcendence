@@ -75,7 +75,6 @@ export function Chat({ children }: ChatLayoutProps) {
     if (isMobile) openSlider(user);
     // else setSelectedId(user);
 
-    console.log("user clicked", user);
     router.push(`/chat/${user.id}`);
   };
 
@@ -147,8 +146,6 @@ export function Chat({ children }: ChatLayoutProps) {
       }
     });
   }
-  // console.log("current chat", currentChat);
-  // console.log("convs rendered", conversations);
 if (!conversations)
   return <div className="w-full h-full flex justify-center items-center"><Loader/></div>
 

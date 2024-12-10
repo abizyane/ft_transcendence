@@ -6,7 +6,6 @@ export function middleware(request: NextRequest) {
   if (!token && !request.url.includes('/auth/')) {
     return NextResponse.redirect(new URL('/auth/login', request.url))
   }
-  console.log('cookie exists, or path is under /auth/');
   return NextResponse.next()
 }
 

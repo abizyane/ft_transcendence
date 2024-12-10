@@ -19,7 +19,7 @@ class UserSerializer(serializers.ModelSerializer):
             return None
         default_image_url = urljoin(request.build_absolute_uri(settings.MEDIA_URL), "Profil.jpg")
         if obj.profile_pic:
-            return request.build_absolute_uri(obj.profile_pic)
+            return urljoin(request.build_absolute_uri(settings.MEDIA_URL), obj.profile_pic)
         return default_image_url
 
 class MessageConsumerSerializer(serializers.ModelSerializer):
