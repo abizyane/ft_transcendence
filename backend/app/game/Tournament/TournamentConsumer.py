@@ -34,6 +34,7 @@ class TournamentConsumer(AsyncWebsocketConsumer):
         self.p_holder.competitor.user_id = userId
     
     async def connect(self):
+        self.user = None
         # user = self.scope['user']
         await self.accept()
         self.p_holder = PlayerHolder(CompetitorNamed(self.channel_name))
@@ -245,7 +246,6 @@ class TournamentConsumer(AsyncWebsocketConsumer):
     
     async def create_room(self,data):
         name = data.get('roomName')
-        print(f'ss {name}', flush=True)
         try :
             self.room = self.competitor.create_room(TournamentConsumer.rm, _type=self._type, name=name)
             self.competitor.join_room(self.room)
@@ -263,10 +263,16 @@ class TournamentConsumer(AsyncWebsocketConsumer):
             await self.send(text_data=json.dumps({
                 'error_msg' : str(e)
             }))
+        except TypeError as te :
+            await self.send(text_data=json.dumps({
+                'error_msg' : str(te)
+            }))
+            self.competitor.exit_room(self.room)
+            TournamentConsumer.rm.remove_room(self._type, self.room.name)
     
     async def broadcast_room_state(self, event):
         await self.send(text_data=json.dumps({
-            'type' : 'created_room',
+            'type' : 'tournament_state',
             'room' : [room.get_data() for room in TournamentConsumer.rm.type_four.values()]
         }))
     

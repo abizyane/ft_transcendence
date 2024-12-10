@@ -40,8 +40,8 @@ class Room(RoomAbstract):
     def add_player(self, Player) -> RoomAbstract :
         if self.ready :
             raise RoomIsFull
-        if Player in self.competitors:
-            raise AlredyJoined(Player.name, self.name)
+        if Player.joined:
+            raise AlredyJoined(Player.name, Player.room.name)
         Player._id = self.competitor_id
         self.competitor_id += 1
         self.competitors.append(Player)
