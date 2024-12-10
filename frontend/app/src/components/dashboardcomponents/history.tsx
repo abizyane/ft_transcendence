@@ -105,11 +105,11 @@ const History = () => {
   
     return (
       
-        <div className="mt-8 w-full lg:mt-0 pt-4 lg:pt-0 lg:h-[335px] 2xl:h-[360px] lg:w-full lg:flex lg:flex-col overflow-hidden"> 
+        <div className="mt-8 w-full lg:mt-0 pt-4 lg:pt-0 lg:h-[366px] lg:w-full lg:flex lg:flex-col overflow-hidden"> 
           <div className="bg-gray-800/60 rounded-xl border border-violet-primary flex flex-col flex-1 ">
             <div className="m-2 flex justify-between items-center">
               <p className="m-2 text-white text-2xl font-extrabold">History</p>
-              <Link href="/history">
+              <Link href="/history/">
               <div className="m-2 p-2 border-2 border-violet-primary backdrop-blur-lg rounded-xl hover:bg-violet-primary">
                 <p className="text-white">View All</p>
               </div>

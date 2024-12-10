@@ -24,7 +24,7 @@ export default function RootLayout({
           className="object-cover w-full h-full absolute top-0 left-0 z-0"
         >
           <source
-            src="https://res.cloudinary.com/dwxvnezhn/video/upload/f_auto:video,q_auto/v1/Videos/a3j7djxismi7plce7vzh"
+            src="https://res.cloudinary.com/digeitq2e/video/upload/v1733753912/wabwszkn1x50lq9svbd3.mp4"
             type="video/mp4"
           />
         </video>

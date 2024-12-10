@@ -2,7 +2,7 @@
 import { useEffect, useState,useRef } from "react"
 import Game_Front from "./gameFront"
 
-export default function Canvas ({socketRef, callback, scoreSetter}){
+export default function Canvas ({socketRef, callback, scoreSetter , setWinner, setLooser}){
     const canvasRef = useRef(null);
     const GameRef = useRef(null)
     const Context = useRef(null)
@@ -75,6 +75,10 @@ export default function Canvas ({socketRef, callback, scoreSetter}){
                         callback(false)
                       }
                     if (jsondata.msg){
+                        if (jsondata.msg == "You Won")
+                        setWinner(true);
+                        else if (jsondata.msg == "You Lost")
+                        setLooser(true);
                         console.log(jsondata.msg)
                     }
                 }
@@ -99,7 +103,7 @@ export default function Canvas ({socketRef, callback, scoreSetter}){
             canvas.height = 720
             Context.current = canvas.getContext('2d');
             if (!GameRef.current)
-                GameRef.current = new Game_Front(canvas, {player_one: {posX:bluePosRef.current.x, posY: 3, width: 12, height:50, color: 'blue'}, player_two:{posX:redPosRef.current.x, posY: 3, width: 12, height:50, color: 'red'}, ball:{}})
+                GameRef.current = new Game_Front(canvas, {player_one: {posX:bluePosRef.current.x, posY: 3, width: 2, height:60, color: 'blue'}, player_two:{posX:redPosRef.current.x, posY: 3, width: 2, height:60, color: 'red'}, ball:{}})
         }
 
         }, [callback])

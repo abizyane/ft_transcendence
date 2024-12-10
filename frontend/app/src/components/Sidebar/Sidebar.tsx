@@ -17,15 +17,15 @@ export default function Sidebar() {
     return null;
   }
 
-  const isActive = (path: string) => pathname === path;
-
+  const isActive = (path: string) => pathname.startsWith(path);
+  console.log(pathname);
   return (
     <div className="bottom-0 left-0 px-4 w-full lg:w-24 h-full lg:justify-center lg:items-center lg:flex backdrop-blur-md">
       <div className="w-full flex p-4 flex-row space-x-8 lg:space-x-0 lg:space-y-12 items-center justify-center lg:flex-col">
         <Link href={`/profile/${user.id}`}>
           <AiFillAppstore
             className={`w-6 h-6 ${
-              isActive(`/profile/${user.id}`) ? "text-white" : "text-gray-700"
+              isActive(`/profile`) ? "text-white" : "text-gray-700"
             }`}
           />
         </Link>

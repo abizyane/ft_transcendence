@@ -21,7 +21,7 @@ function neonEffect(ctx, rgb , callback){
 class Ball{
     constructor(game, init){
         this.game = game
-        this.rad = 15
+        this.rad = 5
         this.posX = init.x
         this.posY = init.y
     }
