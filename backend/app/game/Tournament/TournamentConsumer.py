@@ -14,6 +14,7 @@ from channels.db import database_sync_to_async
 from enum import Enum
 from ..models import Profile, GameModel, Scores, TournamentModel
 from .room_restrict import RoomRestriction, RoomIsEmpty
+from .alias_restrict import AliasException, NoAlias, AliasAlreadyUsed
 
 class Command(Enum):
     CREATE = 1
@@ -22,6 +23,7 @@ class Command(Enum):
     INPUT = 4
     JOINRANDOM = 5
     PLAY = 6
+    ALIAS = 7
 
 class TournamentConsumer(AsyncWebsocketConsumer):
     rm = RoomManagerNew()
@@ -35,6 +37,7 @@ class TournamentConsumer(AsyncWebsocketConsumer):
     
     async def connect(self):
         self.user = None
+        self.alias = None
         # user = self.scope['user']
         await self.accept()
         self.p_holder = PlayerHolder(CompetitorNamed(self.channel_name))
@@ -43,7 +46,7 @@ class TournamentConsumer(AsyncWebsocketConsumer):
         if self._type == "FOUR" :
             await self.channel_layer.group_add("FOUR", self.channel_name)
             await self.channel_layer.group_send("FOUR", {
-                'type' : 'broadcast.room.state'
+                'type' : 'broadcast.allrooms.state'
             })
         self.room:Room = None
         self.match = None
@@ -207,6 +210,8 @@ class TournamentConsumer(AsyncWebsocketConsumer):
         
 
     async def disconnect(self, error_code):
+        if self.alias :
+            TournamentConsumer.rm.aliases.remove(self.alias)
         if self.user:
             TournamentConsumer.connected_users.remove(self.user.username)
         if self.room:
@@ -225,7 +230,7 @@ class TournamentConsumer(AsyncWebsocketConsumer):
                 TournamentConsumer.rm.remove_room(self._type, self.room.name)
             if self._type == "FOUR":
                 await self.channel_layer.group_send("FOUR", {
-                    'type' : 'broadcast.room.state'
+                    'type' : 'broadcast.allrooms.state'
                 })
                 await self.channel_layer.group_discard("FOUR", self.channel_name)
             await self.channel_layer.group_discard(self.room.name, self.channel_name)
@@ -241,7 +246,8 @@ class TournamentConsumer(AsyncWebsocketConsumer):
                 Command.LEAVE.value * int(command == "leave") +
                 Command.INPUT.value * int(command == "input") +
                 Command.JOINRANDOM.value * int(command == "join_random") +
-                Command.PLAY.value * int(command == "play")
+                Command.PLAY.value * int(command == "play") +
+                Command.ALIAS.value * int(command == "setAlias")
                 )
     
     async def create_room(self,data):
@@ -256,25 +262,27 @@ class TournamentConsumer(AsyncWebsocketConsumer):
             self.competitor.is_host = True
             self.room.p_holders[self.channel_name] = self.p_holder
             if self._type == "FOUR":
+                print("YOOOOOOO", flush=True)
                 await self.channel_layer.group_send("FOUR", {
-                    'type' : 'broadcast.room.state',
+                    'type' : 'broadcast.allrooms.state',
                 })
         except RoomRestriction as e:
             await self.send(text_data=json.dumps({
-                'error_msg' : str(e)
+                'ErrorMsg' : str(e)
             }))
         except TypeError as te :
             await self.send(text_data=json.dumps({
-                'error_msg' : str(te)
+                'ErrorMsg' : str(te)
             }))
             self.competitor.exit_room(self.room)
             TournamentConsumer.rm.remove_room(self._type, self.room.name)
     
-    async def broadcast_room_state(self, event):
+    async def broadcast_allrooms_state(self, event):
         await self.send(text_data=json.dumps({
             'type' : 'tournament_state',
             'room' : [room.get_data() for room in TournamentConsumer.rm.type_four.values()]
         }))
+    
     
     async def leave_room(self):
         if self.competitor and self.room :
@@ -286,7 +294,7 @@ class TournamentConsumer(AsyncWebsocketConsumer):
                 }) 
             except RoomRestriction as e:
                 TournamentConsumer.rm.remove_room(self.room._id)
-                #broadcast room deletion
+                #broadcast allrooms deletion
         else :
             await self.send(text_data=json.dumps({
                 'ErrorMsg' : 'You are not in a room'
@@ -318,7 +326,7 @@ class TournamentConsumer(AsyncWebsocketConsumer):
             self.room.p_holders[self.channel_name] = self.p_holder
             if self._type == "FOUR":
                 await self.channel_layer.group_send("FOUR", {
-                    'type' : 'broadcast.room.state',
+                    'type' : 'broadcast.allrooms.state',
                     'room' : self.room.get_data()
                 })
         except RoomRestriction as e :
@@ -351,6 +359,24 @@ class TournamentConsumer(AsyncWebsocketConsumer):
                 'ErrorMsg' : "Game Not Ready Yet"
             }))
     
+    async def setAlias(self, recv_data):
+        alias = recv_data.get('alias')
+        try :
+            if not alias:
+                raise NoAlias
+            if alias in TournamentConsumer.rm.aliases :
+                raise AliasAlreadyUsed
+            TournamentConsumer.rm.aliases.add(alias)
+            self.alias = alias
+            await self.send(text_data=json.dumps({
+                'type' : 'alias',
+                'accepted' : True
+            }))
+        except AliasException as e :
+            await self.send(text_data=json.dumps({
+                'ErrorMsg' : str(e)
+            }))
+    
     async def receive(self, text_data):
         recv_data = json.loads(text_data)
         command = recv_data.get('command')
@@ -374,6 +400,9 @@ class TournamentConsumer(AsyncWebsocketConsumer):
     
             case Command.PLAY.value :
                 await self.play()
+            
+            case Command.ALIAS.value :
+                await self.setAlias(recv_data)
     
     async def leave_state(self, event):
         self.match.state = "LEAVE"

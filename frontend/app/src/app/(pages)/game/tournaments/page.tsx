@@ -53,6 +53,13 @@ const Page = () => {
 
       if (received_data.type == "tournament_state")
         handleTournamentList(received_data);
+      if (received_data.type == "alias"){
+        if(received_data.accepted){
+          setConfirmation(true)
+        }else{
+          console.error(received_data.ErrorMsg)
+        }
+      }
 
     };
 
@@ -110,6 +117,23 @@ const Page = () => {
       console.error('WebSocket is not connected');
     }
   };
+
+  const handleAlias = () => {
+    const command = 'setAlias';
+    const data = {
+      command,
+      alias
+    }
+
+    if (WebSocketRef.current && WebSocketRef.current.readyState === WebSocket.OPEN){
+      WebSocketRef.current.send(JSON.stringify(data))
+      console.log("Data send :", data)
+    }else{
+      console.error('Websocket is not connected');
+    }
+    setAlias('')
+  }
+
   // Tournament map component
   const TournamentMap = () => {
     return (
@@ -227,7 +251,7 @@ const Page = () => {
             />
             <button
               className="mt-4 w-full bg-gray-400 py-2 rounded-md"
-              onClick={() => setConfirmation(true)}
+              onClick={() => handleAlias()}
             >
               Confirm
             </button>

@@ -128,6 +128,7 @@ class RoomListManager(RoomManager):
 
 class RoomManagerNew(RoomManager):
     def __init__(self):
+        self.aliases = set()
         self.type_four_name = {4:set()}
         self.type_two = {}
         self.type_four = {}
