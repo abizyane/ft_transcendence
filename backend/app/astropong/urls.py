@@ -10,6 +10,7 @@ from .views.auth.auth_user import UserView,MFAView, UsersView, ChangePasswordVie
 from .views.auth.refresh import RefreshTokenView
 from .views.friends.friends import AddFriendView, ListFriendView, AcceptFriendRequestView, RemoveFriendView, RejectFriendRequestView,FriendsOfView, BlockFriendView,UnblockFriendView, BlockedUsersList
 from .views.dashboard.dashboard import GamesHistoryView, PlayerRanking, PlayerWinRateView, TopPlayersView, WeeklyStatsView, WeeklyXPView, DashboardView
+from .views.auth.auth_user import GameCustomizationView
 
 urlpatterns = [
     path('register', RegisterView.as_view(), name='register'),
@@ -52,5 +53,7 @@ urlpatterns = [
     path('join_tournament', JoinTournamentView.as_view(), name='join_tournament'),
     path('get_tournament/<int:tournament_id>', GetTournamentView.as_view(), name='get_tournament'),
     path('set_tournament_alias', SetTournamentAliasView.as_view(), name='set_tournament_alias'),
+
+    path('game_customization', GameCustomizationView.as_view(), name='game_customization'),
 ]
     
