@@ -20,6 +20,10 @@ class NotificationConsumer(AsyncWebsocketConsumer):
             self.group_name,
             self.channel_name
         )
+        await self.channel_layer.group_add(
+            self.group_name+"_"+user.username,
+            self.channel_name
+        )
         await self.accept()
         await self.set_user_online(user.username, True)
         await self.notify_online_user(user.username, True, user.id)
@@ -82,7 +86,7 @@ class NotificationConsumer(AsyncWebsocketConsumer):
                 'user': notification.user.username,
                 'type': notification.type,
                 'content': notification.content,
-                'timestamp': notification.timestamp,
+                'timestamp': str(notification.timestamp),
                 'seen': notification.seen,
             }))
 

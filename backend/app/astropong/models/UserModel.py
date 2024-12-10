@@ -161,3 +161,6 @@ class Relationship(models.Model):
 
     def __str__(self):
         return str(self.user1) + " - " + str(self.user2) + ": " + self.status
+    
+    def get_status_display(self):
+        return self.Status(self.status).label

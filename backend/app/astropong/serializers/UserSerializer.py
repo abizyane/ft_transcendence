@@ -3,7 +3,7 @@ from ..models.UserModel import User, Relationship
 from game.models import Profile
 from urllib.parse import urljoin
 from django.conf import settings
-from django.db import models
+from django.db.models import Q
 import pyotp
 
 class UserSerializer(serializers.ModelSerializer):
@@ -79,7 +79,8 @@ class FriendSerializer(serializers.ModelSerializer):
         return default_image_url
 
     def get_relationship(self, obj):
-        relationships = self.context.get('relationships', [])
+        relationships = self.context.get('relationships', None)
+        request = self.context.get('request')
         if isinstance(relationships, list):
             print("is array", type(relationships))
             for friend, relation in relationships:
@@ -90,6 +91,9 @@ class FriendSerializer(serializers.ModelSerializer):
             if relationships.user1 == obj or relationships.user2 == obj:
                 return relationships.get_status_display()
         elif relationships is None:
+            rel = Relationship.objects.filter(Q(user1=obj, user2=request.user) | Q(user2=obj, user1=request.user))
+            if rel.exists():
+                return rel.first().get_status_display()
             return "Unknown"
 
     def get_sender_id(self, obj):

@@ -46,7 +46,7 @@ class MessageSerializer(serializers.ModelSerializer):
             'sender': instance.sender.username,
             'receiver': instance.receiver.username,
             'message': instance.message,
-            'timestamp': instance.timestamp,
+            'timestamp': str(instance.timestamp),
             'seen': instance.seen
         }
 
@@ -59,7 +59,7 @@ class ChatRoomSerializer(serializers.Serializer):
     def to_representation(self, instance):
         user = instance['receiver'] if instance['sender'].username == self.context['request'].user.username else instance['sender']
         return {
-            'user': UserSerializer(user, context=self.context).data,
+            'user': FriendSerializer(user, context=self.context).data,
             'messages': self.get_messages(instance),
             'next': instance['next'],
             'previous': instance['previous'],

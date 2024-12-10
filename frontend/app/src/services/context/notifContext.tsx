@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { useUser } from './usercontext';
+import toast from "react-hot-toast";
 
 
 interface Notification {
@@ -47,6 +48,13 @@ export const NotifProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     };
     
     ws.onclose = () => {
+    };
+
+    ws.onmessage = (event) => {
+      const data = JSON.parse(event.data);
+      if (data.type === 'chat_message') {
+        toast(data.content);
+      }
     };
     
     setSocket(ws);

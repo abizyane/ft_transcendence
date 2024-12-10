@@ -6,6 +6,7 @@ from .models import Message
 from astropong.models.UserModel import User, Relationship
 from .serializers import ConversationSerializer, ChatRoomSerializer, UserSerializer
 from rest_framework import generics
+from astropong.serializers.UserSerializer import FriendSerializer, UserSerializer
 
 class ConversationsPageNumberPagination(PageNumberPagination):
     page_size = 9
@@ -53,7 +54,6 @@ class ChatRoomView(generics.ListAPIView):
 
         if Relationship.objects.filter(Q(user1=currentuser, user2=otheruser) | Q(user1=otheruser, user2=currentuser), status = Relationship.Status.BLOCKED).exists():
             raise NotFound("These users are blocked.")
-
         return Message.objects.filter(Q(sender=currentuser, receiver=otheruser) | Q(sender=otheruser, receiver=currentuser)).order_by('-timestamp')
 
     def list(self, request, *args, **kwargs):

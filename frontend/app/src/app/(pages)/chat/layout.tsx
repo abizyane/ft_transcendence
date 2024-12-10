@@ -141,13 +141,50 @@ export function Chat({ children }: ChatLayoutProps) {
     }
   };
 
+  const apiUnblockUser = async (userid:number) => {
+    try {
+      const response = await fetch('http://localhost:8000/api/unblock', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          user_id: userid,
+        }),
+        credentials: 'include',
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        console.log('Friend unblocked successfully:', data);
+        return true;
+
+      } else {
+        const errorData = await response.json();
+        console.log('Failed to block friend:', errorData);
+        return false;
+      }
+    } catch (error) {
+      console.log('Error during the request:', error);
+      return false;
+    } finally {
+    }
+  };
   const handleBlockUser = (user:User, relationship:string) => {
     console.log("blocking user", user);
-    apiBlockUser(user.id).then((success) => {
-      if (success === true) {
-        contextBlockUser(user.username, relationship);
-      }
-    });
+    if (relationship === "Blocked") {
+      apiBlockUser(user.id).then((success) => {
+        if (success === true) {
+          contextBlockUser(user.username, relationship);
+        }
+      });
+    } else {
+      apiUnblockUser(user.id).then((success) => {
+        if (success === true) {
+          contextBlockUser(user.username, relationship);
+        }
+      });
+    }
   }
   // console.log("current chat", currentChat);
   // console.log("convs rendered", conversations);
@@ -206,7 +243,8 @@ if (!conversations || !user)
                         onClick={() => handleUserClick(conv.user)}
                         className="flex justify-between items-center p-3 hover:bg-gray-800 rounded-lg cursor-pointer"
                       >
-                        <div className="w-16 h-16 flex-shrink-0">
+                        <div className="w-16 h-16 relative flex-shrink-0">
+                          <span className={`h-3 w-3 ${conv.user.is_online ? "bg-green-500" : "bg-gray-500"} absolute bottom-0 right-1  rounded-full z-0`} />
                           <img
                             className="shadow-md rounded-full w-full h-full object-cover"
                             src={conv.user.profile_pic}
@@ -251,7 +289,7 @@ if (!conversations || !user)
                     </div>
                     <div className="text-sm">
                       <p className="font-bold">{currentChat.user.username}</p>
-                      <p>{is_online ? "Online" : "Offline"}</p>
+                      <p>{currentChat.user.is_online ? "Online" : "Offline"}</p>
                     </div>
                   </div>
                   <div className="w-full  flex justify-end">

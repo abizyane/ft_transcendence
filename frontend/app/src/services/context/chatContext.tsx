@@ -238,16 +238,32 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
   }
 
   const updateUserStatus = (username: string, isOnline: boolean) => {
-    setConversations(prev => ({
-      ...prev,
-      [username]: {
-        ...prev[username],
+    console.log("updating ", username, isOnline);
+    console.log("conversations", conversations);
+    console.log("currentChat", currentChat);
+    if (conversations[username]) {
+      console.log("updating conversations user status", username, isOnline);
+      setConversations(prev => ({
+        ...prev,
+        [username]: {
+          ...prev[username],
+          user: {
+            ...prev[username].user,
+            is_online: isOnline
+          }
+        }
+      }));
+    }
+    if (currentChat?.user.username === username) {
+      console.log("updating currenchat user status", username, isOnline);
+      setCurrentChat(prev => prev ? {
+        ...prev,
         user: {
-          ...prev[username].user,
+          ...prev.user,
           is_online: isOnline
         }
-      }
-    }));
+      } : undefined);
+    }
   };
 
   const setNewChat = (user: ChatUser) => {
@@ -304,6 +320,7 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
       ws.onmessage = (event) => {
         if (event.type === "message") {
           const data = JSON.parse(event.data);
+          console.log("chat message", data);
           if (data.type === "chat_message") {
             addMessage(data.message);
             setTyping(false);
@@ -313,7 +330,11 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
               setTyping(true);
               setTimeout(handleScrollToBottom, 100);
             }
-          } else if (data.type === "stop_typing") {
+          } else if (data.type === "user_status")
+          {
+            updateUserStatus(data.username, data.is_online);
+          }
+           else if (data.type === "stop_typing") {
             setTyping(false);
           } else if (data.message === "You must be friends in order to chat.") {
             toast.error("You must be friends in order to chat.");
@@ -321,7 +342,7 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
         }
       };
     }
-  }, [user, currentChat, ws, messageContainerRef]);
+  }, [user, currentChat, ws, messageContainerRef, conversations]);
 
   useEffect(() => {
     setConversations({});
