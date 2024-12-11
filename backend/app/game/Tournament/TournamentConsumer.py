@@ -262,10 +262,12 @@ class TournamentConsumer(AsyncWebsocketConsumer):
             self.competitor.is_host = True
             self.room.p_holders[self.channel_name] = self.p_holder
             if self._type == "FOUR":
-                print("YOOOOOOO", flush=True)
                 await self.channel_layer.group_send("FOUR", {
                     'type' : 'broadcast.allrooms.state',
                 })
+                await self.send(text_data=json.dumps({
+                    'approving' : True,
+                }))
         except RoomRestriction as e:
             await self.send(text_data=json.dumps({
                 'ErrorMsg' : str(e)
@@ -329,12 +331,22 @@ class TournamentConsumer(AsyncWebsocketConsumer):
                     'type' : 'broadcast.allrooms.state',
                     'room' : self.room.get_data()
                 })
+                await self.send(text_data=json.dumps({
+                    'approving' : True,
+                })) 
+            # await self.channel_layer.group_send(self.room.name,{
+            #     'type' : 'broadcast.room.state'
+            # })
         except RoomRestriction as e :
             await self.send(text_data=json.dumps({
                 'ErrorMsg' : str(e)
             }))
 
-
+    async def broadcast_room_state(self, event):
+        await self.send(text_data=json.dumps({
+            'command' : 'update_room',
+            'competitors' : self.competitor.get_allroom_info()
+        }))
     
     def join_random_room(self, _type):
         self.room = self.competitor.random_room_request(TournamentConsumer.rm)

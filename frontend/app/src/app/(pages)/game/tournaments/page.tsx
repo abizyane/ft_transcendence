@@ -53,6 +53,8 @@ const Page = () => {
 
       if (received_data.type == "tournament_state")
         handleTournamentList(received_data);
+      if (received_data.approving)
+        setTournamentMap(received_data.approving)
       if (received_data.type == "alias"){
         if(received_data.accepted){
           setConfirmation(true)
@@ -83,7 +85,6 @@ const Page = () => {
 
   const handleCreateTournament = (event) => {
     event.preventDefault();
-    setTournamentMap(true);
     // if (!alias || !roomName) {
     //   alert("Please fill in all fields.");
     //   return;
@@ -136,6 +137,38 @@ const Page = () => {
 
   // Tournament map component
   const TournamentMap = () => {
+    const defaultUser = {
+      username: 'player',
+      img: '',
+      id: 0
+    }
+    const defaultUsers = (() => {
+      let users = [];
+      for (let i = 0; i < 4; i++)
+        users[i] = {...defaultUser, id:i, username:"player"+i.toString()}
+      return users  
+    })()
+  
+    const [players, setPlayers] = useState(defaultUsers)
+
+    const handleRoomUpdate = (users)=> {
+      const nextUserList = defaultUsers.map(user => users.find( (u) => u.id === user.id) || user)
+      setPlayers(nextUserList)
+    }
+
+    useEffect(()=>{
+      WebSocketRef.current.onmessage = (e) => {
+        if (typeof e.data === "string"){
+          const data = JSON.parse(e.data);
+          if (data.type === "room"){
+            if (data.command === "setCompetitors"){
+              handleRoomUpdate(data.competitors)
+            }
+          }
+        }
+      }
+    }, [])
+
     return (
       <div className="w-full h-full flex justify-center items-center">
 
@@ -146,7 +179,7 @@ const Page = () => {
             alt="Tournament pic"
             className="object-cover w-14 h-14 lg:w-16 lg:h-16 xl:w-20 xl:h-20 rounded-full"
             />
-          <h1 className="text-white ml-4 text-lg md:text-xl lg:text-2xl">Tournament Name</h1>
+          <h1 className="text-white ml-4 text-lg md:text-xl lg:text-2xl">{roomName}</h1>
         </div>
         <div className="p-2 w-full mt-4 lg:flex lg:flex-row lg:p-0">
           <div className="flex justify-around items-end w-full lg:flex lg:flex-col lg:items-end lg:w-24">
@@ -156,7 +189,7 @@ const Page = () => {
                 alt="Player 1"
                 className="w-14 h-14 md:w-16 md:h-16 lg:w-16 lg:h-16 xl:w-20 xl:h-20 object-cover rounded-full shadow-lg"
                 />
-              <span className="text-white text-sm lg:text-base mt-2">Player 1</span>
+              <span className="text-white text-sm lg:text-base mt-2">{players[0].username}</span>
             </div>
             <div className="flex flex-col items-center lg:mt-[190px]">
               <img
@@ -164,7 +197,7 @@ const Page = () => {
                 alt="Player 2"
                 className="w-14 h-14 md:w-16 md:h-16 lg:w-16 lg:h-16 xl:w-20 xl:h-20 object-cover rounded-full shadow-lg"
                 />
-              <span className="text-white text-sm lg:text-base mt-2">Player 2</span>
+              <span className="text-white text-sm lg:text-base mt-2">{players[1].username}</span>
             </div>
           </div>
 
@@ -218,7 +251,7 @@ const Page = () => {
                 alt="Player 3"
                 className="w-14 h-14 md:w-16 md:h-16 lg:w-16 lg:h-16 xl:w-20 xl:h-20 object-cover rounded-full shadow-lg"
                 />
-              <span className="text-white text-sm lg:text-base mt-2">Player 3</span>
+              <span className="text-white text-sm lg:text-base mt-2">{players[2].username}</span>
             </div>
             <div className="flex flex-col items-center lg:mt-[190px]">
               <img
@@ -226,7 +259,7 @@ const Page = () => {
                 alt="Player 4"
                 className="w-14 h-14 md:w-16 md:h-16 lg:w-16 lg:h-16 xl:w-20 xl:h-20 object-cover rounded-full shadow-lg"
                 />
-              <span className="text-white text-sm lg:text-base mt-2">Player 4</span>
+              <span className="text-white text-sm lg:text-base mt-2">{players[3].username}</span>
             </div>
           </div>
         </div>
