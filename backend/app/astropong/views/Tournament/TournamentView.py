@@ -2,7 +2,7 @@ from django.core.exceptions import ValidationError
 from django.db import models
 
 from astropong.serializers.TournamentSerializer import TournamentSerializer
-from game.models import TournamentModel
+from game.models import TournamentModel, TournamentPic
 from ...models.UserModel import Relationship
 from ...serializers.UserSerializer import FriendSerializer, UserSerializer
 from rest_framework.views import APIView
@@ -118,3 +118,55 @@ class SetTournamentAliasView(APIView):
         request.user.tournament_alias = alias
         request.user.save()
         return Response({"message": "Tournament alias set successfully"}, status=status.HTTP_200_OK)
+    
+
+
+class TournamentPicUploadSerializer(serializers.Serializer):
+    tournament_pic = serializers.ImageField()
+
+class UploadTournamentPicView(APIView):
+    permission_classes = [IsAuthenticated]
+    parser_classes = [MultiPartParser, FormParser]
+    serializer_class = TournamentPicUploadSerializer
+
+    def post(self, request):
+        serializer = TournamentPicUploadSerializer(data=request.data)
+        if serializer.is_valid():
+            profile_pic = serializer.validated_data['tournament_pic']
+            
+            tournament_pic_path = f"tournament_pics/{request.user.id}_{profile_pic.name}"
+            full_path = os.path.join(settings.MEDIA_ROOT, tournament_pic_path)
+            default_storage.save(full_path, ContentFile(profile_pic.read()))
+
+            tournament_pic = TournamentPic.objects.create(picture=tournament_pic_path)
+            tournament_pic.user_id = request.user
+            tournament_pic.save()
+            return Response({"message": "Tournament picture uploaded successfully",
+                              "picture_id": tournament_pic.id,
+                              "tournament_pic_url": request.build_absolute_uri(settings.MEDIA_URL + tournament_pic_path)})
+        return Response(serializer.errors, status=400)
+    
+class UpdateTournamentPicView(APIView):
+    permission_classes = [IsAuthenticated]
+    def post(self, request):
+        try:
+            tournament_id = request.data.get('tournament_id')
+            tournament_pic_id = request.data.get('tournament_pic_id')
+            tournament_pic = TournamentPic.objects.get(id=tournament_pic_id)
+            print(tournament_pic.user_id.id, request.user.id, flush=True)
+            if tournament_pic.user_id.id != request.user.id:
+                return Response({'error': 'You are not the owner of this tournament 1 '}, status=403)
+            tournament = TournamentModel.objects.get(id=tournament_id)
+            if tournament is None:
+                return Response({'error': 'Tournament not found'}, status=404)
+            if tournament.owner != request.user.profile:
+                return Response({'error': 'You are not the owner of this tournament2 '}, status=403)
+            tournament_pic.tournament_id = tournament_id
+            tournament_pic.save()
+            return Response({"message": "Tournament picture updated successfully"}, status=200)
+        except TournamentPic.DoesNotExist:
+            return Response({'error': 'Tournament picture not found'}, status=404)
+        except TournamentModel.DoesNotExist:
+            return Response({'error': 'Tournament not found'}, status=404)
+        except Exception as e:
+            return Response({'error': str(e)}, status=400)

@@ -22,7 +22,7 @@ export const config = {
     '/',
     '/((?!auth/).)*',
     '/dashboard',
-    '/chat',
+    '/chat/:id*',
     '/friends',
     '/game',
     '/ranking',

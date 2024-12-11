@@ -153,6 +153,7 @@ class Scores(models.Model):
 def get_default_start_time():
     return timezone.now() + timezone.timedelta(days=1)
 
+
 class TournamentModel(models.Model):
     class State(models.TextChoices):
         SCHEDULED = 'SCHEDULED'
@@ -202,3 +203,8 @@ class TournamentModel(models.Model):
 
     def get_all_tournaments(player_id:int)-> models.QuerySet:
         return TournamentModel.objects.filter(players=player_id)
+    
+class TournamentPic(models.Model):
+    tournament_id = models.OneToOneField(TournamentModel, on_delete=models.CASCADE, null=True)
+    user_id = models.ForeignKey(User, on_delete=models.CASCADE, null=True)
+    picture = models.CharField(max_length=500, null=True)

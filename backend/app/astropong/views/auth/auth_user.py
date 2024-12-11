@@ -1,3 +1,4 @@
+from game.models import TournamentPic
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.exceptions import AuthenticationFailed
@@ -97,6 +98,7 @@ class UploadProfilePicView(APIView):
 
             return Response({"message": "Profile picture uploaded successfully", "profile_pic_url": request.build_absolute_uri(settings.MEDIA_URL + profile_pic_path)})
         return Response(serializer.errors, status=400)
+
 class UsersView(APIView):
     permission_classes = [IsAuthenticated]
 

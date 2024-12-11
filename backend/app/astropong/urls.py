@@ -1,7 +1,7 @@
 from django.contrib import admin
 from django.urls import path, include
 
-from .views.Tournament.TournamentView import GetTournamentView, JoinTournamentView, PublicTournamentView, CreateTournamentView, SetTournamentAliasView
+from .views.Tournament.TournamentView import GetTournamentView, JoinTournamentView, PublicTournamentView, CreateTournamentView, SetTournamentAliasView, UploadTournamentPicView, UpdateTournamentPicView
 from .views.auth.register import RegisterView
 from .views.auth.login import LoginView ,UserListView
 from .views.auth.logout import LogoutView
@@ -53,7 +53,8 @@ urlpatterns = [
     path('join_tournament', JoinTournamentView.as_view(), name='join_tournament'),
     path('get_tournament/<int:tournament_id>', GetTournamentView.as_view(), name='get_tournament'),
     path('set_tournament_alias', SetTournamentAliasView.as_view(), name='set_tournament_alias'),
-
+    path('upload_tournament_pic', UploadTournamentPicView.as_view(), name='upload_tournament_pic'),
+    path('update_tournament_pic', UpdateTournamentPicView.as_view(), name='update_tournament_pic'),
     path('game_customization', GameCustomizationView.as_view(), name='game_customization'),
     path('ping', PingView.as_view(), name='ping'),
 ]
