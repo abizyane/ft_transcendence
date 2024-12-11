@@ -9,15 +9,21 @@ class ScoreBoard{
         this.first_score = 0;
         this.second_score = 0;
         this.scoreSetter = setScores;
-    }
+      }
     update(){
         if (this.ball.posX - this.ball.rad < this.game.player.posX )
         {
             this.first_score++;
+            this.ball.reset_ball()
         }
         else if (this.ball.posX > this.game.enemy.posX + this.game.enemy.width/2)
         {
             this.second_score++;
+            this.ball.reset_ball()
+        }
+        if (this.first_score === 10 || this.second_score === 10)
+        {
+            this.game.status = 0;
         }
         this.scoreSetter({one : this.first_score , two:this.second_score });
     }
@@ -35,7 +41,7 @@ class Ball {
         this.rad = 5
         this.posX = game.width / 2
         this.posY = game.height / 2
-        this.speed = 10
+        this.speed = 7
         this.angle = 45
         this.dirX = Math.cos(this.angle)
         this.dirY = Math.sin(this.angle)
@@ -198,6 +204,7 @@ class Game{
       this.speed = 5;
       this.mouseX = 0;
       this.mouseY = 0;
+      this.status = 1;
     //   loadFonts();
 
       window.addEventListener('keydown', (e) => {
@@ -261,6 +268,9 @@ class Game{
               Context.current.clearRect(0,0, CanvasRef.current.width, CanvasRef.current.height)
                 game.update()
                 game.render(Context.current)
+                if (game.status === 0 ){
+                  return;
+                }
                 requestAnimationFrame(animate)
             }
         }

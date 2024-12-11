@@ -168,6 +168,7 @@ class TournamentConsumer(AsyncWebsocketConsumer):
             await self.send(text_data=json.dumps({
                 'msg': 'You Lost'
             }))
+        rm = None
        
         
 
@@ -215,9 +216,14 @@ class TournamentConsumer(AsyncWebsocketConsumer):
         if self.user:
             TournamentConsumer.connected_users.remove(self.user.username)
         if self.room:
-            if self.room.is_ready():
+            if  self.room.is_ready():
                 #set other player to winner
-                if self.match.is_ready():
+                if self.match and self.match.is_ready():
+                    try:
+                        self.p_holder.competitor.exit_room(self.room)
+                    # del self.room.tournament.p_holders[self.channel_name]
+                    except self.room.RoomIsEmpty:
+                        TournamentConsumer.rm.remove_not_ready(self.room)
                     await self.channel_layer.group_send(self.match_name, {
                         'type' : 'leave.state',
                         'player' : f'{self.channel_name}'
@@ -386,6 +392,7 @@ class TournamentConsumer(AsyncWebsocketConsumer):
             }))
         except AliasException as e :
             await self.send(text_data=json.dumps({
+                'type' : 'alias',
                 'ErrorMsg' : str(e)
             }))
     
@@ -449,6 +456,7 @@ class TournamentConsumer(AsyncWebsocketConsumer):
             score_1=score_1,
             score_2=score_2
         )
+
 
     @database_sync_to_async
     def award_xp(self, won: bool):

@@ -50,11 +50,11 @@ const TopPlayers: React.FC = () => {
 
   return (
     <div className="w-full lg:w-1/3 py-4">
-      <div className="bg-gray-800/60 rounded-xl border border-violet-primary flex flex-col flex-1 h-full">
+      <div className="bg-gray-800/60 p-2 rounded-xl border border-violet-primary flex flex-col flex-1 h-full">
         <div className=" flex justify-between items-center m-2">
-          <p className="m-2 text-white text-2xl font-extrabold">Top Players</p>
+          <p className="text-white text-2xl font-extrabold">Top Players</p>
           <Link href="/ranking">
-            <div className="m-2 p-2 border border-violet-primary backdrop-blur-lg bg-opacity-30 hover:bg-violet-primary rounded-xl">
+            <div className="border p-2 border-violet-primary backdrop-blur-lg bg-opacity-30 hover:bg-violet-primary rounded-xl">
               <p className="text-white">View All</p>
             </div>
           </Link>

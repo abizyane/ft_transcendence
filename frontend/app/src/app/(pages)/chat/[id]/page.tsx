@@ -14,8 +14,6 @@ import { IoSend } from "react-icons/io5";
 
 const UserChatPage = ({ currentUser }) => {
   const { currentChat, conversations, typing, ws, setMessageContainerRef, addMessage, fetchMessages } = useChat();
-  // console.log("currentChat c", currentChat);
-  // console.log("conversations c", conversations);
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
   const { username, profile_pic_url, is_online, id } = currentUser;

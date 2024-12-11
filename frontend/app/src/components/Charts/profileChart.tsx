@@ -90,7 +90,6 @@ const ProfileChart = ({ user }) => {
     maintainAspectRatio: false,
   };
 
-  console.log("data" , data);
   return (
     <div className="flex-1 h-full mt-8 w-full lg:mt-0 py-4 lg:w-1/3 ">
         <div className="bg-gray-800/60 rounded-xl border border-violet-primary h-fit ">
