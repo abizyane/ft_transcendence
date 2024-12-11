@@ -70,8 +70,8 @@ function Avatar({ user }) {
 const Page = () => {
   const [gameready, setReady] = useState(false);
   const socketRef = useRef(null);
-  const [users, setCompetitors] = useState(defaultCompetitors);
   const [scores, setScores] = useState({ one: 0, two: 0 });
+  const [users, setCompetitors] = useState(defaultCompetitors);
   const { user: currentUser } = useUser();
   const [countdown, setCountdown] = useState(3);
   // Retrieve the 'game' and 'map' query params
