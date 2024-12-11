@@ -1,6 +1,6 @@
 from channels.generic.websocket import AsyncWebsocketConsumer
-from .tournament_utils import RoomListManager
-from .competitor import Competitor,Room
+from .tournament_utils import RoomManagerNew
+from .competitor import CompetitorNamed,Room
 import json
 from .matchHolder import MatchTreeBuilder, MatchHolder, PlayerHolder
 import asyncio
@@ -11,22 +11,22 @@ from ..game_utils import Game, Player
 import gc
 import numpy as np
 from channels.db import database_sync_to_async
-
+from enum import Enum
 from ..models import Profile, GameModel, Scores, TournamentModel
-from astropong.serializers.UserSerializer import UserSerializer
+from .room_restrict import RoomRestriction, RoomIsEmpty
+from .alias_restrict import AliasException, NoAlias, AliasAlreadyUsed
 
-def build_absolute_image_uri(scope, relative_path):
-    host = dict(scope['headers']).get(b'host', b'localhost').decode('utf-8')
+class Command(Enum):
+    CREATE = 1
+    JOIN = 2
+    LEAVE = 3
+    INPUT = 4
+    JOINRANDOM = 5
+    PLAY = 6
+    ALIAS = 7
 
-    scheme = scope.get('scheme', 'http')
-
-    base_url = f"{scheme}://{host}"
-    if relative_path is None:
-        return urljoin(base_url, settings.MEDIA_URL + "Profil.jpg")
-    return urljoin(base_url, relative_path)
 class TournamentConsumer(AsyncWebsocketConsumer):
-    rm = RoomListManager()
-    connected_users = set()
+    rm = RoomManagerNew()
     rooms = {}
     i = 0
     _id = 0
@@ -37,53 +37,24 @@ class TournamentConsumer(AsyncWebsocketConsumer):
     
     async def connect(self):
         self.user = None
-        user = self.scope['user']
-        if user.is_anonymous or not user.is_authenticated:
-            await self.accept()
-            await self.send(text_data=json.dumps({
-                "msg" : f"{user} is not authenticated.",
-                "type" : "error"
-            }))
-            await self.close()
-            return
-        
-        if user.username in TournamentConsumer.connected_users :
-            await self.accept()
-            await self.send(text_data=json.dumps({
-                "msg" : f"{user} user already connected.",
-                "type" : "error"
-            }))
-            await self.close()
-            return
-            
+        self.alias = None
+        # user = self.scope['user']
         await self.accept()
-        self.user = user
-        TournamentConsumer.connected_users.add(self.user.username)
-        self.p_holder = PlayerHolder(Competitor(self.channel_name))
-        self.set_competitor_info(username=user.username, img=build_absolute_image_uri(self.scope, user.profile_pic), userId=user.id)
+        self.p_holder = PlayerHolder(CompetitorNamed(self.channel_name))
+        self.competitor = self.p_holder.competitor
         self._type = self.scope['url_route']['kwargs']['competition_type']
-        self.game_mode = "tournament" if self._type == "tournament" else "1v1"
+        if self._type == "FOUR" :
+            await self.channel_layer.group_add("FOUR", self.channel_name)
+            await self.channel_layer.group_send("FOUR", {
+                'type' : 'broadcast.allrooms.state'
+            })
         self.room:Room = None
         self.match = None
         self.match_name = ''
         self.task = None
         self.game = None
         self.state = ''
-        self.access_competition(self.p_holder.competitor);
-        self.room.tournament.p_holders[self.channel_name] = self.p_holder
-        await self.channel_layer.group_add((self.room.name), self.channel_name)
-        await self.channel_layer.group_send(self.room.name, {
-            "type" : "joined.competitor",
-        })
-        if self.room.is_ready():
-            TournamentConsumer.rm.switch_to_ready(self.room)
-            competitors_gen = iter(list(self.room.tournament.p_holders.values()))
-            self.room.holder = MatchTreeBuilder.build_tree(MatchHolder(),0, 1, competitors_gen, self.room.size)
-            MatchTreeBuilder.visualize_tree(holder=self.room.holder, lvl=0, size=self.room.size)
-            await self.channel_layer.group_send(self.room.name, {
-                "type" : "init.game",
-            })
-            print(self.match)
+        self.competitor.set_competition_type(self._type)
     
     async def init_game(self, event):
         self.match = self.room.tournament.get_player_match(self.channel_name)
@@ -240,6 +211,8 @@ class TournamentConsumer(AsyncWebsocketConsumer):
         
 
     async def disconnect(self, error_code):
+        if self.alias :
+            TournamentConsumer.rm.aliases.remove(self.alias)
         if self.user:
             TournamentConsumer.connected_users.remove(self.user.username)
         if self.room:
@@ -255,24 +228,200 @@ class TournamentConsumer(AsyncWebsocketConsumer):
                         'type' : 'leave.state',
                         'player' : f'{self.channel_name}'
                     })
-                pass
-            else :
-                try:
-                    self.p_holder.competitor.exit_room(self.room)
-                    # del self.room.tournament.p_holders[self.channel_name]
-                except self.room.RoomIsEmpty:
-                    TournamentConsumer.rm.remove_not_ready(self.room)
-        await self.channel_layer.group_discard(self.room.name, self.channel_name)
+            try:
+                self.p_holder.competitor.exit_room(self.room)
+                self.room.competitors[0].is_host = True
+                # del self.room.tournament.p_holders[self.channel_name]
+            except RoomIsEmpty as e:
+                TournamentConsumer.rm.remove_room(self._type, self.room.name)
+            if self._type == "FOUR":
+                await self.channel_layer.group_send("FOUR", {
+                    'type' : 'broadcast.allrooms.state'
+                })
+                await self.channel_layer.group_discard("FOUR", self.channel_name)
+            await self.channel_layer.group_discard(self.room.name, self.channel_name)
 
-    def access_competition(self, competitor:Competitor) -> None :
+    def access_competition(self, competitor:CompetitorNamed) -> None :
         competitor.set_competition_type(self._type)
         self.room = competitor.room_request(TournamentConsumer.rm)
         competitor.join_room(self.room)
+    
+    def command_switch(self,command) -> int:
+        return (Command.CREATE.value * int(command == "create") + 
+                Command.JOIN.value * int(command == "join") +
+                Command.LEAVE.value * int(command == "leave") +
+                Command.INPUT.value * int(command == "input") +
+                Command.JOINRANDOM.value * int(command == "join_random") +
+                Command.PLAY.value * int(command == "play") +
+                Command.ALIAS.value * int(command == "setAlias")
+                )
+    
+    async def create_room(self,data):
+        name = data.get('roomName')
+        try :
+            self.room = self.competitor.create_room(TournamentConsumer.rm, _type=self._type, name=name)
+            self.competitor.join_room(self.room)
+            await self.channel_layer.group_add(name, self.channel_name)
+            await self.send(text_data=json.dumps({
+                'InformMsg' : f'Room {name} created successfuly'
+            }))
+            self.competitor.is_host = True
+            self.room.p_holders[self.channel_name] = self.p_holder
+            if self._type == "FOUR":
+                await self.channel_layer.group_send("FOUR", {
+                    'type' : 'broadcast.allrooms.state',
+                })
+                await self.send(text_data=json.dumps({
+                    'approving' : True,
+                }))
+        except RoomRestriction as e:
+            await self.send(text_data=json.dumps({
+                'ErrorMsg' : str(e)
+            }))
+        except TypeError as te :
+            await self.send(text_data=json.dumps({
+                'ErrorMsg' : str(te)
+            }))
+            self.competitor.exit_room(self.room)
+            TournamentConsumer.rm.remove_room(self._type, self.room.name)
+    
+    async def broadcast_allrooms_state(self, event):
+        await self.send(text_data=json.dumps({
+            'type' : 'tournament_state',
+            'room' : [room.get_data() for room in TournamentConsumer.rm.type_four.values()]
+        }))
+    
+    
+    async def leave_room(self):
+        if self.competitor and self.room :
+            try :
+                self.competitor.exit_room(self.room)
+                await self.group_send(self.room.name, {
+                    'type' : 'left.msg',
+                    'left_player' : self.competitor.username
+                }) 
+            except RoomRestriction as e:
+                TournamentConsumer.rm.remove_room(self.room._id)
+                #broadcast allrooms deletion
+        else :
+            await self.send(text_data=json.dumps({
+                'ErrorMsg' : 'You are not in a room'
+            }))
+
+    async def left_msg(self, event):
+        comp_info = self.p_holder.competitor.get_allroom_info()
+        user_left = event['left_player']
+        await self.send(text_data=json.dumps({
+            "type" : "room",
+            "msg" : f'user {left_player} has left', #alias later (!attention)
+            "competitors" : comp_info,
+            "command" : "setCompetitors"
+        }))
         
+    async def join_room(self,data):
+        name = data.get('name')
+        print(name, flush=True)
+        try :
+            room = TournamentConsumer.rm.get_room(self._type, name)
+            self.room = self.competitor.join_room(room)
+            await self.channel_layer.group_add(self.room.name, self.channel_name)
+            await self.send(text_data=json.dumps({
+                'InformMsg': f'you joined room:{self.room.name} successfuly'
+            }))
+            await self.channel_layer.group_send(self.room.name, {
+                'type' : 'joined.competitor'
+            })
+            self.room.p_holders[self.channel_name] = self.p_holder
+            if self._type == "FOUR":
+                await self.channel_layer.group_send("FOUR", {
+                    'type' : 'broadcast.allrooms.state',
+                    'room' : self.room.get_data()
+                })
+                await self.send(text_data=json.dumps({
+                    'approving' : True,
+                })) 
+            # await self.channel_layer.group_send(self.room.name,{
+            #     'type' : 'broadcast.room.state'
+            # })
+        except RoomRestriction as e :
+            await self.send(text_data=json.dumps({
+                'ErrorMsg' : str(e)
+            }))
+
+    async def broadcast_room_state(self, event):
+        await self.send(text_data=json.dumps({
+            'command' : 'update_room',
+            'competitors' : self.competitor.get_allroom_info()
+        }))
+    
+    def join_random_room(self, _type):
+        self.room = self.competitor.random_room_request(TournamentConsumer.rm)
+        self.competitor.join_room(self.room)
+    
+    async def play(self):
+        if self.room.is_ready() and self.competitor.is_host:
+            print(list(self.room.p_holders.values()) , flush=True)
+            competitors_gen = iter(list(self.room.p_holders.values()))
+            self.room.holder = MatchTreeBuilder.build_tree(MatchHolder(),0, 1, competitors_gen, self.room.size)
+            MatchTreeBuilder.visualize_tree(holder=self.room.holder, lvl=0, size=self.room.size)
+            self.room.tournament.p_holders = self.room.p_holders
+            await self.channel_layer.group_send(self.room.name, {
+                "type" : "init.game",
+            })
+            await self.send(text_data=json.dumps({
+                'debug' : str(self.room.size),
+                'msg' : str(self.room.competitors)
+            }))
+        else :
+            await self.send(text_data=json.dumps({
+                'ErrorMsg' : "Game Not Ready Yet"
+            }))
+    
+    async def setAlias(self, recv_data):
+        alias = recv_data.get('alias')
+        try :
+            if not alias:
+                raise NoAlias
+            if alias in TournamentConsumer.rm.aliases :
+                raise AliasAlreadyUsed
+            TournamentConsumer.rm.aliases.add(alias)
+            self.alias = alias
+            await self.send(text_data=json.dumps({
+                'type' : 'alias',
+                'accepted' : True
+            }))
+        except AliasException as e :
+            await self.send(text_data=json.dumps({
+                'type' : 'alias',
+                'ErrorMsg' : str(e)
+            }))
+    
     async def receive(self, text_data):
         recv_data = json.loads(text_data)
-        if self.p_holder.paddle :
-            self.p_holder.paddle_command(recv_data['command'])
+        command = recv_data.get('command')
+
+        match self.command_switch(command) :
+            case Command.CREATE.value :
+                print(command, flush=True)
+                await self.create_room(recv_data)
+            
+            case Command.JOIN.value :
+                await self.join_room(recv_data)
+
+            case Command.LEAVE.value :
+                await self.leave_room()
+            
+            case Command.JOINRANDOM :
+                await self.join_random_room()
+        
+            case Command.INPUT.value :
+                self.handle_input(recv_data)
+    
+            case Command.PLAY.value :
+                await self.play()
+            
+            case Command.ALIAS.value :
+                await self.setAlias(recv_data)
     
     async def leave_state(self, event):
         self.match.state = "LEAVE"

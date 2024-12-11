@@ -1,5 +1,6 @@
 from abc import ABC, abstractmethod 
 from .tournament import Tournament
+from .room_restrict import RoomIsFull, AlredyJoined, RoomIsEmpty
 
 class RoomAbstract(ABC):
     @abstractmethod
@@ -30,13 +31,17 @@ class Room(RoomAbstract):
         self.size = size
         self.name = ''
         self.competitors = []
+        self.p_holders = {}
         self.holder = None
         self.ready = False
+        self.started = False
         self.tournament = Tournament()
 
     def add_player(self, Player) -> RoomAbstract :
         if self.ready :
-            raise Room.RoomIsFull
+            raise RoomIsFull
+        if Player.joined:
+            raise AlredyJoined(Player.name, Player.room.name)
         Player._id = self.competitor_id
         self.competitor_id += 1
         self.competitors.append(Player)
@@ -49,7 +54,7 @@ class Room(RoomAbstract):
         Player._id = -1
         self.competitor_id -= 1
         if (self.competitors_count() == 0):
-            raise Room.RoomIsEmpty;
+            raise RoomIsEmpty;
 
     def competitors_count(self) -> int:
         return len(self.competitors)
@@ -61,19 +66,11 @@ class Room(RoomAbstract):
         return (self.competitors_count() <= 0)
 
     def get_data(self) :
-        return {
-            "id": self._id,
-            "competitors" : {competitor.name : competitor.get_data() for competitor in self.competitors},
-             
-        }
-    
-    class RoomIsFull(Exception):
-        def __init__(self, message="Room Is Full"):
-            super().__init__(message)
-
-    class RoomIsEmpty(Exception):
-        def __init__(self,message="Room Is Empty" ):
-            super().__init__(message)
+        return dict({
+            "name" : self.name,
+            "size": self.competitors_count(),
+            "started" : self.started
+        })
 
 class TwoPlayersRoom(Room):
     def __init__(self):

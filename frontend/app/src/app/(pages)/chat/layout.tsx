@@ -77,7 +77,6 @@ export function Chat({ children }: ChatLayoutProps) {
     if (isMobile) openSlider(user);
     // else setSelectedId(user);
 
-    console.log("user clicked", user);
     router.push(`/chat/${user.id}`);
   };
 

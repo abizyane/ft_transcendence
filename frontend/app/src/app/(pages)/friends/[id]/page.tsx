@@ -153,7 +153,6 @@ const Friends = () => {
     }
   };
 
-  console.log("curruser", currentUser.id.toString());
   return (
     <div className="w-full lg:max-w-[1200px] p-2 mb-24 lg:h-full">
       <h1 className="text-white text-center w-full text-xl lg:text-3xl font-bold mb-4 mt-2">
