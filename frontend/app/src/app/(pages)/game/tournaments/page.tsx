@@ -20,20 +20,21 @@ const Page = () => {
 
   //---------Tournament Map vars Start---------
   const defaultUser = {
-    username: 'player',
+    alias: 'player',
     img: '',
     id: 0
   }
   const defaultUsers = (() => {
     let users = [];
     for (let i = 0; i < 4; i++)
-      users[i] = {...defaultUser, id:i, username:"player"+i.toString()}
+      users[i] = {...defaultUser, id:i, alias:"player"+i.toString()}
     return users  
   })()
 
   const [players, setPlayers] = useState(defaultUsers)
 
   const handleRoomUpdate = (users)=> {
+    console.log(users)
     const nextUserList = defaultUsers.map((defuser) => {
       const newUser = users.find(u => u.id === defuser.id);
       return newUser ? {...defuser, ...newUser} : defuser
@@ -186,38 +187,6 @@ const Page = () => {
 
   // Tournament map component
   const TournamentMap = () => {
-    const defaultUser = {
-      username: 'player',
-      img: '',
-      id: 0
-    }
-    const defaultUsers = (() => {
-      let users = [];
-      for (let i = 0; i < 4; i++)
-        users[i] = {...defaultUser, id:i, username:"player"+i.toString()}
-      return users  
-    })()
-  
-    const [players, setPlayers] = useState(defaultUsers)
-
-    const handleRoomUpdate = (users)=> {
-      const nextUserList = defaultUsers.map(user => users.find( (u) => u.id === user.id) || user)
-      setPlayers(nextUserList)
-    }
-
-    useEffect(()=>{
-      WebSocketRef.current.onmessage = (e) => {
-        if (typeof e.data === "string"){
-          const data = JSON.parse(e.data);
-          if (data.type === "room"){
-            if (data.command === "setCompetitors"){
-              handleRoomUpdate(data.competitors)
-            }
-          }
-        }
-      }
-    }, [])
-
     return (
       <div className="w-full h-full flex justify-center items-center">
 
@@ -241,7 +210,7 @@ const Page = () => {
               alt="Player 1"
               className="w-14 h-14 md:w-16 md:h-16 lg:w-16 lg:h-16  xl:w-20 xl:h-20 object-cover rounded-full shadow-lg"
               />
-            <span className="text-white text-sm lg:text-base mt-2">{players[0].username}</span>
+            <span className="text-white text-sm lg:text-base mt-2">{players[0].alias}</span>
           </div>
           <div className="flex flex-col items-center lg:mt-[190px]">
             <img
@@ -249,7 +218,7 @@ const Page = () => {
               alt="Player 2"
               className="w-14 h-14 md:w-16 md:h-16 lg:w-16 lg:h-16 xl:w-20 xl:h-20 object-cover rounded-full shadow-lg"
               />
-            <span className="text-white text-sm lg:text-base mt-2">{players[1].username}</span>
+            <span className="text-white text-sm lg:text-base mt-2">{players[1].alias}</span>
           </div>
         </div>
 
@@ -317,7 +286,7 @@ const Page = () => {
               alt="Player 3"
               className="w-14 h-14 md:w-16 md:h-16 lg:w-16 lg:h-16 xl:w-20 xl:h-20 object-cover rounded-full shadow-lg"
               />
-            <span className="text-white text-sm lg:text-base mt-2">{players[2].username}</span>
+            <span className="text-white text-sm lg:text-base mt-2">{players[2].alias}</span>
           </div>
           <div className="flex flex-col items-center lg:mt-[190px]">
             <img
@@ -325,11 +294,11 @@ const Page = () => {
               alt="Player 4"
               className="w-14 h-14 md:w-16 md:h-16 lg:w-16 lg:h-16 xl:w-20 xl:h-20 object-cover rounded-full shadow-lg"
               />
-            <span className="text-white text-sm lg:text-base mt-2">{players[3].username}</span>
+            <span className="text-white text-sm lg:text-base mt-2">{players[3].alias}</span>
           </div>
         </div>
       </div>
-      <div clas>
+      <div>
 
       <button
       className="bg-violet-900/90 text-white font-bold py-2 px-4 mt-6 rounded hover:bg-violet-700"

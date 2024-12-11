@@ -202,7 +202,7 @@ class TournamentConsumer(AsyncWebsocketConsumer):
         await self.send(bytes_data=f_arr)
     
     async def joined_competitor(self, event):
-        comp_info = self.p_holder.competitor.get_allroom_info()
+        comp_info = self.competitor.get_allroom_info()
         await self.send(text_data=json.dumps({
             "type" : "room",
             "competitors" : comp_info,
@@ -386,6 +386,7 @@ class TournamentConsumer(AsyncWebsocketConsumer):
                 raise AliasAlreadyUsed
             TournamentConsumer.rm.aliases.add(alias)
             self.alias = alias
+            self.competitor.alias = alias
             await self.send(text_data=json.dumps({
                 'type' : 'alias',
                 'accepted' : True
