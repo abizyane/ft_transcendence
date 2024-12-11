@@ -392,6 +392,7 @@ class TournamentConsumer(AsyncWebsocketConsumer):
             }))
         except AliasException as e :
             await self.send(text_data=json.dumps({
+                'type' : 'alias',
                 'ErrorMsg' : str(e)
             }))
     
