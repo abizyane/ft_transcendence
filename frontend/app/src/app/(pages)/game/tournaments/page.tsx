@@ -34,8 +34,10 @@ const Page = () => {
   const [players, setPlayers] = useState(defaultUsers)
 
   const handleRoomUpdate = (users)=> {
-    const nextUserList = defaultUsers.map(user => 
-        users.find( (u) => (u.id === user.id) ? u : user))
+    const nextUserList = defaultUsers.map((defuser) => {
+      const newUser = users.find(u => u.id === defuser.id);
+      return newUser ? {...defuser, ...newUser} : defuser
+    })
     setPlayers(nextUserList)
   }
 
@@ -239,7 +241,7 @@ const Page = () => {
               alt="Player 1"
               className="w-14 h-14 md:w-16 md:h-16 lg:w-16 lg:h-16  xl:w-20 xl:h-20 object-cover rounded-full shadow-lg"
               />
-            <span className="text-white text-sm lg:text-base mt-2">Player 1</span>
+            <span className="text-white text-sm lg:text-base mt-2">{players[0].username}</span>
           </div>
           <div className="flex flex-col items-center lg:mt-[190px]">
             <img
@@ -247,7 +249,7 @@ const Page = () => {
               alt="Player 2"
               className="w-14 h-14 md:w-16 md:h-16 lg:w-16 lg:h-16 xl:w-20 xl:h-20 object-cover rounded-full shadow-lg"
               />
-            <span className="text-white text-sm lg:text-base mt-2">Player 2</span>
+            <span className="text-white text-sm lg:text-base mt-2">{players[1].username}</span>
           </div>
         </div>
 
@@ -315,7 +317,7 @@ const Page = () => {
               alt="Player 3"
               className="w-14 h-14 md:w-16 md:h-16 lg:w-16 lg:h-16 xl:w-20 xl:h-20 object-cover rounded-full shadow-lg"
               />
-            <span className="text-white text-sm lg:text-base mt-2">Player 3</span>
+            <span className="text-white text-sm lg:text-base mt-2">{players[2].username}</span>
           </div>
           <div className="flex flex-col items-center lg:mt-[190px]">
             <img
@@ -323,7 +325,7 @@ const Page = () => {
               alt="Player 4"
               className="w-14 h-14 md:w-16 md:h-16 lg:w-16 lg:h-16 xl:w-20 xl:h-20 object-cover rounded-full shadow-lg"
               />
-            <span className="text-white text-sm lg:text-base mt-2">Player 4</span>
+            <span className="text-white text-sm lg:text-base mt-2">{players[3].username}</span>
           </div>
         </div>
       </div>
