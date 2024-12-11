@@ -24,6 +24,29 @@ const Page = () => {
   ]);
   const [tournamentMap, setTournamentMap] = useState(false);
 
+  //---------Tournament Map vars Start---------
+  const defaultUser = {
+    username: 'player',
+    img: '',
+    id: 0
+  }
+  const defaultUsers = (() => {
+    let users = [];
+    for (let i = 0; i < 4; i++)
+      users[i] = {...defaultUser, id:i, username:"player"+i.toString()}
+    return users  
+  })()
+
+  const [players, setPlayers] = useState(defaultUsers)
+
+  const handleRoomUpdate = (users)=> {
+    const nextUserList = defaultUsers.map(user => 
+        users.find( (u) => (u.id === user.id) ? u : user))
+    setPlayers(nextUserList)
+  }
+
+  //---------Tournament Map var END--------- 
+
   const defaObj = {
     name: 'Tournament', img: '/tournament1.jpg', size: 0 
   }
@@ -60,6 +83,11 @@ const Page = () => {
           setConfirmation(true)
         }else{
           console.error(received_data.ErrorMsg)
+        }
+      }
+      if (received_data.type === "room"){
+        if (received_data.command === "setCompetitors"){
+          handleRoomUpdate(received_data.competitors)
         }
       }
 
@@ -113,6 +141,7 @@ const Page = () => {
     console.log('Joining Tournament:', tournament);
     if (WebSocketRef.current && WebSocketRef.current.readyState === WebSocket.OPEN) {
       WebSocketRef.current.send(JSON.stringify(tournament));
+      setTournamentName(tournament.name)
       console.log('Data sent:', tournament);
     } else {
       console.error('WebSocket is not connected');
@@ -137,37 +166,11 @@ const Page = () => {
 
   // Tournament map component
   const TournamentMap = () => {
-    const defaultUser = {
-      username: 'player',
-      img: '',
-      id: 0
-    }
-    const defaultUsers = (() => {
-      let users = [];
-      for (let i = 0; i < 4; i++)
-        users[i] = {...defaultUser, id:i, username:"player"+i.toString()}
-      return users  
-    })()
-  
-    const [players, setPlayers] = useState(defaultUsers)
-
-    const handleRoomUpdate = (users)=> {
-      const nextUserList = defaultUsers.map(user => users.find( (u) => u.id === user.id) || user)
-      setPlayers(nextUserList)
-    }
-
-    useEffect(()=>{
-      WebSocketRef.current.onmessage = (e) => {
-        if (typeof e.data === "string"){
-          const data = JSON.parse(e.data);
-          if (data.type === "room"){
-            if (data.command === "setCompetitors"){
-              handleRoomUpdate(data.competitors)
-            }
-          }
-        }
-      }
-    }, [])
+      // "competitors": [
+      //   {"username": "",
+      //  "profile_pic_url": "",
+      //   "lost": false,
+      //   "id": 0},
 
     return (
       <div className="w-full h-full flex justify-center items-center">
