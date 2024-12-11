@@ -7,6 +7,8 @@ import Trophy from "../../../../../public/Trophy.png";
 import { useState, useEffect, useRef } from "react";
 import { IoAddCircleSharp } from "react-icons/io5";
 import { toast } from "react-hot-toast";
+import { isReadable } from "stream";
+import Canvas from "@/components/Canva/page";
 
 const Page = () => {
   const [confirmation, setConfirmation] = useState(false);
@@ -17,6 +19,7 @@ const Page = () => {
   const WebSocketRef = useRef(null);
   const [availableTournaments, setAvailableTournaments] = useState([]);
   const [tournamentMap, setTournamentMap] = useState(false);
+  const [ready, setReady] = useState(false)
 
   //---------Tournament Map vars Start---------
   const defaultUser = {
@@ -100,6 +103,13 @@ const Page = () => {
       if (received_data.type === "room"){
         if (received_data.command === "setCompetitors"){
           handleRoomUpdate(received_data.competitors)
+        }
+      }
+      if (received_data.type === "room") {
+        if (received_data.command === "setReady") {
+          setReady(true);
+        } else if (received_data.command === "wait") {
+          setReady(false);
         }
       }
 
@@ -302,6 +312,11 @@ const Page = () => {
 
       <button
       className="bg-violet-900/90 text-white font-bold py-2 px-4 mt-6 rounded hover:bg-violet-700"
+      onClick={(e)=>{
+        WebSocketRef.current.send(JSON.stringify({
+          command: 'play'
+        }))
+      }}
       >
       Play
     </button>
@@ -425,7 +440,13 @@ const Page = () => {
           </div>
         )
       ) : (
-        <TournamentMap />
+        ready ?<Canvas
+        socketRef={WebSocketRef}
+        setWinner={null}
+        setLooser={null}
+        callback={setReady}
+        scoreSetter={null}
+      ></Canvas> : <TournamentMap />
       )}
     </div>
   );
