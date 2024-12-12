@@ -40,6 +40,14 @@ class JWTAuthenticationMiddleware(MiddlewareMixin):
                 request.COOKIES['access'] = new_access_token
 
             except TokenError:
+                if request.COOKIES.get('isLoggedIn') is not None:
+                    request.COOKIES.pop('access')
+                    request.COOKIES.pop('refresh')
+                    request.COOKIES.pop('isLoggedIn')
                 request.user = AnonymousUser()
         else:
+            if request.COOKIES.get('isLoggedIn') is not None:
+                request.COOKIES.pop('access')
+                request.COOKIES.pop('refresh')
+                request.COOKIES.pop('isLoggedIn')
             request.user = AnonymousUser()

@@ -55,7 +55,7 @@ class Player:
         self.x = 0
         self.y = game.height/ 2
         self.color = ''
-        self.speed = 5
+        self.speed = 8
         self.isW = False
         self.isS = False
         self.isHiting = False
@@ -85,7 +85,7 @@ class Game:
         self.ball = Ball(self)
         self.blue = None
         self.red = None
-        self.max_score = 2
+        self.max_score = 4
 
     def is_full(self):
         if len(self.players) == 2:

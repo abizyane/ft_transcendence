@@ -41,18 +41,20 @@ class RoomManager(AbstractRoomManager):
     def __init__(self):
         self.rooms = []
     #Builder Call
-    def generate_room(self, _type) -> Room :
+    async def generate_room(self, _type, image_id, scope) -> Room :
         value:int = RoomType[_type].value
         if value == 1:
             return TwoPlayersRoom()
         elif value == 2:
-            return FourPlayersRoom()
+            room = FourPlayersRoom()
+            await room.set_image(image_id, scope)
+            return room
         else:
             raise ValueError("No such a type")
     
     #Room LifeTime
-    def create_room(self, _type) -> Room:
-        new_room = self.generate_room(_type);
+    async def create_room(self, _type, image_id, scope) -> Room:
+        new_room = await self.generate_room(_type, image_id, scope);
         self.rooms.append(new_room)
         return new_room
 
@@ -140,22 +142,22 @@ class RoomManagerNew(RoomManager):
         self.type_two_id += 1
         return room
 
-    def create_type_four_room(self, name):
+    async def create_type_four_room(self, name, image_id, scope):
         if not name:
             raise MustHaveName
         if name in self.type_four_name[4]:
             raise RoomNameAlreadyExist(name)
         self.type_four_name[4].add(name)
-        self.type_four[name] = self.generate_room(RM_TYPE[4])
+        self.type_four[name] = await self.generate_room(RM_TYPE[4], image_id, scope)
         self.type_four[name].name = name
         return self.type_four[name]
 
 
-    def create_room(self, _type:str, name):
+    async def create_room(self, _type:str, name, image_id, scope):
         if _type == RM_TYPE[2]:
             return self.create_type_two();
         elif _type == RM_TYPE[4] :
-            return self.create_type_four_room(name)
+            return await self.create_type_four_room(name, image_id, scope)
 
     def get_room(self, _type ,room_name):
         if not room_name :

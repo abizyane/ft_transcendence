@@ -1,3 +1,4 @@
+from game.models import TournamentPic
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.exceptions import AuthenticationFailed
@@ -16,6 +17,7 @@ from rest_framework.parsers import MultiPartParser, FormParser
 import pyotp
 import io
 import qrcode
+import re
 
 class UserView(APIView):
     permission_classes = [IsAuthenticated]
@@ -96,6 +98,7 @@ class UploadProfilePicView(APIView):
 
             return Response({"message": "Profile picture uploaded successfully", "profile_pic_url": request.build_absolute_uri(settings.MEDIA_URL + profile_pic_path)})
         return Response(serializer.errors, status=400)
+
 class UsersView(APIView):
     permission_classes = [IsAuthenticated]
 
@@ -137,4 +140,50 @@ class MFAView(APIView):
         print("session", request.session['2fa_verified'], flush=True)
         user.save()
         return Response({'message': 'MFA disabled successfully'}, status=200)
+    
+class GameCustomizationView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def validate_color(self, color):
+        if not color:
+            return False
+        color = color.lstrip('#')
+        if len(color) not in [6, 8]:
+            return False
+        try:
+            int(color, 16)
+            return True
+        except ValueError:
+            return False
+    
+    def get(self, request):
+        user = request.user
+        return Response({
+            'user_paddle_color': user.profile.user_paddle_color,
+            'opponent_paddle_color': user.profile.opponent_paddle_color,
+            'ball_color': user.profile.ball_color
+        }, status=200)
+    def post(self, request):
+        user = request.user
+        user_paddle_color = request.data.get('user_paddle_color')
+        opponent_paddle_color = request.data.get('opponent_paddle_color')
+        ball_color = request.data.get('ball_color')
+        if not user_paddle_color or not opponent_paddle_color or not ball_color:
+            return Response({'error': 'All fields are required'}, status=400)
+        if not self.validate_color(user_paddle_color):
+            return Response({'error': 'Invalid user paddle color'}, status=400)
+        if not self.validate_color(opponent_paddle_color):
+            return Response({'error': 'Invalid opponent paddle color'}, status=400)
+        if not self.validate_color(ball_color):
+            return Response({'error': 'Invalid ball color'}, status=400)
+        user.profile.user_paddle_color = user_paddle_color
+        user.profile.opponent_paddle_color = opponent_paddle_color
+        user.profile.ball_color = ball_color
+        user.profile.save()
+        return Response({'message': 'Game customization updated successfully'}, status=200)
         
+
+class PingView(APIView):
+    permission_classes = [IsAuthenticated]
+    def get(self, request):
+        return Response({'message': 'pong'}, status=200)

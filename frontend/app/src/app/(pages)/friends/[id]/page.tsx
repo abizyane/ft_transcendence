@@ -185,12 +185,14 @@ const Friends = () => {
             </div>
           </Link>
             <div className="ml-auto flex space-x-2 lg:space-x-4">
+             <Link href={`/chat/${friend.id}`}>
               <button
-                aria-label="Chat"
-                className="hover:text-blue-500 text-white transition-colors"
-              >
-                <IoChatbubbleEllipsesSharp className="w-6 h-6 text-blue-600 hover:text-blue-900" />
-              </button>
+                  aria-label="Chat"
+                  className="hover:text-blue-500 text-white transition-colors"
+                >
+                  <IoChatbubbleEllipsesSharp className="w-6 h-6 text-blue-600 hover:text-blue-900" />
+                </button>
+             </Link>
               <button
                 aria-label="Invite"
                 className="hover:text-red-500 text-white transition-colors"

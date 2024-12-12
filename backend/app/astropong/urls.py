@@ -1,13 +1,16 @@
 from django.contrib import admin
 from django.urls import path, include
+
+from .views.Tournament.TournamentView import GetTournamentView, JoinTournamentView, PublicTournamentView, CreateTournamentView, SetTournamentAliasView, UploadTournamentPicView, UpdateTournamentPicView
 from .views.auth.register import RegisterView
 from .views.auth.login import LoginView ,UserListView
 from .views.auth.logout import LogoutView
 from .views.auth.OAuth import OAuth, OAuthCallback
-from .views.auth.auth_user import UserView,MFAView, UsersView, ChangePasswordView, UserIdView, UploadProfilePicView
+from .views.auth.auth_user import UserView,MFAView, UsersView, ChangePasswordView, UserIdView, UploadProfilePicView,PingView
 from .views.auth.refresh import RefreshTokenView
 from .views.friends.friends import AddFriendView, ListFriendView, AcceptFriendRequestView, RemoveFriendView, RejectFriendRequestView,FriendsOfView, BlockFriendView,UnblockFriendView, BlockedUsersList
 from .views.dashboard.dashboard import GamesHistoryView, PlayerRanking, PlayerWinRateView, TopPlayersView, WeeklyStatsView, WeeklyXPView, DashboardView
+from .views.auth.auth_user import GameCustomizationView
 
 urlpatterns = [
     path('register', RegisterView.as_view(), name='register'),
@@ -44,4 +47,15 @@ urlpatterns = [
     path('weekly_stats', WeeklyStatsView.as_view(), name='weekly_stats'),
     path('weekly_experience', WeeklyXPView.as_view(), name='weekly_experience'),
     path('dashboard', DashboardView.as_view(), name='dashboard'),
+
+    path('public_tournament', PublicTournamentView.as_view(), name='public_tournament'),
+    path('create_tournament', CreateTournamentView.as_view(), name='create_tournament'),
+    path('join_tournament', JoinTournamentView.as_view(), name='join_tournament'),
+    path('get_tournament/<int:tournament_id>', GetTournamentView.as_view(), name='get_tournament'),
+    path('set_tournament_alias', SetTournamentAliasView.as_view(), name='set_tournament_alias'),
+    path('upload_tournament_pic', UploadTournamentPicView.as_view(), name='upload_tournament_pic'),
+    path('update_tournament_pic', UpdateTournamentPicView.as_view(), name='update_tournament_pic'),
+    path('game_customization', GameCustomizationView.as_view(), name='game_customization'),
+    path('ping', PingView.as_view(), name='ping'),
 ]
+    

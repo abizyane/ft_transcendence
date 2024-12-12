@@ -42,7 +42,7 @@ class Competitor(AbstractCompetitor):
             self.joined = True
             return room
         except RoomRestriction as e:
-            raise
+            raise e
 
     def exit_room(self, room:Room) -> None:
         try :
@@ -85,11 +85,13 @@ class CompetitorNamed(Competitor):
     def __init__(self, name):
         super().__init__(name)
 
-    def create_room(self, rm:AbstractRoomManager, _type:str, name:str=None):
+    async def create_room(self, rm:AbstractRoomManager, _type:str, name:str=None, image_id:int=None, scope=None):
         try :
             if self.joined :
                 raise AlredyJoined(self.name, self.room.name)
-            self.room = rm.create_room(_type, name)
+            self.room = await rm.create_room(_type, name, image_id, scope)
+            if image_id and scope:
+                await self.room.set_image(image_id, scope)
             return self.room
         except Exception as e:
            raise e 

@@ -94,7 +94,7 @@ class ChatRoomConsumer(AsyncWebsocketConsumer):
             }
         )
 
-        await self.send_notification(self.sender, self.receiver) 
+        await self.send_notification(self.sender, self.receiver, text_data_json['message']) 
 
     async def handle_typing(self):
         await self.channel_layer.group_send(
@@ -166,12 +166,25 @@ class ChatRoomConsumer(AsyncWebsocketConsumer):
             'receiver': event['receiver'],
         }))
 
-    async def send_notification(self, sender, receiver):
+    async def user_status(self, event):
+        receiver = event['receiver']
+        # if receiver != self.scope['user'].username:
+        #     return
+
+        await self.send(text_data=json.dumps({
+            'type': 'user_status',
+            'username': receiver,
+            'user_id': event['user_id'],
+            'is_online': event['is_online']
+        }))
+
+    async def send_notification(self, sender, receiver, message):
+        print("sending notification", sender.username, receiver.username, flush=True)
         await self.channel_layer.group_send(
-            'notifications_' + receiver.username,
+            'notifications_'+receiver.username,
             {
                 'type': 'notification',
-                'content': f'New message from {sender.username}',
+                'content': f'New message from {sender.username}\n{message}',
                 'receiver': receiver.username,
                 'notification_type': 'chat_message',
             }

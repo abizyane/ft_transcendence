@@ -1,6 +1,7 @@
 "use client"
 import { useEffect, useState,useRef } from "react"
 import Game_Front from "./gameFront"
+import { useGame, GameContextType } from "@/services/context/gameContext";
 
 class ScoreBoard{
     constructor(game, setScores){
@@ -36,7 +37,7 @@ class ScoreBoard{
 }
 
 class Ball {
-    constructor(game){
+    constructor(game, color){
         this.game = game
         this.rad = 5
         this.posX = game.width / 2
@@ -45,12 +46,13 @@ class Ball {
         this.angle = 45
         this.dirX = Math.cos(this.angle)
         this.dirY = Math.sin(this.angle)
+        this.color = color
     }
     draw(ctx){
       ctx.beginPath();
       ctx.arc(this.posX, this.posY, this.rad , 0,  Math.PI * 2, 1);
-      ctx.fillStyle = `rgb(255,255,255,0.5)`;
-      ctx.strokeStyle = "white";
+      ctx.fillStyle = this.color;
+      ctx.strokeStyle = this.color;
       ctx.fill();
       ctx.stroke();
       ctx.closePath();
@@ -101,7 +103,7 @@ class Ball {
 }
 
 class Paddle{
-  constructor(game){
+  constructor(game, color){
       this.game = game;
       this.canvas = game.canvas;
       this.width =  2; 
@@ -111,8 +113,8 @@ class Paddle{
       this.posY = this.canvas.height/2 - this.height / 2;
       this.speed = 10;
       this.isHitting = false
-      this.color = "red"
-      this.rgb = [0,0,0]
+      this.color = color 
+      this.rgb = color
       this.offsetX = 10
   }
   drawRect(ctx){
@@ -122,18 +124,18 @@ class Paddle{
   draw(ctx){
       ctx.fillStyle = this.color;
       ctx.save()
-      ctx.shadowColor = "rgb("+this.rgb[0]+","+this.rgb[1]+","+this.rgb[2]+")";
+      ctx.shadowColor = this.color;
       ctx.shadowBlur = 10;
-      ctx.strokeStyle= "rgba("+this.rgb[0]+","+this.rgb[1]+","+this.rgb[2]+",0.2)";
+      ctx.strokeStyle= this.color;
       ctx.lineWidth=7.5;
       this.drawRect(ctx);
-      ctx.strokeStyle= "rgba("+this.rgb[0]+","+this.rgb[1]+","+this.rgb[2]+",0.2)";
+      ctx.strokeStyle= this.color;
       ctx.lineWidth=6;
       this.drawRect(ctx);
-      ctx.strokeStyle= "rgba("+this.rgb[0]+","+this.rgb[1]+","+this.rgb[2]+",0.2)";
+      ctx.strokeStyle= this.color;
       ctx.lineWidth=4.5;
       this.drawRect(ctx);
-      ctx.strokeStyle= "rgba("+this.rgb[0]+","+this.rgb[1]+","+this.rgb[2]+",0.2)";
+      ctx.strokeStyle= this.color;
       ctx.lineWidth=3;
       this.drawRect(ctx);
       ctx.strokeStyle= '#fff';
@@ -145,13 +147,13 @@ class Paddle{
 
 class Enemy extends Paddle
 {
-    constructor(game)
+    constructor(game, color)
     {
-      super(game)
+      super(game, color)
       this.posX= this.canvas.width - this.offsetX - this.width;
       this.posY = this.canvas.height/2 - this.height / 2;
-      this.color = "red"
-      this.rgb = [255,0,0]
+      this.color = color
+      this.rgb = color
     }
     update(ball)
     {
@@ -168,14 +170,14 @@ class Enemy extends Paddle
 
 class Player extends Paddle
 {
-    constructor(game)
+    constructor(game, color)
     {
-      super(game)
+      super(game, color)
       this.posX=this.offsetX;
       this.posY = this.canvas.height/2 - this.height / 2;
       this.speed = 10;
-      this.color = "blue"
-      this.rgb = [0,0,255]
+      this.color = color
+      this.rgb = color
     }
   
     update()
@@ -191,13 +193,13 @@ class Player extends Paddle
 }
 
 class Game{
-    constructor(canvas,setScores){
+    constructor(canvas,setScores, gameCustomization : GameContextType){
       this.width = canvas.width;
       this.height = canvas.height;
       this.canvas= canvas;
-      this.player = new Player(this);
-      this.enemy = new Enemy(this);
-      this.ball = new Ball(this);
+      this.player = new Player(this, gameCustomization.user_paddle_color);
+      this.enemy = new Enemy(this, gameCustomization.opponent_paddle_color);
+      this.ball = new Ball(this, gameCustomization.ball_color);
       this.scoreBoard = new ScoreBoard(this,setScores);
       this.keyUp = 0;
       this.keyDown = 0;
@@ -254,6 +256,7 @@ class Game{
   export default function Localcanva ({scoreSetter}){
     const CanvasRef = useRef(null)
     const Context = useRef(null)
+    const {gameCustomization} = useGame();
     useEffect(()=>{
         Context.current = CanvasRef.current.getContext("2d")
         CanvasRef.current.width = 560;
@@ -261,7 +264,7 @@ class Game{
     }, [])
     
     useEffect(()=>{
-        let game = new Game(CanvasRef.current,scoreSetter);
+        let game = new Game(CanvasRef.current,scoreSetter, gameCustomization);
         game.render(Context.current)
         function animate(){
             if (CanvasRef.current){

@@ -15,6 +15,20 @@ from enum import Enum
 from ..models import Profile, GameModel, Scores, TournamentModel
 from .room_restrict import RoomRestriction, RoomIsEmpty
 from .alias_restrict import AliasException, NoAlias, AliasAlreadyUsed
+from astropong.serializers.UserSerializer import UserSerializer
+
+def is_image_url(url):
+    return url.startswith("http")
+
+def build_absolute_image_uri(scope, relative_path):
+    host = dict(scope['headers']).get(b'host', b'localhost').decode('utf-8')
+    scheme = scope.get('scheme', 'http')
+    base_url = f"{scheme}://{host}"
+    if relative_path is None:
+        return urljoin(base_url, settings.MEDIA_URL + "Profil.jpg")
+    if is_image_url(relative_path):
+        return relative_path
+    return urljoin(base_url,settings.MEDIA_URL + relative_path)
 
 class Command(Enum):
     CREATE = 1
@@ -24,6 +38,7 @@ class Command(Enum):
     JOINRANDOM = 5
     PLAY = 6
     ALIAS = 7
+    SETIMAGE = 8
 
 class TournamentConsumer(AsyncWebsocketConsumer):
     rm = RoomManagerNew()
@@ -38,9 +53,27 @@ class TournamentConsumer(AsyncWebsocketConsumer):
     async def connect(self):
         self.user = None
         self.alias = None
-        # user = self.scope['user']
+        user = self.scope['user']
+        if user.is_anonymous or not user.is_authenticated:
+            await self.accept()
+            await self.send(text_data=json.dumps({
+                "msg" : f"{user} is not authenticated.",
+                "type" : "error"
+            }))
+            await self.close()
+            return
+        
+        # if user.username in TournamentConsumer.connected_users :
+        #     await self.accept()
+        #     await self.send(text_data=json.dumps({
+        #         "msg" : f"{user} user already connected.",
+        #         "type" : "error"
+        #     }))
+        #     await self.close()
+        #     return
         await self.accept()
         self.p_holder = PlayerHolder(CompetitorNamed(self.channel_name))
+        self.set_competitor_info(username=user.username, img=build_absolute_image_uri(self.scope, user.profile_pic), userId=user.id)
         self.competitor = self.p_holder.competitor
         self._type = self.scope['url_route']['kwargs']['competition_type']
         if self._type == "FOUR" :
@@ -48,6 +81,7 @@ class TournamentConsumer(AsyncWebsocketConsumer):
             await self.channel_layer.group_send("FOUR", {
                 'type' : 'broadcast.allrooms.state'
             })
+        self.user = user
         self.room:Room = None
         self.match = None
         self.match_name = ''
@@ -128,7 +162,7 @@ class TournamentConsumer(AsyncWebsocketConsumer):
         if self.p_holder.is_won():
             await self.save_game()
 
-            await self.award_xp(True)
+            # await self.award_xp(True)
 
             await self.send(text_data=json.dumps({
                 'msg': 'You Won'
@@ -163,7 +197,7 @@ class TournamentConsumer(AsyncWebsocketConsumer):
                 }))
         else:
             # self.p_holder.paddle = None
-            await self.award_xp(False)
+            # await self.award_xp(False)
 
             await self.send(text_data=json.dumps({
                 'msg': 'You Lost'
@@ -176,7 +210,7 @@ class TournamentConsumer(AsyncWebsocketConsumer):
         await self.send(text_data=json.dumps({
             'type' : 'room',
             'command' : 'wait',
-            'competitorsInfo' : self.p_holder.competitor.get_allroom_info()
+            'competitors' : self.p_holder.competitor.get_allroom_info()
         }))
 
     async def newgame_request(self, event):
@@ -216,7 +250,7 @@ class TournamentConsumer(AsyncWebsocketConsumer):
         if self.user:
             TournamentConsumer.connected_users.remove(self.user.username)
         if self.room:
-            if  self.room.is_ready():
+            if  self.room.started :
                 #set other player to winner
                 if self.match and self.match.is_ready():
                     try:
@@ -248,6 +282,7 @@ class TournamentConsumer(AsyncWebsocketConsumer):
     
     def command_switch(self,command) -> int:
         return (Command.CREATE.value * int(command == "create") + 
+                Command.SETIMAGE.value * int(command == "set_image") +
                 Command.JOIN.value * int(command == "join") +
                 Command.LEAVE.value * int(command == "leave") +
                 Command.INPUT.value * int(command == "input") +
@@ -259,7 +294,7 @@ class TournamentConsumer(AsyncWebsocketConsumer):
     async def create_room(self,data):
         name = data.get('roomName')
         try :
-            self.room = self.competitor.create_room(TournamentConsumer.rm, _type=self._type, name=name)
+            self.room = await self.competitor.create_room(TournamentConsumer.rm, _type=self._type, name=name, image_id=data.get('roomImage', None), scope=self.scope)
             self.competitor.join_room(self.room)
             await self.channel_layer.group_add(name, self.channel_name)
             await self.send(text_data=json.dumps({
@@ -273,6 +308,7 @@ class TournamentConsumer(AsyncWebsocketConsumer):
                 })
                 await self.send(text_data=json.dumps({
                     'approving' : True,
+                    'room' : self.room.get_data()
                 }))
                 await self.channel_layer.group_send(self.room.name, {
                 'type' : 'joined.competitor'
@@ -342,6 +378,7 @@ class TournamentConsumer(AsyncWebsocketConsumer):
                 })
                 await self.send(text_data=json.dumps({
                     'approving' : True,
+                    'room' : self.room.get_data()
                 })) 
             # await self.channel_layer.group_send(self.room.name,{
             #     'type' : 'broadcast.room.state'
@@ -368,6 +405,7 @@ class TournamentConsumer(AsyncWebsocketConsumer):
             self.room.holder = MatchTreeBuilder.build_tree(MatchHolder(),0, 1, competitors_gen, self.room.size)
             MatchTreeBuilder.visualize_tree(holder=self.room.holder, lvl=0, size=self.room.size)
             self.room.tournament.p_holders = self.room.p_holders
+            self.room.started = True
             await self.channel_layer.group_send(self.room.name, {
                 "type" : "init.game",
             })
@@ -400,6 +438,15 @@ class TournamentConsumer(AsyncWebsocketConsumer):
                 'ErrorMsg' : str(e)
             }))
     
+    async def set_image(self, recv_data, scope):
+        image_id = recv_data.get('image_id')
+        if self.room:
+            self.room.set_image(image_id, scope)
+        else :
+            await self.send(text_data=json.dumps({
+                'ErrorMsg' : "You are not in a room"
+            }))
+    
     async def receive(self, text_data):
         recv_data = json.loads(text_data)
         command = recv_data.get('command')
@@ -408,6 +455,8 @@ class TournamentConsumer(AsyncWebsocketConsumer):
             case Command.CREATE.value :
                 print(command, flush=True)
                 await self.create_room(recv_data)
+            case Command.SETIMAGE.value :
+                await self.set_image(recv_data, self.scope)
             
             case Command.JOIN.value :
                 await self.join_room(recv_data)

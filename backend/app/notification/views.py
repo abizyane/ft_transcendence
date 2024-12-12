@@ -5,14 +5,20 @@ from django.http import Http404
 from rest_framework.pagination import PageNumberPagination
 from astropong.models.UserModel import User
 from rest_framework import viewsets
+from rest_framework.permissions import IsAuthenticated
+from .serializers import NotificationSerializer
+
 
 class NotificationPageNumberPagination(PageNumberPagination):
     page_size = 4
 
 class NotificationListView(views.APIView):
-    def get_notifications(self, request, username):
+    permission_classes = [IsAuthenticated]
+
+
+    def get_notifications(self, request):
         try:
-            user = User.objects.get(username=username)
+            user = request.user
         except User.DoesNotExist:
             raise Http404("User not found.")
 
@@ -22,24 +28,38 @@ class NotificationListView(views.APIView):
         serializer = NotificationSerializer(context, many=True)
         return paginator.get_paginated_response(serializer.data)
 
-    def get(self, request, username):
+    def get(self, request):
         try :
-            paginated_response = self.get_notifications(request, username)
-            notifications = paginated_response.data.get('results', [])
-            if not notifications:
-                return Response({'error': 'No notifications found for the specified user.'}, status=404)
-            return Response({
-                'notifications': notifications,
-                'next': paginated_response.data.get('next'),
-                'previous': paginated_response.data.get('previous')
-            })
+            user = request.user
+            # paginated_response = self.get_notifications(request)
+            notifications = Notifications.objects.filter(user=user).order_by('-timestamp')
+            return Response(NotificationSerializer(notifications, many=True).data, status=200)
+            # notifications = paginated_response.data.get('results', [])
+            # if not notifications:
+            #     return Response({'error': 'No notifications found for the specified user.'}, status=404)
+            # return Response({
+            #     'notifications': notifications,
+            #     'next': paginated_response.data.get('next'),
+            #     'previous': paginated_response.data.get('previous')
+            # })
         except Http404 as e:
             return Response({'error': str(e)}, status=404)
 
+class UpdateAllNotificationsView(views.APIView):
+    permission_classes = [IsAuthenticated]
+    def post(self, request):
+        user = request.user
+        notifications = Notifications.objects.filter(user=user)
+        for notification in notifications:
+            notification.seen = True
+            notification.save()
+        return Response({'message': 'All notifications marked as seen.'}, status=200)
+
 class NotificationUpdateView(views.APIView):
-    def put(self, request, username, notification_id=None):
+    permission_classes = [IsAuthenticated]
+    def put(self, request, notification_id=None):
         try:
-            user = User.objects.get(username=username)
+            user = request.user
         except User.DoesNotExist:
             raise Http404("User not found.")
         

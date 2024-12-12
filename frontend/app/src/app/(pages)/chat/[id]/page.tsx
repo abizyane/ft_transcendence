@@ -185,7 +185,7 @@ useEffect(() => {
                 </div> : <></>}
           </div>
 
-          <div className="h-fit">
+        {currentChat.user.relationship && currentChat.user.relationship === "Friend" ? <><div className="h-fit">
             <div className="relative flex-grow">
               <label className="flex items-center">
                 <input
@@ -205,7 +205,8 @@ useEffect(() => {
                 </button>
               </label>
             </div>
-          </div>
+          </div></> : <>
+          </>}
         </section>
       </main>
     </div>

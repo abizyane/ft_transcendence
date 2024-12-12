@@ -75,6 +75,7 @@ class OAuthCallback(APIView):
         
         response.set_cookie(key='refresh', value=str(refresh),samesite='None', httponly=True, secure=True)
         response.set_cookie(key='access', value=str(refresh.access_token),samesite='None', httponly=True, secure=True)
+        response.set_cookie(key='isLoggedIn', value=str(True), httponly=False, secure=True)
         if user_instance.mfa_enabled:
             response.status_code = 403
             request.session['2fa_verified'] = False
