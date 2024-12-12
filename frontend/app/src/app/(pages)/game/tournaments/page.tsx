@@ -7,6 +7,8 @@ import Trophy from "../../../../../public/Trophy.png";
 import { useState, useEffect, useRef } from "react";
 import { IoAddCircleSharp } from "react-icons/io5";
 import { toast } from "react-hot-toast";
+import Canvas from "@/components/Canva/page";
+import Mars from "../../../../../public/Mars.jpeg";
 
 const Page = () => {
   const [confirmation, setConfirmation] = useState(false);
@@ -17,6 +19,12 @@ const Page = () => {
   const WebSocketRef = useRef(null);
   const [availableTournaments, setAvailableTournaments] = useState([]);
   const [tournamentMap, setTournamentMap] = useState(false);
+  const [inGame, setInGame] = useState(false);
+  const socketRef = useRef(null);
+  const [scores, setScores] = useState({ one: 0, two: 0 });
+  const [winner, setWinner] = useState(false);
+  const [looser, setLooser] = useState(false);
+  const [gameready, setReady] = useState(false);
   const [creationImageid, setCreationImageid] = useState(-1);
 
   const defaObj = {
@@ -39,11 +47,9 @@ const Page = () => {
       ...room,
       img: "/tournament1.jpg",
     })) || [];
-    
     console.log(rooms);
     console.log(availableTournaments);
-
-      setAvailableTournaments(rooms);
+    setAvailableTournaments(rooms);
   };
 
   useEffect(() => {
@@ -163,6 +169,7 @@ const Page = () => {
     }
   };
 
+
   const handleAlias = () => {
     const command = "setAlias";
     const data = {
@@ -183,8 +190,82 @@ const Page = () => {
     setAlias("");
   };
 
+
+  const handleStartGame = () => {
+    setInGame(true);
+  };
+
+  const handleMatchEnd = () => {
+    setInGame(false);
+  };
+
+  const RenderCanvas = () => {
+    return (
+      <div className="w-full h-full flex items-center justify-center">
+
+      <div className="max-w-[1200px] w-full h-fit flex flex-col items-center justify-between p-2">
+      <div className="max-w-[1200px] w-full  h-fit border-violet-primary backdrop-blur-lg border-2 p-2 rounded-lg flex flex-col mb-24 lg:mb-0">
+        <div className="flex justify-between items-center w-full bg-transparent p-2 rounded-lg mb-2">
+          <div className="flex items-center space-x-2 bg-gray-700 p-1 lg:p-3 rounded-full w-36 lg:w-1/3 lg:h-14 justify-center lg:justify-start">
+            <img
+              src={Mars.src}
+              alt="First User"
+              width={30}
+              height={30}
+              className="rounded-full"
+              />
+            <div className="text-white">
+              {/* <div className="text-xs font-bold">{users[0].username}</div> */}
+            </div>
+          </div>
+          <div className="flex items-center space-x-2 m-2">
+            <div className="text-xl lg:text-3xl text-white font-bold">
+              {scores.one}
+            </div>
+            <span className="text-xl lg:text-3xl text-white">:</span>
+            <div className="text-xl lg:text-3xl text-white font-bold">
+              {scores.two}
+            </div>
+          </div>
+          <div className="flex items-center space-x-2 bg-gray-700 p-1 lg:p-3 rounded-full w-36 lg:w-1/3 lg:h-14 justify-center lg:justify-end">
+            <div className="text-white">
+              <div className="text-xs font-bold text-right">
+                {/* {users[1].username} */}
+              </div>
+            </div>
+            <img
+              src={Mars.src}
+              alt="Second User"
+              width={30}
+              height={30}
+              className="rounded-full"
+              />
+          </div>
+        </div>
+        <div
+          className=" w-full h-full flex items-center justify-center border-4 object-cover border-white rounded-lg relative"
+          style={{
+            backgroundImage: `url('/Mars.jpeg')`,
+            backgroundSize: "cover",
+            backgroundPosition: "center",
+            opacity: 0.7,
+          }}
+          >
+          <Canvas
+            socketRef={socketRef}
+            setWinner={setWinner}
+            setLooser={setLooser}
+            callback={setReady}
+            scoreSetter={setScores}
+            ></Canvas>
+        </div>
+      </div>
+    </div>
+   </div>
+    )};
+
   // Tournament map component
-  const TournamentMap = () => {
+  const TournamentMap = ({ onPlay }: { onPlay: () => void }) => {
     const defaultUser = {
       username: "player",
       img: "",
@@ -217,6 +298,8 @@ const Page = () => {
         }
       };
     }, []);
+
+
 
     return (
       <div className="w-full h-full flex justify-center items-center">
@@ -329,14 +412,12 @@ const Page = () => {
           </div>
         </div>
       </div>
-      <div>
 
       <button
-        className="bg-violet-900/90 text-white font-bold py-2 px-4 mt-6 rounded hover:bg-violet-700"
-        >
-        Play
-      </button>
-      </div>
+      className="bg-violet-900/90 text-white font-bold py-2 px-4 mt-6 rounded hover:bg-violet-700"
+      >
+      Play
+    </button>
     </div>
     </div>
     );
@@ -344,7 +425,8 @@ const Page = () => {
 
   return (
     <div className="flex flex-col justify-start items-center px-4 w-full h-full py-8">
-      {!tournamentMap ? (
+      {
+      !tournamentMap ? (
         !confirmation ? (
           <div className="bg-gray-700/50 shadow-lg border border-violet-primary max-w-lg w-full p-6 rounded-lg mb-8">
             <h1 className="text-xl text-white font-semibold text-center">
@@ -455,8 +537,10 @@ const Page = () => {
             </div>
           </div>
         )
+      ) : inGame ? (
+        <RenderCanvas onMatchEnd={handleMatchEnd} />
       ) : (
-        <TournamentMap />
+        <TournamentMap onPlay={handleStartGame} />
       )}
     </div>
   );
