@@ -1,6 +1,11 @@
-from abc import ABC, abstractmethod 
+from abc import ABC, abstractmethod
+
+from urllib.parse import urljoin
+from django.conf import settings
+from ..models import TournamentPic 
 from .tournament import Tournament
 from .room_restrict import RoomIsFull, AlredyJoined, RoomIsEmpty
+from channels.db import database_sync_to_async
 
 class RoomAbstract(ABC):
     @abstractmethod
@@ -24,6 +29,13 @@ class RoomAbstract(ABC):
         pass
 
     pass
+def build_absolute_image_uri(scope, relative_path):
+    host = dict(scope['headers']).get(b'host', b'localhost').decode('utf-8')
+    scheme = scope.get('scheme', 'http')
+    base_url = f"{scheme}://{host}"
+    if relative_path is None:
+        return urljoin(base_url, settings.MEDIA_URL + "Profil.jpg")
+    return urljoin(base_url, settings.MEDIA_URL + relative_path)
 
 class Room(RoomAbstract):
     def __init__(self, size):
@@ -35,7 +47,23 @@ class Room(RoomAbstract):
         self.holder = None
         self.ready = False
         self.started = False
+        self.imageModel = None
+        self.imageUrl = None
         self.tournament = Tournament()
+    @database_sync_to_async
+    def set_image(self, image_id, scope=None):
+        try:
+            picture = TournamentPic.objects.get(id=image_id)
+            self.imageModel = picture
+            if self.imageModel:
+                self.imageUrl = build_absolute_image_uri(scope, picture.picture)
+                print("Image setted to ",self.imageUrl, flush=True)
+        except Exception as e:
+            print(e, flush=True)
+            print("Image not found", flush=True)
+
+    def get_image(self):
+        return self.imageUrl
 
     def add_player(self, Player) -> RoomAbstract :
         if self.ready :
@@ -70,7 +98,9 @@ class Room(RoomAbstract):
         return dict({
             "name" : self.name,
             "size": self.competitors_count(),
-            "started" : self.started
+            "started" : self.started,
+            "img" : self.imageUrl,
+            "competitors" : [competitor.get_info() for competitor in self.competitors]
         })
 
 class TwoPlayersRoom(Room):

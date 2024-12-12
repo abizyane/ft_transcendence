@@ -59,10 +59,6 @@ const ProfileSettings = () => {
     </div>
   );
 
-  const onSubmit = (data: any) => {
-    console.log("Form Data:", data);
-    console.log("Profile Image:", profileImage);
-  };
 
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];

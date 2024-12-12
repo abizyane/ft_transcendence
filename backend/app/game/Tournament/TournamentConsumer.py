@@ -17,13 +17,18 @@ from .room_restrict import RoomRestriction, RoomIsEmpty
 from .alias_restrict import AliasException, NoAlias, AliasAlreadyUsed
 from astropong.serializers.UserSerializer import UserSerializer
 
+def is_image_url(url):
+    return url.startswith("http")
+
 def build_absolute_image_uri(scope, relative_path):
     host = dict(scope['headers']).get(b'host', b'localhost').decode('utf-8')
     scheme = scope.get('scheme', 'http')
     base_url = f"{scheme}://{host}"
     if relative_path is None:
         return urljoin(base_url, settings.MEDIA_URL + "Profil.jpg")
-    return urljoin(base_url, relative_path)
+    if is_image_url(relative_path):
+        return relative_path
+    return urljoin(base_url,settings.MEDIA_URL + relative_path)
 
 class Command(Enum):
     CREATE = 1
@@ -33,6 +38,7 @@ class Command(Enum):
     JOINRANDOM = 5
     PLAY = 6
     ALIAS = 7
+    SETIMAGE = 8
 
 class TournamentConsumer(AsyncWebsocketConsumer):
     rm = RoomManagerNew()
@@ -204,7 +210,7 @@ class TournamentConsumer(AsyncWebsocketConsumer):
         await self.send(text_data=json.dumps({
             'type' : 'room',
             'command' : 'wait',
-            'competitorsInfo' : self.p_holder.competitor.get_allroom_info()
+            'competitors' : self.p_holder.competitor.get_allroom_info()
         }))
 
     async def newgame_request(self, event):
@@ -276,6 +282,7 @@ class TournamentConsumer(AsyncWebsocketConsumer):
     
     def command_switch(self,command) -> int:
         return (Command.CREATE.value * int(command == "create") + 
+                Command.SETIMAGE.value * int(command == "set_image") +
                 Command.JOIN.value * int(command == "join") +
                 Command.LEAVE.value * int(command == "leave") +
                 Command.INPUT.value * int(command == "input") +
@@ -287,7 +294,7 @@ class TournamentConsumer(AsyncWebsocketConsumer):
     async def create_room(self,data):
         name = data.get('roomName')
         try :
-            self.room = self.competitor.create_room(TournamentConsumer.rm, _type=self._type, name=name)
+            self.room = await self.competitor.create_room(TournamentConsumer.rm, _type=self._type, name=name, image_id=data.get('roomImage', None), scope=self.scope)
             self.competitor.join_room(self.room)
             await self.channel_layer.group_add(name, self.channel_name)
             await self.send(text_data=json.dumps({
@@ -301,6 +308,7 @@ class TournamentConsumer(AsyncWebsocketConsumer):
                 })
                 await self.send(text_data=json.dumps({
                     'approving' : True,
+                    'room' : self.room.get_data()
                 }))
         except RoomRestriction as e:
             await self.send(text_data=json.dumps({
@@ -367,6 +375,7 @@ class TournamentConsumer(AsyncWebsocketConsumer):
                 })
                 await self.send(text_data=json.dumps({
                     'approving' : True,
+                    'room' : self.room.get_data()
                 })) 
             # await self.channel_layer.group_send(self.room.name,{
             #     'type' : 'broadcast.room.state'
@@ -426,6 +435,15 @@ class TournamentConsumer(AsyncWebsocketConsumer):
                 'ErrorMsg' : str(e)
             }))
     
+    async def set_image(self, recv_data, scope):
+        image_id = recv_data.get('image_id')
+        if self.room:
+            self.room.set_image(image_id, scope)
+        else :
+            await self.send(text_data=json.dumps({
+                'ErrorMsg' : "You are not in a room"
+            }))
+    
     async def receive(self, text_data):
         recv_data = json.loads(text_data)
         command = recv_data.get('command')
@@ -434,6 +452,8 @@ class TournamentConsumer(AsyncWebsocketConsumer):
             case Command.CREATE.value :
                 print(command, flush=True)
                 await self.create_room(recv_data)
+            case Command.SETIMAGE.value :
+                await self.set_image(recv_data, self.scope)
             
             case Command.JOIN.value :
                 await self.join_room(recv_data)
