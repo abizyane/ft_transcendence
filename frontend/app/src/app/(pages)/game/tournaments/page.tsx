@@ -9,7 +9,7 @@ import { IoAddCircleSharp } from "react-icons/io5";
 import { toast } from "react-hot-toast";
 import Canvas from "@/components/Canva/page";
 import Mars from "../../../../../public/Mars.jpeg";
-
+ import Unknwon from "../../../../../public/Unknown_person.jpeg";
 const Page = () => {
   const [confirmation, setConfirmation] = useState(false);
   const [alias, setAlias] = useState("");
@@ -25,6 +25,32 @@ const Page = () => {
   const [winner, setWinner] = useState(false);
   const [looser, setLooser] = useState(false);
   const [gameready, setReady] = useState(false);
+
+  //---------Tournament Map vars Start---------
+  const defaultUser = {
+    alias: 'player',
+    img: '',
+    id: 0
+  }
+  const defaultUsers = (() => {
+    let users = [];
+    for (let i = 0; i < 4; i++)
+      users[i] = {...defaultUser, id:i, alias:"player"+i.toString()}
+    return users  
+  })()
+
+  const [players, setPlayers] = useState(defaultUsers)
+
+  const handleRoomUpdate = (users)=> {
+    console.log(users)
+    const nextUserList = defaultUsers.map((defuser) => {
+      const newUser = users.find(u => u.id === defuser.id);
+      return newUser ? {...defuser, ...newUser} : defuser
+    })
+    setPlayers(nextUserList)
+  }
+
+  //---------Tournament Map var END--------- 
 
   const defaObj = {
     name: "Tournament",
@@ -64,8 +90,9 @@ const Page = () => {
 
     WebSocketRef.current.onmessage = (event) => {
       console.log("Message from server:", event.data);
+      if (typeof event.data != "string")
+        return;
       const received_data = JSON.parse(event.data);
-
       if (received_data.type == "tournament_state")
         handleTournamentList(received_data);
       if (received_data.approving) setTournamentMap(received_data.approving);
@@ -77,6 +104,12 @@ const Page = () => {
           toast.error(received_data.ErrorMsg);
         }
       }
+      if (received_data.type === "room"){
+        if (received_data.command === "setCompetitors"){
+          handleRoomUpdate(received_data.competitors)
+        }
+      }
+
     };
 
     WebSocketRef.current.onerror = (error) => {
@@ -98,11 +131,18 @@ const Page = () => {
 
   const handleCreateTournament = (event) => {
     event.preventDefault();
+    if (!tournamentImage || !roomName) {
+      toast.error("Please fill in all fields.");
+      return;
+    }
     // if (!alias || !roomName) {
     //   alert("Please fill in all fields.");
     //   return;
     // }
-
+    if (roomName.length < 2 || roomName.length > 5) {
+      toast.error("Tournament name must be between 2 and 5 characters.");
+      return;
+    }
     const command = "create";
     // Prepare the data to send
     const roomData = {
@@ -132,7 +172,8 @@ const Page = () => {
       WebSocketRef.current.readyState === WebSocket.OPEN
     ) {
       WebSocketRef.current.send(JSON.stringify(tournament));
-      console.log("Data sent:", tournament);
+      setTournamentName(tournament.name)
+      console.log('Data sent:', tournament);
     } else {
       console.error("WebSocket is not connected");
     }
@@ -140,6 +181,12 @@ const Page = () => {
 
 
   const handleAlias = () => {
+    if (alias.length < 2 || alias.length > 5)
+      {
+        toast.error("Alias must be between 2 and 4 characters");
+        return;
+      }
+      
     const command = "setAlias";
     const data = {
       command,
@@ -161,6 +208,20 @@ const Page = () => {
 
 
   const handleStartGame = () => {
+    const command = 'play';
+    const data = {
+      command,
+    }
+    if (
+      WebSocketRef.current &&
+      WebSocketRef.current.readyState === WebSocket.OPEN
+    ) {
+      WebSocketRef.current.send(JSON.stringify(data));
+      console.log("Data send :", data);
+    } else {
+      console.error("Websocket is not connected");
+      console.log("Websocket is not connected");
+    }
     setInGame(true);
   };
 
@@ -184,7 +245,7 @@ const Page = () => {
               className="rounded-full"
               />
             <div className="text-white">
-              {/* <div className="text-xs font-bold">{users[0].username}</div> */}
+              <div className="text-xs font-bold">{players[0].alias}</div>
             </div>
           </div>
           <div className="flex items-center space-x-2 m-2">
@@ -199,7 +260,7 @@ const Page = () => {
           <div className="flex items-center space-x-2 bg-gray-700 p-1 lg:p-3 rounded-full w-36 lg:w-1/3 lg:h-14 justify-center lg:justify-end">
             <div className="text-white">
               <div className="text-xs font-bold text-right">
-                {/* {users[1].username} */}
+              {players[1].alias}
               </div>
             </div>
             <img
@@ -221,7 +282,7 @@ const Page = () => {
           }}
           >
           <Canvas
-            socketRef={socketRef}
+            socketRef={WebSocketRef}
             setWinner={setWinner}
             setLooser={setLooser}
             callback={setReady}
@@ -235,40 +296,6 @@ const Page = () => {
 
   // Tournament map component
   const TournamentMap = ({ onPlay }: { onPlay: () => void }) => {
-    const defaultUser = {
-      username: "player",
-      img: "",
-      id: 0,
-    };
-    const defaultUsers = (() => {
-      let users = [];
-      for (let i = 0; i < 4; i++)
-        users[i] = { ...defaultUser, id: i, username: "player" + i.toString() };
-      return users;
-    })();
-
-    const [players, setPlayers] = useState(defaultUsers);
-
-    const handleRoomUpdate = (users) => {
-      const nextUserList = defaultUsers.map(
-        (user) => users.find((u) => u.id === user.id) || user
-      );
-      setPlayers(nextUserList);
-    };
-    useEffect(() => {
-      WebSocketRef.current.onmessage = (e) => {
-        if (typeof e.data === "string") {
-          const data = JSON.parse(e.data);
-          if (data.type === "room") {
-            if (data.command === "setCompetitors") {
-              handleRoomUpdate(data.competitors);
-            }
-          }
-        }
-      };
-    }, []);
-
-
 
     return (
       <div className="w-full h-full flex justify-center items-center">
@@ -276,7 +303,7 @@ const Page = () => {
       <div className="mb-24 mt-6 lg:mb-0 lg:mt-0 bg-gray-800/50 border border-violet-primary rounded-xl text-center w-full lg:w-fit lg:p-4  p-4 flex flex-col">
       <div className="flex justify-center items-center mb-8 lg:mb-0 lg:ml-8">
         <img
-          src={Profil.src}
+          src={previewImage}
           alt="Tournament pic"
           className="object-cover w-14 h-14 lg:w-16 lg:h-16 xl:w-20 xl:h-20 rounded-full"
         />
@@ -289,19 +316,19 @@ const Page = () => {
         <div className="flex justify-around items-end w-full lg:flex lg:flex-col lg:items-end lg:w-24">
           <div className="flex flex-col items-center lg:mt-6 xl:mt-0">
             <img
-              src={Profil.src}
+              src={Unknwon.src||players[0].profile_pic_url}
               alt="Player 1"
               className="w-14 h-14 md:w-16 md:h-16 lg:w-16 lg:h-16  xl:w-20 xl:h-20 object-cover rounded-full shadow-lg"
               />
-            <span className="text-white text-sm lg:text-base mt-2">Player 1</span>
+            <span className="text-white text-sm lg:text-base mt-2">{players[0].alias}</span>
           </div>
           <div className="flex flex-col items-center lg:mt-[190px]">
             <img
-              src={Profil.src}
+              src={Unknwon.src||players[0].profile_pic_url}
               alt="Player 2"
               className="w-14 h-14 md:w-16 md:h-16 lg:w-16 lg:h-16 xl:w-20 xl:h-20 object-cover rounded-full shadow-lg"
               />
-            <span className="text-white text-sm lg:text-base mt-2">Player 2</span>
+            <span className="text-white text-sm lg:text-base mt-2">{players[1].alias}</span>
           </div>
         </div>
 
@@ -323,7 +350,7 @@ const Page = () => {
         <div className="flex flex-col justify-center items-center gap-8 lg:gap-2 lg:flex-row lg:mt-6">
           <div className="flex flex-col items-center ">
             <img
-              src={Profil.src}
+              src={Unknwon.src||players[0].profile_pic_url}
               alt="Finalist 1"
               className="w-14 h-14 md:w-16 md:h-16 lg:w-16 lg:h-16 xl:w-20 xl:h-20 object-cover rounded-full shadow-lg"
               />
@@ -339,7 +366,7 @@ const Page = () => {
           </div>
           <div className="flex flex-col items-center">
             <img
-              src={Profil.src}
+              src={Unknwon.src||players[0].profile_pic_url}
               alt="Finalist 2"
               className="w-14 h-14 md:w-16 md:h-16 lg:w-16 lg:h-16 xl:w-20 xl:h-20 z-50 object-cover rounded-full shadow-lg"
               />
@@ -365,19 +392,19 @@ const Page = () => {
         <div className="flex justify-around items-end w-full lg:flex lg:flex-col lg:items-start lg:w-24">
           <div className="flex flex-col items-center lg:mt-6 xl:mt-0">
             <img
-              src={Profil.src}
+              src={Unknwon.src||players[0].profile_pic_url}
               alt="Player 3"
               className="w-14 h-14 md:w-16 md:h-16 lg:w-16 lg:h-16 xl:w-20 xl:h-20 object-cover rounded-full shadow-lg"
               />
-            <span className="text-white text-sm lg:text-base mt-2">Player 3</span>
+            <span className="text-white text-sm lg:text-base mt-2">{players[2].alias}</span>
           </div>
           <div className="flex flex-col items-center lg:mt-[190px]">
             <img
-              src={Profil.src}
+              src={Unknwon.src||players[0].profile_pic_url}
               alt="Player 4"
               className="w-14 h-14 md:w-16 md:h-16 lg:w-16 lg:h-16 xl:w-20 xl:h-20 object-cover rounded-full shadow-lg"
               />
-            <span className="text-white text-sm lg:text-base mt-2">Player 4</span>
+            <span className="text-white text-sm lg:text-base mt-2">{players[3].alias}</span>
           </div>
         </div>
       </div>
