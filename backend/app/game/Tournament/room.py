@@ -43,6 +43,7 @@ class Room(RoomAbstract):
         self.size = size
         self.name = ''
         self.competitors = []
+        self.winners = []
         self.p_holders = {}
         self.holder = None
         self.ready = False
@@ -102,6 +103,11 @@ class Room(RoomAbstract):
             "img" : self.imageUrl,
             "competitors" : [competitor.get_info() for competitor in self.competitors]
         })
+    def get_winners_info(self):
+        res = []
+        for winner in self.winners:
+            res.append(winner.get_info())
+        return res
 
 class TwoPlayersRoom(Room):
     def __init__(self):
