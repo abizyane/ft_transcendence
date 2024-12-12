@@ -216,7 +216,7 @@ class TournamentConsumer(AsyncWebsocketConsumer):
         if self.user:
             TournamentConsumer.connected_users.remove(self.user.username)
         if self.room:
-            if  self.room.is_ready():
+            if  self.room.started :
                 #set other player to winner
                 if self.match and self.match.is_ready():
                     try:
@@ -365,6 +365,7 @@ class TournamentConsumer(AsyncWebsocketConsumer):
             self.room.holder = MatchTreeBuilder.build_tree(MatchHolder(),0, 1, competitors_gen, self.room.size)
             MatchTreeBuilder.visualize_tree(holder=self.room.holder, lvl=0, size=self.room.size)
             self.room.tournament.p_holders = self.room.p_holders
+            self.room.started = True
             await self.channel_layer.group_send(self.room.name, {
                 "type" : "init.game",
             })

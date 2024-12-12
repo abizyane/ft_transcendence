@@ -51,6 +51,7 @@ class Room(RoomAbstract):
 
     def remove_player(self, Player) -> None:
         self.competitors.remove(Player)
+        self.ready = False
         Player._id = -1
         self.competitor_id -= 1
         if (self.competitors_count() == 0):

@@ -3,11 +3,11 @@ class RoomRestriction(Exception):
             super().__init__(message)
         pass
 
-class RoomIsFull(Exception):
+class RoomIsFull(RoomRestriction):
         def __init__(self, message="Room Is Full"):
             super().__init__(message)
 
-class RoomIsEmpty(Exception):
+class RoomIsEmpty(RoomRestriction):
     def __init__(self,message="Room Is Empty" ):
         super().__init__(message)
     

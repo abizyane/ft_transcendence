@@ -42,7 +42,7 @@ class Competitor(AbstractCompetitor):
             self.joined = True
             return room
         except RoomRestriction as e:
-            raise
+            raise e
 
     def exit_room(self, room:Room) -> None:
         try :
