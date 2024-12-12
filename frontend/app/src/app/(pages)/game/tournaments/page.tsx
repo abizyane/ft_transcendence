@@ -4,7 +4,7 @@ import Profil from "../../../../../public/Profil.jpg";
 import Line from "../../../../../public/tournamentline.svg";
 import Line1 from "../../../../../public/tournementline2.svg";
 import Trophy from "../../../../../public/Trophy.png";
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { IoAddCircleSharp } from "react-icons/io5";
 import { toast } from "react-hot-toast";
 import Mars from "../../../../../public/Mars.jpeg";
@@ -304,6 +304,9 @@ const Page = () => {
   };
 
   const RenderCanvas = () => {
+    const updateScores = useCallback((newScores) => {
+      setScores((prev) => ({ ...prev, ...newScores }));
+    }, []);
     return (
       <div className="w-full h-full flex items-center justify-center">
 
@@ -359,8 +362,9 @@ const Page = () => {
                 socketRef={WebSocketRef}
                 setWinner={setWinner}
                 setLooser={setLooser}
-                callback={setGameReady}
-                scoreSetter={setScores}
+                callback={setReady}
+                scores={scores}
+                scoreSetter={updateScores}
               ></Canvas>
             </div>
           </div>
@@ -512,7 +516,7 @@ const Page = () => {
             <div className="flex justify-around items-end w-full lg:flex lg:flex-col lg:items-start lg:w-24">
               <div className="flex flex-col items-center lg:mt-6 xl:mt-0">
                 <img
-                  src={Profil.src}
+                  src={players[2].profile_pic_url}
                   alt="Player 3"
                   className="w-14 h-14 md:w-16 md:h-16 lg:w-16 lg:h-16 xl:w-20 xl:h-20 object-cover rounded-full shadow-lg"
                 />
@@ -657,18 +661,11 @@ const Page = () => {
               </div>
             </div>
           )
-        ) : inGame ? (
+        ) : ready ? (
           <RenderCanvas onMatchEnd={handleMatchEnd} />
-        ) : (
-          ready ? <Canvas
-            socketRef={WebSocketRef}
-            setWinner={null}
-            setLooser={null}
-            callback={setReady}
-            scoreSetter={null}
-          ></Canvas> : 
+        ) : 
                 <TournamentMap onPlay={handleStartGame} />
-        )}
+        }
     </div>
   );
 };
