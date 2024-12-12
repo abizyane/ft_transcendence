@@ -8,6 +8,7 @@ import { useState, useEffect, useRef } from "react";
 import { IoAddCircleSharp } from "react-icons/io5";
 import { toast } from "react-hot-toast";
 import Mars from "../../../../../public/Mars.jpeg";
+import Unknwon from "../../../../../public/Unknown_person.jpeg";
 import { isReadable } from "stream";
 import Canvas from "@/components/Canva/page";
 
@@ -121,8 +122,9 @@ const Page = () => {
 
     WebSocketRef.current.onmessage = (event) => {
       console.log("Message from server:", event.data);
+      if (typeof event.data != "string")
+        return;
       const received_data = JSON.parse(event.data);
-
       if (received_data.type == "tournament_state")
         handleTournamentList(received_data);
       else if (received_data.approving){
@@ -203,11 +205,18 @@ const Page = () => {
   };
   const handleCreateTournament = (event) => {
     event.preventDefault();
+    if (!tournamentImage || !roomName) {
+      toast.error("Please fill in all fields.");
+      return;
+    }
     // if (!alias || !roomName) {
     //   alert("Please fill in all fields.");
     //   return;
     // }
-
+    if (roomName.length < 2 || roomName.length > 5) {
+      toast.error("Tournament name must be between 2 and 5 characters.");
+      return;
+    }
     const command = "create";
     // Prepare the data to send
     const roomData = {
@@ -246,6 +255,12 @@ const Page = () => {
 
 
   const handleAlias = () => {
+    if (alias.length < 2 || alias.length > 5)
+      {
+        toast.error("Alias must be between 2 and 4 characters");
+        return;
+      }
+      
     const command = "setAlias";
     const data = {
       command,
@@ -267,6 +282,20 @@ const Page = () => {
 
 
   const handleStartGame = () => {
+    const command = 'play';
+    const data = {
+      command,
+    }
+    if (
+      WebSocketRef.current &&
+      WebSocketRef.current.readyState === WebSocket.OPEN
+    ) {
+      WebSocketRef.current.send(JSON.stringify(data));
+      console.log("Data send :", data);
+    } else {
+      console.error("Websocket is not connected");
+      console.log("Websocket is not connected");
+    }
     setInGame(true);
   };
 

@@ -310,6 +310,9 @@ class TournamentConsumer(AsyncWebsocketConsumer):
                     'approving' : True,
                     'room' : self.room.get_data()
                 }))
+                await self.channel_layer.group_send(self.room.name, {
+                'type' : 'joined.competitor'
+            })
         except RoomRestriction as e:
             await self.send(text_data=json.dumps({
                 'ErrorMsg' : str(e)
