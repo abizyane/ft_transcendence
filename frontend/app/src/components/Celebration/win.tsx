@@ -15,7 +15,7 @@ function ConfettiComponent({ isWinner }: { isWinner: boolean }) {
 
   return (
     <div className="w-full h-full overflow-hidden flex flex-col justify-center items-center">
-      {true ? (
+      {isWinner ? (
         <>
           <ReactConfetti />
           <div className="text-center text-yellow-500 font-bold text-9xl mb-6">

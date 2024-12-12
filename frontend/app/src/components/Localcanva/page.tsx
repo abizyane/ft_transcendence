@@ -14,12 +14,12 @@ class ScoreBoard{
     update(){
         if (this.ball.posX - this.ball.rad < this.game.player.posX )
         {
-            this.first_score++;
+            this.second_score++;
             this.ball.reset_ball()
         }
         else if (this.ball.posX > this.game.enemy.posX + this.game.enemy.width/2)
         {
-            this.second_score++;
+            this.first_score++;
             this.ball.reset_ball()
         }
         if (this.first_score === 10 || this.second_score === 10)

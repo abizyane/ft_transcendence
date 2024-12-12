@@ -108,11 +108,10 @@ const LoginForm = () => {
   href="http://localhost:8000/api/42OAuth"
 >
   <img
-    src="https://res.cloudinary.com/dwxvnezhn/image/upload/f_auto,q_auto/v1/pics/hxangc1kyhtibnepmygf"
+    src="/42.png"
     alt="42 Logo"
-    className="w-8 h-8 rounded-full"
-    width={24}
-    height={24}
+    className="w-10 h-10 rounded-full"
+
   />
 </a>
 </div>

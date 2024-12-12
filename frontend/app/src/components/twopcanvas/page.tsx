@@ -14,7 +14,7 @@ class ScoreBoard{
     update(){
         if (this.ball.posX - this.ball.rad < this.game.player.posX )
         {
-          this.first_score++;
+          this.second_score++;
           this.ball.reset_ball() 
           console.log("update score")
             // this.ball.init(-1)
@@ -22,7 +22,7 @@ class ScoreBoard{
         else if (this.ball.posX > this.game.enemy.posX + this.game.enemy.width/2)
         {
             console.log("update score")
-            this.second_score++;
+            this.first_score++;
             // this.ball.init(1)
             this.ball.reset_ball()
         }
