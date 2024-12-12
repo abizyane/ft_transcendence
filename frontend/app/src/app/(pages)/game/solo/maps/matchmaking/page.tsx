@@ -89,11 +89,20 @@ const Page = () => {
   const IsConnected = useRef(false);
 
   let startCountDown = () => {
+
     if (timer === null) {
       setCountDownStarted(true);
       setTimer(
         setInterval(() => {
-          setCountdown((prev) => prev - 1);
+          setCountdown((prev) => {
+            if (prev > 0) return prev - 1;
+            if (prev == 0) {
+              setCountDownStarted(false);
+              clearInterval(timer);
+              setTimer(null);
+            }
+            return 0;
+          });
         }, 1000)
       );
     }
@@ -164,11 +173,13 @@ const Page = () => {
 
   useEffect(() => {
     if (!currentUser) return;
+    console.log("isLocalGame", isLocalGame, isVsBot, currentUser);
     if (isLocalGame) {
       setCompetitors([
         currentUser,
         { ...defaultCompetitors[0], username: "Player2" },
       ]);
+      if (timer == null) 
       startCountDown();
     } else if (isVsBot) {
       setCompetitors([
@@ -176,18 +187,25 @@ const Page = () => {
         { ...defaultCompetitors[2], username: "Bot" },
       ]);
       console.log("local start count");
+      if (timer == null) 
       startCountDown();
     }
   }, [isLocalGame, isVsBot, currentUser]);
 
   useEffect(() => {
     startCountDown = () => {
+      console.log("startCountDown", timer);
       if (timer == null) {
         setCountDownStarted(true);
         setTimer(
           setInterval(() => {
             setCountdown((prev) => {
               if (prev > 0) return prev - 1;
+              if (prev == 0) {
+                setCountDownStarted(false);
+                clearInterval(timer);
+                setTimer(null);
+              }
               return 0;
             });
           }, 1000)
@@ -201,7 +219,7 @@ const Page = () => {
         setTimer(null);
       }
     };
-  }, [countdown, timer, gameready]);
+  }, [countdown, timer]);
 
   if (!currentUser) {
     return (
@@ -212,7 +230,7 @@ const Page = () => {
   }
   return (
     <>
-      {timer && countdown >= 0 && (
+      {timer && countdown > 0 && (
         <div className="w-full h-full absolute text-center inset-0 bg-black/20 backdrop-blur-md  z-[100] ">
           <h3 className="justify-center items-center w-full h-full flex text-center text-3xl text-white text-nowrap font-extrabold">
             Game Starting in: {countdown}s
