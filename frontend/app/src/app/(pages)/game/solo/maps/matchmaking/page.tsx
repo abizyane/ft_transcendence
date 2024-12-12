@@ -22,7 +22,6 @@ const defaultCompetitors = [
     xp: 0,
   },
   {
-    id: 1,
     username: "random",
     profile_pic_url: "/profile-bot.jpg",
     level: 1,
@@ -36,6 +35,22 @@ const defaultCompetitors = [
     xp: 0,
   },
 ];
+
+
+const randomizeUser = () => {
+  const randomPic = `https://randomuser.me/api/portraits/women/${Math.floor(Math.random() * 100)}.jpg`;
+  const randomLevel = Math.floor(Math.random() * 100); // Random level between 0-100
+  const randomXP = Math.floor(Math.random() * 1000); 
+  const maxXPPerLevel = 1000;
+  const remainingXP = ((randomXP % maxXPPerLevel) / maxXPPerLevel) * 100;
+  
+  return {
+    profile_pic_url: randomPic,
+    username: `User_${Math.floor(Math.random() * 1000)}`,
+    level: randomLevel,
+    xp: randomXP,
+  };
+};
 
 // Avatar component for displaying user info
 function Avatar({ user }) {
@@ -56,7 +71,7 @@ function Avatar({ user }) {
         <div className="flex items-center h-2 w-full rounded-xl bg-white m-1">
           <div
             className="bg-violet-900 h-2 rounded-xl"
-            style={{ width: `${(user.xp / 50000) * 100}%` }}
+            style={{ width: `${(user.xp / 1000) * 100}%` }}
           ></div>
         </div>
         <p className="flex justify-end text-white font-light text-xs mr-4 w-full m-1">
@@ -87,6 +102,8 @@ const Page = () => {
   const [looser, setLooser] = useState(false);
   const router = useRouter();
   const IsConnected = useRef(false);
+  const [isSecondPlayerValid, setIsSecondPlayerValid] = useState(false);
+
 
   let startCountDown = () => {
     if (timer === null) {
@@ -101,7 +118,7 @@ const Page = () => {
 
   // WebSocket connection for random matchmaking
   useEffect(() => {
-    console.log("isRandomMatch", isRandomMatch);
+    
     if (isRandomMatch && socketRef.current === null) {
       socketRef.current = new WebSocket(
         "ws://localhost:8000/ws/tournament/TWO/"
@@ -129,6 +146,7 @@ const Page = () => {
             // Update competitors from WebSocket data
             if (data.competitors) {
               if (data.competitors.length == 2) {
+                setIsSecondPlayerValid(true);
                 startCountDown();
               }
               setCompetitors([...data.competitors]);
@@ -156,7 +174,7 @@ const Page = () => {
   const updateCompetitors = (competitors) => {
     const nextCompetitors = users.map((c) => {
       if (c.id == competitors.id) {
-        console.log(c.id, competitors.id);
+        console.log( "competitors ----->",c.id, competitors.id);
         return competitors;
       } else return c;
     });
@@ -203,6 +221,21 @@ const Page = () => {
     };
   }, [countdown, timer, gameready]);
 
+  const [randomUser, setRandomUser] = useState(randomizeUser());
+
+  useEffect(() => {
+    if (isRandomMatch) {
+      const interval = setInterval(() => {
+        const newRandomUser = randomizeUser();
+        setRandomUser(newRandomUser);
+        if (users[1].id) { 
+          clearInterval(interval);
+        }
+      }, 100); 
+
+      return () => clearInterval(interval); 
+    }
+  }, [isRandomMatch, users]);
   if (!currentUser) {
     return (
       <div>
@@ -213,7 +246,7 @@ const Page = () => {
   return (
     <>
       {timer && countdown >= 0 && (
-        <div className="w-full h-full absolute text-center inset-0 bg-black/20 backdrop-blur-md  z-[100] ">
+        <div className="w-full h-full absolute text-center inset-0 bg-black/20 z-[100] ">
           <h3 className="justify-center items-center w-full h-full flex text-center text-3xl text-white text-nowrap font-extrabold">
             Game Starting in: {countdown}s
           </h3>
@@ -378,30 +411,44 @@ const Page = () => {
         </div>
       ) : (
         <div className="flex flex-col lg:flex-row gap-4 lg:gap-24 items-center justify-center lg:w-fit h-fit">
-          {isRandomMatch && users[0] ? (
-            <li key={users[0].id}>
-              <Avatar user={users[0]}></Avatar>
-            </li>
-          ) : (
-            <Avatar user={currentUser} />
-          )}
-          <div className="flex items-center justify-end">
-            <div className="w-16 h-16 lg:w-32 lg:h-32 rounded-full bg-white flex items-center justify-center">
-              <img
-                src={VS.src}
-                alt="VS"
-                className="w-full h-full rounded-full"
-              />
-            </div>
-          </div>
+         {
+  isRandomMatch && users[0] ? (
+    <li key={`user-${currentUser.id}`}>
+      <Avatar user={currentUser} />
+      <div className="bg-blue-600">here</div>
+    </li>
+  ) : (
+    <Avatar user={currentUser} />
+  )
+}
 
-          {isLocalGame && <Avatar user={users[1]} />}
-          {isVsBot && <Avatar user={defaultCompetitors[2]} />}
-          {isRandomMatch && users[1] && (
-            <li key={users[1].id}>
-              <Avatar user={users[1]}></Avatar>
-            </li>
-          )}
+<div className="flex items-center justify-center">
+  <div className="w-16 h-16 lg:w-32 lg:h-32 rounded-full bg-white flex items-center justify-center">
+    <img
+      src={VS.src}
+      alt="VS"
+      className="w-full h-full rounded-full"
+    />
+  </div>
+</div>
+
+{isLocalGame && users[1] && <Avatar user={users[1]} />}
+{isVsBot && defaultCompetitors[2] && <Avatar user={defaultCompetitors[2]} />}
+
+{isRandomMatch && users[1].id  && (
+  <li key={users[1].id}>
+    <Avatar user={users[1]} />
+    
+    <div className="bg-red-600">{users[1].username}</div>
+  </li>
+)}
+
+{isRandomMatch && !users[1].id && (
+  <li key={randomUser.username}>
+    <Avatar user={randomUser} />
+    <div className="bg-red-600">here {randomUser.username}</div>
+  </li>
+)}
         </div>
       )}
     </>

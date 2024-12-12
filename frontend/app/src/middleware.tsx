@@ -18,6 +18,7 @@ export const config = {
     '/ranking',
     '/settings',
     '/profile',
+    '/history',
     '/((?!auth/).)'
   ],
 }

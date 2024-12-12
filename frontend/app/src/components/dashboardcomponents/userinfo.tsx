@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import DoughnutChart from "../Charts/Winrate";
 import { useUser } from "@/services/context/usercontext";
 import { MdOutlinePersonAddAlt1, MdPersonAddAlt1 } from "react-icons/md";
+import { FaHourglassEnd } from "react-icons/fa";
 import { ImBlocked, ImEyeBlocked } from "react-icons/im";
 import { IoIosRemoveCircleOutline } from "react-icons/io";
 import Link from "next/link";
@@ -336,7 +337,7 @@ const UserInfo: React.FC<UserInfoProps> = ({ user, setUser }) => {
                   className="px-4 py-2 flex items-center justify-center bg-orange-400 text-white rounded-lg hover:bg-orange-450 transition duration-200 w-full md:w-1/2 lg:w-1/2"
                   disabled
                 >
-                  <MdOutlinePersonAddAlt1 className="text-xl" />
+                  <FaHourglassEnd className="text-xl" />
                   Pending
                 </button>
                 <button

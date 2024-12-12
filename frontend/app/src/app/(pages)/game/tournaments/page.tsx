@@ -135,10 +135,6 @@ const Page = () => {
       toast.error("Please fill in all fields.");
       return;
     }
-    // if (!alias || !roomName) {
-    //   alert("Please fill in all fields.");
-    //   return;
-    // }
     if (roomName.length < 2 || roomName.length > 5) {
       toast.error("Tournament name must be between 2 and 5 characters.");
       return;
@@ -324,7 +320,7 @@ const Page = () => {
           </div>
           <div className="flex flex-col items-center lg:mt-[190px]">
             <img
-              src={Unknwon.src||players[0].profile_pic_url}
+              src={Unknwon.src||players[1].profile_pic_url}
               alt="Player 2"
               className="w-14 h-14 md:w-16 md:h-16 lg:w-16 lg:h-16 xl:w-20 xl:h-20 object-cover rounded-full shadow-lg"
               />
@@ -392,7 +388,7 @@ const Page = () => {
         <div className="flex justify-around items-end w-full lg:flex lg:flex-col lg:items-start lg:w-24">
           <div className="flex flex-col items-center lg:mt-6 xl:mt-0">
             <img
-              src={Unknwon.src||players[0].profile_pic_url}
+              src={Unknwon.src||players[2].profile_pic_url}
               alt="Player 3"
               className="w-14 h-14 md:w-16 md:h-16 lg:w-16 lg:h-16 xl:w-20 xl:h-20 object-cover rounded-full shadow-lg"
               />
@@ -400,7 +396,7 @@ const Page = () => {
           </div>
           <div className="flex flex-col items-center lg:mt-[190px]">
             <img
-              src={Unknwon.src||players[0].profile_pic_url}
+              src={Unknwon.src||players[3].profile_pic_url}
               alt="Player 4"
               className="w-14 h-14 md:w-16 md:h-16 lg:w-16 lg:h-16 xl:w-20 xl:h-20 object-cover rounded-full shadow-lg"
               />
