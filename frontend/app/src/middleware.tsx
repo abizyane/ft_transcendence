@@ -28,6 +28,7 @@ export const config = {
     '/ranking',
     '/settings',
     '/profile/:id*',
+    '/history/:id*',
     '/((?!auth/).)',
     '/auth/:path*'
   ],

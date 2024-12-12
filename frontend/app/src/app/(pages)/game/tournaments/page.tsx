@@ -17,6 +17,7 @@ const Page = () => {
   const WebSocketRef = useRef(null);
   const [availableTournaments, setAvailableTournaments] = useState([]);
   const [tournamentMap, setTournamentMap] = useState(false);
+  const [creationImageid, setCreationImageid] = useState(-1);
 
   const defaObj = {
     name: "Tournament",
@@ -29,6 +30,7 @@ const Page = () => {
     if (file) {
       setTournamentImage(file);
       setPreviewImage(URL.createObjectURL(file));
+      handleImage(file);
     }
   };
 
@@ -89,7 +91,36 @@ const Page = () => {
       }
     };
   }, []);
+  const handleImage = async (profileImage: File) => {
+    const formData = new FormData();
+    formData.append('tournament_pic', profileImage);
 
+    try {
+      const response = await fetch('http://localhost:8000/api/upload_tournament_pic', {
+        method: 'POST',
+        body: formData,
+        credentials: 'include',
+      });
+
+      const responseData = await response.json();
+      if (!response.ok) {
+        console.error(responseData);
+        toast.error('Image upload failed');
+        setPreviewImage(null);
+        return false;
+      } else {
+        console.log(responseData);
+        toast.success('Image updated successfully');
+        setCreationImageid(responseData.picture_id);
+        setPreviewImage(responseData.tournament_pic_url);
+        return true;
+      }
+    } catch (error) {
+      console.error('Error uploading image:', error);
+      toast.error('Error uploading image');
+      setPreviewImage(null);
+    }
+  };
   const handleCreateTournament = (event) => {
     event.preventDefault();
     // if (!alias || !roomName) {
@@ -298,13 +329,13 @@ const Page = () => {
           </div>
         </div>
       </div>
-      <div clas>
+      <div>
 
       <button
-      className="bg-violet-900/90 text-white font-bold py-2 px-4 mt-6 rounded hover:bg-violet-700"
-      >
-      Play
-    </button>
+        className="bg-violet-900/90 text-white font-bold py-2 px-4 mt-6 rounded hover:bg-violet-700"
+        >
+        Play
+      </button>
       </div>
     </div>
     </div>
