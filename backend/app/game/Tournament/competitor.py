@@ -21,6 +21,7 @@ class Competitor(AbstractCompetitor):
         self.name = name
         self._id = -1
         self.username = ''
+        self.alias = ''
         self.room:Room = None
         self._type = ''
         self._state = None
@@ -41,7 +42,7 @@ class Competitor(AbstractCompetitor):
             self.joined = True
             return room
         except RoomRestriction as e:
-            raise
+            raise e
 
     def exit_room(self, room:Room) -> None:
         try :
@@ -68,6 +69,7 @@ class Competitor(AbstractCompetitor):
     def get_info(self):
         return {
             'username' : self.username,
+            'alias' : self.alias,
             'profile_pic_url' : self.img,
             'lost' : self.islost,
             'id' : self._id,

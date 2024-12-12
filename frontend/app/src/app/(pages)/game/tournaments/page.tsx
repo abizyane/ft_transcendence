@@ -7,8 +7,9 @@ import Trophy from "../../../../../public/Trophy.png";
 import { useState, useEffect, useRef } from "react";
 import { IoAddCircleSharp } from "react-icons/io5";
 import { toast } from "react-hot-toast";
-import Canvas from "@/components/Canva/page";
 import Mars from "../../../../../public/Mars.jpeg";
+import { isReadable } from "stream";
+import Canvas from "@/components/Canva/page";
 
 const Page = () => {
   const [confirmation, setConfirmation] = useState(false);
@@ -19,13 +20,41 @@ const Page = () => {
   const WebSocketRef = useRef(null);
   const [availableTournaments, setAvailableTournaments] = useState([]);
   const [tournamentMap, setTournamentMap] = useState(false);
+  const [ready, setReady] = useState(false)
   const [inGame, setInGame] = useState(false);
   const socketRef = useRef(null);
   const [scores, setScores] = useState({ one: 0, two: 0 });
   const [winner, setWinner] = useState(false);
   const [looser, setLooser] = useState(false);
-  const [gameready, setReady] = useState(false);
+  const [gameready, setGameReady] = useState(false);
   const [creationImageid, setCreationImageid] = useState(-1);
+
+  //---------Tournament Map vars Start---------
+  const defaultUser = {
+    alias: 'player',
+    profile_pic_url: '',
+    id: 0
+  }
+  const defaultUsers = (() => {
+    let users = [];
+    for (let i = 0; i < 4; i++)
+      users[i] = {...defaultUser, id:i, alias:"player"+i.toString()}
+    return users  
+  })()
+
+  const [players, setPlayers] = useState(defaultUsers)
+
+  const handleRoomUpdate = (users)=> {
+    console.log(users)
+    const nextUserList = defaultUsers.map((defuser) => {
+      const newUser = users.find(u => u.id === defuser.id);
+      return newUser ? {...defuser, ...newUser} : defuser
+    })
+    setPlayers(nextUserList)
+  }
+
+  //---------Tournament Map var END--------- 
+
 
   const defaObj = {
     name: "Tournament",
@@ -79,6 +108,19 @@ const Page = () => {
           toast.error(received_data.ErrorMsg);
         }
       }
+      if (received_data.type === "room"){
+        if (received_data.command === "setCompetitors"){
+          handleRoomUpdate(received_data.competitors)
+        }
+      }
+      if (received_data.type === "room") {
+        if (received_data.command === "setReady") {
+          setReady(true);
+        } else if (received_data.command === "wait") {
+          setReady(false);
+        }
+      }
+
     };
 
     WebSocketRef.current.onerror = (error) => {
@@ -163,7 +205,8 @@ const Page = () => {
       WebSocketRef.current.readyState === WebSocket.OPEN
     ) {
       WebSocketRef.current.send(JSON.stringify(tournament));
-      console.log("Data sent:", tournament);
+      setTournamentName(tournament.name)
+      console.log('Data sent:', tournament);
     } else {
       console.error("WebSocket is not connected");
     }
@@ -255,7 +298,7 @@ const Page = () => {
             socketRef={socketRef}
             setWinner={setWinner}
             setLooser={setLooser}
-            callback={setReady}
+            callback={setGameReady}
             scoreSetter={setScores}
             ></Canvas>
         </div>
@@ -320,19 +363,19 @@ const Page = () => {
         <div className="flex justify-around items-end w-full lg:flex lg:flex-col lg:items-end lg:w-24">
           <div className="flex flex-col items-center lg:mt-6 xl:mt-0">
             <img
-              src={Profil.src}
+              src={players[0].profile_pic_url}
               alt="Player 1"
               className="w-14 h-14 md:w-16 md:h-16 lg:w-16 lg:h-16  xl:w-20 xl:h-20 object-cover rounded-full shadow-lg"
               />
-            <span className="text-white text-sm lg:text-base mt-2">Player 1</span>
+            <span className="text-white text-sm lg:text-base mt-2">{players[0].alias}</span>
           </div>
           <div className="flex flex-col items-center lg:mt-[190px]">
             <img
-              src={Profil.src}
+              src={players[1].profile_pic_url}
               alt="Player 2"
               className="w-14 h-14 md:w-16 md:h-16 lg:w-16 lg:h-16 xl:w-20 xl:h-20 object-cover rounded-full shadow-lg"
               />
-            <span className="text-white text-sm lg:text-base mt-2">Player 2</span>
+            <span className="text-white text-sm lg:text-base mt-2">{players[1].alias}</span>
           </div>
         </div>
 
@@ -354,7 +397,7 @@ const Page = () => {
         <div className="flex flex-col justify-center items-center gap-8 lg:gap-2 lg:flex-row lg:mt-6">
           <div className="flex flex-col items-center ">
             <img
-              src={Profil.src}
+              src={players[2].profile_pic_url}
               alt="Finalist 1"
               className="w-14 h-14 md:w-16 md:h-16 lg:w-16 lg:h-16 xl:w-20 xl:h-20 object-cover rounded-full shadow-lg"
               />
@@ -370,7 +413,7 @@ const Page = () => {
           </div>
           <div className="flex flex-col items-center">
             <img
-              src={Profil.src}
+              src={players[3].profile_pic_url}
               alt="Finalist 2"
               className="w-14 h-14 md:w-16 md:h-16 lg:w-16 lg:h-16 xl:w-20 xl:h-20 z-50 object-cover rounded-full shadow-lg"
               />
@@ -400,7 +443,7 @@ const Page = () => {
               alt="Player 3"
               className="w-14 h-14 md:w-16 md:h-16 lg:w-16 lg:h-16 xl:w-20 xl:h-20 object-cover rounded-full shadow-lg"
               />
-            <span className="text-white text-sm lg:text-base mt-2">Player 3</span>
+            <span className="text-white text-sm lg:text-base mt-2">{players[2].alias}</span>
           </div>
           <div className="flex flex-col items-center lg:mt-[190px]">
             <img
@@ -408,13 +451,18 @@ const Page = () => {
               alt="Player 4"
               className="w-14 h-14 md:w-16 md:h-16 lg:w-16 lg:h-16 xl:w-20 xl:h-20 object-cover rounded-full shadow-lg"
               />
-            <span className="text-white text-sm lg:text-base mt-2">Player 4</span>
+            <span className="text-white text-sm lg:text-base mt-2">{players[3].alias}</span>
           </div>
         </div>
       </div>
 
       <button
       className="bg-violet-900/90 text-white font-bold py-2 px-4 mt-6 rounded hover:bg-violet-700"
+      onClick={(e)=>{
+        WebSocketRef.current.send(JSON.stringify({
+          command: 'play'
+        }))
+      }}
       >
       Play
     </button>
@@ -540,6 +588,13 @@ const Page = () => {
       ) : inGame ? (
         <RenderCanvas onMatchEnd={handleMatchEnd} />
       ) : (
+        ready ?<Canvas
+        socketRef={WebSocketRef}
+        setWinner={null}
+        setLooser={null}
+        callback={setReady}
+        scoreSetter={null}
+      ></Canvas> : <TournamentMap />
         <TournamentMap onPlay={handleStartGame} />
       )}
     </div>
