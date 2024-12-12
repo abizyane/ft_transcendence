@@ -24,7 +24,7 @@ const Page = () => {
   //---------Tournament Map vars Start---------
   const defaultUser = {
     alias: 'player',
-    img: '',
+    profile_pic_url: '',
     id: 0
   }
   const defaultUsers = (() => {
@@ -216,7 +216,7 @@ const Page = () => {
         <div className="flex justify-around items-end w-full lg:flex lg:flex-col lg:items-end lg:w-24">
           <div className="flex flex-col items-center lg:mt-6 xl:mt-0">
             <img
-              src={Profil.src}
+              src={players[0].profile_pic_url}
               alt="Player 1"
               className="w-14 h-14 md:w-16 md:h-16 lg:w-16 lg:h-16  xl:w-20 xl:h-20 object-cover rounded-full shadow-lg"
               />
@@ -224,7 +224,7 @@ const Page = () => {
           </div>
           <div className="flex flex-col items-center lg:mt-[190px]">
             <img
-              src={Profil.src}
+              src={players[1].profile_pic_url}
               alt="Player 2"
               className="w-14 h-14 md:w-16 md:h-16 lg:w-16 lg:h-16 xl:w-20 xl:h-20 object-cover rounded-full shadow-lg"
               />
@@ -250,7 +250,7 @@ const Page = () => {
         <div className="flex flex-col justify-center items-center gap-8 lg:gap-2 lg:flex-row lg:mt-6">
           <div className="flex flex-col items-center ">
             <img
-              src={Profil.src}
+              src={players[2].profile_pic_url}
               alt="Finalist 1"
               className="w-14 h-14 md:w-16 md:h-16 lg:w-16 lg:h-16 xl:w-20 xl:h-20 object-cover rounded-full shadow-lg"
               />
@@ -266,7 +266,7 @@ const Page = () => {
           </div>
           <div className="flex flex-col items-center">
             <img
-              src={Profil.src}
+              src={players[3].profile_pic_url}
               alt="Finalist 2"
               className="w-14 h-14 md:w-16 md:h-16 lg:w-16 lg:h-16 xl:w-20 xl:h-20 z-50 object-cover rounded-full shadow-lg"
               />
