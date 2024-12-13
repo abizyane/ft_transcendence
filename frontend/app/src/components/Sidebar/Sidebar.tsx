@@ -18,7 +18,6 @@ export default function Sidebar() {
   }
 
   const isActive = (path: string) => pathname.startsWith(path);
-  console.log(pathname);
   return (
     <div className="bottom-0 left-0 px-4 w-full lg:w-24 h-full lg:justify-center lg:items-center lg:flex backdrop-blur-md">
       <div className="w-full flex p-4 flex-row space-x-8 lg:space-x-0 lg:space-y-12 items-center justify-center lg:flex-col">

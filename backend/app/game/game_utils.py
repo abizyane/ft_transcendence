@@ -37,6 +37,7 @@ class Ball:
             
     
     def reset_ball(self):
+        self.posY = self.game.height / 2
         self.posX = self.game.width / 2
 
     def update(self):
@@ -85,7 +86,7 @@ class Game:
         self.ball = Ball(self)
         self.blue = None
         self.red = None
-        self.max_score = 4
+        self.max_score = 1
 
     def is_full(self):
         if len(self.players) == 2:

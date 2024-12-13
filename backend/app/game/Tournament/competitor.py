@@ -80,6 +80,7 @@ class Competitor(AbstractCompetitor):
         for competitor in (self.room.competitors) :
             res.append(competitor.get_info())
         return res
+    
             
 class CompetitorNamed(Competitor):
     def __init__(self, name):

@@ -28,6 +28,13 @@ interface Room {
   competitors: Comptetitor[];
 }
 
+interface WinnersPlayers
+{
+  one: Comptetitor;
+  two: Comptetitor;
+  final: Comptetitor;  
+}
+
 const Page = () => {
   const [confirmation, setConfirmation] = useState(false);
   const [alias, setAlias] = useState("");
@@ -40,17 +47,21 @@ const Page = () => {
   const [room, setRoom] = useState(null);
   const [ready, setReady] = useState(false)
   const [inGame, setInGame] = useState(false);
-  const socketRef = useRef(null);
-  const [scores, setScores] = useState({ one: 0, two: 0 });
   const [winner, setWinner] = useState(false);
   const [looser, setLooser] = useState(false);
-  const [gameready, setGameReady] = useState(false);
   const [creationImageid, setCreationImageid] = useState(-1);
+  const [player, setPlayer] = useState(null);
+  const [players, setPlayers] = useState([]);
 
+  const [winners, setWinners] = useState<WinnersPlayers | null>({
+    one:null,
+    two:null,
+    final:null
+  });
   //---------Tournament Map vars Start---------
   const defaultUser = {
     alias: 'player',
-    profile_pic_url: '',
+    profile_pic_url: Unknwon.src,
     id: 0
   }
   const defaultUsers = (() => {
@@ -60,15 +71,15 @@ const Page = () => {
     return users
   })()
 
-  const [players, setPlayers] = useState(defaultUsers)
+  // const [players, setPlayers] = useState(defaultUsers)
 
   const handleRoomUpdate = (users) => {
     console.log(users)
-    const nextUserList = defaultUsers.map((defuser) => {
-      const newUser = users.find(u => u.id === defuser.id);
-      return newUser ? { ...defuser, ...newUser } : defuser
-    })
-    setPlayers(nextUserList)
+    // const nextUserList = defaultUsers.map((defuser) => {
+    //   const newUser = users.find(u => u.id === defuser.id);
+    //   return newUser ? { ...defuser, ...newUser } : defuser
+    // })
+    setPlayers(users)
   }
 
   //---------Tournament Map var END--------- 
@@ -300,9 +311,8 @@ const Page = () => {
   };
 
   const RenderCanvas = () => {
-    const updateScores = useCallback((newScores) => {
-      setScores((prev) => ({ ...prev, ...newScores }));
-    }, []);
+    const [scores, setScores] = useState({ one: 0, two: 0 });
+
     return (
       <div className="w-full h-full flex items-center justify-center">
 
@@ -360,7 +370,7 @@ const Page = () => {
                 setLooser={setLooser}
                 callback={setReady}
                 scores={scores}
-                scoreSetter={updateScores}
+                scoreSetter={setScores}
               ></Canvas>
             </div>
           </div>
@@ -373,7 +383,7 @@ const Page = () => {
   const TournamentMap = ({ onPlay }: { onPlay: () => void }) => {
     const defaultUser = {
       username: "Player",
-      profile_pic_url: Profil.src,
+      profile_pic_url: Unknwon.src,
       id: 0,
     };
     const defaultUsers = (() => {
@@ -385,21 +395,26 @@ const Page = () => {
       return users;
     })();
 
-    const [players, setPlayers] = useState(defaultUsers);
+    const [readyToPlay, setReadyToPlay] = useState(false);
+    const [timer, setTimer] = useState(null);
 
     const handleRoomUpdate = (users) => {
-      const nextUserList = defaultUsers.map(
-        (user) => users.find((u) => u.id === user.id) || user
-      );
-      setPlayers(nextUserList);
+      // const nextUserList = defaultUsers.map(
+      //   (user) => users.find((u) => u.id === user.id) || user
+      // );
+      setPlayers(users);
     };
     useEffect(() => {
       WebSocketRef.current.onmessage = (e) => {
         if (typeof e.data === "string") {
           console.log("received data 22", e.data);
           const data = JSON.parse(e.data);
+          if (data.timer)
+          {
+            setTimer(data.timer);
+          }
           if (data.type === "room") {
-            if (data.command === "setCompetitors" || data.command === "wait") {
+            if (data.command === "setCompetitors") {
               if (data.competitors) {
                 handleRoomUpdate(data.competitors);
               }
@@ -407,8 +422,40 @@ const Page = () => {
             else if (data.command === "setReady") {
               console.log("setting Ready", data);
               setReady(true);
+              setTimer(null);
+            } else if (data.command === "readyToPlay") {
+              setReadyToPlay(data.ready);
             } else if (data.command === "wait") {
               setReady(false);
+              if (data.competitors)
+              {
+                handleRoomUpdate(data.competitors);
+              }
+            }
+          }
+          if (data.command && data.command === "update_room")
+          {
+            if (data.competitors)
+            {
+              setPlayers(data.competitors);
+              console.log("players updated", data.competitors);
+            }
+            if (data.winners) {
+              const updatedWinners = { ...winners };
+              
+              [0, 1].forEach(index => {
+                const winner = data.winners[index];
+                if (winner) {
+                  if (winner.alias === players[0].alias || winner.alias === players[1].alias) {
+                    updatedWinners.one = winner;
+                  }
+                  if (winner.alias === players[2].alias || winner.alias === players[3].alias) {
+                    updatedWinners.two = winner;
+                  }winners
+                }
+              });
+
+              setWinners(updatedWinners);
             }
           }
         }
@@ -416,10 +463,17 @@ const Page = () => {
     }, []);
 
 
-    console.log("ready", ready);
+    console.log("ready", ready, players, winners);
+
     return (
       <div className="w-full h-full flex justify-center items-center">
-
+        {timer && (
+          <div className="w-full h-full absolute text-center inset-0 bg-black/20 backdrop-blur-md z-[100]">
+            <h3 className="justify-center items-center w-full h-full flex text-center text-3xl text-white text-nowrap font-extrabold">
+              Game Starting in: {timer}s
+            </h3>
+          </div>
+        )}
         <div className="mb-24 mt-6 lg:mb-0 lg:mt-0 bg-gray-800/50 border border-violet-primary rounded-xl text-center w-full lg:w-fit lg:p-4  p-4 flex flex-col">
           <div className="flex justify-center items-center mb-8 lg:mb-0 lg:ml-8">
             <img
@@ -436,19 +490,19 @@ const Page = () => {
             <div className="flex justify-around items-end w-full lg:flex lg:flex-col lg:items-end lg:w-24">
               <div className="flex flex-col items-center lg:mt-6 xl:mt-0">
                 <img
-                  src={players[0].profile_pic_url}
+                  src={(players[0] && players[0].profile_pic_url) || Unknwon.src}
                   alt="Player 1"
                   className="w-14 h-14 md:w-16 md:h-16 lg:w-16 lg:h-16  xl:w-20 xl:h-20 object-cover rounded-full shadow-lg"
                 />
-                <span className="text-white text-sm lg:text-base mt-2">{players[0].alias}</span>
+                <span className="text-white text-sm lg:text-base mt-2">{ players[0] && players[0].alias || ""}</span>
               </div>
               <div className="flex flex-col items-center lg:mt-[190px]">
                 <img
-                  src={players[1].profile_pic_url}
+                  src={(players[1] && players[1].profile_pic_url) || Unknwon.src}
                   alt="Player 2"
                   className="w-14 h-14 md:w-16 md:h-16 lg:w-16 lg:h-16 xl:w-20 xl:h-20 object-cover rounded-full shadow-lg"
                 />
-                <span className="text-white text-sm lg:text-base mt-2">{players[1].alias}</span>
+                <span className="text-white text-sm lg:text-base mt-2">{players[1] && players[1].alias || ""}</span>
               </div>
             </div>
 
@@ -470,14 +524,15 @@ const Page = () => {
             <div className="flex flex-col justify-center items-center gap-8 lg:gap-2 lg:flex-row lg:mt-6">
               <div className="flex flex-col items-center ">
                 <img
-                  src={Profil.src}
+                  src={(winners.one && winners.one.profile_pic_url) || Unknwon.src}
                   alt="Finalist 1"
-                  className="w-14 h-14 md:w-16 md:h-16 lg:w-16 lg:h-16 xl:w-20 xl:h-20 object-cover rounded-full shadow-lg"
+                  className="w-14 h-14 border border-violet-primary md:w-16 md:h-16 lg:w-16 lg:h-16 xl:w-20 xl:h-20 object-cover rounded-full shadow-lg"
                 />
-                <span className="text-white text-sm lg:text-nowrap lg:text-base mt-2">Finalist 1</span>
+                <span className="text-white text-sm lg:text-nowrap lg:text-base mt-2">{(winners.one && winners.one.alias) || ""}</span>
               </div>
               <div className="flex flex-col items-center lg:mb-48">
                 <img
+                // src={Line1.src}
                   src={Trophy.src}
                   alt="Trophy"
                   className="w-14 h-14 md:w-16 md:h-16 lg:w-12  lg:h-12  xl:w-18 xl:h-18 object-cover p-2"
@@ -486,11 +541,11 @@ const Page = () => {
               </div>
               <div className="flex flex-col items-center">
                 <img
-                  src={Profil.src}
+                  src={(winners.two && winners.two.profile_pic_url) || Unknwon.src}
                   alt="Finalist 2"
-                  className="w-14 h-14 md:w-16 md:h-16 lg:w-16 lg:h-16 xl:w-20 xl:h-20 z-50 object-cover rounded-full shadow-lg"
+                  className="w-14 h-14 border border-violet-primary md:w-16 md:h-16 lg:w-16 lg:h-16 xl:w-20 xl:h-20 z-50 object-cover rounded-full shadow-lg"
                 />
-                <span className="text-white text-sm  lg:text-nowrap lg:text-base mt-2">Finalist 2</span>
+                <span className="text-white text-sm  lg:text-nowrap lg:text-base mt-2">{(winners.two && winners.two.alias) || ""}</span>
               </div>
             </div>
 
@@ -512,32 +567,33 @@ const Page = () => {
             <div className="flex justify-around items-end w-full lg:flex lg:flex-col lg:items-start lg:w-24">
               <div className="flex flex-col items-center lg:mt-6 xl:mt-0">
                 <img
-                  src={players[2].profile_pic_url}
+                  src={(players[2] && players[2].profile_pic_url) || Unknwon.src}
                   alt="Player 3"
                   className="w-14 h-14 md:w-16 md:h-16 lg:w-16 lg:h-16 xl:w-20 xl:h-20 object-cover rounded-full shadow-lg"
                 />
-                <span className="text-white text-sm lg:text-base mt-2">{players[2].alias}</span>
+                <span className="text-white text-sm lg:text-base mt-2">{players[2] && players[2].alias || ""}</span>
               </div>
               <div className="flex flex-col items-center lg:mt-[190px]">
                 <img
-                  src={Profil.src}
+                  src={(players[3] && players[3].profile_pic_url) || Unknwon.src}
                   alt="Player 4"
                   className="w-14 h-14 md:w-16 md:h-16 lg:w-16 lg:h-16 xl:w-20 xl:h-20 object-cover rounded-full shadow-lg"
                 />
-                <span className="text-white text-sm lg:text-base mt-2">{players[3].alias}</span>
+                <span className="text-white text-sm lg:text-base mt-2">{players[3] && players[3].alias || ""}</span>
               </div>
             </div>
           </div>
-          <button
-            className="bg-violet-900/90 text-white font-bold py-2 px-4 mt-6 rounded hover:bg-violet-700"
-            onClick={(e) => {
-              WebSocketRef.current.send(JSON.stringify({
-                command: 'play'
-              }))
-            }}
-          >
-            Play
-          </button>
+            {readyToPlay && creationImageid != -1 && (
+              <button
+                className="bg-violet-900/90 text-white font-bold py-2 px-4 mt-6 rounded hover:bg-violet-700"
+              onClick={(e) => {
+                WebSocketRef.current.send(JSON.stringify({
+                  command: 'play'
+                }))
+              }}
+            >
+              Play
+            </button>)}
         </div>
       </div>
     );

@@ -86,6 +86,9 @@ export default function Canvas ({socketRef, callback, scoreSetter , setWinner, s
         };
 
       }, []);
+    
+    
+    
 
     /*Canvas Function */
     let lastTime = 0
@@ -98,7 +101,7 @@ export default function Canvas ({socketRef, callback, scoreSetter , setWinner, s
             if (!GameRef.current)
                 GameRef.current = new Game_Front(canvas, {player_one: {posX:bluePosRef.current.x, posY: 3, width: 2, height:60, color: gameCustomization.user_paddle_color  }, player_two:{posX:redPosRef.current.x, posY: 3, width: 2, height:60, color: gameCustomization.opponent_paddle_color}, ball:{color: gameCustomization.ball_color}})
         }
-    }, [callback])
+    }, [])
     
     useEffect(() => {
         let lastTime = 0;
