@@ -125,8 +125,8 @@ const History = () => {
             <div className="flex flex-col space-y-2 w-full h-full">
               {gameHistory?.length ? (
                 gameHistory
+                .reverse()
                   .slice(-3)
-                  .reverse()
                   .map((game) => renderGame(game))
               ) : (
                 <div className="w-full h-full flex justify-center items-center">

@@ -93,8 +93,6 @@ export default class Game_Front{
     }
 
     render(ctx){
-        ctx.fillStyle = "rgba(0,0,0,0.7)";
-        ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
         this.player_1.draw(ctx)
         this.player_2.draw(ctx)
         this.ball.draw(ctx)
