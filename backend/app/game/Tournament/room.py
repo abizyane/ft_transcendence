@@ -101,7 +101,8 @@ class Room(RoomAbstract):
             "size": self.competitors_count(),
             "started" : self.started,
             "img" : self.imageUrl,
-            "competitors" : [competitor.get_info() for competitor in self.competitors]
+            "competitors" : [competitor.get_info() for competitor in self.competitors],
+            "host" : next((competitor.get_info() for competitor in self.competitors if competitor.is_host), None)
         })
     def get_winners_info(self):
         res = []

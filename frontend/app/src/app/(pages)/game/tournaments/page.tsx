@@ -11,6 +11,8 @@ import Mars from "../../../../../public/Mars.jpeg";
 import Unknwon from "../../../../../public/Unknown_person.jpeg";
 import { isReadable } from "stream";
 import Canvas from "@/components/Canva/page";
+import ConfettiComponent from "@/components/Celebration/win";
+
 
 interface Comptetitor {
   username: string;
@@ -26,6 +28,7 @@ interface Room {
   size: number;
   started: boolean;
   competitors: Comptetitor[];
+  host: Comptetitor;
 }
 
 interface WinnersPlayers
@@ -33,6 +36,18 @@ interface WinnersPlayers
   one: Comptetitor;
   two: Comptetitor;
   final: Comptetitor;  
+}
+
+interface Players
+{
+  username: string;
+  img: string;
+}
+
+interface MatchPlayers
+{
+  player_1: Players;
+  player_2: Players;
 }
 
 const Page = () => {
@@ -52,6 +67,8 @@ const Page = () => {
   const [creationImageid, setCreationImageid] = useState(-1);
   const [player, setPlayer] = useState(null);
   const [players, setPlayers] = useState([]);
+  const [tournamentStarted, setTournamentStarted] = useState(false);
+  const [matchPlayers, setMatchPlayers] = useState<Players | null>(null);
 
   const [winners, setWinners] = useState<WinnersPlayers | null>({
     one:null,
@@ -144,18 +161,24 @@ const Page = () => {
       }
       else if (received_data.type == "alias") {
         if (received_data.accepted) {
-          toast.success("alias accepted");
+          toast.success("Alias accepted");
           setConfirmation(true);
+          setAlias(received_data.alias);
         } else {
           toast.error(received_data.ErrorMsg);
+          setAlias("");
         }
       }
       else if (received_data.type === "room") {
         if (received_data.command === "setCompetitors") {
-          handleRoomUpdate(received_data.competitors)
+          if (!tournamentStarted)
+          {
+            handleRoomUpdate(received_data.competitors)
+          }
         }
         else if (received_data.command === "setReady") {
           console.log("setting Ready", received_data);
+          setTournamentStarted(true);
           setReady(true);
         } else if (received_data.command === "wait") {
           setReady(false);
@@ -184,6 +207,25 @@ const Page = () => {
       }
     };
   }, []);
+
+  useEffect(() => {
+    if (winners.final) {
+      if (winners.final.alias === alias) {
+        setWinner(true);
+      }
+      else {
+        setLooser(true);
+      }
+    }
+  }, [winners]);
+
+  if (winner || looser) {
+    return (
+      <ConfettiComponent isWinner={winner} />
+    )
+  }
+
+
   const handleImage = async (profileImage: File) => {
     const formData = new FormData();
     formData.append('tournament_pic', profileImage);
@@ -321,14 +363,14 @@ const Page = () => {
             <div className="flex justify-between items-center w-full bg-transparent p-2 rounded-lg mb-2">
               <div className="flex items-center space-x-2 bg-gray-700 p-1 lg:p-3 rounded-full w-36 lg:w-1/3 lg:h-14 justify-center lg:justify-start">
                 <img
-                  src={Mars.src}
+                  src={matchPlayers?.player_1.img}
                   alt="First User"
                   width={30}
                   height={30}
                   className="rounded-full"
                 />
                 <div className="text-white">
-                  {/* <div className="text-xs font-bold">{users[0].username}</div> */}
+                  <div className="text-xs font-bold">{matchPlayers?.player_1.username}</div>
                 </div>
               </div>
               <div className="flex items-center space-x-2 m-2">
@@ -343,11 +385,11 @@ const Page = () => {
               <div className="flex items-center space-x-2 bg-gray-700 p-1 lg:p-3 rounded-full w-36 lg:w-1/3 lg:h-14 justify-center lg:justify-end">
                 <div className="text-white">
                   <div className="text-xs font-bold text-right">
-                    {/* {users[1].username} */}
+                    {matchPlayers?.player_2.username}
                   </div>
                 </div>
                 <img
-                  src={Mars.src}
+                  src={matchPlayers?.player_2.img}
                   alt="Second User"
                   width={30}
                   height={30}
@@ -366,8 +408,8 @@ const Page = () => {
             >
               <Canvas
                 socketRef={WebSocketRef}
-                setWinner={setWinner}
-                setLooser={setLooser}
+                // setWinner={setWinner}
+                // setLooser={setLooser}
                 callback={setReady}
                 scores={scores}
                 scoreSetter={setScores}
@@ -413,14 +455,22 @@ const Page = () => {
           {
             setTimer(data.timer);
           }
+          if (data.type === "match_players")
+          {
+            setMatchPlayers(data.players);
+          }
           if (data.type === "room") {
             if (data.command === "setCompetitors") {
               if (data.competitors) {
-                handleRoomUpdate(data.competitors);
+                if (!tournamentStarted)
+                {
+                  handleRoomUpdate(data.competitors);
+                }
               }
             }
             else if (data.command === "setReady") {
               console.log("setting Ready", data);
+              setTournamentStarted(true);
               setReady(true);
               setTimer(null);
             } else if (data.command === "readyToPlay") {
@@ -429,7 +479,10 @@ const Page = () => {
               setReady(false);
               if (data.competitors)
               {
-                handleRoomUpdate(data.competitors);
+                if (!tournamentStarted)
+                {
+                  handleRoomUpdate(data.competitors);
+                }
               }
             }
           }
@@ -437,8 +490,10 @@ const Page = () => {
           {
             if (data.competitors)
             {
-              setPlayers(data.competitors);
-              console.log("players updated", data.competitors);
+              if (!tournamentStarted)
+              {
+                handleRoomUpdate(data.competitors);
+              }
             }
             if (data.winners) {
               const updatedWinners = { ...winners };
@@ -446,16 +501,26 @@ const Page = () => {
               [0, 1].forEach(index => {
                 const winner = data.winners[index];
                 if (winner) {
-                  if (winner.alias === players[0].alias || winner.alias === players[1].alias) {
+                  if ((players[0] && winner.alias === players[0].alias) || (players[1] && winner.alias === players[1].alias)) {
                     updatedWinners.one = winner;
                   }
-                  if (winner.alias === players[2].alias || winner.alias === players[3].alias) {
+                  if ((players[2] && winner.alias === players[2].alias) || (players[3] && winner.alias === players[3].alias)) {
                     updatedWinners.two = winner;
-                  }winners
+                  }
                 }
               });
-
               setWinners(updatedWinners);
+              if (data.winners.length > 2) {
+                const finalWinner = data.winners[2];
+                const duplicateAlias = data.winners.find((winner, index) => 
+                  index < 2 && winner.alias === finalWinner.alias
+                );
+                if (duplicateAlias) {
+                  updatedWinners.final = finalWinner;
+                  setWinners(updatedWinners);
+                }
+              
+              }
             }
           }
         }
@@ -583,7 +648,7 @@ const Page = () => {
               </div>
             </div>
           </div>
-            {readyToPlay && creationImageid != -1 && (
+            {readyToPlay && room.host.alias === alias && (
               <button
                 className="bg-violet-900/90 text-white font-bold py-2 px-4 mt-6 rounded hover:bg-violet-700"
               onClick={(e) => {

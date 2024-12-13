@@ -108,9 +108,10 @@ class TournamentConsumer(AsyncWebsocketConsumer):
     async def init_game(self, event):
         try :
             self.match = self.room.tournament.get_player_match(self.channel_name)
+            self.match_name = str(f'{self.room.name}m_{self.match.index}')
         except Exception as e :
             print(f'Exception sor {self.competitor.alias}', flush=True)
-        self.match_name = str(f'{self.room.name}m_{self.match.index}')
+            print(f'{self.channel_name}', flush=True)
         await self.channel_layer.group_add(self.match_name, self.channel_name)
         if not self.match.game and ((self.p_holder.index % 2) == 0):
             self.match.game = Game(self.match.index)
@@ -126,11 +127,16 @@ class TournamentConsumer(AsyncWebsocketConsumer):
             self.match.game.players[self.channel_name] = self.p_holder.paddle
             self.match.game.players[opponent.get_name()] = opponent.paddle
             #*** Temporary Fixed This Way ***#
+            players = {
+                "player_1" : {"username":self.competitor.alias, "img":self.competitor.img },
+                "player_2" : {"username":opponent.competitor.alias, "img":opponent.competitor.img}
+            }
 
             self.match.game.init_paddle_pos()
             await self.channel_layer.group_send(self.match_name,{
                 'type' : 'init.match',
-                'msg' : self.match_name
+                'msg' : self.match_name,
+                'players' : players
             })
             
     async def call_game(self):
@@ -138,6 +144,11 @@ class TournamentConsumer(AsyncWebsocketConsumer):
 
     async def init_match(self, event):
         self.game = self.match.game
+        players = event.get('players')
+        await self.send(text_data=json.dumps({
+            'type' : 'match_players',
+            'players' : players
+        }))
         for i in range(3, 0, -1):
             await self.send(json.dumps({
                 'timer': str(i)
@@ -185,6 +196,9 @@ class TournamentConsumer(AsyncWebsocketConsumer):
             await self.send(text_data=json.dumps({
                 'msg': 'You Won'
             }))
+            await self.channel_layer.group_send(self.room.name,{
+                'type' : 'broadcast.room.state'
+            })
             # self.p_holder.paddle = None
             try :
                 self.p_holder.upgrade() # if err mean he won
@@ -213,16 +227,19 @@ class TournamentConsumer(AsyncWebsocketConsumer):
                 await self.send(text_data=json.dumps({
                     'msg': 'You Won'
                 }))
-            await self.channel_layer.group_send(self.room.name,{
-                'type' : 'broadcast.room.state'
-            })
+            # await self.channel_layer.group_send(self.room.name,{
+            #     'type' : 'broadcast.room.state'
+            # })
         else:
             # self.p_holder.paddle = None
             # await self.award_xp(False)
-
+    
             await self.send(text_data=json.dumps({
                 'msg': 'You Lost'
             }))
+            await self.channel_layer.group_send(self.room.name,{
+                'type' : 'broadcast.room.state'
+            })
         rm = None
        
         
@@ -278,12 +295,13 @@ class TournamentConsumer(AsyncWebsocketConsumer):
                         'type' : 'leave.state',
                         'player' : f'{self.channel_name}'
                     })
+                    await self.channel_layer.group_send(self.match_name,{
+                        'type' : 'room.update',
+                    })
+
             try:
                 self.p_holder.competitor.exit_room(self.room)
                 self.room.competitors[0].is_host = True
-                await self.channel_layer.group_send(self.room.name,{
-                    'type' : 'room.update',
-                })
                 # del self.room.tournament.p_holders[self.channel_name]
             except RoomIsEmpty as e:
                 TournamentConsumer.rm.remove_room(self._type, self.room.name)
@@ -459,7 +477,8 @@ class TournamentConsumer(AsyncWebsocketConsumer):
             self.competitor.alias = alias
             await self.send(text_data=json.dumps({
                 'type' : 'alias',
-                'accepted' : True
+                'accepted' : True,
+                'alias' : alias
             }))
         except AliasException as e :
             await self.send(text_data=json.dumps({
