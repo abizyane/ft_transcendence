@@ -8,8 +8,6 @@ export function middleware(request: NextRequest) {
     return NextResponse.redirect(new URL('/auth/login', request.url))
   }
   console.log('isLoggedIn ', isLoggedIn )
-  console.log('request.url ', request.nextUrl.pathname )
-  console.log('request.nextUrl.pathname === / ', request.nextUrl.pathname === '/')
   if (isLoggedIn === 'True' && (request.nextUrl.pathname.includes('/auth/') || request.nextUrl.pathname === '/')) {
     return NextResponse.redirect(new URL('/dashboard', request.url))
   }
