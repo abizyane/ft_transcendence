@@ -118,28 +118,28 @@ export default function Canvas ({socketRef, callback, scoreSetter , setWinner, s
     
                     if (keyUp) {
                         socketRef.current.send(JSON.stringify({
-                            type: 'input',
-                            command: 'keyW_down',
+                            command: 'input',
+                            type: 'keyW_down',
                             w: 'true',
                         }));
                     } else {
                         socketRef.current.send(JSON.stringify({
-                            type: 'input',
-                            command: 'keyW_up',
+                            command: 'input',
+                            type: 'keyW_up',
                             w: 'false',
                         }));
                     }
     
                     if (keyDown) {
                         socketRef.current.send(JSON.stringify({
-                            type: 'input',
-                            command: 'keyS_down',
+                            command: 'input',
+                            type: 'keyS_down',
                             s: 'true',
                         }));
                     } else {
                         socketRef.current.send(JSON.stringify({
-                            type: 'input',
-                            command: 'keyS_up',
+                            command: 'input',
+                            type: 'keyS_up',
                             s: 'false',
                         }));
                     }
