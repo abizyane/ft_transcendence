@@ -92,9 +92,10 @@ class TournamentConsumer(AsyncWebsocketConsumer):
         self.state = ''
         self.competitor.set_competition_type(self._type)
         if self._type == "TWO":
-            self.room = TournamentConsumer.rm.get_or_create(_type=self._type)
+            self.room = await TournamentConsumer.rm.getrandom_or_create(_type=self._type)
             self.competitor.join_room(self.room)
-            self.channel_layer.group_add(self.room, self.channel_name)
+            print('l'+self.room.name+'l', flush=True)
+            await self.channel_layer.group_add(self.room.name, self.channel_name)
             await self.channel_layer.group_send(self.room.name, {
                 'type' : 'joined.competitor'
             })
@@ -271,7 +272,7 @@ class TournamentConsumer(AsyncWebsocketConsumer):
                     # del self.room.tournament.p_holders[self.channel_name]
                         
                     except self.room.RoomIsEmpty:
-                        TournamentConsumer.rm.remove_not_ready(self.room)
+                        TournamentConsumer.rm.remove_room(self._type, self.room.name)
                     await self.channel_layer.group_send(self.match_name, {
                         'type' : 'leave.state',
                         'player' : f'{self.channel_name}'

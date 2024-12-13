@@ -41,9 +41,10 @@ class RoomManager(AbstractRoomManager):
     def __init__(self):
         self.rooms = []
     #Builder Call
-    async def generate_room(self, _type, image_id, scope) -> Room :
+    async def generate_room(self, _type, image_id=None, scope=None) -> Room :
         value:int = RoomType[_type].value
         if value == 1:
+            
             return TwoPlayersRoom()
         elif value == 2:
             room = FourPlayersRoom()
@@ -136,9 +137,10 @@ class RoomManagerNew(RoomManager):
         self.type_four = {}
         self.type_two_id = 0
     
-    def create_type_two_room(self):
-        room = self.type_two[self.type_two_id] = self.generate_room(RM_TYPE[2])
+    async def create_type_two_room(self):
+        room = await self.generate_room(RM_TYPE[2])
         room.name = f'room_{self.type_two_id}'
+        self.type_two[room.name] = room
         self.type_two_id += 1
         return room
 
@@ -166,11 +168,13 @@ class RoomManagerNew(RoomManager):
             raise RoomNotExist(room_name)
         return self.type_four[room_name]
 
-    def getrandom_or_create(self, _type) :
-        for room in self.type_two :
-            if not room.started:
-                return room
-        return self.create_room(_type=_type, name=None)
+    async def getrandom_or_create(self, _type) :
+        print(self.type_two, flush=True)
+
+        for i,r in  self.type_two.items():
+            if not r.started:
+                return r
+        return await self.create_type_two_room()
     """
     get all in type four rooms needed data
     """
@@ -191,4 +195,7 @@ class RoomManagerNew(RoomManager):
         del self.type_four[room_name]
 
     def remove_type_two_room(self, room_id):
+        print(room_id ,flush=True)
+        print(self.type_two[room_id], flush=True)
+
         del self.type_two[room_id]
