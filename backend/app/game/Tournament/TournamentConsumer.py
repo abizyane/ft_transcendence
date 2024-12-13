@@ -72,7 +72,7 @@ class TournamentConsumer(AsyncWebsocketConsumer):
         #     }))
         #     await self.close()
         #     return
-        TournamentConsumer.connected_users.add(user.username)
+        # TournamentConsumer.connected_users.add(user.username)
         await self.accept()
         self.p_holder = PlayerHolder(CompetitorNamed(self.channel_name))
         self.set_competitor_info(username=user.username, img=build_absolute_image_uri(self.scope, user.profile_pic), userId=user.id)
@@ -92,19 +92,27 @@ class TournamentConsumer(AsyncWebsocketConsumer):
         self.state = ''
         self.competitor.set_competition_type(self._type)
         if self._type == "TWO":
-            self.room = TournamentConsumer.rm.get_or_create(_type=self._type)
+            self.room = await TournamentConsumer.rm.getrandom_or_create(_type=self._type)
             self.competitor.join_room(self.room)
-            self.channel_layer.group_add(self.room, self.channel_name)
+            print('l'+self.room.name+'l', flush=True)
+            await self.channel_layer.group_add(self.room.name, self.channel_name)
             await self.channel_layer.group_send(self.room.name, {
                 'type' : 'joined.competitor'
             })
+            self.room.p_holders[self.channel_name] = self.p_holder
+            if self.room.is_ready() :
+                self.competitor.is_host = True
+                await self.play()
             
     
     async def init_game(self, event):
-        self.match = self.room.tournament.get_player_match(self.channel_name)
+        try :
+            self.match = self.room.tournament.get_player_match(self.channel_name)
+        except Exception as e :
+            print(f'Exception sor {self.competitor.alias}', flush=True)
         self.match_name = str(f'{self.room.name}m_{self.match.index}')
         await self.channel_layer.group_add(self.match_name, self.channel_name)
-        if not self.match.game:
+        if not self.match.game and ((self.p_holder.index % 2) == 0):
             self.match.game = Game(self.match.index)
             self.p_holder.paddle = Player(channel_name=self.channel_name, id=self.p_holder.index ,game=self.match.game)  
             opponent = self.match.get_opponent(self.p_holder)
@@ -260,18 +268,12 @@ class TournamentConsumer(AsyncWebsocketConsumer):
     async def disconnect(self, error_code):
         if self.alias :
             TournamentConsumer.rm.aliases.remove(self.alias)
-        if self.user:
-            TournamentConsumer.connected_users.remove(self.user.username)
+        # if self.user:
+            # TournamentConsumer.connected_users.remove(self.user.username)
         if self.room:
             if  self.room.started :
                 #set other player to winner
                 if self.match and self.match.is_ready():
-                    try:
-                        self.p_holder.competitor.exit_room(self.room)
-                    # del self.room.tournament.p_holders[self.channel_name]
-                        
-                    except self.room.RoomIsEmpty:
-                        TournamentConsumer.rm.remove_not_ready(self.room)
                     await self.channel_layer.group_send(self.match_name, {
                         'type' : 'leave.state',
                         'player' : f'{self.channel_name}'
@@ -308,7 +310,7 @@ class TournamentConsumer(AsyncWebsocketConsumer):
                 Command.PLAY.value * int(command == "play") +
                 Command.ALIAS.value * int(command == "setAlias")
                 )
-    
+
     async def create_room(self,data):
         name = data.get('roomName')
         try :
@@ -474,6 +476,18 @@ class TournamentConsumer(AsyncWebsocketConsumer):
                 'ErrorMsg' : "You are not in a room"
             }))
     
+    def handle_input(self, data):
+        input_key = data.get('type')
+        if input_key == "keyW_up" :
+            self.p_holder.paddle.isW = True
+        elif input_key == "keyW_down" :
+            self.p_holder.paddle.isW = False
+        elif input_key == "keyS_up" :
+            self.p_holder.paddle.isS = True
+        elif input_key == "keyS_down" :
+            self.p_holder.paddle.isS = False
+
+        
     async def receive(self, text_data):
         recv_data = json.loads(text_data)
         command = recv_data.get('command')

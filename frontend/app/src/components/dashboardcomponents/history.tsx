@@ -40,7 +40,8 @@ const History = () => {
   const [gameHistory, setGameHistory] = useState<Game[]>([]);
   const [loading, setLoading] = useState(false);
   const { user: cUser, setUser } = useUser();
-  const finalUserId = userId || cUser.id; 
+  const finalUserId =  userId || cUser.id; 
+
 
   useEffect(() => {
     setLoading(true);
@@ -49,7 +50,7 @@ const History = () => {
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({ id: cUser.id }), // Pass the logged-in user's ID
+      body: JSON.stringify({ id: finalUserId }), // Pass the logged-in user's ID
       credentials: 'include',
     })
       .then(async (response) => {
@@ -122,7 +123,7 @@ const History = () => {
             </div>
           ) : (
             <div className="flex flex-col space-y-2 w-full h-full">
-              {gameHistory.length ? (
+              {gameHistory?.length ? (
                 gameHistory
                   .slice(-3)
                   .reverse()

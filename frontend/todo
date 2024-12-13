@@ -1,29 +1,27 @@
 local game fiha score m9loub also for bot   Done 
+block notification when you cant see profile  and redirect (toast)  Done
+friends on other profil  remove chat and game for curr user Done
+hiistory matches showen played with himself Done
 randomise the match making  (must test when tournament ends)
 costimuse scroll bar (ahmed)
 update user profil when notif  (ismail)
 xp itzad f matchat
-o history tupgradi mora kola match o nzido liha date  (tournoi)
+o history tupgradi mora kola match o nzido liha date (tournoi)
 counter at first makihssebch mzn  to check
 in random match i can play with myself
 user can create two tournaments 
-
 pics for bot and local game 
 changing pics for canvas to the new ones 
-block notification when you cant see profile  and redirect (toast)  Done
-friends on other profil  remove chat and game for curr user
 zid online f friends (other profil)
 pic not showen and chat timer until connect (when cliking on icone chat from other page)
 decor f other profil 
-history show username  and fix no games found placement
+history show username and fix no games found placement
 colors f bot makhdaminch paddle o ball local 
 dashboard tournament played 
-counter dial games to check 
-to9ba kidouz mn jenb f bot o local game 
+to9ba kidouz mn jenb f bot o local game
 to9ba kidouz mn wast l paddle f random match o tournoi
 http://localhost:3000/profile/1666666 page not found instead of showing profile  (same for chat and history)
 invite (
-
 challenge f friends list 
 challenge f profile and other profile
 challenge f chat  (challenge)
@@ -31,3 +29,6 @@ challenge f chat  (challenge)
 replace http with https before push (ismail)
 online not upddated on chat   (even when i click on logout unset cookie)
 notif reverse from recent to old
+state offline f mobile 
+
+history  (reverse the order) in other profile and show date  and show status winner or loser (using borders or icon)

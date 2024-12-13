@@ -67,7 +67,7 @@ class Room(RoomAbstract):
         return self.imageUrl
 
     def add_player(self, Player) -> RoomAbstract :
-        if self.ready :
+        if self.ready or self.started:
             raise RoomIsFull
         if Player.joined:
             raise AlredyJoined(Player.name, Player.room.name)

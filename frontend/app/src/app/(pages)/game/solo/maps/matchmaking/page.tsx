@@ -239,7 +239,7 @@ const Page = () => {
         setTimer(null);
       }
     };
-  }, [countdown, timer]);
+  }, [countdown, timer, gameready]);
 
   const [randomUser, setRandomUser] = useState(randomizeUser());
 
@@ -388,7 +388,7 @@ const Page = () => {
             <div
               className=" w-full max-h-[800px] flex items-center justify-center border-4 object-cover border-white rounded-lg relative"
               style={{
-                backgroundImage: `url('/${map}.jpeg')`,
+                backgroundImage: `url('/${map}map.jpeg')`,
                 backgroundSize: "cover",
                 backgroundPosition: "center",
                 opacity: 0.7,
