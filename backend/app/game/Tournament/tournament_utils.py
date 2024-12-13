@@ -138,7 +138,7 @@ class RoomManagerNew(RoomManager):
     
     def create_type_two_room(self):
         room = self.type_two[self.type_two_id] = self.generate_room(RM_TYPE[2])
-        room.name = self.type_two_id
+        room.name = f'room_{self.type_two_id}'
         self.type_two_id += 1
         return room
 
@@ -166,6 +166,11 @@ class RoomManagerNew(RoomManager):
             raise RoomNotExist(room_name)
         return self.type_four[room_name]
 
+    def getrandom_or_create(self, _type) :
+        for room in self.type_two :
+            if not room.started:
+                return room
+        return self.create_room(_type=_type, name=None)
     """
     get all in type four rooms needed data
     """

@@ -91,6 +91,14 @@ class TournamentConsumer(AsyncWebsocketConsumer):
         self.game = None
         self.state = ''
         self.competitor.set_competition_type(self._type)
+        if self._type == "TWO":
+            self.room = TournamentConsumer.rm.get_or_create(_type=self._type)
+            self.competitor.join_room(self.room)
+            self.channel_layer.group_add(self.room, self.channel_name)
+            await self.channel_layer.group_send(self.room.name, {
+                'type' : 'joined.competitor'
+            })
+            
     
     async def init_game(self, event):
         self.match = self.room.tournament.get_player_match(self.channel_name)
