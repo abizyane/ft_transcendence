@@ -35,7 +35,7 @@ const Registration = () => {
     handleRegistrationSubmit(data, setSuccessMessage, setErrorMessage, router);
   };
   return (
-    <div className="font-mont p-6 backdrop-blur-lg bg-gray-800/60 rounded-xl shadow-lg max-w-sm w-full">
+    <div className="font-mont p-6 backdrop-blur-lg bg-gray-800/30 rounded-xl shadow-lg max-w-sm w-full">
       {successMessage && (
         <div className="text-green-500 text-center mb-4">{successMessage}</div>
       )}
@@ -108,9 +108,9 @@ const Registration = () => {
   href="http://localhost:8000/api/42OAuth"
 >
   <img
-    src="https://res.cloudinary.com/dwxvnezhn/image/upload/f_auto,q_auto/v1/pics/hxangc1kyhtibnepmygf"
+    src="/42.png"
     alt="42 Logo"
-    className="w-8 h-8 rounded-full"
+    className="w-10 h-10 rounded-full"
     width={24}
     height={24}
   />

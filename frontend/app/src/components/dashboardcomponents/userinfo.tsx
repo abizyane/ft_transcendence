@@ -2,11 +2,14 @@ import React, { useEffect, useState } from "react";
 import DoughnutChart from "../Charts/Winrate";
 import { useUser } from "@/services/context/usercontext";
 import { MdOutlinePersonAddAlt1, MdPersonAddAlt1 } from "react-icons/md";
+import { FaHourglassEnd } from "react-icons/fa";
 import { ImBlocked, ImEyeBlocked } from "react-icons/im";
 import { IoIosRemoveCircleOutline } from "react-icons/io";
 import Link from "next/link";
 import toast from 'react-hot-toast';
 import { useRouter } from 'next/navigation';
+import { IoPersonRemove } from "react-icons/io5";
+
 
 type User = {
   id: string;
@@ -269,6 +272,8 @@ const UserInfo: React.FC<UserInfoProps> = ({ user, setUser }) => {
                 alt="User Profile"
                 className="w-full h-auto object-cover rounded-2xl"
               />
+              {currentUser?.id !== user?.id && 
+              <div className="text-white text-xl font-bold text-center mt-2"><p>{user.username} </p></div>}
             </div>
             <div className="flex flex-col border-[2px] border-violet-primary rounded-xl m-1 h-auto w-full p-2">
               <p className="text-white font-semibold text-xs justify-start flex">Level {user.level}</p>
@@ -295,11 +300,11 @@ const UserInfo: React.FC<UserInfoProps> = ({ user, setUser }) => {
             ) : user.relationship === "Friend" ? (
               <div className="border-2 border-violet-primary rounded-3xl p-4 mb-2 mr-2 bg-gray-800 flex flex-col md:flex-row items-center space-y-2 md:space-y-0 md:space-x-2">
                 <button
-                  className="px-4 py-2 flex items-center justify-center bg-red-900 text-white rounded-lg hover:bg-red-950 transition duration-200 w-full md:w-1/2 lg:w-1/2"
+                  className="px-4 py-2 flex items-center justify-center bg-red-900 text-nowrap lg:text-wrap text-white rounded-lg hover:bg-red-950 transition duration-200 w-full md:w-1/2 lg:w-1/2"
                   onClick={handleRemoveFriend}
                   disabled={loading}
                 >
-                  <IoIosRemoveCircleOutline className="text-xl" />
+                  <IoPersonRemove  className="text-fluid mr-2 xl:text-base" />
                   Remove Friend
                 </button>
                 <button
@@ -307,7 +312,7 @@ const UserInfo: React.FC<UserInfoProps> = ({ user, setUser }) => {
                   onClick={handleBlockFriend}
                   disabled={loading}
                 >
-                  <ImBlocked className="text-xl" />
+                  <ImBlocked className="text-fluid mr-2 xl:text-base" />
                   Block
                 </button>
               </div>
@@ -318,7 +323,7 @@ const UserInfo: React.FC<UserInfoProps> = ({ user, setUser }) => {
                   onClick={handleAcceptFriend}
                   disabled={loading}
                 >
-                  <MdOutlinePersonAddAlt1 className="text-xl" />
+                  <MdOutlinePersonAddAlt1 className="text-fluid mr-2 xl:text-base" />
                   Accept
                 </button>
                 <button
@@ -326,7 +331,7 @@ const UserInfo: React.FC<UserInfoProps> = ({ user, setUser }) => {
                   onClick={handleRejectFriend}
                   disabled={loading}
                 >
-                  <ImEyeBlocked className="text-xl" />
+                  <ImEyeBlocked className="text-fluid mr-2 xl:text-base" />
                   Reject
                 </button>
               </div>
@@ -336,7 +341,7 @@ const UserInfo: React.FC<UserInfoProps> = ({ user, setUser }) => {
                   className="px-4 py-2 flex items-center justify-center bg-orange-400 text-white rounded-lg hover:bg-orange-450 transition duration-200 w-full md:w-1/2 lg:w-1/2"
                   disabled
                 >
-                  <MdOutlinePersonAddAlt1 className="text-xl" />
+                  <FaHourglassEnd className="text-fluid mr-2 xl:text-base" />
                   Pending
                 </button>
                 <button
@@ -344,7 +349,7 @@ const UserInfo: React.FC<UserInfoProps> = ({ user, setUser }) => {
                   onClick={handleRejectFriend}
                   disabled={loading}
                 >
-                  <ImEyeBlocked className="text-xl" />
+                  <ImEyeBlocked className="text-fluid mr-2 xl:text-base" />
                   Cancel
                 </button>
               </div>
@@ -355,7 +360,7 @@ const UserInfo: React.FC<UserInfoProps> = ({ user, setUser }) => {
                   onClick={handleAddFriend}
                   disabled={loading}
                 >
-                  <MdPersonAddAlt1 className="text-xl" />
+                  <MdPersonAddAlt1 className="text-fluid mr-2 xl:text-base" />
                   Add Friend
                 </button>
                 <button
@@ -363,7 +368,7 @@ const UserInfo: React.FC<UserInfoProps> = ({ user, setUser }) => {
                   onClick={handleBlockFriend}
                   disabled={loading}
                 >
-                  <ImBlocked className="text-xl" />
+                  <ImBlocked className="text-fluid mr-2 xl:text-base" />
                   Block
                 </button>
               </div>

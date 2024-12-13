@@ -220,10 +220,6 @@ const Page = () => {
       toast.error("Please fill in all fields.");
       return;
     }
-    // if (!alias || !roomName) {
-    //   alert("Please fill in all fields.");
-    //   return;
-    // }
     if (roomName.length < 2 || roomName.length > 5) {
       toast.error("Tournament name must be between 2 and 5 characters.");
       return;

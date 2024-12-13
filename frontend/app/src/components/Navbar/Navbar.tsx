@@ -69,10 +69,10 @@ const Navbar = () => {
                   {isLoading ? (
                     <div className="p-2 text-white text-center">Loading...</div>
                   ) : notifications.length > 0 ? (
-                    notifications.map((notif) => {
+                    notifications.map((notif, i) => {
                       console.log(notif);
                       return (
-                        <div className="flex items-center p-2 hover:bg-gray-100 cursor-pointer min-h-[50px] space-x-4">
+                        <div  key={i} className="flex items-center p-2 hover:bg-gray-100 cursor-pointer min-h-[50px] space-x-4">
                           <p className="text-sm w-2/3 px-2 font-medium text-white">
                             {notif.content}
                           </p>

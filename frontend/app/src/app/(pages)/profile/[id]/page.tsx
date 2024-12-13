@@ -15,11 +15,11 @@ import Legend from "../../../../../public/Legend.svg";
 import Expert from "../../../../../public/expert.svg";
 import Grandmaster from "../../../../../public/Grandmaster.svg";
 import ProfileChart from "@/components/Charts/profileChart";
+import toast from 'react-hot-toast';
 
-const user = data.user;
-const values = user.charts.lineChart.data;
-const gameHistory = user.history;
-
+// const user = data.user;
+// const values = user.charts.lineChart.data;
+// const gameHistory = user.history;
 
 const Page = () => {
   const { id: userId } = useParams();
@@ -28,7 +28,8 @@ const Page = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [userLevel, setUserLevel] = useState(1);
-
+  const router=useRouter ();
+  
   const levelImages = {
     1: Rookie.src,
     2: Challenger.src,
@@ -55,7 +56,8 @@ const Page = () => {
       })
         .then((response) => {
           if (!response.ok) {
-            console.log("Response not ok:", response.status);
+            toast.error("You are Blocked");
+            router.push("/dashboard");
             throw new Error("User not found");
           }
           return response.json();
@@ -80,7 +82,7 @@ const Page = () => {
   if (userloading) return (<div className="w-full h-full flex justify-center items-center"><Loader/></div>);
   if (loading) return (<div className="w-full h-full flex justify-center items-center"><Loader/></div>);
   if (error) return <p>Error: {error}</p>;
-  if (!user) return <p>No user found.</p>;
+  if (!user) return <p></p>;
   return (
     <div className="mt-10 lg:mt-0 flex flex-1  w-full px-1 overflow-hidden justify-center items-center">
     <div className="flex-1 w-full flex flex-col items-center justify-center mb-14 mt-2 relative">
