@@ -195,7 +195,5 @@ class RoomManagerNew(RoomManager):
         del self.type_four[room_name]
 
     def remove_type_two_room(self, room_id):
-        print(room_id ,flush=True)
-        print(self.type_two[room_id], flush=True)
-
+        self.type_two_id -= 1
         del self.type_two[room_id]

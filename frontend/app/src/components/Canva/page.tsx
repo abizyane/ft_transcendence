@@ -86,6 +86,9 @@ export default function Canvas ({socketRef, callback, scoreSetter , setWinner, s
         };
 
       }, []);
+    
+    
+    
 
     /*Canvas Function */
     let lastTime = 0
