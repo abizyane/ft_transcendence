@@ -58,6 +58,8 @@ const Dashboard = () => {
   );
   return (
     <>
+    <div className="w-full h-full flex justify-center items-center">
+
       <div className="w-full my-10 h-full">
         <div className="p-10 flex flex-col  lg:gap-8 items-center w-full">
           <div className="flex flex-col lg:flex-row lg:items-center lg:gap-8 w-full ">
@@ -120,6 +122,7 @@ const Dashboard = () => {
           </div>
         </div>
       </div>
+    </div>
     </>
   );
 };

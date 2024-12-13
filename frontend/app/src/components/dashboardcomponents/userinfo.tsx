@@ -31,12 +31,8 @@ const UserInfo: React.FC<UserInfoProps> = ({ user, setUser }) => {
   const { user: currentUser } = useUser();
   const { name, profile_pic_url, xp, level, id } = user;
   const maxXPPerLevel = 1000;
-  const remainingXP = ((xp % maxXPPerLevel) / maxXPPerLevel) * 100;
+  const remainingXP = ((user.xp % maxXPPerLevel) / maxXPPerLevel) * 100;
   
-  // const calculateWinRate = (xp:number) => {
-  //   return totalGames === 0 ? 20 : (xp / 100);
-  // };
-  // const winRatePercentage = calculateWinRate(20, 100);
 
   const [loading, setLoading] = useState(false);
   const Router = useRouter ();
