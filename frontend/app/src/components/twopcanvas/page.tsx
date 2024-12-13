@@ -15,14 +15,14 @@ class ScoreBoard{
         if (this.ball.posX - this.ball.rad < this.game.player.posX )
         {
           this.second_score++;
+          this.game.enemy.score  = this.second_score;
           this.ball.reset_ball() 
-          console.log("update score")
             // this.ball.init(-1)
         }
         else if (this.ball.posX > this.game.enemy.posX + this.game.enemy.width/2)
         {
-            console.log("update score")
             this.first_score++;
+            this.game.player.score  = this.first_score;
             // this.ball.init(1)
             this.ball.reset_ball()
         }
@@ -68,16 +68,16 @@ class Ball {
         if (this.posX - this.rad <= 0){
             this.game.enemy.score += 1
             this.reset_ball()
-        }
-        if (this.posX - this.rad <= this.game.player.posX + this.game.player.width && (this.posY >= this.game.player.posY && this.posY <= this.game.player.posY + this.game.player.height) && ! this.game.player.isHiting)
-        {
-          this.dirX *= -1
-          this.posX = this.game.player.posX + this.game.player.width
-          this.game.player.isHiting = true
-        }
-    }
-    else if (this.posX > this.game.width * 3/4){
-        if (this.posX + this.rad >= this.game.width){
+          }
+          if (this.posX - this.rad <= this.game.player.posX + this.game.player.width && (this.posY >= this.game.player.posY && this.posY <= this.game.player.posY + this.game.player.height) && ! this.game.player.isHiting)
+            {
+              this.dirX *= -1
+              this.posX = this.game.player.posX + this.game.player.width
+              this.game.player.isHiting = true
+            }
+          }
+          else if (this.posX > this.game.width * 3/4){
+            if (this.posX + this.rad >= this.game.width){
             this.game.player.score += 1
             this.reset_ball()
         }
@@ -120,6 +120,7 @@ class Paddle{
       this.color = color
       this.rgb = color
       this.offsetX = 10
+      this.score = 0
   }
   drawRect(ctx){
     ctx.fillRect(this.posX, this.posY, this.width, this.height);
@@ -269,7 +270,7 @@ class Game{
     
   }
   
-  export default function Twopcanvas ({setScores}){
+  export default function Twopcanvas ({setScores, setWinner, setLooser}){
     const CanvasRef = useRef(null)
     const Context = useRef(null)
     const {gameCustomization} = useGame();
@@ -288,6 +289,9 @@ class Game{
                 game.update()
                 game.render(Context.current)
                 if (game.status === 0 ){
+                  if (game.player.score > game.enemy.score)
+                    setWinner(true)
+                  else setLooser(true)
                   return;
                 }
                 requestAnimationFrame(animate)

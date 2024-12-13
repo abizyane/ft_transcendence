@@ -2,16 +2,19 @@
 import Link from 'next/link';
 import { useState, useEffect } from 'react';
 import ReactConfetti from 'react-confetti';
+import { useRouter } from 'next/navigation'
 
 
 function ConfettiComponent({ isWinner }: { isWinner: boolean }) {
   const [isClient, setIsClient] = useState(false);
 
+  const router = useRouter();
   useEffect(() => {
     setIsClient(true);
   }, []);
 
   if (!isClient) return null;
+
 
   return (
     <div className="w-full h-full overflow-hidden flex flex-col justify-center items-center">
@@ -23,7 +26,7 @@ function ConfettiComponent({ isWinner }: { isWinner: boolean }) {
           </div>
           <img src="/celebrate-cheers.gif" alt="celebration" />
           <Link href="/dashboard">
-            <button className="hover:bg-red-700 text-fluid border border-white mt-20 h-12 w-36 text-center rounded-full text-2xl font-bold text-white">
+            <button  className="hover:bg-red-700 text-fluid border border-white mt-20 h-12 w-36 text-center rounded-full text-2xl font-bold text-white">
               Quit
             </button>
           </Link>

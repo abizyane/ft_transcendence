@@ -116,6 +116,7 @@ class Paddle{
       this.color = color 
       this.rgb = color
       this.offsetX = 10
+      this.score = 0;
   }
   drawRect(ctx){
     ctx.fillRect(this.posX, this.posY, this.width, this.height);
@@ -253,7 +254,7 @@ class Game{
     
   }
   
-  export default function Localcanva ({scoreSetter}){
+  export default function Localcanva ({scoreSetter, setWinner, setLooser}){
     const CanvasRef = useRef(null)
     const Context = useRef(null)
     const {gameCustomization} = useGame();
@@ -272,6 +273,9 @@ class Game{
                 game.update()
                 game.render(Context.current)
                 if (game.status === 0 ){
+                  if (game.player.score > game.enemy.score)
+                    setWinner(true)
+                  else setLooser(true)
                   return;
                 }
                 requestAnimationFrame(animate)

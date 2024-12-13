@@ -23,6 +23,8 @@ class GamesHistoryView(APIView):
     def post(self, request):
         try:
             userid = request.data.get('id')
+            if userid is None:
+                raise Profile.DoesNotExist
             user_profile = Profile.objects.get(user_id=userid)
             games = GameModel.get_all_games(user_profile.id).order_by('-created')
             history = []
