@@ -173,7 +173,7 @@ const HistoryPage = () => {
         {/* 1 VS 1 Section */}
         <div className="w-full lg:w-1/2 p-2 rounded-xl border border-violet-primary mb-6 lg:mb-0">
           <h2 className="text-xl md:text-2xl lg:text-3xl font-semibold text-center text-white mb-4">1 VS 1</h2>
-          <div className="space-y-4 overflow-y-auto max-h-64 lg:max-h-[28rem] no-scrollbar">
+          <div className="h-[518px] space-y-4 overflow-y-auto max-h-64 lg:max-h-[28rem] no-scrollbar">
             {loading ? (
                 <div className="flex w-full h-[28rem] items-center justify-center">
                   <Loader />
@@ -183,7 +183,10 @@ const HistoryPage = () => {
                 <MatchDetails key={index} game={game} />
               ))
             ) : (
-              <p className="text-white text-center">No games found</p>
+              <div className="flex justify-center  h-[500px] items-center">
+
+              <p className="text-white text-center text-xl">No Games Found .</p>
+              </div>
             )}
           </div>
         </div>

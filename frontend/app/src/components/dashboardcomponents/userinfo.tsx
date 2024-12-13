@@ -32,6 +32,7 @@ const UserInfo: React.FC<UserInfoProps> = ({ user, setUser }) => {
   const { name, profile_pic_url, xp, level, id } = user;
   const maxXPPerLevel = 1000;
   const remainingXP = ((xp % maxXPPerLevel) / maxXPPerLevel) * 100;
+  
   // const calculateWinRate = (xp:number) => {
   //   return totalGames === 0 ? 20 : (xp / 100);
   // };
@@ -113,14 +114,15 @@ const UserInfo: React.FC<UserInfoProps> = ({ user, setUser }) => {
 
       if (response.ok) {
         const data = await response.json();
-        console.log('Friend blocked successfully:', data);
+        toast.success('Friend blocked successfully:');
+        Router.push("/dashboard");
         // Update the relationship after success
         // onRelationshipChange("Blocked");
         fetchUser();
 
       } else {
         const errorData = await response.json();
-        console.log('Failed to block friend:', errorData);
+        toast.error('Failed to block friend:');
       }
     } catch (error) {
       console.log('Error during the request:', error);
