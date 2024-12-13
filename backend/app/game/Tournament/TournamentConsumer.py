@@ -476,6 +476,18 @@ class TournamentConsumer(AsyncWebsocketConsumer):
                 'ErrorMsg' : "You are not in a room"
             }))
     
+    def handle_input(self, data):
+        input_key = data.get('type')
+        if input_key == "keyW_up" :
+            self.p_holder.paddle.isW = True
+        elif input_key == "keyW_down" :
+            self.p_holder.paddle.isW = False
+        elif input_key == "keyS_up" :
+            self.p_holder.paddle.isS = True
+        elif input_key == "keyS_down" :
+            self.p_holder.paddle.isS = False
+
+        
     async def receive(self, text_data):
         recv_data = json.loads(text_data)
         command = recv_data.get('command')
