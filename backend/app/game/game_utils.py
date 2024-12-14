@@ -4,11 +4,11 @@ import json
 class Ball:
     def __init__(self, game):
         self.game = game
-        self.rad = 5
+        self.rad = 10
         self.posX = game.width / 2
         self.posY = game.height / 2
-        self.speed = 10
-        self.angle = 45
+        self.speed = 8
+        self.angle = 0
         self.dirX = math.cos(self.angle)
         self.dirY = math.sin(self.angle)
         pass
@@ -16,29 +16,31 @@ class Ball:
         if (self.posY + self.rad >= self.game.height or self.posY - self.rad <= 0 ):
             self.dirY *= -1
         #blue Range 
-        if (self.posX < self.game.width * 1/4):
-            if (self.posX - self.rad <= 0):
-                self.game.red.score += 1
-                self.reset_ball()
-            if (self.posX - self.rad <= self.game.blue.x + self.game.blue.width and (self.posY >= self.game.blue.y and self.posY <= self.game.blue.y + self.game.blue.height) and not self.game.blue.isHiting):
-                self.dirX *= -1
-                self.game.blue.isHiting = True
+        # if (self.posX < self.game.width * 1/4):
+        left_collision = self.posX - self.rad
+        if (left_collision <= 0):
+            self.game.red.score += 1
+            self.reset_ball()
+        if ((left_collision <= self.game.blue.x  + self.game.blue.width and left_collision > self.game.blue.x) and (self.posY >= self.game.blue.y and self.posY <= self.game.blue.y + self.game.blue.height) and not self.game.blue.isHiting):
+            self.dirX *= -1
+            self.game.blue.isHiting = True
         #red Range
-        elif (self.posX > self.game.width * 3/4):
-            if (self.posX + self.rad >= self.game.width):
-                self.game.blue.score += 1
-                self.reset_ball()
-            if (self.posX + self.rad >= self.game.red.x and (self.posY >= self.game.red.y and self.posY <= self.game.red.y + self.game.red.height) and not self.game.red.isHiting):
-                self.dirX *= -1
-                self.game.red.isHiting = True
-        else:
-            self.game.red.isHiting = False
-            self.game.blue.isHiting = False
+        # elif (self.posX > self.game.width * 3/4):
+        right_collision = self.posX + self.rad
+        if (right_collision >= self.game.width):
+            self.game.blue.score += 1
+            self.reset_ball()
+        if ((right_collision >= self.game.red.x and right_collision <= self.game.red.x + self.game.red.width) and (self.posY >= self.game.red.y and self.posY <= self.game.red.y + self.game.red.height) and not self.game.red.isHiting):
+            self.dirX *= -1
+            self.game.red.isHiting = True
+        # else:
+        self.game.red.isHiting = False
+        self.game.blue.isHiting = False
             
     
     def reset_ball(self):
         self.posY = self.game.height / 2
-        self.posX = self.game.width / 2
+        self.posX = self.game.width / 2 
 
     def update(self):
         self.checkCollide()
@@ -52,7 +54,7 @@ class Player:
         self.id = id
         self.score = 0
         self.width = 2
-        self.height = 60
+        self.height = 70
         self.x = 0
         self.y = game.height/ 2
         self.color = ''
@@ -86,7 +88,7 @@ class Game:
         self.ball = Ball(self)
         self.blue = None
         self.red = None
-        self.max_score = 6
+        self.max_score = 2000
 
     def is_full(self):
         if len(self.players) == 2:
