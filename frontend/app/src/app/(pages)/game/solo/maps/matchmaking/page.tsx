@@ -12,6 +12,7 @@ import Vsbotcanva from "@/components/Localcanva/page";
 import Localgamecanva from "@/components/twopcanvas/page";
 import Canvas from "@/components/Canva/page";
 import ConfettiComponent from "@/components/Celebration/win";
+import {toast} from 'react-hot-toast'
 
 // Default competitors and user data
 const defaultCompetitors = [
@@ -150,6 +151,11 @@ const Page = () => {
       socketRef.current.onmessage = (e) => {
         if (!(e.data instanceof Blob)) {
           const data = JSON.parse(e.data);
+          if (data.type === "error") {
+            toast.error(data.msg);
+            router.push("/game");
+            return;
+          }
           if (data.type === "room") {
             if (data.command === "setReady") {
               setReady(true);

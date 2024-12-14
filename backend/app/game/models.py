@@ -215,6 +215,10 @@ class TournamentPic(models.Model):
 
 
 class GameInvite(models.Model):
+    class Status(models.TextChoices):
+        PENDING = 'PENDING'
+        ACCEPTED = 'ACCEPTED'
     user_created = models.ForeignKey(User, on_delete=models.CASCADE, null=True, related_name='game_invites_created')
     user_invited = models.ForeignKey(User, on_delete=models.CASCADE, null=True, related_name='game_invites_invited')
     token = models.CharField(max_length=100, null=True)
+    status = models.CharField(max_length=10, choices=Status.choices, default=Status.PENDING)

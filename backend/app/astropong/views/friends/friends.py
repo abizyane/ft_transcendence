@@ -246,8 +246,8 @@ class InviteFriendView(APIView):
             )
             if not relations.exists():
                 return Response({"error": "You must be friends with this user to invite them to a game."}, status=status.HTTP_400_BAD_REQUEST)
-            token = secrets.token_urlsafe(16)
-            GameInvite.objects.create(user_created=user, user_invited=friend, token=token)
+            token = secrets.token_urlsafe(32)
+            GameInvite.objects.create(user_created=user, user_invited=friend, token=token, status=GameInvite.Status.PENDING)
             
             channel_layer = get_channel_layer()
             async_to_sync(channel_layer.group_send)(

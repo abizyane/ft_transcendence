@@ -1,3 +1,4 @@
+from notification.models import Notifications
 from channels.generic.websocket import AsyncWebsocketConsumer
 from .tournament_utils import RoomManagerNew
 from .competitor import CompetitorNamed,Room
@@ -12,7 +13,7 @@ import gc
 import numpy as np
 from channels.db import database_sync_to_async
 from enum import Enum
-from ..models import Profile, GameModel, Scores, TournamentModel
+from ..models import GameInvite, Profile, GameModel, Scores, TournamentModel
 from .room_restrict import RoomRestriction, RoomIsEmpty
 from .alias_restrict import AliasException, NoAlias, AliasAlreadyUsed
 from astropong.serializers.UserSerializer import UserSerializer
@@ -53,6 +54,31 @@ class TournamentConsumer(AsyncWebsocketConsumer):
         self.p_holder.competitor.img = img
         self.p_holder.competitor.user_id = userId
         self.p_holder.competitor._id = userId
+
+    @database_sync_to_async
+    def check_token(self, token):
+        try:
+            game_invite = GameInvite.objects.get(token=token)
+            print("status of game ",game_invite.status, flush=True)
+            try:
+                notif = Notifications.objects.get(link=f"/game/solo/maps?game=randommatch&token={token}")
+                notif.link = None
+                notif.save()
+            except Notifications.DoesNotExist:
+                pass
+            return game_invite.status == GameInvite.Status.PENDING
+        except GameInvite.DoesNotExist:
+            return False
+    
+    @database_sync_to_async
+    def change_token_status(self, token, status):
+        try:
+            game_invite = GameInvite.objects.get(token=token)
+            game_invite.status = status
+            game_invite.save()
+            return True
+        except GameInvite.DoesNotExist:
+            return False
     
     async def connect(self):
         self.user = None
@@ -101,6 +127,13 @@ class TournamentConsumer(AsyncWebsocketConsumer):
                     token = self.scope['query_string'].decode().split('=')[1]
                     if token == "":
                         token = None
+            if token is not None and not await self.check_token(token):
+                await self.send(text_data=json.dumps({
+                    "msg" : f"Token is invalid or expired",
+                    "type" : "error"
+                }))
+                await self.close()
+                return
             self.room = await TournamentConsumer.rm.getrandom_or_create(_type=self._type, token=token)
             self.competitor.join_room(self.room)
             print('l'+self.room.name+'l', flush=True)
@@ -111,6 +144,8 @@ class TournamentConsumer(AsyncWebsocketConsumer):
             self.room.p_holders[self.channel_name] = self.p_holder
             if self.room.is_ready() :
                 self.competitor.is_host = True
+                if self.room.token is not None:
+                    await self.change_token_status(self.room.token, GameInvite.Status.ACCEPTED)
                 await self.play()
 
     @database_sync_to_async
