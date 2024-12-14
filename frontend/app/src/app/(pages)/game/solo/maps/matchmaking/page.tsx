@@ -83,14 +83,22 @@ function Avatar({ user }) {
   );
 }
 
+interface GameState {
+  gameready: boolean;
+  countdown: number | null;
+}
+
 const Page = () => {
-  const [gameready, setReady] = useState(false);
+  // const [gameready, setReady] = useState(false);
+  const [gameState, setGameState] = useState<GameState>({
+    gameready: false,
+    countdown: null,
+    timer: null,
+  });
   const socketRef = useRef(null);
   const [users, setCompetitors] = useState(defaultCompetitors);
   const [scores, setScores] = useState({ one: 0, two: 0 });
   const { user: currentUser } = useUser();
-  const [countdown, setCountdown] = useState(3);
-  // Retrieve the 'game' and 'map' query params
   const searchParams = useSearchParams();
   const token = searchParams.get('token') || null;
 
@@ -99,39 +107,47 @@ const Page = () => {
   const isLocalGame = game === "localgame";
   const isRandomMatch = game === "randommatch";
   const isVsBot = game === "vsbot";
-  const [isCountDownStarted, setCountDownStarted] = useState(false);
-  const [timer, setTimer] = useState(null);
   const [winner, setWinner] = useState(false);
   const [looser, setLooser] = useState(false);
   const router = useRouter();
   const IsConnected = useRef(false);
+  const timer = useRef(null);
   const [isSecondPlayerValid, setIsSecondPlayerValid] = useState(false);
   const [displayCelebration, setDisplayCelebration] = useState(false);
 
 
   let startCountDown = () => {
-
-    if (timer === null) {
-      setCountDownStarted(true);
-      setTimer(
-        setInterval(() => {
-          setCountdown((prev) => {
-            if (prev > 0) return prev - 1;
-            if (prev == 0) {
-              setCountDownStarted(false);
-              clearInterval(timer);
-              setTimer(null);
-            }
-            return 0;
-          });
-        }, 1000)
-      );
+    console.log("starting countdown")
+    if (timer.current === null && gameState.gameready === false) {
+      timer.current = setInterval(() => {
+        setGameState((prev) => {
+          let newCount = prev.countdown;
+          let newTimer = timer.current;
+          let newGameReady = prev.gameready;
+          if (newCount == null && newGameReady === false) newCount = 3;
+          else if (newCount > 0) newCount = newCount - 1;
+          else if (newCount == 0) {
+            clearInterval(newTimer);
+            newTimer = null;
+            timer.current = null;
+            newGameReady = true;
+            newCount = null;
+          }
+          const obj = {
+            ...prev,
+            gameready: newGameReady,
+            countdown: newCount,
+          };
+          console.log("newCount", obj);
+          return obj;
+        });
+      }, 1000);
     }
   };
 
   // WebSocket connection for random matchmaking
   useEffect(() => {
-
+    console.log("isRandomMatch", isRandomMatch);
     if (isRandomMatch && socketRef.current === null) {
       let url = "ws://localhost:8000/ws/tournament/TWO/"
       if (token) {
@@ -156,11 +172,24 @@ const Page = () => {
             router.push("/game");
             return;
           }
+          if (data.timer) {
+            setGameState((prev) => ({
+              ...prev,
+              countdown: data.timer,
+            }));
+          }
           if (data.type === "room") {
             if (data.command === "setReady") {
-              setReady(true);
+              setGameState((prev) => ({
+                ...prev,
+                countdown: null,
+                gameready: true,
+              }));
             } else if (data.command === "wait") {
-              setReady(false);
+              setGameState((prev) => ({
+                ...prev,
+                gameready: false,
+              }));
             }
 
             // Update competitors from WebSocket data
@@ -184,12 +213,6 @@ const Page = () => {
     };
   }, [isRandomMatch, IsConnected]);
 
-  // useEffect(() => {
-  //   if (winner || looser) {
-  //     router.push("/game/solo");
-  //     return;
-  //   }
-  // }, [winner, looser]);
 
   const updateCompetitors = (competitors) => {
     const nextCompetitors = users.map((c) => {
@@ -202,53 +225,24 @@ const Page = () => {
 
   useEffect(() => {
     if (!currentUser) return;
-    console.log("isLocalGame", isLocalGame, isVsBot, currentUser);
     if (isLocalGame) {
       setCompetitors([
         currentUser,
         { ...defaultCompetitors[0], username: "Player2" },
       ]);
-      if (timer == null)
+      if (timer.current == null)
         startCountDown();
-    } else if (isVsBot) {
+    } 
+    else if (isVsBot) {
       setCompetitors([
         currentUser,
         { ...defaultCompetitors[2], username: "Bot", profile_pic_url: "/bot.jpg" },
       ]);
-      console.log("local start count");
-      if (timer == null)
+      if (timer.current == null)
         startCountDown();
     }
   }, [isLocalGame, isVsBot, currentUser]);
 
-  useEffect(() => {
-    startCountDown = () => {
-      console.log("startCountDown", timer);
-      if (timer == null) {
-        setCountDownStarted(true);
-        setTimer(
-          setInterval(() => {
-            setCountdown((prev) => {
-              if (prev > 0) return prev - 1;
-              if (prev == 0) {
-                setCountDownStarted(false);
-                clearInterval(timer);
-                setTimer(null);
-              }
-              return 0;
-            });
-          }, 1000)
-        );
-      }
-    };
-    console.log("countdown", countdown);
-    return () => {
-      if (timer && countdown === 0) {
-        clearInterval(timer);
-        setTimer(null);
-      }
-    };
-  }, [countdown, timer, gameready]);
 
   const [randomUser, setRandomUser] = useState(randomizeUser());
 
@@ -262,14 +256,15 @@ const Page = () => {
         }
       }, 100);
 
-      return () => clearInterval(interval);
+      return () => {
+        clearInterval(interval);
+        console.log("clear interval 2");
+      };
     }
   }, [isRandomMatch, users]);
 
   useEffect(() => {
     if (winner || looser) {
-    console.log("displayCelebration", winner, looser);
-
       setDisplayCelebration(true);
     }
   }, [winner, looser]);
@@ -282,6 +277,13 @@ const Page = () => {
     );
   }
 
+  const setReady = (ready: boolean) => {
+    setGameState((prev) => ({
+      ...prev,
+      gameready: ready,
+    }));
+  };
+
 
 
   if (displayCelebration) {
@@ -292,14 +294,14 @@ const Page = () => {
   
   return (
     <>
-      {timer && countdown > 0 && (
+      {gameState.countdown != undefined && (
         <div className="w-full h-full absolute text-center inset-0 bg-black/20  z-[100] ">
           <h3 className="justify-center items-center w-full h-full flex text-center text-3xl text-white text-nowrap font-extrabold">
-            Game Starting in: {countdown}s
+            Game Starting in: {gameState.countdown}s
           </h3>
         </div>
       )}
-      {gameready && isRandomMatch && countdown <= 0 ? (
+      {gameState.gameready && isRandomMatch ? (
         <div className="max-w-[1200px] w-full h-fit flex flex-col items-center justify-between p-2">
           <div className="max-w-[1200px] w-full  h-fit border-violet-primary backdrop-blur-lg border-2 p-2 rounded-lg flex flex-col mb-24 lg:mb-0">
             <div className="flex justify-between items-center w-full bg-transparent p-2 rounded-lg mb-2">
@@ -358,7 +360,7 @@ const Page = () => {
             </div>
           </div>
         </div>
-      ) : isVsBot && countdown <= 0 ? (
+      ) : isVsBot && gameState.gameready ? (
         <div className="max-w-[1200px] w-full  h-fit flex flex-col items-center justify-between p-2">
           <div className="max-w-[1200px] w-full h-fit border-violet-primary backdrop-blur-lg border-2 p-2 rounded-lg flex flex-col mb-24 lg:mb-0">
             <div className="flex justify-between items-center w-full bg-transparent p-2 rounded-lg mb-2">
@@ -411,7 +413,7 @@ const Page = () => {
             </div>
           </div>
         </div>
-      ) : isLocalGame && countdown <= 0 ? (
+      ) : isLocalGame && gameState.gameready ? (
         <div className="max-w-[1200px] w-full h-fit flex flex-col items-center justify-between p-2">
           <div className="max-w-[1200px] w-full h-fit border-violet-primary backdrop-blur-lg border-2 p-2 rounded-lg flex flex-col mb-24 lg:mb-0">
             <div className="flex justify-between items-center w-full bg-transparent p-2 rounded-lg mb-2">
