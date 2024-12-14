@@ -61,34 +61,32 @@ class Ball {
     iscollide(){
       if (this.posY + this.rad >= this.game.height || this.posY - this.rad <= 0 )
             this.dirY *= -1
-      if (this.posX < this.game.width * 1/4){
-          if (this.posX - this.rad <= 0){
+      // if (this.posX < this.game.width * 1/4){
+        let left_collission = this.posX - this.rad;
+          if (left_collission <= 0){
               this.game.enemy.score += 1
               this.reset_ball()
           }
-          if (this.posX - this.rad <= this.game.player.posX + this.game.player.width && (this.posY >= this.game.player.posY && this.posY <= this.game.player.posY + this.game.player.height) && ! this.game.player.isHiting)
+          if ((left_collission <= this.game.player.posX + this.game.player.width && left_collission >= this.game.player.posX) && (this.posY >= this.game.player.posY && this.posY <= this.game.player.posY + this.game.player.height) && ! this.game.player.isHiting)
           {
             this.dirX *= -1
-            this.posX = this.game.player.posX + this.game.player.width
             this.game.player.isHiting = true
           }
-      }
-      else if (this.posX > this.game.width * 3/4){
-          if (this.posX + this.rad >= this.game.width){
+      // }
+      // else if (this.posX > this.game.width * 3/4){
+        let right_collision = this.posX + this.rad
+          if (right_collision >= this.game.width){
               this.game.player.score += 1
               this.reset_ball()
           }
-          if (this.posX + this.rad >= this.game.enemy.posX && (this.posY >= this.game.enemy.posY && this.posY <= this.game.enemy.posY + this.game.enemy.height) && ! this.game.enemy.isHiting)
+          if ((right_collision >= this.game.enemy.posX && right_collision <= this.game.enemy.posX + this.game.enemy.height) && (this.posY >= this.game.enemy.posY && this.posY <= this.game.enemy.posY + this.game.enemy.height) && ! this.game.enemy.isHiting)
             {
               this.dirX *= -1
-              this.posX = this.game.enemy.posX - this.game.enemy.width
               this.game.enemy.isHiting = true
             }
-      }
-      else{
-        this.game.enemy.isHiting = false
-        this.game.player.isHiting = false
-      }
+      // }
+      this.game.enemy.isHiting = false
+      this.game.player.isHiting = false
     }
 
     reset_ball(){
@@ -264,7 +262,7 @@ class Game{
         CanvasRef.current.width = 560;
         CanvasRef.current.height = 400;
     }, [])
-    
+
     useEffect(()=>{
         let game = new Game(CanvasRef.current,scoreSetter, gameCustomization);
         game.render(Context.current)
