@@ -265,7 +265,7 @@ class Game{
     useEffect(()=>{
         let game = new Game(CanvasRef.current,scoreSetter, gameCustomization);
         game.render(Context.current)
-        function animate(timestamp){
+        function animate(){
             if (CanvasRef.current){
               Context.current.clearRect(0,0, CanvasRef.current.width, CanvasRef.current.height)
                 game.update()

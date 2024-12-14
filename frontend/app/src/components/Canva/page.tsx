@@ -11,32 +11,61 @@ export default function Canvas ({socketRef, callback, scoreSetter , setWinner, s
     const redPosRef = useRef({ x: 0, y: 0 });
     const ballRef = useRef({ x: 0, y: 0 });
     const {gameCustomization} = useGame();
-    const [keyDown, setKeyDown] = useState(false);
-    const [keyUp, setKeyUp] = useState(false);
+    const keyWUp = useRef(false);
+    const keyWdown = useRef(false)
+    const keySUp = useRef(false);
+    const keySDown = useRef(false);
+
     
     const keyDownHandler = (e) =>{
 
         if (e.key === 'w'){
-            setKeyUp(true)
-
+            keyWdown.current = true
         }
         else if (e.key === 's'){
-            setKeyDown(true)
-
+            keySDown.current = true
         }
     }
 
     const keyUpHandler = (e) =>{
-        console.log("keyUpHandler")
         if (e.key === 'w'){
-            setKeyUp(false)
-
+            console.log('wwwwwwww')
+            keyWUp.current = false
         }
         else if (e.key === 's'){
-            setKeyDown(false)
+            keySUp.current = false
         }
     }
     
+    useEffect(() => {
+        if (socketRef.current && socketRef.current.readyState === WebSocket.OPEN){
+            if (keyWUp.current) {
+                console.log("yoyoyoyooyo")
+                socketRef.current.send(JSON.stringify({
+                    'command' : 'input',
+                    'type' : 'keyW_up'
+                }))
+            }if (keyWdown){
+                socketRef.current.send(JSON.stringify({
+                    'command' : 'input',
+                    'type' : 'keyW_down'
+            }))
+            }if (keySUp){
+                socketRef.current.send(JSON.stringify({
+                    'command' : 'input',
+                    'type' : 'keyS_up'
+            }))
+            }if (keySDown){
+                socketRef.current.send(JSON.stringify({
+                    'command' : 'input',
+                    'type' : 'keyS_down'
+            }))
+            }
+        }else{
+            console.error("websocket is already closed")
+        }
+       
+    }, [keySDown.current, keySUp.current, keyWUp.current, keyWdown.current])
 
     useEffect(() => {
         console.log("socket ref on  effect ", socketRef.current)
@@ -91,7 +120,6 @@ export default function Canvas ({socketRef, callback, scoreSetter , setWinner, s
     
 
     /*Canvas Function */
-    let lastTime = 0
     useEffect(()=>{
         const canvas = canvasRef.current
         if (canvas){
@@ -104,65 +132,25 @@ export default function Canvas ({socketRef, callback, scoreSetter , setWinner, s
     }, [])
     
     useEffect(() => {
-        let lastTime = 0;
-    const FPS = 60;
-    const interval = 1000 / FPS;
     let animationFrameId = null;
         const game_loop = (timestamp) =>{
             if (canvasRef.current && Context.current) {
-                const deltaTime = timestamp - lastTime;
-                
-                if (deltaTime >= interval) {
-
                     Context.current.clearRect(0, 0, canvasRef.current.width, canvasRef.current.height);
-    
-                    if (keyUp) {
-                        socketRef.current.send(JSON.stringify({
-                            command: 'input',
-                            type: 'keyW_down',
-                            w: 'true',
-                        }));
-                    } else {
-                        socketRef.current.send(JSON.stringify({
-                            command: 'input',
-                            type: 'keyW_up',
-                            w: 'false',
-                        }));
-                    }
-    
-                    if (keyDown) {
-                        socketRef.current.send(JSON.stringify({
-                            command: 'input',
-                            type: 'keyS_down',
-                            s: 'true',
-                        }));
-                    } else {
-                        socketRef.current.send(JSON.stringify({
-                            command: 'input',
-                            type: 'keyS_up',
-                            s: 'false',
-                        }));
-                    }
-    
                     GameRef.current.update({ 
                         player_1: bluePosRef.current, 
                         player_2: redPosRef.current, 
                         ball: ballRef.current 
                     });
-    
                     GameRef.current.render(Context.current);
-                    lastTime = timestamp;
-                }
             }
             animationFrameId = requestAnimationFrame(game_loop);
         }
             animationFrameId = requestAnimationFrame(game_loop);
-            console.log("updating canvas 2")
             return () => {
                 cancelAnimationFrame(animationFrameId);
             };
         
-    },[ keyDown, keyUp])
+    },[])
 
     return (
         <canvas tabIndex={1} ref={canvasRef} className="w-full h-full"></canvas>
