@@ -11,6 +11,7 @@ interface Message {
   message: string;
   timestamp: string;
   seen: boolean;
+  notification: boolean;
 }
 
 interface ChatUser {

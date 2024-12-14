@@ -81,21 +81,25 @@ class Profile(models.Model):
     def get_tournament_wins(self):
         return TournamentModel.get_all_tournaments(self.id).filter(winner=self.id).count()
     def get_tournament_losses(self):
-        return TournamentModel.get_all_tournaments(self.id).filter(models.Q(winner=self.id)).count()
+        return TournamentModel.get_all_tournaments(self.id).filter(~models.Q(winner=self.id)).count()
 
 class GameModel(models.Model):
+    class Type(models.TextChoices):
+        SEMIFINAL = 'SEMIFINAL'
+        FINAL = 'FINAL'
     player_1 = models.ForeignKey(Profile, related_name="player_one", null=True,on_delete=models.CASCADE)
     player_2 = models.ForeignKey(Profile, related_name="player_two", null=True,on_delete=models.CASCADE)
     status = models.CharField(max_length=5, null=True)
     created = models.DateTimeField(default=timezone.now, null=False)
     updated = models.DateTimeField(default=timezone.now, null=False)
+    type = models.CharField(max_length=10, choices=Type.choices, default=None, null=True)
     created.editable = False
 
     def get_all_games(player_id:int) -> models.QuerySet:
-        games = GameModel.objects.filter(player_1=player_id) | GameModel.objects.filter(player_2=player_id)
+        games = GameModel.objects.filter(models.Q(player_1=player_id) | models.Q(player_2=player_id))
         return games.order_by("created")
 
-    def get_opponent(self, player:Profile):
+    def get_opponent(self, player:Profile) -> Profile:
         if player.id == self.player_1.pk:
             return self.player_2
         elif player.id == self.player_2.pk:

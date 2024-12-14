@@ -16,9 +16,11 @@ from ..models import Profile, GameModel, Scores, TournamentModel
 from .room_restrict import RoomRestriction, RoomIsEmpty
 from .alias_restrict import AliasException, NoAlias, AliasAlreadyUsed
 from astropong.serializers.UserSerializer import UserSerializer
+from chat.models import Message
+from chat.serializers import MessageConsumerSerializer
 
 def is_image_url(url):
-    return url.startswith("http")
+    return url.startswith("http") or url.startswith("https")
 
 def build_absolute_image_uri(scope, relative_path):
     host = dict(scope['headers']).get(b'host', b'localhost').decode('utf-8')
@@ -50,6 +52,7 @@ class TournamentConsumer(AsyncWebsocketConsumer):
         self.p_holder.competitor.username = username
         self.p_holder.competitor.img = img
         self.p_holder.competitor.user_id = userId
+        self.p_holder.competitor._id = userId
     
     async def connect(self):
         self.user = None
@@ -109,7 +112,17 @@ class TournamentConsumer(AsyncWebsocketConsumer):
             if self.room.is_ready() :
                 self.competitor.is_host = True
                 await self.play()
-            
+
+    @database_sync_to_async
+    def create_message(self, opponent):
+        message = Message.objects.create(
+                sender_id=self.room.get_room_host()['id'],
+                receiver_id=self.competitor.user_id,
+                message=f"A tournament match vs {opponent.competitor.alias} is starting now",
+                notification=True
+            )
+        serialized_message = MessageConsumerSerializer(message).data
+        return serialized_message
     
     async def init_game(self, event):
         try :
@@ -137,7 +150,19 @@ class TournamentConsumer(AsyncWebsocketConsumer):
                 "player_1" : {"username":self.competitor.alias, "img":self.competitor.img },
                 "player_2" : {"username":opponent.competitor.alias, "img":opponent.competitor.img}
             }
-
+            if self._type == "FOUR":
+                serialized_message = await self.create_message(opponent)
+                await self.channel_layer.group_send(
+                    "chat_room",
+                    {
+                        'type': 'chat_message',
+                        'message': serialized_message,
+                        'sender': self.room.get_room_host()['username'],
+                        'receiver': self.competitor.username,
+                        'sender_id': self.room.get_room_host()['id'],
+                        'receiver_id': self.competitor.user_id
+                    }
+                )
             self.match.game.init_paddle_pos()
             await self.channel_layer.group_send(self.match_name,{
                 'type' : 'init.match',

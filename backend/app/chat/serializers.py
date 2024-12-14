@@ -34,7 +34,7 @@ class MessageConsumerSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Message
-        fields = ['message_id', 'sender', 'receiver', 'sender_id', 'receiver_id', 'message', 'timestamp', 'seen']
+        fields = ['message_id', 'sender', 'receiver', 'sender_id', 'receiver_id', 'message', 'timestamp', 'seen', 'notification']
 
 class MessageSerializer(serializers.ModelSerializer):
     sender = UserSerializer(read_only=True)
@@ -47,7 +47,8 @@ class MessageSerializer(serializers.ModelSerializer):
             'receiver': instance.receiver.username,
             'message': instance.message,
             'timestamp': str(instance.timestamp),
-            'seen': instance.seen
+            'seen': instance.seen,
+            'notification': instance.notification
         }
 
 class ChatRoomSerializer(serializers.Serializer):
@@ -99,5 +100,6 @@ class ConversationSerializer(serializers.ModelSerializer):
             'message': instance.message,
             'sender': instance.sender.username,
             'timestamp': instance.timestamp,
-            'seen': instance.seen
+            'seen': instance.seen,
+            'notification': instance.notification
         }

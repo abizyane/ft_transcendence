@@ -103,8 +103,10 @@ class Room(RoomAbstract):
             "started" : self.started,
             "img" : self.imageUrl,
             "competitors" : [competitor.get_info() for competitor in self.competitors],
-            "host" : next((competitor.get_info() for competitor in self.competitors if competitor.is_host), None)
+            "host" : self.get_room_host()
         })
+    def get_room_host(self):
+        return next((competitor.get_info() for competitor in self.competitors if competitor.is_host), None)
     def get_winners_info(self):
         res = []
         for winner in self.winners:
