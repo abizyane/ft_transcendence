@@ -16,56 +16,86 @@ export default function Canvas ({socketRef, callback, scoreSetter , setWinner, s
     const keySUp = useRef(false);
     const keySDown = useRef(false);
 
-    
+
+
     const keyDownHandler = (e) =>{
 
         if (e.key === 'w'){
-            keyWdown.current = true
+          console.log("down:", e.key)
+          socketRef.current.send(JSON.stringify({
+                      'command' : 'input',
+                      'type' : 'keyW_up'
+                  }))
         }
         else if (e.key === 's'){
-            keySDown.current = true
+          console.log("dowm:", e.key)
+          socketRef.current.send(JSON.stringify({
+                      'command' : 'input',
+                      'type' : 'keyS_up'
+              }))
         }
     }
 
     const keyUpHandler = (e) =>{
         if (e.key === 'w'){
-            console.log('wwwwwwww')
-            keyWUp.current = false
+          console.log("up:", e.key)
+          socketRef.current.send(JSON.stringify({
+                      'command' : 'input',
+                      'type' : 'keyW_down'
+              }))
         }
         else if (e.key === 's'){
-            keySUp.current = false
+          console.log("up: ", e.key)
+          socketRef.current.send(JSON.stringify({
+                      'command' : 'input',
+                      'type' : 'keyS_down'
+              }))
         }
     }
-    
+
     useEffect(() => {
-        if (socketRef.current && socketRef.current.readyState === WebSocket.OPEN){
-            if (keyWUp.current) {
-                console.log("yoyoyoyooyo")
-                socketRef.current.send(JSON.stringify({
-                    'command' : 'input',
-                    'type' : 'keyW_up'
-                }))
-            }if (keyWdown){
-                socketRef.current.send(JSON.stringify({
-                    'command' : 'input',
-                    'type' : 'keyW_down'
-            }))
-            }if (keySUp){
-                socketRef.current.send(JSON.stringify({
-                    'command' : 'input',
-                    'type' : 'keyS_up'
-            }))
-            }if (keySDown){
-                socketRef.current.send(JSON.stringify({
-                    'command' : 'input',
-                    'type' : 'keyS_down'
-            }))
-            }
-        }else{
-            console.error("websocket is already closed")
-        }
-       
-    }, [keySDown.current, keySUp.current, keyWUp.current, keyWdown.current])
+      console.log("effect")
+
+        // if (socketRef.current && socketRef.current.readyState === WebSocket.OPEN){
+        //     if (keyWUp.current) {
+        //         console.log("yoyoyoyooyo")
+        //         socketRef.current.send(JSON.stringify({
+        //             'command' : 'input',
+        //             'type' : 'keyW_up'
+        //         }))
+        //         keyWUp.current = false
+        //     }if (keyWdown){
+        //         socketRef.current.send(JSON.stringify({
+        //             'command' : 'input',
+        //             'type' : 'keyW_down'
+        //     }))
+        //     keyWdown.current = false
+        //     }if (keySUp){
+        //         socketRef.current.send(JSON.stringify({
+        //             'command' : 'input',
+        //             'type' : 'keyS_up'
+        //     }))
+        //     keySUp.current = false
+        //     }if (keySDown){
+        //         socketRef.current.send(JSON.stringify({
+        //             'command' : 'input',
+        //             'type' : 'keyS_down'
+        //     }))
+        //     }
+        //     keySDown.current = false
+        // }else{
+        //     console.error("websocket is already closed")
+        // }
+        window.addEventListener('keydown', keyDownHandler);
+        window.addEventListener('keyup', keyUpHandler);
+
+        return () => {
+            console.log("key lestners detroyed")
+            window.removeEventListener('keydown', keyDownHandler);
+            window.removeEventListener('keyup', keyUpHandler);
+        };
+
+    }, [socketRef])
 
     useEffect(() => {
         console.log("socket ref on  effect ", socketRef.current)
@@ -104,20 +134,13 @@ export default function Canvas ({socketRef, callback, scoreSetter , setWinner, s
                     }
                 }
             };
+
         }
-    
-        window.addEventListener('keydown', keyDownHandler);
-        window.addEventListener('keyup', keyUpHandler);
-    
-        return () => {
-            window.removeEventListener('keydown', keyDownHandler);
-            window.removeEventListener('keyup', keyUpHandler);
-        };
 
       }, []);
-    
-    
-    
+
+
+
 
     /*Canvas Function */
     useEffect(()=>{
@@ -130,16 +153,16 @@ export default function Canvas ({socketRef, callback, scoreSetter , setWinner, s
                 GameRef.current = new Game_Front(canvas, {player_one: {posX:bluePosRef.current.x, posY: 3, width: 2, height:60, color: gameCustomization.user_paddle_color  }, player_two:{posX:redPosRef.current.x, posY: 3, width: 2, height:60, color: gameCustomization.opponent_paddle_color}, ball:{color: gameCustomization.ball_color}})
         }
     }, [])
-    
+
     useEffect(() => {
     let animationFrameId = null;
         const game_loop = (timestamp) =>{
             if (canvasRef.current && Context.current) {
                     Context.current.clearRect(0, 0, canvasRef.current.width, canvasRef.current.height);
-                    GameRef.current.update({ 
-                        player_1: bluePosRef.current, 
-                        player_2: redPosRef.current, 
-                        ball: ballRef.current 
+                    GameRef.current.update({
+                        player_1: bluePosRef.current,
+                        player_2: redPosRef.current,
+                        ball: ballRef.current
                     });
                     GameRef.current.render(Context.current);
             }
@@ -149,7 +172,7 @@ export default function Canvas ({socketRef, callback, scoreSetter , setWinner, s
             return () => {
                 cancelAnimationFrame(animationFrameId);
             };
-        
+
     },[])
 
     return (
