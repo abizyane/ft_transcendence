@@ -16,11 +16,10 @@ import ConfettiComponent from "@/components/Celebration/win";
 // Default competitors and user data
 const defaultCompetitors = [
   {
-    id: 0,
     username: "player2",
-    profile_pic_url: "/profile1.jpg",
-    level: 1,
-    xp: 0,
+    profile_pic_url: "/player2.jpg",
+    level: 5,
+    xp: 756,
   },
   {
     username: "random",
@@ -31,9 +30,9 @@ const defaultCompetitors = [
   {
     id: 2,
     username: "bot",
-    profile_pic_url: "/profile-bot.jpg",
-    level: 1,
-    xp: 0,
+    profile_pic_url: "/bot.jpg",
+    level: 8,
+    xp: 600,
   },
 ];
 
@@ -41,10 +40,10 @@ const defaultCompetitors = [
 const randomizeUser = () => {
   const randomPic = `https://randomuser.me/api/portraits/women/${Math.floor(Math.random() * 100)}.jpg`;
   const randomLevel = Math.floor(Math.random() * 100); // Random level between 0-100
-  const randomXP = Math.floor(Math.random() * 1000); 
+  const randomXP = Math.floor(Math.random() * 1000);
   const maxXPPerLevel = 1000;
   const remainingXP = ((randomXP % maxXPPerLevel) / maxXPPerLevel) * 100;
-  
+
   return {
     profile_pic_url: randomPic,
     username: `User_${Math.floor(Math.random() * 1000)}`,
@@ -129,7 +128,7 @@ const Page = () => {
 
   // WebSocket connection for random matchmaking
   useEffect(() => {
-    
+
     if (isRandomMatch && socketRef.current === null) {
       socketRef.current = new WebSocket(
         "ws://localhost:8000/ws/tournament/TWO/"
@@ -173,7 +172,7 @@ const Page = () => {
         socketRef.current = null;
       }
     };
-  }, [isRandomMatch,IsConnected]);
+  }, [isRandomMatch, IsConnected]);
 
   // useEffect(() => {
   //   if (winner || looser) {
@@ -185,7 +184,7 @@ const Page = () => {
   const updateCompetitors = (competitors) => {
     const nextCompetitors = users.map((c) => {
       if (c.id == competitors.id) {
-        console.log( "competitors ----->",c.id, competitors.id);
+        console.log("competitors ----->", c.id, competitors.id);
         return competitors;
       } else return c;
     });
@@ -199,16 +198,16 @@ const Page = () => {
         currentUser,
         { ...defaultCompetitors[0], username: "Player2" },
       ]);
-      if (timer == null) 
-      startCountDown();
+      if (timer == null)
+        startCountDown();
     } else if (isVsBot) {
       setCompetitors([
         currentUser,
-        { ...defaultCompetitors[2], username: "Bot" },
+        { ...defaultCompetitors[2], username: "Bot", profile_pic_url: "/bot.jpg" },
       ]);
       console.log("local start count");
-      if (timer == null) 
-      startCountDown();
+      if (timer == null)
+        startCountDown();
     }
   }, [isLocalGame, isVsBot, currentUser]);
 
@@ -248,12 +247,12 @@ const Page = () => {
       const interval = setInterval(() => {
         const newRandomUser = randomizeUser();
         setRandomUser(newRandomUser);
-        if (users[1].id) { 
+        if (users[1]?.id) {
           clearInterval(interval);
         }
-      }, 100); 
+      }, 100);
 
-      return () => clearInterval(interval); 
+      return () => clearInterval(interval);
     }
   }, [isRandomMatch, users]);
 
@@ -284,7 +283,7 @@ const Page = () => {
   return (
     <>
       {timer && countdown > 0 && (
-        <div className="w-full h-full absolute text-center inset-0 bg-black/20 backdrop-blur-md  z-[100] ">
+        <div className="w-full h-full absolute text-center inset-0 bg-black/20  z-[100] ">
           <h3 className="justify-center items-center w-full h-full flex text-center text-3xl text-white text-nowrap font-extrabold">
             Game Starting in: {countdown}s
           </h3>
@@ -295,9 +294,9 @@ const Page = () => {
           <div className="max-w-[1200px] w-full  h-fit border-violet-primary backdrop-blur-lg border-2 p-2 rounded-lg flex flex-col mb-24 lg:mb-0">
             <div className="flex justify-between items-center w-full bg-transparent p-2 rounded-lg mb-2">
               <div className="flex items-center space-x-2 bg-gray-700 p-1 lg:p-3 rounded-full w-36 lg:w-1/3 lg:h-14 justify-center lg:justify-start">
-                <Image
-                  src={Mars}
-                  alt="First User"
+                <img
+                  src={users[0].profile_pic_url}
+                  alt="First Player"
                   width={30}
                   height={30}
                   className="rounded-full"
@@ -321,8 +320,8 @@ const Page = () => {
                     {users[1].username}
                   </div>
                 </div>
-                <Image
-                  src={Mars}
+                <img
+                  src={users[1].profile_pic_url}
                   alt="Second User"
                   width={30}
                   height={30}
@@ -333,7 +332,7 @@ const Page = () => {
             <div
               className=" w-full h-full flex items-center justify-center border-4 object-cover border-white rounded-lg relative"
               style={{
-                backgroundImage: `url('/${map}.jpeg')`,
+                backgroundImage: `url('/${map}map.jpeg')`,
                 backgroundSize: "cover",
                 backgroundPosition: "center",
                 opacity: 0.7,
@@ -353,14 +352,14 @@ const Page = () => {
         <div className="max-w-[1200px] w-full  h-fit flex flex-col items-center justify-between p-2">
           <div className="max-w-[1200px] w-full h-fit border-violet-primary backdrop-blur-lg border-2 p-2 rounded-lg flex flex-col mb-24 lg:mb-0">
             <div className="flex justify-between items-center w-full bg-transparent p-2 rounded-lg mb-2">
-            <div className="flex items-center space-x-2 bg-gray-700 p-1 lg:p-3 rounded-full w-36 lg:w-1/3 lg:h-14 justify-center lg:justify-start">
-              <div className=" w-12 h-12 lg:w-14 lg:h-14">
-                <img src={users[0].profile_pic_url} alt="player 1 pic" className="rounded-full object-cover w-full h-full p-1" />
+              <div className="flex items-center space-x-2 bg-gray-700 p-1 lg:p-3 rounded-full w-36 lg:w-1/3 lg:h-14 justify-center lg:justify-start">
+                <div className=" w-12 h-12 lg:w-14 lg:h-14">
+                  <img src={users[0].profile_pic_url} alt="player 1 pic" className="rounded-full object-cover w-full h-full p-1" />
+                </div>
+                <div className="text-white">
+                  <div className="text-xs font-bold">{users[0].username}</div>
+                </div>
               </div>
-              <div className="text-white">
-                <div className="text-xs font-bold">{users[0].username}</div>
-              </div>
-            </div>
               <div className="flex items-center space-x-2 m-2">
                 <div className="text-xl lg:text-3xl text-white font-bold">
                   {scores.one}
@@ -376,9 +375,9 @@ const Page = () => {
                     {users[1].username}
                   </div>
                 </div>
-                <Image
-                  src={Mars}
-                  alt="Second User"
+                <img
+                  src={users[1].profile_pic_url}
+                  alt="Bot pic"
                   width={30}
                   height={30}
                   className="rounded-full"
@@ -407,9 +406,9 @@ const Page = () => {
           <div className="max-w-[1200px] w-full h-fit border-violet-primary backdrop-blur-lg border-2 p-2 rounded-lg flex flex-col mb-24 lg:mb-0">
             <div className="flex justify-between items-center w-full bg-transparent p-2 rounded-lg mb-2">
               <div className="flex items-center space-x-2 bg-gray-700 p-1 lg:p-3 rounded-full w-36 lg:w-1/3 lg:h-14 justify-center lg:justify-start">
-              <div className=" w-12 h-12 lg:w-14 lg:h-14">
-                <img src={users[0].profile_pic_url} alt="player 1 pic" className="rounded-full object-cover w-full h-full p-1" />
-              </div>
+                <div className=" w-12 h-12 lg:w-14 lg:h-14">
+                  <img src={users[0].profile_pic_url} alt="player 1 pic" className="rounded-full object-cover w-full h-full p-1" />
+                </div>
                 <div className="text-white">
                   <div className="text-xs font-bold">{users[0].username}</div>
                 </div>
@@ -429,9 +428,9 @@ const Page = () => {
                     {users[1].username}
                   </div>
                 </div>
-                <Image
-                  src={Mars}
-                  alt="Second User"
+                <img
+                  src={users[1].profile_pic_url}
+                  alt="player 2"
                   width={30}
                   height={30}
                   className="rounded-full"
@@ -441,7 +440,7 @@ const Page = () => {
             <div
               className="flex-grow w-full h-full flex items-center justify-center border-4 object-cover border-white rounded-lg relative"
               style={{
-                backgroundImage: `url('/${map}.jpeg')`,
+                backgroundImage: `url('/${map}map.jpeg')`,
                 backgroundSize: "cover",
                 backgroundPosition: "center",
                 opacity: 0.7,
@@ -453,44 +452,40 @@ const Page = () => {
         </div>
       ) : (
         <div className="flex flex-col lg:flex-row gap-4 lg:gap-24 items-center justify-center lg:w-fit h-fit">
-         {
-  isRandomMatch && users[0] ? (
-    <li key={`user-${currentUser.id}`}>
-      <Avatar user={currentUser} />
-      <div className="bg-blue-600">here</div>
-    </li>
-  ) : (
-    <Avatar user={currentUser} />
-  )
-}
+          {
+            isRandomMatch && users[1]?.id ? (
+              <li key={`user-${users[0].id}`}>
+                <Avatar user={users[0]} />
+              </li>
+            ) : (
+              <Avatar user={currentUser} />
+            )
+          }
 
-<div className="flex items-center justify-center">
-  <div className="w-16 h-16 lg:w-32 lg:h-32 rounded-full bg-white flex items-center justify-center">
-    <img
-      src={VS.src}
-      alt="VS"
-      className="w-full h-full rounded-full"
-    />
-  </div>
-</div>
+          <div className="flex items-center justify-center">
+            <div className="w-16 h-16 lg:w-32 lg:h-32 rounded-full bg-white flex items-center justify-center">
+              <img
+                src={VS.src}
+                alt="VS"
+                className="w-full h-full rounded-full"
+              />
+            </div>
+          </div>
 
-{isLocalGame && users[1] && <Avatar user={users[1]} />}
-{isVsBot && defaultCompetitors[2] && <Avatar user={defaultCompetitors[2]} />}
+          {isLocalGame && users[1] && <Avatar user={users[1]} />}
+          {isVsBot && defaultCompetitors[2] && <Avatar user={defaultCompetitors[2]} />}
 
-{isRandomMatch && users[1].id  && (
-  <li key={users[1].id}>
-    <Avatar user={users[1]} />
-    
-    <div className="bg-red-600">{users[1].username}</div>
-  </li>
-)}
+          {isRandomMatch && users[1]?.id && (
+            <li key={users[1].id}>
+              <Avatar user={users[1]} />
+            </li>
+          )}
 
-{isRandomMatch && !users[1].id && (
-  <li key={randomUser.username}>
-    <Avatar user={randomUser} />
-    <div className="bg-red-600">here {randomUser.username}</div>
-  </li>
-)}
+          {isRandomMatch && !users[1]?.id && (
+            <li key={randomUser.username}>
+              <Avatar user={randomUser} />
+            </li>
+          )}
         </div>
       )}
     </>

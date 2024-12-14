@@ -166,6 +166,8 @@ const HistoryPage = () => {
   ];
 
   return (
+    <div className="w-full h-full flex justify-center items-center">
+
     <div className="h-full py-10 px-4 max-w-screen-2xl lg:min-w-full">
       <h1 className="text-2xl md:text-3xl lg:text-4xl font-bold text-white text-center mb-6">History</h1>
 
@@ -194,7 +196,7 @@ const HistoryPage = () => {
         {/* Tournament Section */}
         <div className="w-full lg:w-1/2 p-2 rounded-xl border border-violet-primary">
           <h2 className="text-xl md:text-2xl lg:text-3xl font-semibold text-center text-white mb-4">Tournaments</h2>
-          <div className="space-y-6 overflow-y-auto max-h-[30rem] lg:max-h-[28rem]">
+          <div className="space-y-6 overflow-y-auto max-h-[30rem] lg:max-h-[28rem] no-scrollbar">
             {tournamentData.map((tournament, index) => (
               <TournamentDetails key={index} {...tournament} />
             ))}
@@ -202,6 +204,7 @@ const HistoryPage = () => {
         </div>
       </div>
     </div>
+  </div>
   );
 };
 

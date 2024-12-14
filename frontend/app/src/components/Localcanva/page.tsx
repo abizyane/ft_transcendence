@@ -25,6 +25,7 @@ class ScoreBoard{
         if (this.first_score === 10 || this.second_score === 10)
         {
             this.game.status = 0;
+            this.game.player.win = true 
         }
         this.scoreSetter({one : this.first_score , two:this.second_score });
     }

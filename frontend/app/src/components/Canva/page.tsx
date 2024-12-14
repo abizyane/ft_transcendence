@@ -49,7 +49,7 @@ export default function Canvas ({socketRef, callback, scoreSetter , setWinner, s
                     bluePosRef.current = {x:floatArray[0], y:floatArray[1]}
                     redPosRef.current = {x:floatArray[2],y:floatArray[3]}
                     ballRef.current = {x:floatArray[4], y:floatArray[5]}
-                    if (scores.one != floatArray[6] || scores.two != floatArray[7]){
+                    if (scores?.one != floatArray[6] || scores?.two != floatArray[7]){
                         scoreSetter({one: floatArray[6], two: floatArray[7]})
                     }
                 } else {
