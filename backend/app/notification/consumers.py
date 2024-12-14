@@ -79,11 +79,14 @@ class NotificationConsumer(AsyncWebsocketConsumer):
         if receiver != 'all' and receiver != self.scope['user'].username:
             return
         receiver = self.scope['user'].username if receiver == 'all' else receiver
+        link = None
+        if 'link' in event:
+            link = event["link"]
 
         notification = await self.create_notification(receiver, 
             event['notification_type'],
             event['content'],
-            event['link']
+            link
         )
         if notification:
             await self.send(text_data=json.dumps({

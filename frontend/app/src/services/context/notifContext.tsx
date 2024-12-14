@@ -1,3 +1,4 @@
+"use client"
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { useUser } from './usercontext';
 import toast from "react-hot-toast";
@@ -52,7 +53,7 @@ export const NotifProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   };
 
   const addNotification = (notification: Notification) => {
-    setNotifications((prevNotifications) => [...(prevNotifications || []), notification]);
+    setNotifications((prevNotifications) => [notification,...(prevNotifications || [])]);
   };
 
   const connectSocket = () => {
