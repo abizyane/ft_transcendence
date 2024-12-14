@@ -662,6 +662,10 @@ const Page = () => {
               <button
                 className="bg-violet-900/90 text-white font-bold py-2 px-4 mt-6 rounded hover:bg-violet-700"
               onClick={(e) => {
+                if (
+                  WebSocketRef.current &&
+                  WebSocketRef.current.readyState === WebSocket.OPEN
+                )
                 WebSocketRef.current.send(JSON.stringify({
                   command: 'play'
                 }))

@@ -51,6 +51,7 @@ class Room(RoomAbstract):
         self.imageModel = None
         self.imageUrl = None
         self.tournament = Tournament()
+        self.token = None
     @database_sync_to_async
     def set_image(self, image_id, scope=None):
         try:

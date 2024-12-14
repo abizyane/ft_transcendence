@@ -208,3 +208,9 @@ class TournamentPic(models.Model):
     tournament_id = models.OneToOneField(TournamentModel, on_delete=models.CASCADE, null=True)
     user_id = models.ForeignKey(User, on_delete=models.CASCADE, null=True)
     picture = models.CharField(max_length=500, null=True)
+
+
+class GameInvite(models.Model):
+    user_created = models.ForeignKey(User, on_delete=models.CASCADE, null=True, related_name='game_invites_created')
+    user_invited = models.ForeignKey(User, on_delete=models.CASCADE, null=True, related_name='game_invites_invited')
+    token = models.CharField(max_length=100, null=True)

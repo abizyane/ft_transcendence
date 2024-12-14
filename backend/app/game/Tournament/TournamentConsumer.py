@@ -92,7 +92,13 @@ class TournamentConsumer(AsyncWebsocketConsumer):
         self.state = ''
         self.competitor.set_competition_type(self._type)
         if self._type == "TWO":
-            self.room = await TournamentConsumer.rm.getrandom_or_create(_type=self._type)
+            token = None
+            if self.scope['query_string'] is not None:
+                if self.scope['query_string'].decode().split('=')[0] == 'token':
+                    token = self.scope['query_string'].decode().split('=')[1]
+                    if token == "":
+                        token = None
+            self.room = await TournamentConsumer.rm.getrandom_or_create(_type=self._type, token=token)
             self.competitor.join_room(self.room)
             print('l'+self.room.name+'l', flush=True)
             await self.channel_layer.group_add(self.room.name, self.channel_name)

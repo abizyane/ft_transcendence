@@ -7,13 +7,13 @@ from urllib.parse import urljoin
 from django.conf import settings
 
 class UserSerializer(serializers.ModelSerializer):
-    profile_pic = serializers.SerializerMethodField()
+    profile_pic_url = serializers.SerializerMethodField()
 
     class Meta:
         model = User
-        fields = ['id', 'username', 'profile_pic', 'is_online']
+        fields = ['id', 'username', 'profile_pic_url', 'is_online']
 
-    def get_profile_pic(self, obj):
+    def get_profile_pic_url(self, obj):
         request = self.context.get('request')
         if request is None:
             return None
@@ -93,7 +93,7 @@ class ConversationSerializer(serializers.ModelSerializer):
         return {
             'id': other_user.id,
             'username': other_user.username,
-            'profile_pic': UserSerializer(other_user, context=self.context).data['profile_pic'],
+            'profile_pic_url': UserSerializer(other_user, context=self.context).data['profile_pic_url'],
             'is_online': other_user.is_online,
             'relationship': FriendSerializer(other_user, context={'request': self.context['request'], 'relationships': relation}).data['relationship'],
             'message': instance.message,

@@ -31,17 +31,8 @@ class NotificationListView(views.APIView):
     def get(self, request):
         try :
             user = request.user
-            # paginated_response = self.get_notifications(request)
             notifications = Notifications.objects.filter(user=user).order_by('-timestamp')
             return Response(NotificationSerializer(notifications, many=True).data, status=200)
-            # notifications = paginated_response.data.get('results', [])
-            # if not notifications:
-            #     return Response({'error': 'No notifications found for the specified user.'}, status=404)
-            # return Response({
-            #     'notifications': notifications,
-            #     'next': paginated_response.data.get('next'),
-            #     'previous': paginated_response.data.get('previous')
-            # })
         except Http404 as e:
             return Response({'error': str(e)}, status=404)
 

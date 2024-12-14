@@ -114,7 +114,7 @@ useEffect(() => {
   }, [currentChat, loading]);
 
   if (!currentChat) {
-    return <div>No chat data found.</div>;
+    return <div className="h-full w-full flex justify-center items-center">No chat data found.</div>;
   }
   return (
     <div className="h-full">

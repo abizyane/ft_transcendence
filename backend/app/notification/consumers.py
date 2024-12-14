@@ -79,7 +79,12 @@ class NotificationConsumer(AsyncWebsocketConsumer):
         if receiver != 'all' and receiver != self.scope['user'].username:
             return
         receiver = self.scope['user'].username if receiver == 'all' else receiver
-        notification = await self.create_notification(receiver, event['notification_type'], event['content'])
+
+        notification = await self.create_notification(receiver, 
+            event['notification_type'],
+            event['content'],
+            event['link']
+        )
         if notification:
             await self.send(text_data=json.dumps({
                 'notification_id': notification.notification_id,
@@ -88,6 +93,7 @@ class NotificationConsumer(AsyncWebsocketConsumer):
                 'content': notification.content,
                 'timestamp': str(notification.timestamp),
                 'seen': notification.seen,
+                'link': notification.link
             }))
 
     async def notify_user(self, content, notification_type, receiver = None): #this can be used to notify all users or a specific user
@@ -130,7 +136,7 @@ class NotificationConsumer(AsyncWebsocketConsumer):
             }))
 
     @database_sync_to_async
-    def create_notification(self, receiver, type, content):
+    def create_notification(self, receiver, type, content, link):
         # user = self.get_user(receiver)
         # if not user:
         try:
@@ -138,7 +144,7 @@ class NotificationConsumer(AsyncWebsocketConsumer):
         except User.DoesNotExist:
             print(f"User {receiver} does not exist")
             return None
-        return Notifications.objects.create(user=receiver, type=type, content=content)
+        return Notifications.objects.create(user=receiver, type=type, content=content, link=link)
 
     @database_sync_to_async
     def get_user(self, username):

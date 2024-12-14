@@ -137,8 +137,9 @@ class RoomManagerNew(RoomManager):
         self.type_four = {}
         self.type_two_id = 0
     
-    async def create_type_two_room(self):
+    async def create_type_two_room(self, token=None):
         room = await self.generate_room(RM_TYPE[2])
+        room.token = token
         room.name = f'room_{self.type_two_id}'
         self.type_two[room.name] = room
         self.type_two_id += 1
@@ -168,13 +169,17 @@ class RoomManagerNew(RoomManager):
             raise RoomNotExist(room_name)
         return self.type_four[room_name]
 
-    async def getrandom_or_create(self, _type) :
+    async def getrandom_or_create(self, _type, token=None) :
         print(self.type_two, flush=True)
 
         for i,r in  self.type_two.items():
-            if not r.started:
-                return r
-        return await self.create_type_two_room()
+            if token == None:
+                if not r.started and r.token == None:
+                    return r
+            else:
+                if not r.started and r.token == token:
+                    return r
+        return await self.create_type_two_room(token)
     """
     get all in type four rooms needed data
     """

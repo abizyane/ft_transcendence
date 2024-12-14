@@ -9,15 +9,17 @@ import { useSearchParams } from 'next/navigation';
 const ChooseGalaxy = () => {
   const searchParams = useSearchParams();
   const game = searchParams.get('game');
+  const token = searchParams.get('token') || null;
   const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
 
   
-  const buildLink = (map: string) => {
+  const buildLink = (map: string, token: string | null) => {
     return {
       pathname: "/game/solo/maps/matchmaking",
       query: {
         game,
-        map
+        map,
+        token
       }
     };
   };
@@ -37,7 +39,7 @@ const ChooseGalaxy = () => {
             className={`w-[90%] md:w-[40%] xl:w-[20%] h-[24%] md:h-[70%] xl:h-[90%] m-2 flex flex-col rounded-2xl border-4 border-violet-primary overflow-hidden transform transition-transform duration-300 ${hoveredIndex === 0 ? 'scale-105' : hoveredIndex === null ? 'scale-100' : 'blur-sm'}`}
           >
             <Link
-              href={{ pathname: "/game/solo/maps/matchmaking", query: { game, map: "mars" }}}  // Passing both game and map
+              href={{ pathname: "/game/solo/maps/matchmaking", query: { game, map: "mars", token }}}  // Passing both game and map
               className="h-full w-full"
             >
               <div
@@ -58,7 +60,7 @@ const ChooseGalaxy = () => {
             className={`w-[90%] md:w-[40%] xl:w-[20%] h-[24%] md:h-[70%] xl:h-[90%] m-2 flex flex-col rounded-2xl border-4 border-violet-primary overflow-hidden transform transition-transform duration-300 ${hoveredIndex === 1 ? 'scale-105' : hoveredIndex === null ? 'scale-100' : 'blur-sm'}`}
           >
             <Link
-              href={{ pathname: "/game/solo/maps/matchmaking", query: { game, map: "earth" }}}  // Passing both game and map
+              href={{ pathname: "/game/solo/maps/matchmaking", query: { game, map: "earth", token }}}  // Passing both game and map
               className="h-full w-full"
             >
               <div
@@ -79,7 +81,7 @@ const ChooseGalaxy = () => {
             className={`w-[90%] md:w-[40%] xl:w-[20%] h-[24%] md:h-[70%] xl:h-[90%] m-2 flex flex-col rounded-2xl border-4 border-violet-primary overflow-hidden transform transition-transform duration-300 ${hoveredIndex === 2 ? 'scale-105' : hoveredIndex === null ? 'scale-100' : 'blur-sm'}`}
           >
             <Link
-              href={{ pathname: "/game/solo/maps/matchmaking", query: { game, map: "jupiter" }}}  // Passing both game and map
+              href={{ pathname: "/game/solo/maps/matchmaking", query: { game, map: "jupiter", token }}}  // Passing both game and map
               className="h-full w-full"
             >
               <div

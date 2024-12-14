@@ -91,6 +91,8 @@ const Page = () => {
   const [countdown, setCountdown] = useState(3);
   // Retrieve the 'game' and 'map' query params
   const searchParams = useSearchParams();
+  const token = searchParams.get('token') || null;
+
   const game = searchParams.get("game");
   const map = searchParams.get("map");
   const isLocalGame = game === "localgame";
@@ -130,9 +132,11 @@ const Page = () => {
   useEffect(() => {
 
     if (isRandomMatch && socketRef.current === null) {
-      socketRef.current = new WebSocket(
-        "ws://localhost:8000/ws/tournament/TWO/"
-      );
+      let url = "ws://localhost:8000/ws/tournament/TWO/"
+      if (token) {
+        url += `?token=${token}`;
+      }
+      socketRef.current = new WebSocket(url);
       socketRef.current.onopen = () => {
         IsConnected.current = true;
         console.log("WebSocket connected");
