@@ -69,6 +69,7 @@ const Page = () => {
   const [players, setPlayers] = useState([]);
   const [tournamentStarted, setTournamentStarted] = useState(false);
   const [matchPlayers, setMatchPlayers] = useState<Players | null>(null);
+  const [isUploadingImage, setIsUploadingImage] = useState(false);
 
   const [winners, setWinners] = useState<WinnersPlayers | null>({
     one:null,
@@ -231,6 +232,7 @@ const Page = () => {
     formData.append('tournament_pic', profileImage);
 
     try {
+      setIsUploadingImage(true);
       const response = await fetch('http://localhost:8000/api/upload_tournament_pic', {
         method: 'POST',
         body: formData,
@@ -242,18 +244,24 @@ const Page = () => {
         console.error(responseData);
         toast.error('Image upload failed');
         setPreviewImage(null);
+        setIsUploadingImage(false);
+
         return false;
       } else {
         console.log(responseData);
         toast.success('Image updated successfully');
         setCreationImageid(responseData.picture_id);
         setPreviewImage(responseData.tournament_pic_url);
+      setIsUploadingImage(false);
+
         return true;
       }
     } catch (error) {
       console.error('Error uploading image:', error);
       toast.error('Error uploading image');
       setPreviewImage(null);
+      setIsUploadingImage(false);
+
     }
   };
   const handleCreateTournament = (event) => {
@@ -440,6 +448,7 @@ const Page = () => {
     const [readyToPlay, setReadyToPlay] = useState(false);
     const [timer, setTimer] = useState(null);
 
+
     const handleRoomUpdate = (users) => {
       // const nextUserList = defaultUsers.map(
       //   (user) => users.find((u) => u.id === user.id) || user
@@ -453,7 +462,9 @@ const Page = () => {
           const data = JSON.parse(e.data);
           if (data.timer)
           {
+            console.log("setting timer", data.timer)
             setTimer(data.timer);
+            console.log("timer set", timer)
           }
           if (data.type === "match_players")
           {
@@ -528,7 +539,6 @@ const Page = () => {
     }, []);
 
 
-    console.log("ready", ready, players, winners);
 
     return (
       <div className="w-full h-full flex justify-center items-center">
@@ -732,12 +742,14 @@ const Page = () => {
                         />
                       </div>
                       <div className="flex justify-between">
+                      {!isUploadingImage && (
                         <button
-                          type="submit"
-                          className="w-full bg-green-500 py-2 rounded-md"
-                        >
-                          Create Tournament
-                        </button>
+                        type="submit"
+                        className="w-full bg-green-500 py-2 rounded-md"
+                      >
+                        Create Tournament
+                      </button>
+                      )}
                       </div>
                     </form>
                   </div>

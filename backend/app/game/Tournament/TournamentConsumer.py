@@ -149,7 +149,7 @@ class TournamentConsumer(AsyncWebsocketConsumer):
             'type' : 'match_players',
             'players' : players
         }))
-        for i in range(3, 0, -1):
+        for i in range(5, 0, -1):
             await self.send(json.dumps({
                 'timer': str(i)
             }))
