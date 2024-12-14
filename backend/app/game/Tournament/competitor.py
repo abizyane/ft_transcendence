@@ -72,7 +72,7 @@ class Competitor(AbstractCompetitor):
             'alias' : self.alias,
             'profile_pic_url' : self.img,
             'lost' : self.islost,
-            'id' : self._id,
+            'id' : self.user_id,
         }
     
     def get_allroom_info(self):

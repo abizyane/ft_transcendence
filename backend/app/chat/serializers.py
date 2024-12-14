@@ -7,13 +7,13 @@ from urllib.parse import urljoin
 from django.conf import settings
 
 class UserSerializer(serializers.ModelSerializer):
-    profile_pic = serializers.SerializerMethodField()
+    profile_pic_url = serializers.SerializerMethodField()
 
     class Meta:
         model = User
-        fields = ['id', 'username', 'profile_pic', 'is_online']
+        fields = ['id', 'username', 'profile_pic_url', 'is_online']
 
-    def get_profile_pic(self, obj):
+    def get_profile_pic_url(self, obj):
         request = self.context.get('request')
         if request is None:
             return None
@@ -34,7 +34,7 @@ class MessageConsumerSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Message
-        fields = ['message_id', 'sender', 'receiver', 'sender_id', 'receiver_id', 'message', 'timestamp', 'seen']
+        fields = ['message_id', 'sender', 'receiver', 'sender_id', 'receiver_id', 'message', 'timestamp', 'seen', 'notification']
 
 class MessageSerializer(serializers.ModelSerializer):
     sender = UserSerializer(read_only=True)
@@ -47,7 +47,8 @@ class MessageSerializer(serializers.ModelSerializer):
             'receiver': instance.receiver.username,
             'message': instance.message,
             'timestamp': str(instance.timestamp),
-            'seen': instance.seen
+            'seen': instance.seen,
+            'notification': instance.notification
         }
 
 class ChatRoomSerializer(serializers.Serializer):
@@ -93,11 +94,12 @@ class ConversationSerializer(serializers.ModelSerializer):
         return {
             'id': other_user.id,
             'username': other_user.username,
-            'profile_pic': UserSerializer(other_user, context=self.context).data['profile_pic'],
+            'profile_pic_url': UserSerializer(other_user, context=self.context).data['profile_pic_url'],
             'is_online': other_user.is_online,
             'relationship': FriendSerializer(other_user, context={'request': self.context['request'], 'relationships': relation}).data['relationship'],
             'message': instance.message,
             'sender': instance.sender.username,
             'timestamp': instance.timestamp,
-            'seen': instance.seen
+            'seen': instance.seen,
+            'notification': instance.notification
         }

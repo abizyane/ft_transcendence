@@ -4,6 +4,14 @@ friends on other profil  remove chat and game for curr user Done
 hiistory matches showen played with himself Done
 pics for bot and local game Done
 randomise the match making  (must test when tournament ends) Done
+invite (                                    DONE
+challenge f friends list                    DONE
+challenge f profile and other profile       DONE
+challenge f chat  (challenge)               DONE
+)
+notif reverse from recent to old            DONE
+
+
 
 
 
@@ -30,15 +38,13 @@ dashboard tournament played
 to9ba kidouz mn jenb f bot o local game
 to9ba kidouz mn wast l paddle f random match o tournoi
 http://localhost:3000/profile/1666666 page not found instead of showing profile  (same for chat and history)
-invite (
-challenge f friends list 
-challenge f profile and other profile
-challenge f chat  (challenge)
-)
 replace http with https before push (ismail)
 online not upddated on chat   (even when i click on logout unset cookie)
-notif reverse from recent to old
 state offline f mobile 
 
 history  (reverse the order) in other profile and show date  and show status winner or loser also check for draw every time we must have a winner and loser   (using borders or icon)
 level and xp to check on profile 
+
+
+
+CHECK TOURNAMENT PLAYER NAME NOTIFICATIONS ON CHAT PAGE

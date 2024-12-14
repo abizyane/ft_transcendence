@@ -15,15 +15,38 @@ import {
 } from "@/components/ui/dropdown-menu";
 import Loader from "components/loader/loader";
 import { useUser } from "@/services/context/usercontext";
+import { toast } from "react-hot-toast";
+import { useRouter } from "next/navigation";
 
 
 const Friends = ({ user }) => {
   const { friends, loading, error } = useFriendsof(user);
   const { user: currentUser, userloading } = useUser();
+  const router = useRouter();
   if (error) {
     return <div className="text-red-500">{error}</div>;
   }
   if (userloading) return (<div className="w-full h-full flex justify-center items-center"><Loader /></div>);
+  const inviteFriendToGame = async (friendId) => {
+    try {
+      const response = await fetch("http://localhost:8000/api/invite_friend", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ friend_id: friendId }),
+        credentials: "include",
+      });
+      const data = await response.json();
+      if (response.ok) {
+        const token = data.token;
+        toast.success("Friend invited to game");
+        router.push(`/game/solo/maps?game=randommatch&token=${token}`);
+      } else {
+        toast.error(data.error);
+      }
+    } catch (error) {
+      console.log("Error rejecting friend:", error);
+    }
+  };
 
   return (
     <div className=" w-full py-4 lg:w-1/3">
@@ -82,7 +105,8 @@ const Friends = ({ user }) => {
                         </div>
                         <div className="bg-black rounded-full p-2 w-12 h-12 flex items-center justify-center">
                           <button
-                            aria-label="Settings"
+                          onClick={() => inviteFriendToGame(friend.id)}
+                            aria-label="Invite"
                             className="hover:text-red-500 text-white transition-colors"
                           >
                             <FaTableTennisPaddleBall className="w-6 h-6 rounded-full text-red-600 hover:text-red-900" />

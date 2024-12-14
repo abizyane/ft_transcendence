@@ -1,5 +1,9 @@
+import secrets
 from django.core.exceptions import ValidationError
 from django.db import models
+
+from notification.models import Notifications
+from game.models import GameInvite
 from ...models.UserModel import Relationship
 from ...serializers.UserSerializer import FriendSerializer, UserSerializer
 from rest_framework.views import APIView
@@ -8,10 +12,11 @@ from rest_framework.response import Response
 from django.contrib.auth import get_user_model
 from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
-
+from channels.layers import get_channel_layer
 from chat.serializers import UserSerializer as MinUserSerializer
 from rest_framework import generics
 from rest_framework.exceptions import NotAuthenticated, NotFound
+from asgiref.sync import async_to_sync
 # from rest_framework.pagination import PageNumberPagination
 
 User = get_user_model()
@@ -216,3 +221,48 @@ class ListFriendView(APIView):
             context={'request': request, 'relationships': friends_with_relationship}
         )
         return Response(serializer.data)
+
+
+class InviteFriendView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request):
+        user = request.user
+        friendId = request.data.get('friend_id')
+        if friendId is None:
+            return Response({"error": "Friend id is required"}, status=status.HTTP_400_BAD_REQUEST)
+        try:
+            friend = User.objects.get(id=friendId)
+            if friend == user:
+                return Response({"error": "You cannot invite yourself to a game."}, status=status.HTTP_400_BAD_REQUEST)
+        except User.DoesNotExist:
+            return Response({"error": "User not found"}, status=status.HTTP_404_NOT_FOUND)
+        
+        try:
+            relations = Relationship.objects.filter(
+                ((models.Q(user1=user) & models.Q(user2=friend)) |
+                (models.Q(user1=friend) & models.Q(user2=user))) &
+                models.Q(status=Relationship.Status.FRIEND)
+            )
+            if not relations.exists():
+                return Response({"error": "You must be friends with this user to invite them to a game."}, status=status.HTTP_400_BAD_REQUEST)
+            token = secrets.token_urlsafe(16)
+            GameInvite.objects.create(user_created=user, user_invited=friend, token=token)
+            
+            channel_layer = get_channel_layer()
+            async_to_sync(channel_layer.group_send)(
+                "notifications",
+                {
+                    'type': 'notification',
+                    'receiver': friend.username,
+                    'notification_type': "game_invite",
+                    'content': f"{user.username} invited you to a game",
+                    'link': f"/game/solo/maps?game=randommatch&token={token}"
+                }
+            )
+            return Response({
+                "message": "Friend invited.",
+                "token": token
+            }, status=status.HTTP_200_OK)
+        except User.DoesNotExist:
+            return Response({"error": "User not found"}, status=status.HTTP_404_NOT_FOUND)

@@ -21,10 +21,12 @@ import { useUser } from "@/services/context/usercontext";
 import { request } from "http";
 import Loader from '../../../../components/loader/loader';
 import Link from "next/link";
-
+import { useRouter } from "next/navigation";
+import { toast } from "react-hot-toast";
 const Friends = () => {
   const param = useParams();
   const userId = param.id;
+  const router = useRouter();
 
   const { user: currentUser, userloading } = useUser();
   const { friends, loading, error, fetchFriendsof } = useFriendsof({
@@ -152,6 +154,26 @@ const Friends = () => {
       console.log("Error rejecting friend:", error);
     }
   };
+  const inviteFriendToGame = async (friendId) => {
+    try {
+      const response = await fetch("http://localhost:8000/api/invite_friend", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ friend_id: friendId }),
+        credentials: "include",
+      });
+      const data = await response.json();
+      if (response.ok) {
+        const token = data.token;
+        toast.success("Friend invited to game");
+        router.push(`/game/solo/maps?game=randommatch&token=${token}`);
+      } else {
+        toast.error(data.error);
+      }
+    } catch (error) {
+      console.log("Error rejecting friend:", error);
+    }
+  };
 
   return (
     <div className="w-full lg:max-w-[1200px] p-2 mb-24 lg:h-full">
@@ -194,6 +216,7 @@ const Friends = () => {
                 </button>
              </Link>
               <button
+                onClick={() => inviteFriendToGame(friend.id)}
                 aria-label="Invite"
                 className="hover:text-red-500 text-white transition-colors"
               >

@@ -11,6 +11,7 @@ import Loader from "../../../../../../components/loader/loader";
 import Vsbotcanva from "@/components/Localcanva/page";
 import Localgamecanva from "@/components/twopcanvas/page";
 import Canvas from "@/components/Canva/page";
+import ConfettiComponent from "@/components/Celebration/win";
 
 // Default competitors and user data
 const defaultCompetitors = [
@@ -90,6 +91,8 @@ const Page = () => {
   const [countdown, setCountdown] = useState(3);
   // Retrieve the 'game' and 'map' query params
   const searchParams = useSearchParams();
+  const token = searchParams.get('token') || null;
+
   const game = searchParams.get("game");
   const map = searchParams.get("map");
   const isLocalGame = game === "localgame";
@@ -102,6 +105,7 @@ const Page = () => {
   const router = useRouter();
   const IsConnected = useRef(false);
   const [isSecondPlayerValid, setIsSecondPlayerValid] = useState(false);
+  const [displayCelebration, setDisplayCelebration] = useState(false);
 
 
   let startCountDown = () => {
@@ -128,9 +132,11 @@ const Page = () => {
   useEffect(() => {
 
     if (isRandomMatch && socketRef.current === null) {
-      socketRef.current = new WebSocket(
-        "ws://localhost:8000/ws/tournament/TWO/"
-      );
+      let url = "ws://localhost:8000/ws/tournament/TWO/"
+      if (token) {
+        url += `?token=${token}`;
+      }
+      socketRef.current = new WebSocket(url);
       socketRef.current.onopen = () => {
         IsConnected.current = true;
         console.log("WebSocket connected");
@@ -172,12 +178,12 @@ const Page = () => {
     };
   }, [isRandomMatch, IsConnected]);
 
-  useEffect(() => {
-    if (winner || looser) {
-      router.push("/game/solo");
-      return;
-    }
-  }, [winner, looser]);
+  // useEffect(() => {
+  //   if (winner || looser) {
+  //     router.push("/game/solo");
+  //     return;
+  //   }
+  // }, [winner, looser]);
 
   const updateCompetitors = (competitors) => {
     const nextCompetitors = users.map((c) => {
@@ -253,6 +259,15 @@ const Page = () => {
       return () => clearInterval(interval);
     }
   }, [isRandomMatch, users]);
+
+  useEffect(() => {
+    if (winner || looser) {
+    console.log("displayCelebration", winner, looser);
+
+      setDisplayCelebration(true);
+    }
+  }, [winner, looser]);
+
   if (!currentUser) {
     return (
       <div>
@@ -260,6 +275,15 @@ const Page = () => {
       </div>
     );
   }
+
+
+
+  if (displayCelebration) {
+    return (
+      <ConfettiComponent isWinner={winner} />
+    );
+  }
+  
   return (
     <>
       {timer && countdown > 0 && (
@@ -373,7 +397,11 @@ const Page = () => {
                 opacity: 0.7,
               }}
             >
-              <Vsbotcanva scoreSetter={setScores}></Vsbotcanva>
+              <Vsbotcanva 
+                scoreSetter={setScores} 
+                setWinner={setWinner} 
+                setLooser={setLooser}
+              ></Vsbotcanva>
             </div>
           </div>
         </div>
@@ -422,7 +450,7 @@ const Page = () => {
                 opacity: 0.7,
               }}
             >
-              <Localgamecanva setScores={setScores}></Localgamecanva>
+              <Localgamecanva setScores={setScores} setWinner={setWinner} setLooser={setLooser}></Localgamecanva>
             </div>
           </div>
         </div>

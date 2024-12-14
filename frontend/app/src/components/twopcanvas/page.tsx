@@ -250,8 +250,8 @@ class Game{
     }
 
   }
-
-  export default function Twopcanvas ({setScores}){
+  
+  export default function Twopcanvas ({setScores, setWinner, setLooser}){
     const CanvasRef = useRef(null)
     const Context = useRef(null)
     const {gameCustomization} = useGame();
@@ -270,6 +270,9 @@ class Game{
                 game.update()
                 game.render(Context.current)
                 if (game.status === 0 ){
+                  if (game.player.score > game.enemy.score)
+                    setWinner(true)
+                  else setLooser(true)
                   return;
                 }
                 requestAnimationFrame(animate)

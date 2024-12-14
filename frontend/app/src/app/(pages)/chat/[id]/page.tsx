@@ -114,7 +114,7 @@ useEffect(() => {
   }, [currentChat, loading]);
 
   if (!currentChat) {
-    return <div>No chat data found.</div>;
+    return <div className="h-full w-full flex justify-center items-center">No chat data found.</div>;
   }
   return (
     <div className="h-full">
@@ -129,6 +129,13 @@ useEffect(() => {
             {currentChat?.messages
               .sort((a, b) => new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime())
               .map((msg, index) => {
+                if (msg.notification) {
+                  return <><div className="flex justify-center items-center w-full">
+                    <div className="flex flex-col items-center justify-center py-4">
+                      <p className="text-gray-500 text-lg">{msg.message}</p>
+                    </div>
+                  </div></>
+                }
                 return (
                   <div
                     key={index}

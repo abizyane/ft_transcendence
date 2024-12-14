@@ -17,7 +17,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import Loader from "components/loader/loader";
 import { useUser } from "@/services/context/usercontext";
-
+import toast from "react-hot-toast";
 interface ChatLayoutProps {
   children: ReactNode;
 }
@@ -25,7 +25,7 @@ interface ChatLayoutProps {
 interface User {
   id: number;
   username: string;
-  profile_pic: string;
+  profile_pic_url: string;
   message: string;
   time: string;
 }
@@ -185,6 +185,26 @@ export function Chat({ children }: ChatLayoutProps) {
       });
     }
   }
+  const inviteFriendToGame = async (friendId) => {
+    try {
+      const response = await fetch("http://localhost:8000/api/invite_friend", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ friend_id: friendId }),
+        credentials: "include",
+      });
+      const data = await response.json();
+      if (response.ok) {
+        const token = data.token;
+        toast.success("Friend invited to game");
+        router.push(`/game/solo/maps?game=randommatch&token=${token}`);
+      } else {
+        toast.error(data.error);
+      }
+    } catch (error) {
+      console.log("Error rejecting friend:", error);
+    }
+  };
   // console.log("current chat", currentChat);
   // console.log("convs rendered", conversations);
 if (!conversations || !user)
@@ -246,7 +266,7 @@ if (!conversations || !user)
                           <span className={`h-3 w-3 ${conv.user.is_online ? "bg-green-500" : "bg-gray-500"} absolute bottom-0 right-1  rounded-full z-0`} />
                           <img
                             className="shadow-md rounded-full w-full h-full object-cover"
-                            src={conv.user.profile_pic}
+                            src={conv.user.profile_pic_url}
                             alt={conv.user.username}
                           />
                         </div>
@@ -282,7 +302,7 @@ if (!conversations || !user)
                     <div className="w-12 h-12 mr-4 relative flex flex-shrink-0">
                       <img
                         className="shadow-md rounded-full w-full h-full object-cover"
-                        src={currentChat.user.profile_pic}
+                        src={currentChat.user.profile_pic_url}
                         alt={currentChat.user.username}
                       />
                     </div>
@@ -302,15 +322,20 @@ if (!conversations || !user)
                             <span className="text-white">View profile</span>
                           </DropdownMenuItem>
                           <DropdownMenuSeparator className="bg-black" />
-                          <DropdownMenuItem>
+                          <DropdownMenuItem onClick={() => {
+                            if (currentChat?.user !== undefined)
+                              inviteFriendToGame(currentChat.user.id);
+                          }}>
                             <span className="text-white">Invite friend</span>
                           </DropdownMenuItem>
                           <DropdownMenuSeparator className="bg-black" />
                           <DropdownMenuItem onClick={() => {
-                            if (currentChat.user.relationship === "Blocked") {
-                              handleBlockUser(currentChat.user, "Unknown");
-                            } else {
-                              handleBlockUser(currentChat.user, "Blocked");
+                            if (currentChat?.user !== undefined){
+                              if (currentChat.user.relationship === "Blocked") {
+                                handleBlockUser(currentChat.user, "Unknown");
+                              } else {
+                                handleBlockUser(currentChat.user, "Blocked");
+                              }
                             }
                           }}>
                             {currentChat.user.relationship === "Blocked" ?
@@ -350,7 +375,7 @@ if (!conversations || !user)
               <div className="w-12 h-12 mr-4 relative flex flex-shrink-0">
                 <img
                   className="shadow-md rounded-full w-full h-full object-cover"
-                  src={currentChat.user.profile_pic}
+                  src={currentChat.user.profile_pic_url}
                   alt={currentChat.user.username}
                 />
               </div>
@@ -371,15 +396,20 @@ if (!conversations || !user)
                       <span className="text-white">View profile</span>
                     </DropdownMenuItem>
                     <DropdownMenuSeparator className="bg-black" />
-                    <DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => {
+                        if (currentChat?.user !== undefined)
+                          inviteFriendToGame(currentChat.user.id);
+                      }}>
                       <span className="text-white">Invite friend</span>
                     </DropdownMenuItem>
                     <DropdownMenuSeparator className="bg-black" />
                     <DropdownMenuItem onClick={() => {
-                      if (currentChat.user.relationship === "Blocked") {
-                        handleBlockUser(currentChat.user, "Unknown");
-                      } else {
-                        handleBlockUser(currentChat.user, "Blocked");
+                      if (currentChat?.user !== undefined){
+                        if (currentChat.user.relationship === "Blocked") {
+                          handleBlockUser(currentChat.user, "Unknown");
+                        } else {
+                          handleBlockUser(currentChat.user, "Blocked");
+                        }
                       }
                     }}>
                       {currentChat.user.relationship === "Blocked" ?

@@ -11,12 +11,13 @@ interface Message {
   message: string;
   timestamp: string;
   seen: boolean;
+  notification: boolean;
 }
 
 interface ChatUser {
   id: number;
   username: string;
-  profile_pic: string;
+  profile_pic_url: string;
   is_online: boolean;
   relationship: string;
 }
@@ -87,7 +88,7 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
             user: {
               id: conv.id,
               username: conv.username,
-              profile_pic: conv.profile_pic,
+              profile_pic_url: conv.profile_pic_url,
               relationship: conv.relationship,
               is_online: conv.is_online
             },
@@ -230,6 +231,7 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const sendSeenMessage = (senderUser:string, receiverUser:string) => {
     if (senderUser === user?.username) return;
+    if (!ws || ws.readyState !== WebSocket.OPEN) return;
     ws.send(JSON.stringify({
       type: "read_message",
       sender: senderUser,
@@ -276,7 +278,7 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
         user: {
           id: user.id,
           username: user.username,
-          profile_pic: user.profile_pic,
+          profile_pic_url: user.profile_pic_url,
           relationship: user.relationship,
           is_online: user.is_online
         },
@@ -354,7 +356,7 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
     if (user) {
       fetchConversations();
     }
-    if (ws) {
+    if (ws && ws.readyState === WebSocket.CLOSED) {
       ws.close();
       setWs(null);
     }
