@@ -185,7 +185,13 @@ class GameCustomizationView(APIView):
         user.profile.opponent_paddle_color = opponent_paddle_color
         user.profile.ball_color = ball_color
         user.profile.save()
-        return Response({'message': 'Game customization updated successfully'}, status=200)
+        return Response({'message': 'Game customization updated successfully',
+                         'data': {
+                            'user_paddle_color': user_paddle_color,
+                            'opponent_paddle_color': opponent_paddle_color,
+                            'ball_color': ball_color
+                         }
+                         }, status=200)
         
 
 class PingView(APIView):
