@@ -268,7 +268,7 @@ const UserInfo: React.FC<UserInfoProps> = ({ user, setUser }) => {
               <img
                 src={user.profile_pic_url}
                 alt="User Profile"
-                className="w-full h-auto object-cover max-h-[300px] rounded-2xl"
+                className="w-full h-auto object-cover h-auto rounded-2xl"
               />
               {currentUser?.id !== user?.id && 
               <div className="text-white text-xl font-bold text-center mt-2"><p>{user.username} </p></div>}
