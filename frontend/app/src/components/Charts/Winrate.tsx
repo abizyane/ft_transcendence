@@ -21,7 +21,7 @@ const DoughnutChart: React.FC<DoughnutChartProps>  = ({idUser}) => {
   const fetchWinrate = async () => {
     setLoading(true);
     try {
-      const response = await fetch('http://localhost:8000/api/win_rate', {
+      const response = await fetch(process.env.NEXT_PUBLIC_HOST_URL+':8000/api/win_rate', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

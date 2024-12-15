@@ -16,7 +16,7 @@ const Dashboard = () => {
   const fetchDashboard = async () => {
     try {
       setLoading(true);
-      const response = await fetch('http://localhost:8000/api/dashboard', {
+      const response = await fetch(process.env.NEXT_PUBLIC_HOST_URL+':8000/api/dashboard', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

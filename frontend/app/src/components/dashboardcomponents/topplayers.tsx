@@ -24,7 +24,7 @@ const TopPlayers: React.FC = () => {
 
   useEffect(() => {
     setLoading(true);
-    fetch(`http://localhost:8000/api/top_players`, {
+    fetch(`${process.env.NEXT_PUBLIC_HOST_URL}:8000/api/top_players`, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',

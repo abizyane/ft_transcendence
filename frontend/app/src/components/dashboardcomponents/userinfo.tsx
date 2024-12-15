@@ -37,7 +37,7 @@ const UserInfo: React.FC<UserInfoProps> = ({ user, setUser }) => {
   const [loading, setLoading] = useState(false);
   const Router = useRouter ();
   const fetchUser = async () => {
-    fetch(`http://localhost:8000/api/userid`, {
+    fetch(`${process.env.NEXT_PUBLIC_HOST_URL}:8000/api/userid`, {
       method: 'POST',
       body: JSON.stringify({ id: user.id }),
       headers: {
@@ -65,7 +65,7 @@ const UserInfo: React.FC<UserInfoProps> = ({ user, setUser }) => {
   const handleAddFriend = async () => {
     setLoading(true);
     try {
-      const response = await fetch('http://localhost:8000/api/add_friend', {
+      const response = await fetch(process.env.NEXT_PUBLIC_HOST_URL+':8000/api/add_friend', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -97,7 +97,7 @@ const UserInfo: React.FC<UserInfoProps> = ({ user, setUser }) => {
   const handleBlockFriend = async () => {
     setLoading(true);
     try {
-      const response = await fetch('http://localhost:8000/api/block', {
+      const response = await fetch(process.env.NEXT_PUBLIC_HOST_URL+':8000/api/block', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -131,7 +131,7 @@ const UserInfo: React.FC<UserInfoProps> = ({ user, setUser }) => {
   const handleUnblockFriend = async () => {
     setLoading(true);
     try {
-      const response = await fetch('http://localhost:8000/api/unblock', {
+      const response = await fetch(process.env.NEXT_PUBLIC_HOST_URL+':8000/api/unblock', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -164,7 +164,7 @@ const UserInfo: React.FC<UserInfoProps> = ({ user, setUser }) => {
   const handleRemoveFriend = async () => {
     setLoading(true);
     try {
-      const response = await fetch('http://localhost:8000/api/remove_friend', {
+      const response = await fetch(process.env.NEXT_PUBLIC_HOST_URL+':8000/api/remove_friend', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -197,7 +197,7 @@ const UserInfo: React.FC<UserInfoProps> = ({ user, setUser }) => {
   const handleAcceptFriend = async () => {
     setLoading(true);
     try {
-      const response = await fetch('http://localhost:8000/api/accept_friend', {
+      const response = await fetch(process.env.NEXT_PUBLIC_HOST_URL+':8000/api/accept_friend', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -230,7 +230,7 @@ const UserInfo: React.FC<UserInfoProps> = ({ user, setUser }) => {
   const handleRejectFriend = async () => {
     setLoading(true);
     try {
-      const response = await fetch('http://localhost:8000/api/reject_friend', {
+      const response = await fetch(process.env.NEXT_PUBLIC_HOST_URL+':8000/api/reject_friend', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -262,13 +262,13 @@ const UserInfo: React.FC<UserInfoProps> = ({ user, setUser }) => {
   return (
     <>
       <div className=" w-full rounded-xl p-2">
-        <div className="flex gap-2">
+        <div className="flex gap-2">   
           <div className="flex-shrink-0 w-3/5">
-            <div className="mb-4 max-w-full aspect-square max-h-[300px] mx-auto">
+            <div className="mb-4 max-w-full aspect-square  mx-auto">
               <img
                 src={user.profile_pic_url}
                 alt="User Profile"
-                className="w-full h-auto object-cover rounded-2xl"
+                className="w-full h-auto object-cover h-auto rounded-2xl"
               />
               {currentUser?.id !== user?.id && 
               <div className="text-white text-xl font-bold text-center mt-2"><p>{user.username} </p></div>}

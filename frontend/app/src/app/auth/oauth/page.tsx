@@ -12,7 +12,7 @@ const OAuthPage = () => {
       if (!searchParams || typeof searchParams.toString !== "function") return; 
   
       const queryParams = searchParams.toString();
-      const backendUrl = 'http://localhost:8000/api/42OAuth/callback' ;
+      const backendUrl = process.env.NEXT_PUBLIC_HOST_URL+':8000/api/42OAuth/callback' ;
   
       const verifyOAuth = async () => {
         try {

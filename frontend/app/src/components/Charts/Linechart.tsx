@@ -35,7 +35,7 @@ const LineChart: React.FC<LineChartProps> = ({userid}) => {
   const fetchExperience = async () => {
     try {
       setLoading(true);
-      const response = await fetch('http://localhost:8000/api/weekly_experience', {
+      const response = await fetch(process.env.NEXT_PUBLIC_HOST_URL+':8000/api/weekly_experience', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

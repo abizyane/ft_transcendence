@@ -76,7 +76,7 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const fetchConversations = async () => {
     try {
-      const response = await fetch('http://localhost:8000/chat/conversations', {
+      const response = await fetch(process.env.NEXT_PUBLIC_HOST_URL+':8000/chat/conversations', {
         credentials: 'include',
         
       });
@@ -139,7 +139,7 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
       if (nextPage == null && !resetPage) {
         return;
       }
-      const url = resetPage ? `http://localhost:8000/chat/room/${userId}/` : nextPage;
+      const url = resetPage ? `${process.env.NEXT_PUBLIC_HOST_URL}:8000/chat/room/${userId}/` : nextPage;
       const response = await fetch(url, {
         credentials: 'include',
       });
