@@ -21,10 +21,12 @@ import { useUser } from "@/services/context/usercontext";
 import { request } from "http";
 import Loader from '../../../../components/loader/loader';
 import Link from "next/link";
-
+import { useRouter } from "next/navigation";
+import { toast } from "react-hot-toast";
 const Friends = () => {
   const param = useParams();
   const userId = param.id;
+  const router = useRouter();
 
   const { user: currentUser, userloading } = useUser();
   const { friends, loading, error, fetchFriendsof } = useFriendsof({
@@ -152,6 +154,26 @@ const Friends = () => {
       console.log("Error rejecting friend:", error);
     }
   };
+  const inviteFriendToGame = async (friendId) => {
+    try {
+      const response = await fetch("http://localhost:8000/api/invite_friend", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ friend_id: friendId }),
+        credentials: "include",
+      });
+      const data = await response.json();
+      if (response.ok) {
+        const token = data.token;
+        toast.success("Friend invited to game");
+        router.push(`/game/solo/maps?game=randommatch&token=${token}`);
+      } else {
+        toast.error(data.error);
+      }
+    } catch (error) {
+      console.log("Error rejecting friend:", error);
+    }
+  };
 
   return (
     <div className="w-full lg:max-w-[1200px] p-2 mb-24 lg:h-full">
@@ -171,11 +193,13 @@ const Friends = () => {
             className="flex justify-center items-center bg-gray-700/70 h-[90px] w-full hover:bg-gray-600 transition-shadow border border-gray-600 rounded-lg p-4 my-2 shadow-lg hover:shadow-2xl"
           >
           <Link className="flex items-center " href={`/profile/${friend.id}`} key={friend.id}>
-            <div className="h-14 w-14 rounded-full overflow-hidden">
+            <div className=" lg:relative h-14 w-14 rounded-full">
+
+              <span className={`h-3 w-3 ${friend.is_online ? "bg-green-500" : "bg-gray-500"} absolute bottom-0 right-1  rounded-full z-0`} />
               <img
                 src={friend.profile_pic_url}
-                alt="friend"
-                className="w-full h-full object-cover"
+                alt="User Profile"
+                className="object-cover w-full h-full rounded-full"
               />
             </div>
             <div className="flex flex-col justify-center ml-4">
@@ -194,6 +218,7 @@ const Friends = () => {
                 </button>
              </Link>
               <button
+                onClick={() => inviteFriendToGame(friend.id)}
                 aria-label="Invite"
                 className="hover:text-red-500 text-white transition-colors"
               >

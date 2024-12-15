@@ -49,7 +49,7 @@ const searchUsers = () => {
     }
   };
 
-  const debouncedSearch = debounce(fetchUsers, 2000);
+  const debouncedSearch = debounce(fetchUsers, 500);
   const handleSearchKeyUp = (e) => {
     const query = e.target.value;
     setSearchQuery(query);

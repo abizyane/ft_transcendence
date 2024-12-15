@@ -60,11 +60,14 @@ class UserIdView(APIView):
                         return Response({'error': 'You cannot see this user'}, status=403)
             except Relationship.DoesNotExist:
                 pass
-            user = User.objects.filter(id=iduser).first()
+            try:
+                user = User.objects.filter(id=iduser).first()
+                if user is None:
+                    raise User.DoesNotExist
 
-            query = models.Q(user1=user, user2=request.user) | models.Q(user1=request.user, user2=user)
+                query = models.Q(user1=user, user2=request.user) | models.Q(user1=request.user, user2=user)
 
-            relation = Relationship.objects.filter(query).first()
+                relation = Relationship.objects.filter(query).first()
 
             # if not relation:
             #     relation = Relationship.objects.create(
@@ -72,7 +75,9 @@ class UserIdView(APIView):
             #         user2=request.user,
             #         status=Relationship.Status.UNKNOWN
             #     )
-            return Response(FriendSerializer(user, context={'request': request, 'relationships': relation}).data)
+                return Response(FriendSerializer(user, context={'request': request, 'relationships': relation}).data)
+            except User.DoesNotExist:
+                return Response({'error': 'User doesnt exist'}, status=404)
         except User.DoesNotExist:
             return Response({'error': 'User doesnt exist'}, status=404)
 
@@ -180,7 +185,13 @@ class GameCustomizationView(APIView):
         user.profile.opponent_paddle_color = opponent_paddle_color
         user.profile.ball_color = ball_color
         user.profile.save()
-        return Response({'message': 'Game customization updated successfully'}, status=200)
+        return Response({'message': 'Game customization updated successfully',
+                         'data': {
+                            'user_paddle_color': user_paddle_color,
+                            'opponent_paddle_color': opponent_paddle_color,
+                            'ball_color': ball_color
+                         }
+                         }, status=200)
         
 
 class PingView(APIView):

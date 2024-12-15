@@ -40,7 +40,7 @@ const Page = () => {
   
 
   useEffect(() => {
-    if (!userId) return;
+    if (!userId || !currentUser) return;
     if (currentUser?.id === userId) {
       setUser(currentUser);
     } else {
@@ -63,7 +63,10 @@ const Page = () => {
           return response.json();
         })
         .then((data: User) => setUser(data))
-        .catch((err) => setError(err.message))
+        .catch((err) => {
+          console.log("setting error");
+          setError(err.message)
+        })
         .finally(() => setLoading(false));
     }
   }, [userId, currentUser]);

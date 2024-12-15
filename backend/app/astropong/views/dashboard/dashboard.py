@@ -23,13 +23,15 @@ class GamesHistoryView(APIView):
     def post(self, request):
         try:
             userid = request.data.get('id')
-            user_profile = Profile.objects.get(user_id=userid)
+            if userid is None:
+                raise Profile.DoesNotExist
+            user_profile : Profile = Profile.objects.get(user_id=userid)
             games = GameModel.get_all_games(user_profile.id).order_by('-created')
             history = []
             for game in games: 
-                opponent = game.get_opponent(user_profile)
-                score = game.get_player_game_score(user_profile.id)
-                opponent_score = game.get_player_game_score(opponent.id)
+                opponent : Profile = game.get_opponent(user_profile)
+                score : int = game.get_player_game_score(user_profile.id)
+                opponent_score : int = game.get_player_game_score(opponent.id)
                 
                 match_data = {
                     'gameId': game.id,

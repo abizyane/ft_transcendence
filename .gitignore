@@ -50,4 +50,4 @@ Thumbs.db
 Desktop.ini
 *~
 # PostgreSQL
-*/database/data
+**/tournament_pics/**

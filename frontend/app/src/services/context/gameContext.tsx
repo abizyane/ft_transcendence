@@ -31,15 +31,14 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
       const response = await fetch('http://localhost:8000/api/game_customization', {credentials: 'include',});
       if (response.ok) {
         const data = await response.json();
-        console.log("notifications", data);
         setGameCustomization(data);
       }
     } catch (error) {
       console.error('Failed to fetch notifications:', error);
       let options = {
-        user_paddle_color: "255,0,0",
-        opponent_paddle_color: "0,255,0",
-        ball_color: "0,0,255"
+        user_paddle_color: "#e01b24",
+        opponent_paddle_color: "#1a5fb4",
+        ball_color: "#ffffff"
       }
       setGameCustomization(options);
     } finally {
@@ -59,7 +58,7 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
       });
       if (response.ok) {
         const data = await response.json();
-        setGameCustomization(data);
+        setGameCustomization(data.data);
         toast.success('Game customization updated successfully');
       }
       return true;

@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import Loader from "components/loader/loader";
 import { useUser } from "@/services/context/usercontext";
 import { useParams } from 'next/navigation';
+import { format, formatDistanceToNow, isToday, isYesterday } from "date-fns";
 
 interface User {
   name: string;
@@ -84,9 +85,20 @@ const History = () => {
           </p>
         </div>
       </div>
-      <p className="font-semibold text-white text-center w-20 mx-4">
-        {game.score.user}:{game.score.opponent}
-      </p>  
+      <div className="flex flex-col items-center justify-center mx-3">
+        <p className="font-bold w-full text-white text-center text-xs w-10  md:text-base lg:text-lg">{game.score.user}:{game.score.opponent}</p>
+        {game.date ? <>
+            <p className="ml-4 w-full text-white-primary whitespace-nowrap">
+              {isToday(new Date(game.date))
+                ? formatDistanceToNow(new Date(game.date), {
+                    addSuffix: true,
+                  })
+                : isYesterday(new Date(game.date))
+                ? "Yesterday"
+                : format(new Date(game.date), "yyyy-MM-dd")}
+            </p>
+        </> : <></>}
+      </div>
       <div className="flex items-center space-x-2 flex-1 justify-end">
         <div className="flex flex-col items-end">
           <p className="font-bold text-white text-xs">
@@ -122,11 +134,10 @@ const History = () => {
               <Loader />
             </div>
           ) : (
-            <div className="flex flex-col space-y-2 w-full h-full">
+            <div className="flex flex-col justify-between space-y-2 w-full h-full">
               {gameHistory?.length ? (
                 gameHistory
-                .reverse()
-                  .slice(-3)
+                  .slice(0,3)
                   .map((game) => renderGame(game))
               ) : (
                 <div className="w-full h-full flex justify-center items-center">

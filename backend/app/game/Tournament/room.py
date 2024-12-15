@@ -51,6 +51,7 @@ class Room(RoomAbstract):
         self.imageModel = None
         self.imageUrl = None
         self.tournament = Tournament()
+        self.token = None
     @database_sync_to_async
     def set_image(self, image_id, scope=None):
         try:
@@ -101,8 +102,11 @@ class Room(RoomAbstract):
             "size": self.competitors_count(),
             "started" : self.started,
             "img" : self.imageUrl,
-            "competitors" : [competitor.get_info() for competitor in self.competitors]
+            "competitors" : [competitor.get_info() for competitor in self.competitors],
+            "host" : self.get_room_host()
         })
+    def get_room_host(self):
+        return next((competitor.get_info() for competitor in self.competitors if competitor.is_host), None)
     def get_winners_info(self):
         res = []
         for winner in self.winners:
