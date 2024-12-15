@@ -233,7 +233,7 @@ const Page = () => {
 
     try {
       setIsUploadingImage(true);
-      const response = await fetch('http://localhost:8000/api/upload_tournament_pic', {
+      const response = await fetch(process.env.NEXT_PUBLIC_HOST_URL+':8000/api/upload_tournament_pic', {
         method: 'POST',
         body: formData,
         credentials: 'include',

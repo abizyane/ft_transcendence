@@ -112,7 +112,7 @@ export function Chat({ children }: ChatLayoutProps) {
 
   const apiBlockUser = async (userid:number) => {
     try {
-      const response = await fetch('http://localhost:8000/api/block', {
+      const response = await fetch(process.env.NEXT_PUBLIC_HOST_URL+':8000/api/block', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -142,7 +142,7 @@ export function Chat({ children }: ChatLayoutProps) {
 
   const apiUnblockUser = async (userid:number) => {
     try {
-      const response = await fetch('http://localhost:8000/api/unblock', {
+      const response = await fetch(process.env.NEXT_PUBLIC_HOST_URL+':8000/api/unblock', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -187,7 +187,7 @@ export function Chat({ children }: ChatLayoutProps) {
   }
   const inviteFriendToGame = async (friendId) => {
     try {
-      const response = await fetch("http://localhost:8000/api/invite_friend", {
+      const response = await fetch(process.env.NEXT_PUBLIC_HOST_URL+":8000/api/invite_friend", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ friend_id: friendId }),
@@ -381,7 +381,7 @@ if (!conversations || !user)
               </div>
               <div className="text-sm">
                 <p className="font-bold">{currentChat.user.username}</p>
-                <p>{is_online ? "Online" : "Offline"}</p>
+                <p>{currentChat.user.is_online ? "Online" : "Offline"}</p>
                 </div>
               </div>              
             </div>

@@ -51,7 +51,7 @@ const page = () => {
   const [loading, setLoading] = useState(false);
   const fetchRanking = async () => {
     setLoading(true);
-    const response = await fetch("http://localhost:8000/api/ranking", {
+    const response = await fetch(process.env.NEXT_PUBLIC_HOST_URL+":8000/api/ranking", {
       method: "GET",
       headers: { "Content-Type": "application/json" },
       credentials: "include",

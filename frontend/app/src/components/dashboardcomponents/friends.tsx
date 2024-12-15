@@ -29,7 +29,7 @@ const Friends = ({ user }) => {
   if (userloading) return (<div className="w-full h-full flex justify-center items-center"><Loader /></div>);
   const inviteFriendToGame = async (friendId) => {
     try {
-      const response = await fetch("http://localhost:8000/api/invite_friend", {
+      const response = await fetch(process.env.NEXT_PUBLIC_HOST_URL+":8000/api/invite_friend", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ friend_id: friendId }),
@@ -80,7 +80,7 @@ const Friends = ({ user }) => {
                   <div className="flex items-center space-x-4">
                     <div className=" lg:relative h-12 w-12 rounded-full">
 
-                      <span className={`h-3 w-3 ${friend.is_online ? "bg-green-500" : "bg-gray-500"} absolute bottom-0 right-1  rounded-full z-0`} />
+                      {/* <span className={`h-3 w-3 ${friend.is_online ? "bg-green-500" : "bg-gray-500"} absolute bottom-0 right-1  rounded-full z-0`} /> */}
                       <img
                         src={friend.profile_pic_url}
                         alt="User Profile"

@@ -27,7 +27,7 @@ const searchUsers = () => {
   const fetchUsers = async (query) => {
     setLoading(true);
     try {
-      const response = await fetch("http://localhost:8000/api/searchuser", {
+      const response = await fetch(process.env.NEXT_PUBLIC_HOST_URL+":8000/api/searchuser", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

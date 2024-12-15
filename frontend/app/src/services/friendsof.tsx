@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+// import '@/loadEnvConfig'
 
 interface Friend {
   id:number;
@@ -17,7 +18,7 @@ export const useFriendsof = (user:User) => {
 
     const fetchFriendsof = async () => {
       try {
-        const response = await fetch(`http://localhost:8000/api/friendsof/${user.id}`, {
+        const response = await fetch(`${process.env.NEXT_PUBLIC_HOST_URL}:8000/api/friendsof/${user.id}`, {
           method: 'GET',
           credentials: 'include',
         });

@@ -30,7 +30,7 @@ const Newchat = ({ isOpen, closeModal, handleUserClick }) => {
   const fetchUsers = async () => {
     setLoading(true);
     try {
-      const response = await fetch("http://localhost:8000/api/friends/friends/", {
+      const response = await fetch(process.env.NEXT_PUBLIC_HOST_URL+":8000/api/friends/friends/", {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
