@@ -59,13 +59,12 @@ class TournamentConsumer(AsyncWebsocketConsumer):
     def check_token(self, token):
         try:
             game_invite = GameInvite.objects.get(token=token)
-            print("status of game ",game_invite.status, flush=True)
-            try:
-                notif = Notifications.objects.get(link=f"/game/solo/maps?game=randommatch&token={token}")
-                notif.link = None
-                notif.save()
-            except Notifications.DoesNotExist:
-                pass
+            # try:
+            #     notif = Notifications.objects.get(link=f"/game/solo/maps?game=randommatch&token={token}")
+            #     notif.link = None
+            #     notif.save()
+            # except Notifications.DoesNotExist:
+            #     pass
             return game_invite.status == GameInvite.Status.PENDING
         except GameInvite.DoesNotExist:
             return False
