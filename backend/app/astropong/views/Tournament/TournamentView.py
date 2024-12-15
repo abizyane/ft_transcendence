@@ -25,26 +25,26 @@ from django.conf import settings
 
 
 
-class PublicTournamentView(APIView):
-    permission_classes = [IsAuthenticated]
-    def get(self, request):
-        try:
-            tournaments = TournamentModel.objects.filter(
-                (models.Q(state=TournamentModel.State.SCHEDULED) & 
-                models.Q(permission=TournamentModel.Permission.PUBLIC)) |
-                (models.Q(state=TournamentModel.State.SCHEDULED) & 
-                models.Q(permission=TournamentModel.Permission.PRIVATE) & 
-                (models.Q(players=request.user.profile) | models.Q(owner=request.user.profile) | models.Q(invites=request.user.profile))
-            ))
-            serializer = TournamentSerializer(tournaments, context={'request': request}, many=True)
-            return Response(serializer.data, status=status.HTTP_200_OK)
-        except TournamentModel.DoesNotExist:
-            return Response([], status=status.HTTP_200_OK)
+# class PublicTournamentView(APIView):
+#     permission_classes = [IsAuthenticated]
+#     def get(self, request):
+#         try:
+#             tournaments = TournamentModel.objects.filter(
+#                 (models.Q(state=TournamentModel.State.SCHEDULED) & 
+#                 models.Q(permission=TournamentModel.Permission.PUBLIC)) |
+#                 (models.Q(state=TournamentModel.State.SCHEDULED) & 
+#                 models.Q(permission=TournamentModel.Permission.PRIVATE) & 
+#                 (models.Q(players=request.user.profile) | models.Q(owner=request.user.profile) | models.Q(invites=request.user.profile))
+#             ))
+#             serializer = TournamentSerializer(tournaments, context={'request': request}, many=True)
+#             return Response(serializer.data, status=status.HTTP_200_OK)
+#         except TournamentModel.DoesNotExist:
+#             return Response([], status=status.HTTP_200_OK)
     
 class TournamentPicUploadSerializer(serializers.Serializer):
     tournament_pic = serializers.ImageField(required=False)
     name = serializers.CharField()
-    permission = serializers.CharField(default=TournamentModel.Permission.PUBLIC)
+    # permission = serializers.CharField(default=TournamentModel.Permission.PUBLIC)
 
 
 class CreateTournamentView(APIView):
@@ -56,7 +56,7 @@ class CreateTournamentView(APIView):
             return Response({"message": "You must set a tournament alias to create a tournament"}, status=status.HTTP_400_BAD_REQUEST)
         if serializer.is_valid():
             name = serializer.validated_data['name']
-            permission = serializer.validated_data['permission']
+            # permission = serializer.validated_data['permission']
             if name is None:
                 return Response({"error": "Name is required"}, status=status.HTTP_400_BAD_REQUEST)
             tournament_pic_path = None
@@ -65,7 +65,7 @@ class CreateTournamentView(APIView):
                 tournament_pic_path = f"tournament_pic/{request.user.id}_{tournament_pic.name}"
                 full_path = os.path.join(settings.MEDIA_ROOT, tournament_pic_path)
                 default_storage.save(full_path, ContentFile(tournament_pic.read()))
-            tournament = TournamentModel.objects.create(name=name, permission=permission, owner=request.user.profile, picture=tournament_pic_path)
+            tournament = TournamentModel.objects.create(name=name, owner=request.user.profile, picture=tournament_pic_path)
             tournament.players.add(request.user.profile)
             return Response({
                 "message": "Tournament created successfully",
@@ -87,7 +87,7 @@ class JoinTournamentView(APIView):
             tournament = TournamentModel.objects.get(id=tournament_id)
             if tournament.players.filter(id=request.user.profile.id).exists():
                 return Response({"message": "You are already in this tournament"}, status=status.HTTP_200_OK)
-            if tournament.invites.filter(user=request.user.profile).exists() or tournament.permission == TournamentModel.Permission.PUBLIC:
+            if tournament.invites.filter(user=request.user.profile).exists() :
                 if tournament.players.count() >= 4:
                     return Response({"message": "Tournament is full"}, status=status.HTTP_400_BAD_REQUEST)
                 tournament.players.add(request.user.profile)

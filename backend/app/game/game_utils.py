@@ -88,7 +88,7 @@ class Game:
         self.ball = Ball(self)
         self.blue = None
         self.red = None
-        self.max_score = 2000
+        self.max_score = 2
 
     def is_full(self):
         if len(self.players) == 2:

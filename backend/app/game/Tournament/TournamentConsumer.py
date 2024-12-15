@@ -13,7 +13,7 @@ import gc
 import numpy as np
 from channels.db import database_sync_to_async
 from enum import Enum
-from ..models import GameInvite, Profile, GameModel, Scores, TournamentModel
+from ..models import GameInvite, Profile, GameModel, Scores, TournamentModel, PlayerModel
 from .room_restrict import RoomRestriction, RoomIsEmpty
 from .alias_restrict import AliasException, NoAlias, AliasAlreadyUsed
 from astropong.serializers.UserSerializer import UserSerializer
@@ -254,7 +254,8 @@ class TournamentConsumer(AsyncWebsocketConsumer):
             self.task.cancel()
 
         if self.p_holder.is_won():
-            await self.save_game()
+            game_id = await self.save_game()
+            print(game_id, flush=True)
             self.room.winners.append(self.competitor)
             # await self.award_xp(True)
 
@@ -292,6 +293,7 @@ class TournamentConsumer(AsyncWebsocketConsumer):
                 await self.send(text_data=json.dumps({
                     'msg': 'You Won'
                 }))
+                await self.save_tournament()
             # await self.channel_layer.group_send(self.room.name,{
             #     'type' : 'broadcast.room.state'
             # })
@@ -622,18 +624,43 @@ class TournamentConsumer(AsyncWebsocketConsumer):
         else:
             player_1, player_2 = opponent, curr_player
             score_1, score_2 = self.game.red.score, self.game.blue.score
+        p_1 = PlayerModel.objects.create(
+            profile=player_1,
+            alias = self.alias,
+            color = "blue",
+            score = self.game.blue.score,
+            state = self.game.blue.win_state
+        )
 
+        p_2 = PlayerModel.objects.create(
+            profile=player_2,
+            alias = self.match.get_opponent(self.p_holder).competitor.alias,
+            color = "red",
+            score = self.game.red.score,
+            state = self.game.red.win_state
+        )
+
+        type = None
         game = GameModel.objects.create(
-            player_1=player_1,
-            player_2=player_2,
+            player_1=p_1,
+            player_2=p_2,
+            type = type,
             status='done'
         )
 
+        if self._type == "FOUR" :
+            if self.p_holder.index > 2 :
+                game.type = 'SEMIFINAL'
+            else :
+                game.type = 'FINAL'
+            self.room.tournament.store_games.append(game.id)
+
         Scores.objects.create(
             game_id=game,
-            score_1=score_1,
-            score_2=score_2
+            score_1=self.game.blue.score,
+            score_2=self.game.red.score
         )
+        return game.id
 
 
     @database_sync_to_async
@@ -653,3 +680,14 @@ class TournamentConsumer(AsyncWebsocketConsumer):
             xp += self.game.blue.score * 10 if self.p_holder.paddle.color == 'blue' else self.game.red.score * 10
 
         curr_player.increment_xp(xp)
+    
+    @database_sync_to_async
+    def save_tournament(self):
+        tournament = TournamentModel.objects.create(
+            name=self.room.name,
+            picture = self.room.imageUrl
+        )
+        for game in self.room.tournament.store_games :
+            tournament.games.add(game);
+
+        return tournament.id
