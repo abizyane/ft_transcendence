@@ -4,127 +4,108 @@ import Game_Front from "./gameFront"
 import { useGame } from "@/services/context/gameContext";
 
 class ScoreBoard{
-    constructor(game,setScores){
+    constructor(game, setScores){
         this.game = game;
         this.ball = game.ball;
         this.first_score = 0;
         this.second_score = 0;
         this.scoreSetter = setScores;
-    }
+      }
     update(){
-        if (this.ball.posX - this.ball.rad < this.game.player.posX )
+        if (this.game.player.score === 10 || this.game.enemy.score === 10)
         {
-          this.second_score++;
-          this.game.enemy.score  = this.second_score;
-          this.ball.reset_ball() 
-            // this.ball.init(-1)
+            this.game.status = 0;
+            this.game.player.win = true
         }
-        else if (this.ball.posX > this.game.enemy.posX + this.game.enemy.width/2)
-        {
-            this.first_score++;
-            this.game.player.score  = this.first_score;
-            // this.ball.init(1)
-            this.ball.reset_ball()
-        }
-        if (this.first_score === 10 || this.second_score === 10)
-          {
-              this.game.status = 0;
-          }
-        this.scoreSetter({one : this.first_score , two : this.second_score})
+        this.scoreSetter({one : this.game.player.score , two: this.game.enemy.score });
     }
-    // draw(ctx){
-    //     ctx.beginPath();
-    //     ctx.fillStyle = 'black'
-    //     ctx.fillText(this.first_score +"-" + this.second_score, this.game.canvas.width / 2 - 50/2, 50)
-    //     ctx.closePath();
-    // }
 }
 
 class Ball {
-  constructor(game, color){
-      this.game = game
-      this.rad = 5
-      this.posX = game.width / 2
-      this.posY = game.height / 2
-      this.speed = 7
-      this.angle = 45
-      this.dirX = Math.cos(this.angle)
-      this.dirY = Math.sin(this.angle)
-      this.color = color
-  }
-  draw(ctx){
-    ctx.beginPath();
-    ctx.arc(this.posX, this.posY, this.rad , 0,  Math.PI * 2, 1);
-    ctx.fillStyle = this.color;
-    ctx.strokeStyle = this.color;
-    ctx.fill();
-    ctx.stroke();
-    ctx.closePath();
-  }
-  iscollide(){
-    if (this.posY + this.rad >= this.game.height || this.posY - this.rad <= 0 )
-          this.dirY *= -1
-    if (this.posX < this.game.width * 1/4){
-        if (this.posX - this.rad <= 0){
-            this.game.enemy.score += 1
-            this.reset_ball()
+    constructor(game, color){
+        this.game = game
+        this.rad = 15
+        this.posX = game.width / 2
+        this.posY = game.height / 2
+        this.speed = 600
+        this.angle = 40
+        this.dirX = Math.cos(this.angle)
+        this.dirY = Math.sin(this.angle)
+        this.color = color
+    }
+    draw(ctx){
+      ctx.beginPath();
+      ctx.arc(this.posX, this.posY, this.rad , 0,  Math.PI * 2, 1);
+      ctx.fillStyle = this.color;
+      ctx.strokeStyle = this.color;
+      ctx.fill();
+      ctx.stroke();
+      ctx.closePath();
+    }
+    iscollide(){
+      if (this.posY + this.rad >= this.game.height || this.posY - this.rad <= 0 )
+            this.dirY *= -1
+      // if (this.posX < this.game.width * 1/4){
+        let left_collission = this.posX - this.rad;
+          if (left_collission <= 0){
+              this.game.enemy.score += 1
+              this.game.scoreBoard.update()
+              this.reset_ball()
           }
-          if (this.posX - this.rad <= this.game.player.posX + this.game.player.width && (this.posY >= this.game.player.posY && this.posY <= this.game.player.posY + this.game.player.height) && ! this.game.player.isHiting)
-            {
-              this.dirX *= -1
-              this.posX = this.game.player.posX + this.game.player.width
-              this.game.player.isHiting = true
-            }
-          }
-          else if (this.posX > this.game.width * 3/4){
-            if (this.posX + this.rad >= this.game.width){
-            this.game.player.score += 1
-            this.reset_ball()
-        }
-        if (this.posX + this.rad >= this.game.enemy.posX && (this.posY >= this.game.enemy.posY && this.posY <= this.game.enemy.posY + this.game.enemy.height) && ! this.game.enemy.isHiting)
+          if ((left_collission <= this.game.player.posX + this.game.player.width /*&& left_collission >= this.game.player.posX*/) && (this.posY >= this.game.player.posY && this.posY <= this.game.player.posY + this.game.player.height) && ! this.game.player.isHiting)
           {
             this.dirX *= -1
-            this.posX = this.game.enemy.posX - this.game.enemy.width
-            this.game.enemy.isHiting = true
+            this.game.player.isHiting = true
           }
-    }
-    else{
+      // }
+      // else if (this.posX > this.game.width * 3/4){
+        let right_collision = this.posX + this.rad
+          if (right_collision >= this.game.width){
+              this.game.player.score += 1
+              this.game.scoreBoard.update()
+              this.reset_ball()
+          }
+          if ((right_collision >= this.game.enemy.posX /*&& right_collision <= this.game.enemy.posX + this.game.enemy.height*/) && (this.posY >= this.game.enemy.posY && this.posY <= this.game.enemy.posY + this.game.enemy.height) && ! this.game.enemy.isHiting)
+            {
+              this.dirX *= -1
+              this.game.enemy.isHiting = true
+            }
+      // }
       this.game.enemy.isHiting = false
       this.game.player.isHiting = false
     }
-  }
 
-  reset_ball(){
-    this.posX = this.game.width / 2
-    this.posY = this.game.height / 2
-  }
+    reset_ball(){
+      this.posX = this.game.width / 2
+      this.posY = this.game.height / 2
+    }
 
-  update(){
-    this.iscollide()
-    this.posX += (this.dirX * this.speed)
-    this.posY += (this.dirY * this.speed)
-  }
+    update(){
+      this.iscollide()
+      this.posX += (this.dirX * this.speed) * 1/60
+      this.posY += (this.dirY * this.speed) * 1/60
+    }
 }
 
 class Paddle{
   constructor(game, color){
       this.game = game;
       this.canvas = game.canvas;
-      this.width =  2; 
-      this.height = 60;
-      this.rad = 10;
+      this.width =  2;
+      this.height = 100;
+      this.rad = 20;
       this.posX= this.canvas.width - 20 - this.width;
       this.posY = this.canvas.height/2 - this.height / 2;
-      this.speed = 10;
+      this.speed = 8;
       this.isHitting = false
       this.color = color
       this.rgb = color
-      this.offsetX = 10
+      this.offsetX = 5
       this.score = 0
   }
   drawRect(ctx){
-    ctx.fillRect(this.posX, this.posY, this.width, this.height);
-    ctx.strokeRect(this.posX, this.posY, this.width, this.height );
+    ctx.fillRect(this.posX, this.posY, this.width, this.height - 10);
+    ctx.strokeRect(this.posX, this.posY, this.width, this.height - 10 );
   }
   draw(ctx){
       ctx.fillStyle = this.color;
@@ -171,7 +152,7 @@ class Enemy extends Paddle
       this.posY += this.speed;
     }
   }
- 
+
 }
 
 class Player extends Paddle
@@ -187,7 +168,7 @@ class Player extends Paddle
   }
   update(ball)
   {
-  
+
     if (this.posY > 0 && this.game.wUp)
       {
         this.posY -= this.speed;
@@ -267,7 +248,7 @@ class Game{
       this.enemy.draw(ctx);
       // this.scoreBoard.draw(ctx);
     }
-    
+
   }
   
   export default function Twopcanvas ({setScores, setWinner, setLooser}){
@@ -276,10 +257,10 @@ class Game{
     const {gameCustomization} = useGame();
     useEffect(()=>{
         Context.current = CanvasRef.current.getContext("2d")
-        CanvasRef.current.width = 560;
-        CanvasRef.current.height = 400;
+        CanvasRef.current.width = 1080;
+        CanvasRef.current.height = 720;
     }, [])
-    
+
     useEffect(()=>{
         let game = new Game(CanvasRef.current,setScores, gameCustomization);
         game.render(Context.current)
@@ -299,7 +280,7 @@ class Game{
         }
             requestAnimationFrame(animate)
     }, [])
-    
+
     return (
         <canvas tabIndex={1}  ref={CanvasRef} className="w-full h-full "></canvas>
     );
