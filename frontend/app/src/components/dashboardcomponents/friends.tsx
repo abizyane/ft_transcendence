@@ -78,11 +78,15 @@ const Friends = ({ user }) => {
                   className="flex items-center justify-between m-3 rounded-[34px] pl-2 py-2 pr-5 border border-violet-primary"
                 >
                   <div className="flex items-center space-x-4">
-                    <img
-                      src={friend.profile_pic_url}
-                      alt={`${friend.username}'s Profile`}
-                      className="w-12 h-12 rounded-full"
-                    />
+                    <div className=" lg:relative h-12 w-12 rounded-full">
+
+                      <span className={`h-3 w-3 ${friend.is_online ? "bg-green-500" : "bg-gray-500"} absolute bottom-0 right-1  rounded-full z-0`} />
+                      <img
+                        src={friend.profile_pic_url}
+                        alt="User Profile"
+                        className="object-cover w-full h-full rounded-full"
+                      />
+                    </div>
                     <div className="flex flex-col">
                       <p className="font-bold text-white">{friend.username}</p>
                       <p className="text-xs justify-start flex ml-3 text-gray-400">
@@ -105,7 +109,7 @@ const Friends = ({ user }) => {
                         </div>
                         <div className="bg-black rounded-full p-2 w-12 h-12 flex items-center justify-center">
                           <button
-                          onClick={() => inviteFriendToGame(friend.id)}
+                            onClick={() => inviteFriendToGame(friend.id)}
                             aria-label="Invite"
                             className="hover:text-red-500 text-white transition-colors"
                           >

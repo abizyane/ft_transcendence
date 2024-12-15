@@ -193,11 +193,13 @@ const Friends = () => {
             className="flex justify-center items-center bg-gray-700/70 h-[90px] w-full hover:bg-gray-600 transition-shadow border border-gray-600 rounded-lg p-4 my-2 shadow-lg hover:shadow-2xl"
           >
           <Link className="flex items-center " href={`/profile/${friend.id}`} key={friend.id}>
-            <div className="h-14 w-14 rounded-full overflow-hidden">
+            <div className=" lg:relative h-14 w-14 rounded-full">
+
+              <span className={`h-3 w-3 ${friend.is_online ? "bg-green-500" : "bg-gray-500"} absolute bottom-0 right-1  rounded-full z-0`} />
               <img
                 src={friend.profile_pic_url}
-                alt="friend"
-                className="w-full h-full object-cover"
+                alt="User Profile"
+                className="object-cover w-full h-full rounded-full"
               />
             </div>
             <div className="flex flex-col justify-center ml-4">

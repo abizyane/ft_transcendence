@@ -4,6 +4,7 @@ interface Friend {
   id:number;
   username: string;
   profile_pic_url: string;
+  is_online: boolean;
   xp: number;
 }
 interface User{
