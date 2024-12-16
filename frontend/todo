@@ -24,6 +24,7 @@ pic not showen and chat timer until connect (when cliking on icone chat from oth
 counter at first makihssebch mzn  to check          CHECKI RAH KHEDAAAMA
 online not upddated on chat   (even when i click on logout unset cookie)   CHECK NOW Without strict mode
 
+state offline f mobile 
 
 history  (reverse the order) in other profile and show date  and ZBI LA DRT HADCHI show status winner or loser also check for draw every time we must have a winner and loser   (using borders or icon)
 
@@ -48,7 +49,6 @@ to9ba kidouz mn jenb f bot o local game
 to9ba kidouz mn wast l paddle f random match o tournoi
 http://localhost:3000/profile/1666666 page not found instead of showing profile  (same for chat and history)
 replace http with https before push (ismail)
-state offline f mobile 
 
 level and xp to check on profile 
 

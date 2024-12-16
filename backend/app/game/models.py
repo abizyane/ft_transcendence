@@ -111,8 +111,9 @@ class GameModel(models.Model):
         return f'{self.player_1.profile.get_username()} vs {self.player_2.profile.get_username()}'
 
     def get_all_games(player_id:int) -> models.QuerySet:
-        games = GameModel.objects.filter(models.Q(player_1=player_id) | models.Q(player_2=player_id))
-        return games.order_by("created")
+        games = GameModel.objects.filter((models.Q(player_1=player_id) | models.Q(player_2=player_id))
+                                         & models.Q(type=None))
+        return games.order_by("-created")
 
     def get_opponent(self, player:Profile) -> Profile:
         if player.id == self.player_1.pk:
@@ -126,9 +127,9 @@ class GameModel(models.Model):
         scoreObj = Scores.objects.get(id=self.id)
         if not scoreObj:
             return -1
-        if self.player_1.id == player_id:
+        if self.player_1.profile.id == player_id:
             return scoreObj.score_1
-        elif self.player_2.id == player_id:
+        elif self.player_2.profile.id == player_id:
             return scoreObj.score_2
         else:
             return -1;
@@ -137,9 +138,9 @@ class GameModel(models.Model):
         scoreObj = Scores.objects.get(id=self.id)
         if not scoreObj:
             return -1
-        if self.player_1.id == player_id:
+        if self.player_1.profile.id == player_id:
             return scoreObj.score_1
-        elif self.player_2.id == player_id:
+        elif self.player_2.profile.id == player_id:
             return scoreObj.score_2
         else:
             return -1
@@ -179,7 +180,7 @@ class TournamentModel(models.Model):
     # tournament_id = models.AutoField(primary_key=True)
     name = models.CharField(max_length=100, default='AstroTournament')
     owner = models.ForeignKey(Profile, related_name='tournament_owner', null=True, on_delete=models.CASCADE)
-    picture = models.ImageField(upload_to='tournament_pictures/', null=True)
+    picture = models.TextField(null=True)
     games = models.ManyToManyField(GameModel, related_name='tournament_games')
     players = models.ManyToManyField(Profile, related_name="tournament_competitors" ,null=True)
     winner = models.ForeignKey(Profile, related_name="tournament_winner" ,null=True, on_delete=models.CASCADE)
@@ -195,12 +196,11 @@ class TournamentModel(models.Model):
     #         oppenent_score = self.get_player_game_score(player.id)
     #         state = "Win" if score > oppenent_score else "Lose"
     #         print(f'{player.get_username()} {score}  Vs  {oppenent.get_username()} {oppenent}')
-    
     def get_tournament_xp(self,player_id:int)-> int:
         return self.get_player_game_xp(player_id)
 
     def get_all_tournaments(player_id:int)-> models.QuerySet:
-        return TournamentModel.objects.filter(players=player_id)
+        return TournamentModel.objects.filter(players__id=player_id)
     
 class TournamentPic(models.Model):
     tournament_id = models.OneToOneField(TournamentModel, on_delete=models.CASCADE, null=True)

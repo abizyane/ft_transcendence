@@ -696,5 +696,6 @@ class TournamentConsumer(AsyncWebsocketConsumer):
         for player in self.room.tournament.store_players :
             tournament.players.add(player);
 
-        tournament.winner = Profile.objects.get(user_id=self.competitor.user_id)
+        tournament.winner_id = Profile.objects.get(user_id=self.p_holder.competitor.user_id).id
+        tournament.save()
         return tournament.id
