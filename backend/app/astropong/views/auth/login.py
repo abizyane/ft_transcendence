@@ -43,9 +43,9 @@ class LoginView(APIView):
         refresh = RefreshToken.for_user(user)
         user_data = UserSerializer(user, context={'request': request}).data
         response = Response(user_data)
-        response.set_cookie(key='refresh', value=str(refresh), httponly=True, secure=True)
-        response.set_cookie(key='access', value=str(refresh.access_token), httponly=True, secure=True)
-        response.set_cookie(key='isLoggedIn', value=str(True), httponly=False, secure=True)
+        response.set_cookie(key='refresh', value=str(refresh), httponly=True)
+        response.set_cookie(key='access', value=str(refresh.access_token), httponly=True)
+        response.set_cookie(key='isLoggedIn', value=str(True), httponly=False)
         if user.mfa_enabled:
             response.status_code = 403
             request.session['2fa_verified'] = False
