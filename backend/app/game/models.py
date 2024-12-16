@@ -181,6 +181,8 @@ class TournamentModel(models.Model):
     owner = models.ForeignKey(Profile, related_name='tournament_owner', null=True, on_delete=models.CASCADE)
     picture = models.ImageField(upload_to='tournament_pictures/', null=True)
     games = models.ManyToManyField(GameModel, related_name='tournament_games')
+    players = models.ManyToManyField(Profile, related_name="tournament_competitors" ,null=True)
+    winner = models.ForeignKey(Profile, related_name="tournament_winner" ,null=True, on_delete=models.CASCADE)
     created = models.DateTimeField(default=timezone.now, null=False)
     updated = models.DateTimeField(default=timezone.now, null=False)
     created.editable = False
