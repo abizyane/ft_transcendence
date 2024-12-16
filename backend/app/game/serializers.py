@@ -1,6 +1,6 @@
 from astropong.serializers.UserSerializer import UserSerializer
 from rest_framework import serializers
-from .models import GameModel, Profile
+from .models import GameModel, Profile, TournamentModel
 
 class GameSerializer(serializers.ModelSerializer):
     class Meta:
@@ -26,3 +26,9 @@ class ProfileSerializer(serializers.ModelSerializer):
         return ranking.index(obj) + 1
 
     
+class TournamentSerializer(serializers.ModelSerializer) :
+    games = GameSerializer(many=True);
+    winner = ProfileSerializer()
+    class Meta :
+        model = TournamentModel
+        fields = ['name', 'games', 'winner']

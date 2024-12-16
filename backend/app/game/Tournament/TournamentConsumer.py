@@ -641,7 +641,7 @@ class TournamentConsumer(AsyncWebsocketConsumer):
         )
 
         type = None
-         if self._type == "FOUR" :
+        if self._type == "FOUR" :
             if self.p_holder.index > 2 :
                 type = 'SEMIFINAL'
             else :
