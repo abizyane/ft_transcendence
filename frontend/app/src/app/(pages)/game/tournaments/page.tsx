@@ -233,7 +233,7 @@ const Page = () => {
 
     try {
       setIsUploadingImage(true);
-      const response = await fetch(process.env.NEXT_PUBLIC_HOST_URL.replace('http://', 'ws://')+':8000/api/upload_tournament_pic', {
+      const response = await fetch(process.env.NEXT_PUBLIC_HOST_URL+':8000/api/upload_tournament_pic', {
         method: 'POST',
         body: formData,
         credentials: 'include',
@@ -252,8 +252,7 @@ const Page = () => {
         toast.success('Image updated successfully');
         setCreationImageid(responseData.picture_id);
         setPreviewImage(responseData.tournament_pic_url);
-      setIsUploadingImage(false);
-
+        setIsUploadingImage(false);
         return true;
       }
     } catch (error) {
