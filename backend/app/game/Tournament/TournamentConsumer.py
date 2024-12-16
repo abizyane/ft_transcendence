@@ -641,6 +641,12 @@ class TournamentConsumer(AsyncWebsocketConsumer):
         )
 
         type = None
+         if self._type == "FOUR" :
+            if self.p_holder.index > 2 :
+                type = 'SEMIFINAL'
+            else :
+                type = 'FINAL'
+
         game = GameModel.objects.create(
             player_1=p_1,
             player_2=p_2,
@@ -648,12 +654,9 @@ class TournamentConsumer(AsyncWebsocketConsumer):
             status='done'
         )
 
-        if self._type == "FOUR" :
-            if self.p_holder.index > 2 :
-                game.type = 'SEMIFINAL'
-            else :
-                game.type = 'FINAL'
+        if self._type == "FOUR" :       
             self.room.tournament.store_games.append(game.id)
+            self.room.tournament.store_players.update({player_1.id, player_2.id})
 
         Scores.objects.create(
             game_id=game,
@@ -690,4 +693,8 @@ class TournamentConsumer(AsyncWebsocketConsumer):
         for game in self.room.tournament.store_games :
             tournament.games.add(game);
 
+        for player in self.room.tournament.store_players :
+            tournament.players.add(player);
+
+        tournament.winner = Profile.objects.get(user_id=self.competitor.user_id)
         return tournament.id
