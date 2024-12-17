@@ -141,7 +141,7 @@ const Page = () => {
     let isConnected = false;
     if (!WebSocketRef.current)
       WebSocketRef.current = new WebSocket(
-        "ws://localhost:8000/ws/tournament/FOUR/"
+        process.env.NEXT_PUBLIC_HOST_URL.replace('http://', 'ws://')+":8000/ws/tournament/FOUR/"
       );
 
     WebSocketRef.current.onopen = () => {
@@ -252,8 +252,7 @@ const Page = () => {
         toast.success('Image updated successfully');
         setCreationImageid(responseData.picture_id);
         setPreviewImage(responseData.tournament_pic_url);
-      setIsUploadingImage(false);
-
+        setIsUploadingImage(false);
         return true;
       }
     } catch (error) {

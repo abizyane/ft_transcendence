@@ -8,7 +8,8 @@ class Tournament():
         self.p_holders = {}
         self.tree = _tree
         self.room = None
-
+        self.store_games = []
+        self.store_players = set();
     def get_player(self, player_name):
         return self.p_holders[player_name]
     

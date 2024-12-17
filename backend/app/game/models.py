@@ -83,21 +83,37 @@ class Profile(models.Model):
     def get_tournament_losses(self):
         return TournamentModel.get_all_tournaments(self.id).filter(~models.Q(winner=self.id)).count()
 
+class PlayerModel(models.Model):
+    class State(models.TextChoices):
+        WIN = 'WIN'
+        LOSE = 'LOSE'
+    profile = models.ForeignKey(Profile, on_delete=models.CASCADE)
+    alias = models.CharField(max_length=50, null=True)
+    color = models.CharField(max_length=32)
+    score = models.IntegerField(null=False)
+    state = models.CharField(max_length=10, choices=State.choices)
+
 class GameModel(models.Model):
     class Type(models.TextChoices):
         SEMIFINAL = 'SEMIFINAL'
         FINAL = 'FINAL'
-    player_1 = models.ForeignKey(Profile, related_name="player_one", null=True,on_delete=models.CASCADE)
-    player_2 = models.ForeignKey(Profile, related_name="player_two", null=True,on_delete=models.CASCADE)
+    player_1 = models.ForeignKey(PlayerModel, related_name="player_one", null=True,on_delete=models.CASCADE)
+    player_2 = models.ForeignKey(PlayerModel, related_name="player_two", null=True,on_delete=models.CASCADE)
     status = models.CharField(max_length=5, null=True)
     created = models.DateTimeField(default=timezone.now, null=False)
     updated = models.DateTimeField(default=timezone.now, null=False)
     type = models.CharField(max_length=10, choices=Type.choices, default=None, null=True)
     created.editable = False
 
+    def __str__(self):
+        if (self.player_1.alias):
+            return f'{self.player_1.alias} vs {self.player_2.alias}'
+        return f'{self.player_1.profile.get_username()} vs {self.player_2.profile.get_username()}'
+
     def get_all_games(player_id:int) -> models.QuerySet:
-        games = GameModel.objects.filter(models.Q(player_1=player_id) | models.Q(player_2=player_id))
-        return games.order_by("created")
+        games = GameModel.objects.filter((models.Q(player_1=player_id) | models.Q(player_2=player_id))
+                                         & models.Q(type=None))
+        return games.order_by("-created")
 
     def get_opponent(self, player:Profile) -> Profile:
         if player.id == self.player_1.pk:
@@ -111,23 +127,20 @@ class GameModel(models.Model):
         scoreObj = Scores.objects.get(id=self.id)
         if not scoreObj:
             return -1
-        if self.player_1.id == player_id:
+        if self.player_1.profile.id == player_id:
             return scoreObj.score_1
-        elif self.player_2.id == player_id:
+        elif self.player_2.profile.id == player_id:
             return scoreObj.score_2
         else:
             return -1;
-
-    def __str__(self):
-        return f"{self.player_1.get_username()} vs {self.player_2.get_username()}"
     
     def get_player_game_xp(self,player_id:int)-> int:
         scoreObj = Scores.objects.get(id=self.id)
         if not scoreObj:
             return -1
-        if self.player_1.id == player_id:
+        if self.player_1.profile.id == player_id:
             return scoreObj.score_1
-        elif self.player_2.id == player_id:
+        elif self.player_2.profile.id == player_id:
             return scoreObj.score_2
         else:
             return -1
@@ -159,36 +172,18 @@ def get_default_start_time():
 
 
 class TournamentModel(models.Model):
-    class State(models.TextChoices):
-        SCHEDULED = 'SCHEDULED'
-        ONGOING = 'ONGOING'
-        COMPLETED = 'COMPLETED'
-
     class TournamentType(models.TextChoices):
         TWO = 'TWO'
         FOUR = 'FOUR'
         EIGHT = 'EIGHT'
-    
-    class Permission(models.TextChoices):
-        PUBLIC = 'PUBLIC'
-        PRIVATE = 'PRIVATE'
 
     # tournament_id = models.AutoField(primary_key=True)
     name = models.CharField(max_length=100, default='AstroTournament')
-    permission = models.CharField(max_length=10, choices=Permission.choices, default=Permission.PUBLIC)
     owner = models.ForeignKey(Profile, related_name='tournament_owner', null=True, on_delete=models.CASCADE)
-    invites = models.ManyToManyField(Profile, related_name='tournament_invites')
-    picture = models.ImageField(upload_to='tournament_pictures/', null=True)
-    
-    players = models.ManyToManyField(Profile, related_name='tournament_players')
+    picture = models.TextField(null=True)
     games = models.ManyToManyField(GameModel, related_name='tournament_games')
-    winner = models.ForeignKey(Profile, related_name='tournament_winner', null=True, on_delete=models.
-    CASCADE)
-
-    state = models.CharField(max_length=10, choices=State.choices, default=State.SCHEDULED)
-    tournament_type = models.CharField(max_length=5, choices=TournamentType.choices, default=TournamentType.TWO)    
-    start_time = models.DateTimeField(default=get_default_start_time)
-
+    players = models.ManyToManyField(Profile, related_name="tournament_competitors" ,null=True)
+    winner = models.ForeignKey(Profile, related_name="tournament_winner" ,null=True, on_delete=models.CASCADE)
     created = models.DateTimeField(default=timezone.now, null=False)
     updated = models.DateTimeField(default=timezone.now, null=False)
     created.editable = False
@@ -201,12 +196,11 @@ class TournamentModel(models.Model):
     #         oppenent_score = self.get_player_game_score(player.id)
     #         state = "Win" if score > oppenent_score else "Lose"
     #         print(f'{player.get_username()} {score}  Vs  {oppenent.get_username()} {oppenent}')
-    
     def get_tournament_xp(self,player_id:int)-> int:
         return self.get_player_game_xp(player_id)
 
     def get_all_tournaments(player_id:int)-> models.QuerySet:
-        return TournamentModel.objects.filter(players=player_id)
+        return TournamentModel.objects.filter(players__id=player_id)
     
 class TournamentPic(models.Model):
     tournament_id = models.OneToOneField(TournamentModel, on_delete=models.CASCADE, null=True)

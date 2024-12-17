@@ -1,5 +1,5 @@
 from game.serializers import ProfileSerializer
-from game.models import Profile, GameModel
+from game.models import Profile, GameModel, TournamentModel
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.exceptions import AuthenticationFailed
@@ -7,7 +7,7 @@ from rest_framework.permissions import IsAuthenticated
 from astropong.serializers.UserSerializer import FriendSerializer, UserSerializer
 from astropong.models.UserModel import User, Relationship
 from django.http import HttpResponse
-from django.conf import settings
+from django.conf import settings    
 from rest_framework import serializers
 from django.core.files.storage import default_storage
 from django.core.files.base import ContentFile
@@ -17,6 +17,38 @@ from datetime import datetime, timedelta
 from django.db.models import Q
 from django.utils import timezone
 
+
+class TournamentHistoryView(APIView):
+    permission_classes = [IsAuthenticated]
+    def post(self, request):
+        userid = request.data.get('id')
+        profile = Profile.objects.get(user_id=userid)
+        tournaments = TournamentModel.get_all_tournaments(profile.id)
+        tournaments_data = []
+        for tournament in tournaments:
+            matchs = []
+            for match in tournament.games.all():
+                player_1 = UserSerializer(User.objects.get(id=match.player_1.profile.user_id_id), context={'request': request}).data
+                player_2 = UserSerializer(User.objects.get(id=match.player_2.profile.user_id_id), context={'request': request}).data
+                matchs.append({
+                    'type': match.type,
+                    'player': match.player_1.alias,
+                    'player_picture': player_1.get('profile_pic_url'),
+                    'opponent': match.player_2.alias,
+                    'opponent_picture': player_2.get('profile_pic_url'),
+                    'score': match.get_player_game_score(match.player_1.profile.id),
+                    'opponent_score': match.get_player_game_score(match.player_2.profile.id),
+                    'result': 'Win' if match.get_player_game_score(match.player_1.profile.id) > match.get_player_game_score(match.player_2.profile.id) else 'Loss' if match.get_player_game_score(match.player_1.profile.id) < match.get_player_game_score(match.player_2.profile.id) else 'Draw'
+                })
+
+            tournaments_data.append({
+                'name': tournament.name,
+                'picture': tournament.picture,
+                'winner': tournament.winner.get_username(),
+                'date': tournament.created,
+                "matchs" : matchs
+            })
+        return Response({'tournaments': tournaments_data})
 
 class GamesHistoryView(APIView):
     permission_classes = [IsAuthenticated]
