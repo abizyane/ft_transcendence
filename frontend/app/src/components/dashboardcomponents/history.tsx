@@ -6,13 +6,11 @@ import { useParams } from 'next/navigation';
 import { format, formatDistanceToNow, isToday, isYesterday } from "date-fns";
 
 interface User {
-  name: string;
   username: string;
   picture: string;
 }
 
 interface Opponent {
-  name: string;
   username: string;
   picture: string;
 }

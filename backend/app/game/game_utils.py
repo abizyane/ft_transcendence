@@ -12,6 +12,18 @@ class Ball:
         self.dirX = math.cos(self.angle)
         self.dirY = math.sin(self.angle)
         pass
+
+    def check_paddle_collision(self, paddle) :
+        try :
+            dx = abs(self.posX - (paddle.x + paddle.half_width))
+            dy = abs(self.posY - (paddle.y + paddle.half_height))
+            if (dx <= self.rad - paddle.half_width and dy <= paddle.height + self.rad) :
+                return True
+            return False
+        except Exception as e:
+            print(e)
+
+
     def checkCollide(self):
         if (self.posY + self.rad >= self.game.height or self.posY - self.rad <= 0 ):
             self.dirY *= -1
@@ -21,7 +33,7 @@ class Ball:
         if (left_collision <= 0):
             self.game.red.score += 1
             self.reset_ball()
-        if ((left_collision <= self.game.blue.x  + self.game.blue.width and left_collision > self.game.blue.x) and (self.posY >= self.game.blue.y and self.posY <= self.game.blue.y + self.game.blue.height) and not self.game.blue.isHiting):
+        if (self.check_paddle_collision(self.game.blue) and not self.game.blue.isHiting):
             self.dirX *= -1
             self.game.blue.isHiting = True
         #red Range
@@ -30,7 +42,7 @@ class Ball:
         if (right_collision >= self.game.width):
             self.game.blue.score += 1
             self.reset_ball()
-        if ((right_collision >= self.game.red.x and right_collision <= self.game.red.x + self.game.red.width) and (self.posY >= self.game.red.y and self.posY <= self.game.red.y + self.game.red.height) and not self.game.red.isHiting):
+        if (self.check_paddle_collision(self.game.red) and not self.game.red.isHiting):
             self.dirX *= -1
             self.game.red.isHiting = True
         # else:
@@ -55,6 +67,8 @@ class Player:
         self.score = 0
         self.width = 2
         self.height = 70
+        self.half_width = self.width / 2
+        self.half_height = self.height / 2
         self.x = 0
         self.y = game.height/ 2
         self.color = ''

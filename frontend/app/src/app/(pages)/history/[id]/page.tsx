@@ -9,7 +9,7 @@ import Loader from '@/components/loader/loader';
 import { format, formatDistanceToNow, isToday, isYesterday } from "date-fns";
 
 
-const MatchDetails = ({ match }: { match: TournamentMatch }) => {
+const MatchDetails = ({ match }: { match: Game }) => {
   if (!match) return 
   (
     <div className="flex items-center justify-center">
@@ -21,15 +21,15 @@ const MatchDetails = ({ match }: { match: TournamentMatch }) => {
       md:px-2 lg:py-6 lg:px-2">
       <div className="flex items-center justify-start">
         <img
-          src={match.player_picture	}
-          alt={`${match.player} Profile`}
+          src={match.player.picture}
+          alt={`${match.player.username} Profile`}
           className="w-12 h-12 md:w-14 md:h-14 lg:w-16 lg:h-16 rounded-full mx-1"
         />
-        <p className="font-thin text-white text-xs text-nowrap md:text-base lg:text-lg">{match.player}</p>
+        <p className="font-thin text-white text-xs text-nowrap md:text-base lg:text-lg">{match.player.username}</p>
       </div>
       <div className="flex flex-col items-center justify-center mx-3">
-        <p className="font-bold w-full text-white text-center text-xs w-10  md:text-base lg:text-lg">{match.score}:{match.opponent_score}</p>
-        {/* {match.date ? <>
+        <p className="font-bold w-full text-white text-center text-xs w-10  md:text-base lg:text-lg">{match.score.user}:{match.score.opponent}</p>
+        {match.date ? <>
             <p className="ml-4 w-full text-white-primary whitespace-nowrap">
               {isToday(new Date(match.date))
                 ? formatDistanceToNow(new Date(match.date), {
@@ -39,13 +39,13 @@ const MatchDetails = ({ match }: { match: TournamentMatch }) => {
                 ? "Yesterday"
                 : format(new Date(match.date), "yyyy-MM-dd")}
             </p>
-        </> : <></>} */}
+        </> : <></>}
       </div>
       <div className="flex justify-end items-center">
-        <p className="font-thin text-white text-nowrap text-xs md:text-base lg:text-lg">{match.opponent}</p>
+        <p className="font-thin text-white text-nowrap text-xs md:text-base lg:text-lg">{match.opponent.username}</p>
         <img
-          src={match.opponent_picture}
-          alt={`${match.opponent} Profile`}
+          src={match.opponent.picture}
+          alt={`${match.opponent.username} Profile`}
           className="w-12 h-12 md:w-12 md:h-12 lg:w-16 lg:h-16 rounded-full mx-1"
         />
       </div>
@@ -101,10 +101,8 @@ interface Game {
 
 interface TournamentMatch {
   type: string;
-  player: string;
-  player_picture: string;
-  opponent: string;
-  opponent_picture: string;
+  player: User;
+  opponent: User;
   score: GameScore;
   result: string;
   }
@@ -114,7 +112,7 @@ interface Tournament {
   picture: string;
   winner: string;
   date: string;
-  matchs: TournamentMatch[];
+  matchs: Game[];
 }
 
 const HistoryPage = () => {

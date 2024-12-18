@@ -446,6 +446,7 @@ const Page = () => {
 
     const [readyToPlay, setReadyToPlay] = useState(false);
     const [timer, setTimer] = useState(null);
+    const [isHost, setIsHost] = useState(false)
 
 
     const handleRoomUpdate = (users) => {
@@ -494,6 +495,9 @@ const Page = () => {
                   handleRoomUpdate(data.competitors);
                 }
               }
+            }else if (data.command === "setHost"){
+              setIsHost(true);
+              console.log("heeeeere");
             }
           }
           if (data.command && data.command === "update_room")
@@ -537,6 +541,8 @@ const Page = () => {
       };
     }, []);
 
+    console.log("readytoplay",readyToPlay);
+    console.log("isHost",isHost);
 
 
     return (
@@ -657,7 +663,7 @@ const Page = () => {
               </div>
             </div>
           </div>
-            {readyToPlay && room.host.alias === alias && (
+            {readyToPlay && isHost && (
               <button
                 className="bg-violet-900/90 text-white font-bold py-2 px-4 mt-6 rounded hover:bg-violet-700"
               onClick={(e) => {
@@ -670,7 +676,7 @@ const Page = () => {
                 }))
               }}
             >
-              Play
+              Play {readyToPlay} {isHost}
             </button>)}
         </div>
       </div>
