@@ -17,13 +17,7 @@ class Ball:
         try :
             dx = abs(self.posX - (paddle.x + paddle.half_width))
             dy = abs(self.posY - (paddle.y + paddle.half_height))
-            max_angle = 30
-            divy = dy
-            if (dx <= self.rad - paddle.half_width and dy <= paddle.half_height + self.rad) :
-                if self.posY < paddle.y + (paddle.half_height):
-                    divy *= -1
-                self.angle = (divy * max_angle) / (paddle.half_height + 9.8)
-                self.dirY = math.sin(math.radians(self.angle))
+            if (dx <= self.rad - paddle.half_width and dy <= paddle.height + self.rad) :
                 return True
             return False
         except Exception as e:
@@ -40,7 +34,7 @@ class Ball:
             self.game.red.score += 1
             self.reset_ball()
         if (self.check_paddle_collision(self.game.blue) and not self.game.blue.isHiting):
-            self.dirX *= -math.cos(math.radians(self.angle))
+            self.dirX *= -1
             self.game.blue.isHiting = True
         #red Range
         # elif (self.posX > self.game.width * 3/4):
@@ -49,11 +43,12 @@ class Ball:
             self.game.blue.score += 1
             self.reset_ball()
         if (self.check_paddle_collision(self.game.red) and not self.game.red.isHiting):
-            self.dirX *= -math.cos(math.radians(self.angle))
+            self.dirX *= -1
             self.game.red.isHiting = True
         # else:
         self.game.red.isHiting = False
         self.game.blue.isHiting = False
+            
             
     
     def reset_ball(self):
