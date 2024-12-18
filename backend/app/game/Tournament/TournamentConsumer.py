@@ -295,7 +295,8 @@ class TournamentConsumer(AsyncWebsocketConsumer):
                 await self.send(text_data=json.dumps({
                     'msg': 'You Won'
                 }))
-                await self.save_tournament()
+                if self._type == "FOUR":
+                    await self.save_tournament()
             # await self.channel_layer.group_send(self.room.name,{
             #     'type' : 'broadcast.room.state'
             # })

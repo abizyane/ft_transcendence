@@ -108,13 +108,13 @@ class Profile(models.Model):
     def get_tournament_wins(self):
         return TournamentModel.objects.filter(winner=self).count()
     def get_tournament_losses(self):
-        participated_tournaments = TournamentModel.objects.filter(players=self)
-        return participated_tournaments.exclude(winner=self).count()
+        return TournamentModel.objects.filter(players=self).count()
 
 class PlayerModel(models.Model):
     class State(models.TextChoices):
         WIN = 'WIN'
         LOSE = 'LOSE'
+        NEUTRAL = 'NEUTRAL'
     profile = models.ForeignKey(Profile, on_delete=models.CASCADE)
     alias = models.CharField(max_length=50, null=True)
     color = models.CharField(max_length=32)
@@ -171,9 +171,24 @@ class GameModel(models.Model):
         scoreObj = Scores.objects.get(id=self.id)
         if not scoreObj:
             return -1
+        xp = 100
         if self.player_1.profile.id == player_id and self.player_1.state == PlayerModel.State.WIN:
-            return 100
+            xp = xp * 3 if self.type is not None  else xp * 1.5
+            xp += scoreObj.score_1 * 20 
+            return xp
         elif self.player_2.profile.id == player_id and self.player_2.state == PlayerModel.State.WIN:
+            xp = xp * 3 if self.type is not None  else xp * 1.5
+            xp += scoreObj.score_2 * 20
+            return xp
+        elif self.player_1.profile.id == player_id and self.player_1.state == PlayerModel.State.LOSE:
+            xp = xp / 2
+            xp += scoreObj.score_1 * 10 
+            return xp
+        elif self.player_2.profile.id == player_id and self.player_2.state == PlayerModel.State.LOSE:
+            xp = xp / 2
+            xp += scoreObj.score_2 * 10
+            return xp
+        elif self.player_1.state == PlayerModel.State.NEUTRAL and self.player_1.state == PlayerModel.State.NEUTRAL:
             return 100
         else:
             return 0

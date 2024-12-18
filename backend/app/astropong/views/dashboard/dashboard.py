@@ -211,7 +211,7 @@ class WeeklyXPView(APIView):
                 label = f'D-{i}' if i > 0 else 'D'
                 date = end_date - timedelta(days=i)
                 daily_xp[label] = {
-                    'xp_gained': 0,
+                    'xp_gained': 0.0,
                     'date': date.strftime('%Y-%m-%d')
                 }
             

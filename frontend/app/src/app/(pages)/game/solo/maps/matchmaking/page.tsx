@@ -127,7 +127,7 @@ const Page = () => {
           if (newCount == null && newGameReady === false) newCount = 3;
           else if (newCount > 0) newCount = newCount - 1;
           else if (newCount == 0) {
-            clearInterval(newTimer);
+            clearInterval(timer.current);
             newTimer = null;
             timer.current = null;
             newGameReady = true;
