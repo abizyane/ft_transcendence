@@ -40,7 +40,7 @@ class Profile(models.Model):
         self.save()
         self.calculate_xp()
 
-     def calculate_xp(self):
+    def calculate_xp(self):
         level_up_threshold = (400, 800, 1200, 2000, 3200, 5200, 8400, 13600, 22000, 35600, 57200, 92800, 150000, 242800, 402800, 642800, 1042800, 1682800, 2722800, 4028000)
 
         for i in range(len(level_up_threshold)):
@@ -148,9 +148,9 @@ class GameModel(models.Model):
         return games.order_by("-created")
 
     def get_opponent(self, player:Profile) -> Profile:
-        if player.id == self.player_1.pk:
+        if player.id == self.player_1.profile.id:
             return self.player_2
-        elif player.id == self.player_2.pk:
+        elif player.id == self.player_2.profile.id:
             return self.player_1
         else:
             return None
@@ -171,12 +171,12 @@ class GameModel(models.Model):
         scoreObj = Scores.objects.get(id=self.id)
         if not scoreObj:
             return -1
-        if self.player_1.profile.id == player_id:
-            return scoreObj.score_1
-        elif self.player_2.profile.id == player_id:
-            return scoreObj.score_2
+        if self.player_1.profile.id == player_id and self.player_1.state == PlayerModel.State.WIN:
+            return 100
+        elif self.player_2.profile.id == player_id and self.player_2.state == PlayerModel.State.WIN:
+            return 100
         else:
-            return -1
+            return 0
 
 
 class Scores(models.Model):
