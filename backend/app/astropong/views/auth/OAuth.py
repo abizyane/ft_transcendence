@@ -15,7 +15,7 @@ User = get_user_model()
 class OAuth(APIView):
     AUTH_URL = "https://api.intra.42.fr/oauth/authorize"
     TOKEN_URL = "https://api.intra.42.fr/oauth/token"
-    REDIRECT_URI = "http://10.11.5.5:3000/auth/oauth"
+    REDIRECT_URI = "http://10.11.2.14:3000/auth/oauth"
     CLIENT_ID = "u-s4t2ud-e86add016b6a41e208d53d0c011abdc53a93f6e1ba65ba9605a37be5a8997a17"
     CLIENT_SECRET="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"
     def get(self, request, *args, **kwargs):

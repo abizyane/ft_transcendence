@@ -103,10 +103,10 @@ const LoginForm = () => {
         <div className="text-center text-sm text-white mt-4">Or continue with</div>
         <div className="w-full flex justify-center mt-4">
         <a
-  type="button"
-  className="relative flex justify-center items-center w-12 h-12 bg-white rounded-full p-1"
-  href={process.env.NEXT_PUBLIC_HOST_URL+":8000/api/42OAuth"}
->
+        type="button"
+        className="relative flex justify-center items-center w-12 h-12 bg-white rounded-full p-1"
+        href={process.env.NEXT_PUBLIC_HOST_URL+":8000/api/42OAuth"}
+      >
   <img
     src="/42.png"
     alt="42 Logo"

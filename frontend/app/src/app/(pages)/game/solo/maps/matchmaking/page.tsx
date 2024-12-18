@@ -13,7 +13,7 @@ import Localgamecanva from "@/components/twopcanvas/page";
 import Canvas from "@/components/Canva/page";
 import ConfettiComponent from "@/components/Celebration/win";
 import {toast} from 'react-hot-toast'
-
+import Instructions from '@/components/Instructions/page';
 // Default competitors and user data
 const defaultCompetitors = [
   {
@@ -149,7 +149,7 @@ const Page = () => {
   useEffect(() => {
     console.log("isRandomMatch", isRandomMatch);
     if (isRandomMatch && socketRef.current === null) {
-      let url = "ws://localhost:8000/ws/tournament/TWO/"
+      let url = process.env.NEXT_PUBLIC_HOST_URL.replace('http','ws')+":8000/ws/tournament/TWO/"
       if (token) {
         url += `?token=${token}`;
       }
@@ -299,6 +299,7 @@ const Page = () => {
           <h3 className="justify-center items-center w-full h-full flex text-center text-3xl text-white text-nowrap font-extrabold">
             Game Starting in: {gameState.countdown}s
           </h3>
+          <Instructions/>
         </div>
       )}
       {gameState.gameready && isRandomMatch ? (

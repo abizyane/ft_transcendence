@@ -360,7 +360,7 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
       ws.close();
       setWs(null);
     }
-    const socket = new WebSocket(`ws://localhost:8000/ws/chat/room/`);
+    const socket = new WebSocket(process.env.NEXT_PUBLIC_HOST_URL.replace('http','ws')+":8000/ws/chat/room/");
     socket.onopen = () => {
     };
     
