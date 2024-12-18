@@ -10,10 +10,11 @@ class UserSerializer(serializers.ModelSerializer):
     profile_pic_url = serializers.SerializerMethodField()
     xp = serializers.SerializerMethodField()
     level = serializers.SerializerMethodField()
+    progress = serializers.SerializerMethodField()
 
     class Meta:
         model = User
-        fields = ['id', 'email', 'username', 'password','profile_pic','profile_pic_url','mfa_enabled','xp','level','tournament_alias', 'is_online']
+        fields = ['id', 'email', 'username', 'password','profile_pic','profile_pic_url','mfa_enabled','xp','level','tournament_alias', 'is_online', 'progress']
         extra_kwargs = {
             'password': {'write_only':True},
             'profile_pic': {'write_only':True}
@@ -39,9 +40,12 @@ class UserSerializer(serializers.ModelSerializer):
         return default_image_url
     def get_xp(self, obj):
         return obj.profile.xp if hasattr(obj, 'profile') else 0
+    
     def get_level(self, obj):
         return obj.profile.level if hasattr(obj, 'profile') else 0
 
+    def get_progress(self, obj):
+        return obj.profile.get_progress() if hasattr(obj, 'profile') else 0
 
 class RelationshipSerializer(serializers.ModelSerializer):
     friend = serializers.SerializerMethodField()
@@ -64,10 +68,11 @@ class FriendSerializer(serializers.ModelSerializer):
     sender_id = serializers.SerializerMethodField()
     xp = serializers.SerializerMethodField()
     level = serializers.SerializerMethodField()
+    progress = serializers.SerializerMethodField()
 
     class Meta:
         model = User
-        fields = ['id', 'username', 'email', 'profile_pic_url', 'is_online', 'relationship','sender_id', 'xp','level' ]
+        fields = ['id', 'username', 'email', 'profile_pic_url', 'is_online', 'relationship','sender_id', 'xp','level', 'progress']
 
     def get_profile_pic_url(self, obj):
         request = self.context.get('request')
@@ -108,5 +113,9 @@ class FriendSerializer(serializers.ModelSerializer):
             
     def get_xp(self, obj):
         return obj.profile.xp if hasattr(obj, 'profile') else 0
+    
     def get_level(self, obj):
         return obj.profile.level if hasattr(obj, 'profile') else 0
+    
+    def get_progress(self, obj):
+        return obj.profile.get_progress() if hasattr(obj, 'profile') else 0
