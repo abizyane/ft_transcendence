@@ -6,7 +6,7 @@ from django.db.models.query import EmptyQuerySet
 class Profile(models.Model):
     # profile_id = models.AutoField(primary_key=True)
     user_id = models.OneToOneField(User, on_delete=models.CASCADE)
-    level = models.IntegerField()
+    level = models.FloatField(default=0)
     xp = models.IntegerField()
     created = models.DateTimeField(default=timezone.now, null=False)
     updated = models.DateTimeField(default=timezone.now, null=False)

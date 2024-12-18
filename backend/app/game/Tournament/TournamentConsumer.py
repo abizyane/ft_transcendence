@@ -257,7 +257,7 @@ class TournamentConsumer(AsyncWebsocketConsumer):
             game_id = await self.save_game()
             print(game_id, flush=True)
             self.room.winners.append(self.competitor)
-            # await self.award_xp(True)
+            await self.award_xp(True)
 
             await self.send(text_data=json.dumps({
                 'msg': 'You Won'
@@ -299,7 +299,7 @@ class TournamentConsumer(AsyncWebsocketConsumer):
             # })
         else:
             # self.p_holder.paddle = None
-            # await self.award_xp(False)
+            await self.award_xp(False)
     
             await self.send(text_data=json.dumps({
                 'msg': 'You Lost'
@@ -673,10 +673,10 @@ class TournamentConsumer(AsyncWebsocketConsumer):
         )
 
         xp = 100
-        if self.game_mode == 'bot':
-            pass
+        if self._type == 'BOT':
+            return
         elif won:
-            xp = xp * 3 if self.game_mode == 'tournament' else xp * 1.5
+            xp = xp * 3 if self._type == 'FOUR' else xp * 1.5
             xp += self.game.blue.score * 20 if self.p_holder.paddle.color == 'blue' else self.game.red.score * 20
         else:
             xp /= 2
