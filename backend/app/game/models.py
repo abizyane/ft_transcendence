@@ -40,14 +40,30 @@ class Profile(models.Model):
         self.save()
         self.calculate_xp()
 
-    def calculate_xp(self):
-        level = self.xp / 1000
-        self.level = level
-        self.xp = self.xp % 1000
+     def calculate_xp(self):
+        level_up_threshold = (400, 800, 1200, 2000, 3200, 5200, 8400, 13600, 22000, 35600, 57200, 92800, 150000, 242800, 402800, 642800, 1042800, 1682800, 2722800, 4028000)
+
+        for i in range(len(level_up_threshold)):
+            if self.xp < level_up_threshold[i]:
+                progress = self.xp / level_up_threshold[i]
+                self.level = i + progress
+                break
+            elif self.xp >= level_up_threshold[i] and i == len(level_up_threshold) - 1:
+                self.level = len(level_up_threshold) + 1
+
+        self.level = round(self.level, 2)
         self.save()
 
-        # self.level = round(self.level, 2)
-        # self.save()
+    def get_progress(self):
+        level_up_threshold = (400, 800, 1200, 2000, 3200, 5200, 8400, 13600, 22000, 35600, 57200, 92800, 150000, 242800, 402800, 642800, 1042800, 1682800, 2722800, 4028000)
+
+        for i in range(len(level_up_threshold)):
+            if self.xp < level_up_threshold[i]:
+                progress = self.xp / level_up_threshold[i]
+                return progress * 100    
+        return 100
+
+
     def get_wins(self, isTournament:bool=False):
         games = GameModel.get_all_games(self.id, isTournament)
         wins = 0
