@@ -29,9 +29,8 @@ type UserInfoProps = {
 
 const UserInfo: React.FC<UserInfoProps> = ({ user, setUser }) => {
   const { user: currentUser } = useUser();
-  const { name, profile_pic_url, xp, level, id } = user;
-  const maxXPPerLevel = 1000;
-  const remainingXP = ((user.xp % maxXPPerLevel) / maxXPPerLevel) * 100;
+  const { name, profile_pic_url, xp, level, id ,progress } = user;
+
   
 
   const [loading, setLoading] = useState(false);
@@ -262,13 +261,13 @@ const UserInfo: React.FC<UserInfoProps> = ({ user, setUser }) => {
   return (
     <>
       <div className=" w-full rounded-xl p-2">
-        <div className="flex gap-2">   
-          <div className="flex-shrink-0 w-3/5">
+        <div className="flex justify-around">   
+          <div className="w-2/5">
             <div className="mb-4 max-w-full aspect-square  mx-auto">
               <img
                 src={user.profile_pic_url}
                 alt="User Profile"
-                className="w-full h-auto object-cover h-auto rounded-2xl"
+                className="w-full h-full object-cover h-auto rounded-2xl"
               />
               {currentUser?.id !== user?.id && 
               <div className="text-white text-xl font-bold text-center mt-2"><p>{user.username} </p></div>}
@@ -278,7 +277,7 @@ const UserInfo: React.FC<UserInfoProps> = ({ user, setUser }) => {
               <div className="flex items-center h-2 w-full rounded-xl bg-white">
                 <div
                   className="bg-violet-primary h-2 rounded-xl"
-                  style={{ width: `${remainingXP}%` }}
+                  style={{ width: `${user.progress}%` }}
                 ></div>
               </div>
               <p className="flex justify-end text-white font-light text-xs mr-4 w-full">
