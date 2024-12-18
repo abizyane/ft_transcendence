@@ -8,7 +8,7 @@ class Ball:
         self.posX = game.width / 2
         self.posY = game.height / 2
         self.speed = 8
-        self.angle = 0
+        self.angle = 45
         self.dirX = math.cos(self.angle)
         self.dirY = math.sin(self.angle)
         pass
