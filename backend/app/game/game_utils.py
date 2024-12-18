@@ -8,7 +8,7 @@ class Ball:
         self.posX = game.width / 2
         self.posY = game.height / 2
         self.speed = 8
-        self.angle = 45
+        self.angle = 0
         self.dirX = math.cos(self.angle)
         self.dirY = math.sin(self.angle)
         pass
@@ -17,7 +17,13 @@ class Ball:
         try :
             dx = abs(self.posX - (paddle.x + paddle.half_width))
             dy = abs(self.posY - (paddle.y + paddle.half_height))
-            if (dx <= self.rad - paddle.half_width and dy <= paddle.height + self.rad) :
+            max_angle = 30
+            divy = dy
+            if (dx <= self.rad - paddle.half_width and dy <= paddle.half_height + self.rad) :
+                if self.posY < paddle.y + (paddle.half_height):
+                    divy *= -1
+                self.angle = (divy * max_angle) / (paddle.half_height + 9.8)
+                self.dirY = math.sin(math.radians(self.angle))
                 return True
             return False
         except Exception as e:
@@ -34,7 +40,7 @@ class Ball:
             self.game.red.score += 1
             self.reset_ball()
         if (self.check_paddle_collision(self.game.blue) and not self.game.blue.isHiting):
-            self.dirX *= -1
+            self.dirX *= -math.cos(math.radians(self.angle))
             self.game.blue.isHiting = True
         #red Range
         # elif (self.posX > self.game.width * 3/4):
@@ -43,7 +49,7 @@ class Ball:
             self.game.blue.score += 1
             self.reset_ball()
         if (self.check_paddle_collision(self.game.red) and not self.game.red.isHiting):
-            self.dirX *= -1
+            self.dirX *= -math.cos(math.radians(self.angle))
             self.game.red.isHiting = True
         # else:
         self.game.red.isHiting = False
@@ -66,7 +72,7 @@ class Player:
         self.id = id
         self.score = 0
         self.width = 2
-        self.height = 70
+        self.height = 60
         self.half_width = self.width / 2
         self.half_height = self.height / 2
         self.x = 0
