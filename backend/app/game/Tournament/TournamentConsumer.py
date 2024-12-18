@@ -160,11 +160,13 @@ class TournamentConsumer(AsyncWebsocketConsumer):
     
     async def init_game(self, event):
         try :
-            self.match = self.room.tournament.get_player_match(self.channel_name)
+            self.match = self.p_holder.back
             self.match_name = str(f'{self.room.name}m_{self.match.index}')
         except Exception as e :
-            print(f'Exception sor {self.competitor.alias}', flush=True)
-            print(f'{self.channel_name}', flush=True)
+            print(f'Exception : alias {self.competitor.alias}', flush=True)
+            print(f'Exception : p_holder {self.p_holder}', flush=True)
+            print(f'Exception : p_holder.back {self.p_holder.back}', flush=True)
+
         await self.channel_layer.group_add(self.match_name, self.channel_name)
         if not self.match.game and ((self.p_holder.index % 2) == 0):
             self.match.game = Game(self.match.index)
@@ -362,13 +364,18 @@ class TournamentConsumer(AsyncWebsocketConsumer):
                         'type' : 'leave.state',
                         'player' : f'{self.channel_name}'
                     })
-                    await self.channel_layer.group_send(self.match_name,{
-                        'type' : 'room.update',
-                    })
+                    # await self.channel_layer.group_send(self.match_name,{
+                    #     'type' : 'room.update',
+                    # })
 
             try:
                 self.p_holder.competitor.exit_room(self.room)
                 self.room.competitors[0].is_host = True
+                del self.room.p_holders[self.channel_name]
+                print(self.room.p_holders, flush=True)
+                await self.channel_layer.group_send(self.room.name,{
+                        'type' : 'joined.competitor',
+                    })
                 # del self.room.tournament.p_holders[self.channel_name]
             except RoomIsEmpty as e:
                 TournamentConsumer.rm.remove_room(self._type, self.room.name)
@@ -399,6 +406,8 @@ class TournamentConsumer(AsyncWebsocketConsumer):
     async def create_room(self,data):
         name = data.get('roomName')
         try :
+            if not name.isalnum() :
+                raise ValueError("Not Alpha")
             self.room = await self.competitor.create_room(TournamentConsumer.rm, _type=self._type, name=name, image_id=data.get('roomImage', None), scope=self.scope)
             self.competitor.join_room(self.room)
             await self.channel_layer.group_add(name, self.channel_name)
@@ -422,12 +431,15 @@ class TournamentConsumer(AsyncWebsocketConsumer):
             await self.send(text_data=json.dumps({
                 'ErrorMsg' : str(e)
             }))
+            TournamentConsumer.rm.remove_room(self._type, self.room.name)
         except TypeError as te :
             await self.send(text_data=json.dumps({
                 'ErrorMsg' : str(te)
             }))
-            self.competitor.exit_room(self.room)
-            TournamentConsumer.rm.remove_room(self._type, self.room.name)
+        except Exception as e:
+            await self.send(text_data=json.dumps({
+                'ErrorMsg' : str(e)
+            }))
     
     async def broadcast_allrooms_state(self, event):
         await self.send(text_data=json.dumps({
@@ -486,7 +498,7 @@ class TournamentConsumer(AsyncWebsocketConsumer):
                     'room' : self.room.get_data()
                 }))
             await self.channel_layer.group_send(self.room.name, {
-                'type': 'ready_to_play',
+                'type': 'ready.to.play',
                 'ready': self.room.is_ready()  # or False, depending on the logic
             })
             
@@ -498,6 +510,12 @@ class TournamentConsumer(AsyncWebsocketConsumer):
         await self.send(text_data=json.dumps({
             'type': 'room',
             'command': 'readyToPlay',
+            'ready': event.get('ready', False)
+        }))
+        if self.competitor.is_host : 
+            await self.send(text_data=json.dumps({
+            'type': 'room',
+            'command': 'setHost',
             'ready': event.get('ready', False)
         }))
 

@@ -7,6 +7,13 @@ import jwt, datetime
 
 class LogoutView(APIView):
     def post(self, request):
+        try:
+            user = request.user
+            dbuser = User.objects.get(id=user.id)
+            dbuser.is_online = False
+            dbuser.save()
+        except:
+            pass
         response = Response()
         response.delete_cookie('access')
         response.delete_cookie('refresh')

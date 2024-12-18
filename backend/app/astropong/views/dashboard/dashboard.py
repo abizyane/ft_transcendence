@@ -1,5 +1,5 @@
 from game.serializers import ProfileSerializer
-from game.models import Profile, GameModel, TournamentModel
+from game.models import Profile, GameModel, Scores, TournamentModel, PlayerModel
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.exceptions import AuthenticationFailed
@@ -32,12 +32,18 @@ class TournamentHistoryView(APIView):
                 player_2 = UserSerializer(User.objects.get(id=match.player_2.profile.user_id_id), context={'request': request}).data
                 matchs.append({
                     'type': match.type,
-                    'player': match.player_1.alias,
-                    'player_picture': player_1.get('profile_pic_url'),
-                    'opponent': match.player_2.alias,
-                    'opponent_picture': player_2.get('profile_pic_url'),
-                    'score': match.get_player_game_score(match.player_1.profile.id),
-                    'opponent_score': match.get_player_game_score(match.player_2.profile.id),
+                    'player' : {
+                        'username': match.player_1.alias,
+                        'picture': player_1.get('profile_pic_url'),
+                    },
+                    'opponent': {
+                        'username': match.player_2.alias,
+                        'picture': player_2.get('profile_pic_url'),
+                    },
+                    'score': {
+                        'user': match.get_player_game_score(match.player_1.profile.id),
+                        'opponent': match.get_player_game_score(match.player_2.profile.id),
+                    },
                     'result': 'Win' if match.get_player_game_score(match.player_1.profile.id) > match.get_player_game_score(match.player_2.profile.id) else 'Loss' if match.get_player_game_score(match.player_1.profile.id) < match.get_player_game_score(match.player_2.profile.id) else 'Draw'
                 })
 
@@ -57,30 +63,34 @@ class GamesHistoryView(APIView):
             userid = request.data.get('id')
             if userid is None:
                 raise Profile.DoesNotExist
-            user_profile : Profile = Profile.objects.get(user_id=userid)
+            user_profile = Profile.objects.get(user_id=userid)
             games = GameModel.get_all_games(user_profile.id).order_by('-created')
             history = []
-            for game in games: 
-                opponent : Profile = game.get_opponent(user_profile)
-                score : int = game.get_player_game_score(user_profile.id)
-                opponent_score : int = game.get_player_game_score(opponent.id)
+            
+            for game in games:
+                # Determine which PlayerModel belongs to the user and opponent
+                current_player = game.player_1 if game.player_1.profile.id == user_profile.id else game.player_2
+                player1 = game.player_1.profile
+                opponent_player = game.player_2.profile
+                opponent_score = game.get_player_game_score(opponent_player.id)
+                score = Scores.objects.get(game_id=game.id)
                 
                 match_data = {
                     'gameId': game.id,
                     'date': game.created,
-                    'player':{
-                        'username': user_profile.get_username(),
-                        'picture': user_profile.get_profile_pic(request),
+                    'player': {
+                        'username': player1.get_username(),
+                        'picture': player1.get_profile_pic(request),
                     },
-                    'opponent':{
-                        'username': opponent.get_username(),
-                        'picture': opponent.get_profile_pic(request),
+                    'opponent': {
+                        'username': opponent_player.get_username(),
+                        'picture': opponent_player.get_profile_pic(request),
                     },
                     'score': {
-                        'user': score,
-                        'opponent': opponent_score,
+                        'user': score.score_1,
+                        'opponent': score.score_2,
                     },
-                    'result': 'Win' if score > opponent_score else 'Loss' if score < opponent_score else 'Draw'
+                    'result': 'Win' if current_player.state == PlayerModel.State.WIN else 'Loss' if current_player.state == PlayerModel.State.LOSE else 'Draw'
                 }
                 history.append(match_data)
                 
@@ -97,18 +107,11 @@ class PlayerWinRateView(APIView):
         try:
             userid = request.data.get('id')
             user_profile = Profile.objects.get(user_id=userid)
-            games = GameModel.get_all_games(user_profile.id)
             
-            total_games = games.count()
-            wins = 0
-            
-            for game in games:
-                player_score = game.get_player_game_score(user_profile.id)
-                opponent = game.get_opponent(user_profile)
-                opponent_score = game.get_player_game_score(opponent.id)
-                
-                if player_score > opponent_score:
-                    wins += 1
+            wins = user_profile.get_wins()
+            losses = user_profile.get_losses()
+            draws = user_profile.get_draws()
+            total_games = wins + losses + draws
             
             return Response({
                 'totalGames': total_games,
@@ -231,31 +234,18 @@ class DashboardView(APIView):
     permission_classes = [IsAuthenticated]
     def post(self, request):
         try:
-
             userid = request.data.get('id')
             user_profile = Profile.objects.get(user_id=userid)
-            games = GameModel.get_all_games(user_profile.id)
             
-            total_games = games.count()
-            wins = 0
-            losses = 0
-            draws = 0
+            # Use the new Profile methods to get stats
+            wins = user_profile.get_wins()
+            losses = user_profile.get_losses()
+            draws = user_profile.get_draws()
+            total_games = wins + losses + draws
             
-            for game in games:
-                player_score = game.get_player_game_score(user_profile.id)
-                opponent = game.get_opponent(user_profile)
-                opponent_score = game.get_player_game_score(opponent.id)
-                
-                if player_score > opponent_score:
-                    wins += 1
-                elif player_score < opponent_score:
-                    losses += 1
-                else:
-                    draws += 1
-                    
-    
             tournament_wins = user_profile.get_tournament_wins()
             tournament_losses = user_profile.get_tournament_losses()
+
             return Response({
                 'totalGames': total_games,
                 'wins': wins,

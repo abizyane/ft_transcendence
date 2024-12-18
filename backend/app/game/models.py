@@ -40,7 +40,7 @@ class Profile(models.Model):
         self.save()
         self.calculate_xp()
 
-    def calculate_xp(self):
+     def calculate_xp(self):
         level_up_threshold = (400, 800, 1200, 2000, 3200, 5200, 8400, 13600, 22000, 35600, 57200, 92800, 150000, 242800, 402800, 642800, 1042800, 1682800, 2722800, 4028000)
 
         for i in range(len(level_up_threshold)):
@@ -64,35 +64,52 @@ class Profile(models.Model):
         return 100
 
 
-    def get_wins(self):
-        games = GameModel.get_all_games(self.id)
+    def get_wins(self, isTournament:bool=False):
+        games = GameModel.get_all_games(self.id, isTournament)
         wins = 0
         for game in games:
-            score = Scores.objects.get(game_id=game)
-            if score.get_winner() == self:
+            # Get the player's PlayerModel instance for this game
+            if game.player_1.profile == self:
+                player = game.player_1
+            else:
+                player = game.player_2
+            
+            if player.state == PlayerModel.State.WIN:
                 wins += 1
         return wins
     def get_losses(self):
         games = GameModel.get_all_games(self.id)
         losses = 0
         for game in games:
-            score = Scores.objects.get(game_id=game)
-            winner = score.get_winner()
-            if winner and winner != self:
+            # Get the player's PlayerModel instance for this game
+            if game.player_1.profile == self:
+                player = game.player_1
+            else:
+                player = game.player_2
+            
+            if player.state == PlayerModel.State.LOSE:
                 losses += 1
         return losses
     def get_draws(self):
         games = GameModel.get_all_games(self.id)
         draws = 0
         for game in games:
-            score = Scores.objects.get(game_id=game)
-            if score.get_winner() is None:
+            # Get both players' scores
+            if game.player_1.profile == self:
+                player_score = game.player_1.score
+                opponent_score = game.player_2.score
+            else:
+                player_score = game.player_2.score
+                opponent_score = game.player_1.score
+            
+            if player_score == opponent_score:
                 draws += 1
         return draws
     def get_tournament_wins(self):
-        return TournamentModel.get_all_tournaments(self.id).filter(winner=self.id).count()
+        return TournamentModel.objects.filter(winner=self).count()
     def get_tournament_losses(self):
-        return TournamentModel.get_all_tournaments(self.id).filter(~models.Q(winner=self.id)).count()
+        participated_tournaments = TournamentModel.objects.filter(players=self)
+        return participated_tournaments.exclude(winner=self).count()
 
 class PlayerModel(models.Model):
     class State(models.TextChoices):
@@ -121,9 +138,13 @@ class GameModel(models.Model):
             return f'{self.player_1.alias} vs {self.player_2.alias}'
         return f'{self.player_1.profile.get_username()} vs {self.player_2.profile.get_username()}'
 
-    def get_all_games(player_id:int) -> models.QuerySet:
-        games = GameModel.objects.filter((models.Q(player_1=player_id) | models.Q(player_2=player_id))
-                                         & models.Q(type=None))
+    def get_all_games(player_id:int, isTournament:bool=False) -> models.QuerySet:
+        playerModels = PlayerModel.objects.filter(profile_id=player_id).all()
+        int_player_models = [playerModel.id for playerModel in playerModels]
+        
+        games = GameModel.objects.filter((models.Q(player_1__in=int_player_models) | models.Q(player_2__in=int_player_models)))
+        if not isTournament:
+            games = games.filter(type=None)
         return games.order_by("-created")
 
     def get_opponent(self, player:Profile) -> Profile:
@@ -135,6 +156,7 @@ class GameModel(models.Model):
             return None
     
     def get_player_game_score(self,player_id:int)-> int:
+        print(self.player_1.profile.id, self.player_2.profile.id, flush=True)
         scoreObj = Scores.objects.get(id=self.id)
         if not scoreObj:
             return -1
