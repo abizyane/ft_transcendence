@@ -149,7 +149,7 @@ const Page = () => {
   useEffect(() => {
     console.log("isRandomMatch", isRandomMatch);
     if (isRandomMatch && socketRef.current === null) {
-      let url = "ws://localhost:8000/ws/tournament/TWO/"
+      let url = process.env.NEXT_PUBLIC_HOST_URL.replace("http://", "ws://")+":8000/ws/tournament/TWO/"
       if (token) {
         url += `?token=${token}`;
       }
