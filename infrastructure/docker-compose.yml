@@ -8,6 +8,26 @@ volumes:
   node_modules:
 
 services:
+  nginx:
+    build:
+      context: ./nginx
+      dockerfile: Dockerfile
+    image: nginx:sa
+    container_name: nginx
+    ports:
+      - "443:443"
+    depends_on:
+      - frontend
+      - backend
+    networks:
+      - infra
+    healthcheck:
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "https://localhost:443"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+    restart: always
+
   frontend:
     build: 
       context: ../frontend
