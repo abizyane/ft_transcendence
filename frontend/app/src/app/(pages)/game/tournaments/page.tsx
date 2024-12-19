@@ -133,7 +133,7 @@ const Page = () => {
     let isConnected = false;
     if (!WebSocketRef.current)
       WebSocketRef.current = new WebSocket(
-        process.env.NEXT_PUBLIC_HOST_URL.replace('http://', 'ws://')+":8000/ws/tournament/FOUR/"
+        process.env.NEXT_PUBLIC_API_URL.replace('https://', 'ws://')+"/ws/tournament/FOUR/"
       );
 
     WebSocketRef.current.onopen = () => {
@@ -221,7 +221,7 @@ const Page = () => {
 
     try {
       setIsUploadingImage(true);
-      const response = await fetch(process.env.NEXT_PUBLIC_HOST_URL+':8000/api/upload_tournament_pic', {
+      const response = await fetch(process.env.NEXT_PUBLIC_API_URL+'/api/upload_tournament_pic/', {
         method: 'POST',
         body: formData,
         credentials: 'include',

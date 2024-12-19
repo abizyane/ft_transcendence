@@ -7,7 +7,7 @@ export const getUserData = async () => {
       throw new Error('No token found');
     }
   
-    const response = await fetch(process.env.NEXT_PUBLIC_HOST_URL+':8000/api/user', {
+    const response = await fetch(process.env.NEXT_PUBLIC_API_URL+'/api/user', {
       method: 'GET',
       headers: {
         'Authorization': `Bearer ${token}`,

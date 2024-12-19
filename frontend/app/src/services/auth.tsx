@@ -12,7 +12,7 @@ export const handleLogin = async (
   router: NextRouter
 ) => {
   try {
-    const response = await fetch(process.env.NEXT_PUBLIC_HOST_URL+':8000/api/login', {
+    const response = await fetch(process.env.NEXT_PUBLIC_API_URL+'/api/login', {
       method: 'POST',
       body: data,
       credentials: 'include',
@@ -48,7 +48,7 @@ export const handleLogin = async (
     router: any 
   ) => {
   try {
-    const response = await fetch(process.env.NEXT_PUBLIC_HOST_URL+':8000/api/register', {
+    const response = await fetch(process.env.NEXT_PUBLIC_API_URL+'/api/register', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -85,7 +85,7 @@ export const handleLogout = async (
   router: NextRouter
 ) => {
   try {
-    const response = await fetch(process.env.NEXT_PUBLIC_HOST_URL+':8000/api/logout', {
+    const response = await fetch(process.env.NEXT_PUBLIC_API_URL+'/api/logout', {
       method: 'POST',
       credentials: 'include',
     });

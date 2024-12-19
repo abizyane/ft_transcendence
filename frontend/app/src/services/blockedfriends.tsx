@@ -14,7 +14,7 @@ export const useBlockedFriends = () => {
 
   const fetchBlocked = async () => {
     try {
-      const response = await fetch(process.env.NEXT_PUBLIC_HOST_URL+':8000/api/blocked', {
+      const response = await fetch(process.env.NEXT_PUBLIC_API_URL+'/api/blocked', {
         method: 'GET',
         credentials: 'include',
       });

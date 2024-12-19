@@ -73,7 +73,7 @@ const ProfileSettings = () => {
     formData.append('profile_pic', profileImage);
 
     try {
-      const response = await fetch(process.env.NEXT_PUBLIC_HOST_URL+':8000/api/upload_image', {
+      const response = await fetch(process.env.NEXT_PUBLIC_API_URL+'/api/upload_image', {
         method: 'POST',
         body: formData,
         credentials: 'include',
@@ -92,7 +92,7 @@ const ProfileSettings = () => {
   };
   const updatePassword = async (formData: any) => {
       try {
-          const response = await fetch(process.env.NEXT_PUBLIC_HOST_URL+':8000/api/changepassword', { // Added http://
+          const response = await fetch(process.env.NEXT_PUBLIC_API_URL+'/api/changepassword', { // Added http://
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
               credentials: 'include',
@@ -124,7 +124,7 @@ const ProfileSettings = () => {
 
   const disable2FA = async () => {
     try {
-      const response = await fetch(process.env.NEXT_PUBLIC_HOST_URL+':8000/api/2fa_code', {
+      const response = await fetch(process.env.NEXT_PUBLIC_API_URL+'/api/2fa_code', {
         method: 'DELETE',
         headers: { 'Content-Type': 'application/json' },
         credentials: 'include',
@@ -141,15 +141,18 @@ const ProfileSettings = () => {
 
   const handleVerifyOtp = async () => {
     try {
-      const response = await fetch(process.env.NEXT_PUBLIC_HOST_URL+':8000/api/2fa_code', {
+      const response = await fetch(process.env.NEXT_PUBLIC_API_URL+'/api/2fa_code', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         credentials: 'include',
         body: JSON.stringify({ otp: otpValue }),
       });
       const data = await response.json();
+      if (response.status === 200) {
+        toast.success(data.message);
+      }
       if (!response.ok) {
-        toast.error(data.message);
+        toast.error(data.error);
       }
     } catch (error) {
       toast.error('Error:', error);
@@ -216,7 +219,7 @@ const ProfileSettings = () => {
               <div className="mt-4 text-center lg:text-left">
                 <p className="font-semibold">Scan this QR code to enable 2FA:</p>
                 <div className="flex justify-center lg:justify-start mt-2">
-                  <img src={process.env.NEXT_PUBLIC_HOST_URL+":8000/api/2fa_code"} alt="2FA QR Code" className="w-20 h-20 sm:w-24 sm:h-24 lg:w-32 lg:h-32" />
+                  <img src={process.env.NEXT_PUBLIC_API_URL+"/api/2fa_code"} alt="2FA QR Code" className="w-20 h-20 sm:w-24 sm:h-24 lg:w-32 lg:h-32" />
                 </div>
                 <div className="flex mt-4 justify-center lg:justify-start items-end">
                   <div>

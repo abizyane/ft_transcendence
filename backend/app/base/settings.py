@@ -18,6 +18,7 @@ from datetime import timedelta
 BASE_DIR = Path(__file__).resolve().parent.parent
 MEDIA_URL = "/pictures/"
 MEDIA_ROOT = os.path.join(BASE_DIR, 'pictures')
+STATIC_URL = '/static/'
 
 
 # Quick-start development settings - unsuitable for production
@@ -135,7 +136,6 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.2/howto/static-files/
 
-STATIC_URL = 'static/'
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
@@ -147,6 +147,7 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 # SESSION_COOKIE_SECURE = False  # Set to True in production with HTTPS
 # SESSION_COOKIE_HTTPONLY = True 
 
+USE_X_FORWARDED_HOST = True
 CORS_ORIGIN_ALLOW_ALL=True
 CORS_ALLOW_CREDENTIALS=True
 AUTH_USER_MODEL = 'astropong.User'

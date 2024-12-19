@@ -105,7 +105,7 @@ const Registration = () => {
         <a
   type="button"
   className="relative flex justify-center items-center w-12 h-12 bg-white rounded-full p-1"
-  href={process.env.NEXT_PUBLIC_HOST_URL+":8000/api/42OAuth"}
+  href={process.env.NEXT_PUBLIC_API_URL+"/api/42OAuth"}
 >
   <img
     src="/42.png"

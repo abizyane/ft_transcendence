@@ -61,7 +61,7 @@ const Friends = () => {
   // // Block friend
   const handleblockFriend = async (userid) => {
     try {
-      const response = await fetch(process.env.NEXT_PUBLIC_HOST_URL+":8000/api/block", {
+      const response = await fetch(process.env.NEXT_PUBLIC_API_URL+"/api/block", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ user_id: userid }),
@@ -81,7 +81,7 @@ const Friends = () => {
   const handleUnblockFriend = async (friendId) => {
     // setUnblkloading(true);
     try {
-      const response = await fetch(process.env.NEXT_PUBLIC_HOST_URL+":8000/api/unblock", {
+      const response = await fetch(process.env.NEXT_PUBLIC_API_URL+"/api/unblock", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ user_id: friendId }),
@@ -100,7 +100,7 @@ const Friends = () => {
   // // Accept friend
   const handleAcceptFriend = async (friendId) => {
     try {
-      const response = await fetch(process.env.NEXT_PUBLIC_HOST_URL+":8000/api/accept_friend", {
+      const response = await fetch(process.env.NEXT_PUBLIC_API_URL+"/api/accept_friend", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ friend_id: friendId }),
@@ -118,7 +118,7 @@ const Friends = () => {
   // // Accept friend
   const handleRemoveFriend = async (friendId) => {
     try {
-      const response = await fetch(process.env.NEXT_PUBLIC_HOST_URL+":8000/api/remove_friend", {
+      const response = await fetch(process.env.NEXT_PUBLIC_API_URL+"/api/remove_friend", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ friend_id: friendId }),
@@ -137,7 +137,7 @@ const Friends = () => {
   // // Reject friend
   const handleRejectFriend = async (friendId) => {
     try {
-      const response = await fetch(process.env.NEXT_PUBLIC_HOST_URL+":8000/api/reject_friend", {
+      const response = await fetch(process.env.NEXT_PUBLIC_API_URL+"/api/reject_friend", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ friend_id: friendId }),
@@ -152,7 +152,7 @@ const Friends = () => {
   };
   const inviteFriendToGame = async (friendId) => {
     try {
-      const response = await fetch(process.env.NEXT_PUBLIC_HOST_URL+":8000/api/invite_friend", {
+      const response = await fetch(process.env.NEXT_PUBLIC_API_URL+"/api/invite_friend", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ friend_id: friendId }),

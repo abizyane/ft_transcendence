@@ -46,7 +46,7 @@ const Page = () => {
     } else {
       setLoading(true);
       setError(null);
-      fetch(`${process.env.NEXT_PUBLIC_HOST_URL}:8000/api/userid`, {
+      fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/userid`, {
         method: 'POST',
         body: JSON.stringify({ id: userId }),
         headers: {

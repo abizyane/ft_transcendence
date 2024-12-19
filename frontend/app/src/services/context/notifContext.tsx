@@ -35,7 +35,7 @@ export const NotifProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   const fetchNotifications = async () => {
     try {
       setIsLoading(true);
-      const response = await fetch(process.env.NEXT_PUBLIC_HOST_URL+':8000/notifications/list', {credentials: 'include',});
+      const response = await fetch(process.env.NEXT_PUBLIC_API_URL+'/notifications/list/', {credentials: 'include',});
       if (response.ok) {
         const data = await response.json();
         setNotifications(data);
@@ -55,7 +55,7 @@ export const NotifProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   };
 
   const connectSocket = () => {
-    const ws = new WebSocket(process.env.NEXT_PUBLIC_HOST_URL.replace('http://', 'ws://')+':8000/notifications/');
+    const ws = new WebSocket(process.env.NEXT_PUBLIC_API_URL.replace('http', 'ws')+'/notifications/');
     ws.onopen = () => {
     };
     

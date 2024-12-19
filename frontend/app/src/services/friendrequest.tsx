@@ -15,7 +15,7 @@ export const useFriendRequests = () => {
 
   const fetchRequests = async () => {
     try {
-      const response = await fetch(process.env.NEXT_PUBLIC_HOST_URL+':8000/api/friends/friend_requests', {
+      const response = await fetch(process.env.NEXT_PUBLIC_API_URL+'/api/friends/friend_requests/', {
         method: 'GET',
         credentials: 'include',
       });

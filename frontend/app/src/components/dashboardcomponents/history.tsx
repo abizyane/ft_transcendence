@@ -44,7 +44,7 @@ const History = () => {
 
   useEffect(() => {
     setLoading(true);
-    fetch(`${process.env.NEXT_PUBLIC_HOST_URL}:8000/api/games_history`, {
+    fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/games_history`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',

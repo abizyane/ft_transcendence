@@ -18,7 +18,7 @@ const MFAPage = () => {
 
   const fetchUser = async () => {
     try {
-      const response = await fetch(process.env.NEXT_PUBLIC_HOST_URL+':8000/api/user', {credentials: 'include',});
+      const response = await fetch(process.env.NEXT_PUBLIC_API_URL+'/api/user', {credentials: 'include',});
       if (response.ok) {
         const data = await response.json();
         router.push(`/profile/${data.id}`);
@@ -32,7 +32,7 @@ const MFAPage = () => {
   
   const submitOtp = async () => {
     try {
-      const response = await fetch(process.env.NEXT_PUBLIC_HOST_URL+':8000/api/2fa_code', {
+      const response = await fetch(process.env.NEXT_PUBLIC_API_URL+'/api/2fa_code', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         credentials: 'include',
