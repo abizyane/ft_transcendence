@@ -15,7 +15,7 @@ services:
     image: nginx:sa
     container_name: nginx
     ports:
-      - "443:443"
+      - "1443:443"
     depends_on:
       - frontend
       - backend
@@ -34,9 +34,9 @@ services:
       dockerfile: Dockerfile
     image: frontend:sa
     container_name: frontend
-    volumes:
-      - ../frontend/app:/app
-      - node_modules:/app/node_modules
+    # volumes:
+    #   - ../frontend/app:/app
+    #   - node_modules:/app/node_modules
     ports:
       - "3000:3000"
     env_file:
