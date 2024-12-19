@@ -214,7 +214,7 @@ if (!conversations || !user)
         {/* Main content */}
         <Newchat isOpen={isModalOpen} closeModal={closeModal} handleUserClick={handleUserClick} />
         <div className="w-full h-full lg:h-full flex flex-col justify-center items-center p-2">
-          <div className="bg-gray-800/60 h-[800px]   w-full text-gray-200 rounded-xl border-2 border-violet-primary flex">
+          <div className="bg-gray-800/60 mt-8 mb-22 lg:mt-0 h-[400px] lg:h-[800px]   w-full text-gray-200 rounded-xl border-2 border-violet-primary flex">
             <div className="w-full lg:w-96 backdrop-blur-md rounded-xl">
               <section className="w-full">
                 <div className="p-4 rounded-xl flex justify-between items-center w-full">
@@ -247,7 +247,7 @@ if (!conversations || !user)
                 </div>
 
                 {/* User list */}
-                <div className="p-2 flex-1 md:w-full h-[650px]  overflow-y-scroll">
+                <div className="p-2 flex-1 md:w-full h-[240px] lg:h-[650px]  overflow-y-scroll">
                   {Object.values(searchValue ? searchConversations : conversations)
                     .sort((a, b) => 
                       new Date(b.lastMessage?.timestamp).getTime() - new Date(a.lastMessage?.timestamp).getTime()
@@ -355,7 +355,7 @@ if (!conversations || !user)
       {/* Slide-out Sidebar (mobile) */}
       <div
         ref={messageContainerRef}
-        className={`lg:hidden fixed  bg-gray-800 h-[800px] w-[95%] sm:w-[97%] m-2  text-gray-200 rounded-xl border-2 border-violet-primary  transition-transform transform ${
+        className={`class="lg:hidden fixed  bg-gray-800 mt-10 pb-4 h-[400px] w-[95%] sm:w-[97%] m-2  text-gray-200 rounded-xl border-2 border-violet-primary  transition-transform transform ${
           isSliderOpen ? "translate-x-0" : "translate-x-[110%]"
         }`}
       >

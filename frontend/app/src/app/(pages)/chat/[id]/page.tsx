@@ -118,7 +118,7 @@ useEffect(() => {
     <div className="h-full">
       <main className="flex-grow flex flex-row h-fit">
         <section className="flex flex-col flex-auto border-l border-gray-800">
-          <div className=" p-4  h-[640px] overflow-y-scroll" ref={messageContainerRef}>
+          <div className=" p-4  h-[240px] lg:h-[640px] overflow-y-scroll" ref={messageContainerRef}>
             {loading && (
               <div className="flex justify-center py-2">
                 <Loader />

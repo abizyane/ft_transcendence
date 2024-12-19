@@ -25,7 +25,7 @@ const Page = () => {
             <Instructions setModal={setModelOpen} />
           </div>
       ) : (
-        <div className= "h-12 w-44   bg-gray-800/60 border border-violet-primary rounded-xl text-center">
+        <div className= "h-12 w-44  mt-4 bg-gray-800/60 border border-violet-primary rounded-xl text-center">
 
         <button className="text-white p-2 w-full h-full text-center hover:bg-gray-800 rounded-xl" onClick={handlehowtoplay}>How to Play</button>
         </div>

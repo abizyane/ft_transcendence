@@ -22,7 +22,11 @@ class TournamentHistoryView(APIView):
     permission_classes = [IsAuthenticated]
     def post(self, request):
         userid = request.data.get('id')
-        profile = Profile.objects.get(user_id=userid)
+        try :
+            profile = Profile.objects.get(user_id=userid)
+        except Exception as e:
+            return Response({'error': 'Profile not found'}, status=404)
+        
         tournaments = TournamentModel.get_all_tournaments(profile.id)
         tournaments_data = []
         for tournament in tournaments:

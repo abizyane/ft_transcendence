@@ -78,4 +78,21 @@ with the Pong game, allowing partial usage of the game via the Command-Line
 Interface (CLI) and web interface. (need to undrestand and test the cli part)
 
 
-/profile /chat/1666666 page not found instead of showing profile
+
+chat responsive fix 
+game first page responsive
+
+
+
+
+
+
+
+/profile /chat/1666666 page not found instead of showing profile Done still just this msg on chat
+
+chatContext.tsx:373 WebSocket connection to 'ws://localhost:8000/ws/chat/room/' failed: WebSocket is closed before the connection is established.
+ChatProvider.useEffect	@	chatContext.tsx:373
+Show 150 more frames
+
+
+ in chat/354354354353

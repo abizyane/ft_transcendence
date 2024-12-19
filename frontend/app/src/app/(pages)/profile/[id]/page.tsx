@@ -46,6 +46,7 @@ const Page = () => {
     } else {
       setLoading(true);
       setError(null);
+      try{
       fetch(`${process.env.NEXT_PUBLIC_HOST_URL}:8000/api/userid`, {
         method: 'POST',
         body: JSON.stringify({ id: userId }),
@@ -55,19 +56,26 @@ const Page = () => {
         credentials: 'include',
       })
         .then((response) => {
-          if (!response.ok) {
-            toast.error("You are Blocked");
+          if (response.status === 404) {
+            toast.error("user not found or blocked ");
             router.push("/dashboard");
-            throw new Error("User not found");
+            return;
+          }
+          else  if (!response.ok) {
+            toast.error("user not found or blocked ");
+            router.push("/dashboard");
+            return;
           }
           return response.json();
         })
         .then((data: User) => setUser(data))
         .catch((err) => {
-          toast.error("setting error");
-          setError(err.message)
+          setError(err.message);
         })
         .finally(() => setLoading(false));
+      }catch(err){
+        setError(err.message);
+      }
     }
   }, [userId, currentUser]);
   useEffect(() => {
