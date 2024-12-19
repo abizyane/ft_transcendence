@@ -44,15 +44,11 @@ const Friends = () => {
   if (error) {
     return <div className="text-red-500">{error}</div>;
   }
-  // console.log(user);
-  // const [unblkloading, setUnblkloading] = useState(false);
-  // const [unblkerror, setUnblkerror] = useState(false);
-  // console.log(" ", userloading)
+
   const isFriendListAlone = userId === currentUser.id.toString();
   const listHeight = isFriendListAlone
     ? "h-[230px] lg:h-[600px]"
     : "h-[400px] lg:h-[800px]";
-  console.log(listHeight);
 
   if (loading) {
     return <div>Loading...</div>;
@@ -77,7 +73,7 @@ const Friends = () => {
         fetchBlocked();
       }
     } catch (error) {
-      console.log("Error blocking friend:", error);
+      toast.error("Error blocking friend:");
     }
   };
 
@@ -97,7 +93,7 @@ const Friends = () => {
         fetchBlocked();
       }
     } catch (error) {
-      console.log("Error unblocking friend:", error);
+      toast.error("Error unblocking friend");
     }
   };
 
@@ -116,7 +112,7 @@ const Friends = () => {
         fetchBlocked();
       }
     } catch (error) {
-      console.log("Error accepting friend:", error);
+      toast.error("Error accepting friend");
     }
   };
   // // Accept friend
@@ -134,7 +130,7 @@ const Friends = () => {
         fetchBlocked();
       }
     } catch (error) {
-      console.log("Error accepting friend:", error);
+      toast.error("Error accepting friend:");
     }
   };
 
@@ -151,7 +147,7 @@ const Friends = () => {
         fetchRequests();
       }
     } catch (error) {
-      console.log("Error rejecting friend:", error);
+      toast.error("Error rejecting friend");
     }
   };
   const inviteFriendToGame = async (friendId) => {
@@ -171,7 +167,7 @@ const Friends = () => {
         toast.error(data.error);
       }
     } catch (error) {
-      console.log("Error rejecting friend:", error);
+      toast.error("Error rejecting friend");
     }
   };
 

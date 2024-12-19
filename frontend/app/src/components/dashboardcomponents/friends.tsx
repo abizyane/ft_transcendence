@@ -44,7 +44,7 @@ const Friends = ({ user }) => {
         toast.error(data.error);
       }
     } catch (error) {
-      console.log("Error rejecting friend:", error);
+      toast.error("Error rejecting friend:", error);
     }
   };
 

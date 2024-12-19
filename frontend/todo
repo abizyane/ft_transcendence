@@ -38,3 +38,76 @@ fech kikhrej louwl mn tournoi makib9ach play
 dashboard tournament played wrong  data
 history tournament wrong data 
 history 1 vs 1 wrong also 
+
+
+
+
+
+
+
+tournament played (data)
+
+
+Major module: Use a Framework to build the backend Done
+
+
+
+Minor module: Use a database for the backend Done
+
+
+
+Major module: Standard user management, authentication, users across tournaments. 
+
+offline on chat problem 
+
+
+Major module: Implementing a remote authentication.
+
+still error on localhost
+
+
+
+
+
+Major module: Remote players              Done just check for user play with himself 
+
+
+
+Minor module: Game Customization Options.
+add quick game default map 
+
+
+
+
+
+
+
+Major module: Live chat. 
+online not upddated on chat   (even when i click on logout unset cookie) until i quit the browser
+socket closed before connection  mli katbghi tsift msg lfriend awal mara
+send a warning to the user using toast or notif or both  when the match of tournamnent start 
+
+Minor module: User and Game Stats Dashboards. Done
+
+
+
+Major module: Implement Two-Factor Authentication (2FA) and JWT.   
+JWT if modified or expired, the user should be logged out and redirected to the login page
+2fa not working doesn t demand code at login 
+
+
+
+Major module: Infrastructure Setup for Log Management
+
+Minor module: Support on all devices Done
+access settings button  on mobile 
+
+Minor module: Expanding Browser Compatibility (check when all errors are fixed)  Done
+
+◦ Major module: Replacing Basic Pong with Server-Side Pong and Implementing an API.
+ Create an API that exposes the necessary resources and endpoints to interact
+with the Pong game, allowing partial usage of the game via the Command-Line
+Interface (CLI) and web interface. (need to undrestand and test the cli part)
+
+
+/profile /chat/1666666 page not found instead of showing profile

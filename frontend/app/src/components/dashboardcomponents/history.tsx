@@ -54,7 +54,7 @@ const History = () => {
     })
       .then(async (response) => {
         if (!response.ok) {
-          console.log("Response not ok:", response.status);
+            toast.error("Response not ok");
         }
         const responseData = await response.json();
         setGameHistory(responseData.history);

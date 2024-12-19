@@ -70,7 +70,6 @@ const Navbar = () => {
                       <div className="p-2 text-white text-center">Loading...</div>
                     ) : notifications.length > 0 ? (
                       notifications.map((notif, i) => {
-                        console.log(notif);
                         if (notif.link) {
                           return (
                             <Link key={i} href={notif.link}>

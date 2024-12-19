@@ -45,19 +45,17 @@ useEffect(() => {
         type: "chat_message",
         timestamp: new Date().toISOString(),
       };
-      console.log("message sent ", newMessage);
       ws.send(JSON.stringify(newMessage));
       addMessage(newMessage);
       setInput("");
       setTimeout(scrollToBottom, 100);
     } else {
-      console.log("WebSocket is not open.");
+      toast.error("WebSocket is not open.");
     }
   };
 
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    console.log('Key Pressed:', e.key);
     e.stopPropagation();
     ws.send(JSON.stringify({
       type: "typing",

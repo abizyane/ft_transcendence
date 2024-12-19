@@ -64,7 +64,7 @@ const Page = () => {
         })
         .then((data: User) => setUser(data))
         .catch((err) => {
-          console.log("setting error");
+          toast.error("setting error");
           setError(err.message)
         })
         .finally(() => setLoading(false));

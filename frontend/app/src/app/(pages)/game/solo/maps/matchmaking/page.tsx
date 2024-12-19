@@ -13,7 +13,9 @@ import Localgamecanva from "@/components/twopcanvas/page";
 import Canvas from "@/components/Canva/page";
 import ConfettiComponent from "@/components/Celebration/win";
 import {toast} from 'react-hot-toast'
-import Instructions from '@/components/Instructions/page';
+
+
+
 // Default competitors and user data
 const defaultCompetitors = [
   {
@@ -117,7 +119,6 @@ const Page = () => {
 
 
   let startCountDown = () => {
-    console.log("starting countdown")
     if (timer.current === null && gameState.gameready === false) {
       timer.current = setInterval(() => {
         setGameState((prev) => {
@@ -138,7 +139,6 @@ const Page = () => {
             gameready: newGameReady,
             countdown: newCount,
           };
-          console.log("newCount", obj);
           return obj;
         });
       }, 1000);
@@ -147,7 +147,6 @@ const Page = () => {
 
   // WebSocket connection for random matchmaking
   useEffect(() => {
-    console.log("isRandomMatch", isRandomMatch);
     if (isRandomMatch && socketRef.current === null) {
       let url = process.env.NEXT_PUBLIC_HOST_URL.replace('http','ws')+":8000/ws/tournament/TWO/"
       if (token) {
@@ -156,12 +155,10 @@ const Page = () => {
       socketRef.current = new WebSocket(url);
       socketRef.current.onopen = () => {
         IsConnected.current = true;
-        console.log("WebSocket connected");
       };
 
       socketRef.current.onclose = () => {
         IsConnected.current = false;
-        console.log("WebSocket closed");
       };
 
       socketRef.current.onmessage = (e) => {
@@ -217,7 +214,6 @@ const Page = () => {
   const updateCompetitors = (competitors) => {
     const nextCompetitors = users.map((c) => {
       if (c.id == competitors.id) {
-        console.log("competitors ----->", c.id, competitors.id);
         return competitors;
       } else return c;
     });
@@ -258,7 +254,6 @@ const Page = () => {
 
       return () => {
         clearInterval(interval);
-        console.log("clear interval 2");
       };
     }
   }, [isRandomMatch, users]);
@@ -299,7 +294,6 @@ const Page = () => {
           <h3 className="justify-center items-center w-full h-full flex text-center text-3xl text-white text-nowrap font-extrabold">
             Game Starting in: {gameState.countdown}s
           </h3>
-          <Instructions/>
         </div>
       )}
       {gameState.gameready && isRandomMatch ? (

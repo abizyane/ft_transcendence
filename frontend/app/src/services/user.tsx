@@ -3,7 +3,6 @@
 
 export const getUserData = async () => {
     const token = localStorage.getItem("jwt");
-    console.log(token);
     if (!token) {
       throw new Error('No token found');
     }

@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import Link from "next/link";
 import data from "../../app/data/Dashboarddata.json";
 import Loader from "components/loader/loader";
+import toast from 'react-hot-toast';
 
 interface User {
   id: number;
@@ -33,7 +34,7 @@ const TopPlayers: React.FC = () => {
     })
     .then(async (response) => {
       if (!response.ok) {
-        console.log("Response not ok:", response.status);
+        toast.error("Response not ok:", response.status);
         // throw new Error("User not found");
       }
       const responseData = await response.json();

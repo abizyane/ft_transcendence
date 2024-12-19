@@ -3,6 +3,7 @@ import { Chart as ChartJS, ArcElement, Tooltip, Legend } from 'chart.js';
 import dataFromJson from '../../app/data/Dashboarddata.json';
 import { useEffect, useState } from 'react';
 import Loader from '../loader/loader';
+import toast from 'react-hot-toast';
 
 ChartJS.register(ArcElement, Tooltip, Legend);
 
@@ -34,16 +35,13 @@ const DoughnutChart: React.FC<DoughnutChartProps>  = ({idUser}) => {
 
       if (response.ok) {
         const data = await response.json() as DataWinRate;
-        console.log('Friend request accepted:', data);
-        // Update the relationship after success
-        // onRelationshipChange("Friend");
         setData(data);
       } else {
         const errorData = await response.json();
-        console.log('Failed to accept friend request:', errorData);
+        toast.error('Failed to accept friend request:');
       }
     } catch (error) {
-      console.log('Error during the request:', error);
+      toast.error('Error during the request');
     } finally {
       setLoading(false);
     }

@@ -46,7 +46,7 @@ const UserInfo: React.FC<UserInfoProps> = ({ user, setUser }) => {
     })
       .then((response) => {
         if (!response.ok) {
-          console.log("Response not ok:", response.status);
+          toast.error("Response not ok:");
           if (response.status == 400)
             {
               throw new Error("You cannot see this profile");
@@ -77,16 +77,14 @@ const UserInfo: React.FC<UserInfoProps> = ({ user, setUser }) => {
 
       if (response.ok) {
         const data = await response.json();
-        console.log('Friend added successfully:', data);
-        // Update the relationship after success
-        // onRelationshipChange("Friend");
+        toast.success('Friend added successfully:', data);
         fetchUser();
       } else {
         const errorData = await response.json();
-        console.log('Failed to add friend:', errorData);
+        toast.error('Failed to add friend');
       }
     } catch (error) {
-      console.log('Error during the request:', error);
+      toast.error('Error during the request');
     } finally {
       setLoading(false);
     }
@@ -120,7 +118,7 @@ const UserInfo: React.FC<UserInfoProps> = ({ user, setUser }) => {
         toast.error('Failed to block friend:');
       }
     } catch (error) {
-      console.log('Error during the request:', error);
+      toast.error('Error during the request:');
     } finally {
       setLoading(false);
     }
@@ -143,17 +141,17 @@ const UserInfo: React.FC<UserInfoProps> = ({ user, setUser }) => {
 
       if (response.ok) {
         const data = await response.json();
-        console.log('Friend unblocked successfully:', data);
+        toast.success('Friend unblocked successfully:', data);
         // Update the relationship after success
         // onRelationshipChange("None");
         fetchUser();
 
       } else {
         const errorData = await response.json();
-        console.log('Failed to unblock friend:', errorData);
+        toast.error('Failed to unblock friend:', errorData);
       }
     } catch (error) {
-      console.log('Error during the request:', error);
+      toast.error('Error during the request:', error);
     } finally {
       setLoading(false);
     }
@@ -176,17 +174,17 @@ const UserInfo: React.FC<UserInfoProps> = ({ user, setUser }) => {
 
       if (response.ok) {
         const data = await response.json();
-        console.log('Friend removed successfully:', data);
+        toast.success('Friend removed successfully:');
         // Update the relationship after success
         // onRelationshipChange("None");
         fetchUser();
 
       } else {
         const errorData = await response.json();
-        console.log('Failed to remove friend:', errorData);
+        toast.error('Failed to remove friend');
       }
     } catch (error) {
-      console.log('Error during the request:', error);
+      toast.error('Error during the request:', error);
     } finally {
       setLoading(false);
     }
@@ -209,17 +207,17 @@ const UserInfo: React.FC<UserInfoProps> = ({ user, setUser }) => {
 
       if (response.ok) {
         const data = await response.json();
-        console.log('Friend request accepted:', data);
+        toast.success('Friend request accepted');
         // Update the relationship after success
         // onRelationshipChange("Friend");
         fetchUser();
 
       } else {
         const errorData = await response.json();
-        console.log('Failed to accept friend request:', errorData);
+        toast.error('Failed to accept friend request:');
       }
     } catch (error) {
-      console.log('Error during the request:', error);
+      toast.error('Error during the request');
     } finally {
       setLoading(false);
     }
@@ -242,17 +240,15 @@ const UserInfo: React.FC<UserInfoProps> = ({ user, setUser }) => {
 
       if (response.ok) {
         const data = await response.json();
-        console.log('Friend request rejected:', data);
-        // Update the relationship after success
-        // onRelationshipChange("Unknown");
+        toast.success('Friend request rejected:', data);
         fetchUser();
 
       } else {
         const errorData = await response.json();
-        console.log('Failed to reject friend request:', errorData);
+        toast.error('Failed to reject friend request:');
       }
     } catch (error) {
-      console.log('Error during the request:', error);
+      toast.error('Error during the request');
     } finally {
       setLoading(false);
     }

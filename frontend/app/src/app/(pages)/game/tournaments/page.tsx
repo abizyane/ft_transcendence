@@ -89,14 +89,8 @@ const Page = () => {
     return users
   })()
 
-  // const [players, setPlayers] = useState(defaultUsers)
 
   const handleRoomUpdate = (users) => {
-    console.log(users)
-    // const nextUserList = defaultUsers.map((defuser) => {
-    //   const newUser = users.find(u => u.id === defuser.id);
-    //   return newUser ? { ...defuser, ...newUser } : defuser
-    // })
     setPlayers(users)
   }
 
@@ -132,8 +126,6 @@ const Page = () => {
         }
       }
     }) || [];
-    console.log(rooms);
-    console.log(availableTournaments);
     setAvailableTournaments(rooms);
   };
 
@@ -146,11 +138,9 @@ const Page = () => {
 
     WebSocketRef.current.onopen = () => {
       isConnected = true;
-      console.log("WebSocket connection established");
     };
 
     WebSocketRef.current.onmessage = (event) => {
-      console.log("Message from server:", event.data);
       if (typeof event.data != "string")
         return;
       const received_data = JSON.parse(event.data);
@@ -178,7 +168,6 @@ const Page = () => {
           }
         }
         else if (received_data.command === "setReady") {
-          console.log("setting Ready", received_data);
           setTournamentStarted(true);
           setReady(true);
         } else if (received_data.command === "wait") {
@@ -194,11 +183,10 @@ const Page = () => {
 
     WebSocketRef.current.onerror = (error) => {
       isConnected = false;
-      console.error("WebSocket error:", error);
     };
 
     WebSocketRef.current.onclose = () => {
-      console.log("WebSocket connection closed");
+      isConnected = false;
     };
 
     return () => {
@@ -241,14 +229,12 @@ const Page = () => {
 
       const responseData = await response.json();
       if (!response.ok) {
-        console.error(responseData);
         toast.error('Image upload failed');
         setPreviewImage(null);
         setIsUploadingImage(false);
 
         return false;
       } else {
-        console.log(responseData);
         toast.success('Image updated successfully');
         setCreationImageid(responseData.picture_id);
         setPreviewImage(responseData.tournament_pic_url);
@@ -256,7 +242,6 @@ const Page = () => {
         return true;
       }
     } catch (error) {
-      console.error('Error uploading image:', error);
       toast.error('Error uploading image');
       setPreviewImage(null);
       setIsUploadingImage(false);
@@ -287,25 +272,22 @@ const Page = () => {
       WebSocketRef.current.readyState === WebSocket.OPEN
     ) {
       WebSocketRef.current.send(JSON.stringify(roomData));
-      console.log("Data sent:", roomData);
     } else {
-      console.error("WebSocket is not connected");
+      toast.error("WebSocket is not connected");
     }
   };
 
   // Handle joining a tournament
   const handleJoinTournament = (tournament) => {
     tournament.command = "join";
-    console.log("Joining Tournament:", tournament);
     if (
       WebSocketRef.current &&
       WebSocketRef.current.readyState === WebSocket.OPEN
     ) {
       WebSocketRef.current.send(JSON.stringify(tournament));
       setTournamentName(tournament.name)
-      console.log('Data sent:', tournament);
     } else {
-      console.error("WebSocket is not connected");
+      toast.error("WebSocket is not connected");
     }
   };
 
@@ -328,10 +310,8 @@ const Page = () => {
       WebSocketRef.current.readyState === WebSocket.OPEN
     ) {
       WebSocketRef.current.send(JSON.stringify(data));
-      console.log("Data send :", data);
     } else {
-      console.error("Websocket is not connected");
-      console.log("Websocket is not connected");
+      toast.error("Websocket is not connected");
     }
     setAlias("");
   };
@@ -347,10 +327,8 @@ const Page = () => {
       WebSocketRef.current.readyState === WebSocket.OPEN
     ) {
       WebSocketRef.current.send(JSON.stringify(data));
-      console.log("Data send :", data);
     } else {
-      console.error("Websocket is not connected");
-      console.log("Websocket is not connected");
+      toast.error("Websocket is not connected");
     }
     setInGame(true);
   };
@@ -458,13 +436,10 @@ const Page = () => {
     useEffect(() => {
       WebSocketRef.current.onmessage = (e) => {
         if (typeof e.data === "string") {
-          console.log("received data 22", e.data);
           const data = JSON.parse(e.data);
           if (data.timer)
           {
-            console.log("setting timer", data.timer)
             setTimer(data.timer);
-            console.log("timer set", timer)
           }
           if (data.type === "match_players")
           {
@@ -480,7 +455,6 @@ const Page = () => {
               }
             }
             else if (data.command === "setReady") {
-              console.log("setting Ready", data);
               setTournamentStarted(true);
               setReady(true);
               setTimer(null);
@@ -497,7 +471,6 @@ const Page = () => {
               }
             }else if (data.command === "setHost"){
               setIsHost(true);
-              console.log("heeeeere");
             }
           }
           if (data.command && data.command === "update_room")
@@ -541,8 +514,6 @@ const Page = () => {
       };
     }, []);
 
-    console.log("readytoplay",readyToPlay);
-    console.log("isHost",isHost);
 
 
     return (

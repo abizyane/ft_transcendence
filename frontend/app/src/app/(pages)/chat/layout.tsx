@@ -125,16 +125,16 @@ export function Chat({ children }: ChatLayoutProps) {
 
       if (response.ok) {
         const data = await response.json();
-        console.log('Friend blocked successfully:', data);
+        toast.success("Friend blocked successfully");
         return true;
 
       } else {
         const errorData = await response.json();
-        console.log('Failed to block friend:', errorData);
+        toast.error('Failed to block friend:');
         return false;
       }
     } catch (error) {
-      console.log('Error during the request:', error);
+      toast.error('Error during the request:', error);
       return false;
     } finally {
     }
@@ -155,22 +155,21 @@ export function Chat({ children }: ChatLayoutProps) {
 
       if (response.ok) {
         const data = await response.json();
-        console.log('Friend unblocked successfully:', data);
+        toast.success('Friend unblocked successfully');
         return true;
 
       } else {
         const errorData = await response.json();
-        console.log('Failed to block friend:', errorData);
+        toast.error('Failed to block friend:');
         return false;
       }
     } catch (error) {
-      console.log('Error during the request:', error);
+      toast.error('Error during the request:');
       return false;
     } finally {
     }
   };
   const handleBlockUser = (user:User, relationship:string) => {
-    console.log("blocking user", user);
     if (relationship === "Blocked") {
       apiBlockUser(user.id).then((success) => {
         if (success === true) {
@@ -202,11 +201,9 @@ export function Chat({ children }: ChatLayoutProps) {
         toast.error(data.error);
       }
     } catch (error) {
-      console.log("Error rejecting friend:", error);
+      toast.error("Error rejecting friend:", error);
     }
   };
-  // console.log("current chat", currentChat);
-  // console.log("convs rendered", conversations);
 if (!conversations || !user)
   return <div className="w-full h-full flex justify-center items-center"><Loader/></div>
 

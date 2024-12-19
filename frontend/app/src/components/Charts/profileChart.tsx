@@ -4,7 +4,7 @@ import { Bar } from 'react-chartjs-2';
 import { Chart as ChartJS, CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend } from 'chart.js';
 import Link from 'next/link';
 import Loader from '../loader/loader';
-
+import toast from 'react-hot-toast';
 
 ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend);
 
@@ -45,10 +45,10 @@ const ProfileChart = ({ user }) => {
         
         setStats(newStats);
       } else {
-        console.log('Failed to fetch stats:', await response.json());
+        toast.error('Failed to fetch stats:', await response.json());
       }
     } catch (error) {
-      console.log('Error during the request:', error);
+      toast.error('Error during the request:', error);
     } finally {
       setLoading(false);
     }

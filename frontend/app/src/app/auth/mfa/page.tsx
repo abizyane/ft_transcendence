@@ -4,6 +4,7 @@ import LoginForm from "components/login/LoginForm";
 import { useState } from "react";
 import {useUser} from "@/services/context/usercontext";
 import { useRouter } from "next/navigation";
+import toast from 'react-hot-toast';
 
 const MFAPage = () => {
 
@@ -24,7 +25,7 @@ const MFAPage = () => {
 
       }
     } catch (error) {
-      console.error('Failed to fetch user:', error);
+      toast.error('Failed to fetch user:');
     } finally {
     }
   };
@@ -39,11 +40,10 @@ const MFAPage = () => {
       });
       const data = await response.json();
       if (!response.ok) {
-        console.error(data)
+        toast.error( "Failed to fetch auth",data)
       }
-      console.log(data.message);
     } catch (error) {
-      console.error('Error:', error);
+      toast.error('Error:');
     }
     fetchUser();
   
