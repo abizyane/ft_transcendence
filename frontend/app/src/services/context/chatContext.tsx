@@ -109,7 +109,7 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
         setConversations(newConversations);
       }
     } catch (error) {
-      console.error('Failed to fetch conversations:', error);
+      toast.error('Failed to fetch conversations:');
     }
   };
 
@@ -180,8 +180,7 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
         handleSetCurrentChat(username, updatedConversation);
       }
     } catch (error) {
-      console.error('Failed to fetch messages:', error);
-      console.error(error);
+      toast.error('Failed to fetch messages');
     }
   };
 
@@ -240,11 +239,7 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
   }
 
   const updateUserStatus = (username: string, isOnline: boolean) => {
-    console.log("updating ", username, isOnline);
-    console.log("conversations", conversations);
-    console.log("currentChat", currentChat);
     if (conversations[username]) {
-      console.log("updating conversations user status", username, isOnline);
       setConversations(prev => ({
         ...prev,
         [username]: {
@@ -257,7 +252,6 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
       }));
     }
     if (currentChat?.user.username === username) {
-      console.log("updating currenchat user status", username, isOnline);
       setCurrentChat(prev => prev ? {
         ...prev,
         user: {
@@ -322,7 +316,6 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
       ws.onmessage = (event) => {
         if (event.type === "message") {
           const data = JSON.parse(event.data);
-          console.log("chat message", data);
           if (data.type === "chat_message") {
             addMessage(data.message);
             setTyping(false);

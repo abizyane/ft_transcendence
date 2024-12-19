@@ -81,14 +81,12 @@ const ProfileSettings = () => {
 
       const responseData = await response.json();
       if (!response.ok) {
-        console.error(responseData);
         toast.error('Image upload failed');
       } else {
         toast.success('Image updated successfully');
         fetchUser(); 
       }
     } catch (error) {
-      console.error('Error uploading image:', error);
       toast.error('Error uploading image');
     }
   };
@@ -103,13 +101,12 @@ const ProfileSettings = () => {
           
           const responseData = await response.json(); 
           if (!response.ok) {
-              console.error(responseData); 
               toast.error(responseData.message);
           } else {
               toast.success('Password updated successfully');
           }
       } catch (error) {
-          console.error('Error:', error);
+        toast.error('Error:', error);
       }
   };
   const onSubmit = (formData: any) => {
@@ -134,11 +131,10 @@ const ProfileSettings = () => {
       });
       const data = await response.json();
       if (!response.ok) {
-        // console.error(data);
         toast.error(data.message);
       }
     } catch (error) {
-      console.error('Error:', error);
+      toast.error('Error:', error);
     }
     fetchUser();
   };
@@ -156,7 +152,7 @@ const ProfileSettings = () => {
         toast.error(data.message);
       }
     } catch (error) {
-      console.error('Error:', error);
+      toast.error('Error:', error);
     }
     fetchUser();
   };

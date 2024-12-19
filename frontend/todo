@@ -1,40 +1,81 @@
 
-state offline f mobile
 online not upddated on chat   (even when i click on logout unset cookie)   CHECK NOW Without strict mode
-history  (reverse the order) in other profile and show date  and ZBI LA DRT HADCHI show status winner or loser also check for draw every time we must have a winner and loser   (using borders or icon)
-username on intra pic  f other profil 
-notif reverse from recent to old
-dashboard tournament played (data)
-colors f bot makhdaminch paddle o ball local random match
-costimuse scroll bar 
-update user profil when notif 
-add score on leaderboard
-mli user ki koun rabe7 f score w ki quiti, ki t7seb lih l match won f dashboard
-update user profil when notif  (ismail)
-xp itzad f matchat
-in random match i can play with myself
-user can create two tournaments q
-zid online f friends (other profil)
-user can create two tournaments 
-changing pics for canvas to the new ones 
-pic not showen and chat timer until connect (when cliking on icone chat from other page)
+http://localhost:3000/profile/1666666 page not found instead of showing profile  (same for chat and history)
+replace http with https before push 
+
+CHECK TOURNAMENT PLAYER NAME NOTIFICATIONS ON CHAT PAGE
 o history tupgradi mora kola match o nzido liha date (tournoi)
 username on intra pic  f other profil 
-history show username and fix no games found placement
-dashboard tournament played 
-to9ba kidouz mn jenb f bot o local game
-to9ba kidouz mn wast l paddle f random match o tournoi
-http://localhost:3000/profile/1666666 page not found instead of showing profile  (same for chat and history)
-replace http with https before push (ismail)
-online not upddated on chat   (even when i click on logout unset cookie)
-state offline f mobile  on chat
-state offline f mobile 
-level and xp to check on profile 
-xp itzad f top player mora random match o ftournoi 
-middleware front to check  landing page not accessible 
-CHECK TOURNAMENT PLAYER NAME NOTIFICATIONS ON CHAT PAGE
+zid online f friends (other profil)
+user can create two tournaments q
+in random match i can play with myself
+update user profil when notif 
+costimuse scroll bar 
+dashboard tournament played  tocheck
 still online status when logout to check 
-fech kikhrej louwl mn tournoi makib9ach play 
 dashboard tournament played wrong  data
-history tournament wrong data 
-history 1 vs 1 wrong also 
+
+
+Major module: Use a Framework to build the backend Done
+
+
+
+Minor module: Use a database for the backend Done
+
+
+
+Major module: Standard user management, authentication, users across tournaments. 
+
+offline on chat problem 
+
+
+Major module: Implementing a remote authentication.
+
+still error on localhost
+
+
+
+
+
+Major module: Remote players              Done just check for user play with himself 
+
+
+
+Minor module: Game Customization Options.
+add quick game default map.
+
+
+
+
+
+
+
+Major module: Live chat.
+online not upddated on chat   (even when i click on logout unset cookie) until i quit the browser
+socket closed before connection  mli katbghi tsift msg lfriend awal mara
+send a warning to the user using toast or notif or both  when the match of tournamnent start 
+
+Minor module: User and Game Stats Dashboards. Done
+
+
+
+Major module: Implement Two-Factor Authentication (2FA) and JWT.   
+JWT if modified or expired, the user should be logged out and redirected to the login page
+2fa not working doesn t demand code at login 
+
+
+
+Major module: Infrastructure Setup for Log Management
+
+Minor module: Support on all devices Done
+access settings button  on mobile 
+
+Minor module: Expanding Browser Compatibility (check when all errors are fixed)  Done
+
+◦ Major module: Replacing Basic Pong with Server-Side Pong and Implementing an API.
+ Create an API that exposes the necessary resources and endpoints to interact
+with the Pong game, allowing partial usage of the game via the Command-Line
+Interface (CLI) and web interface. (need to undrestand and test the cli part)
+
+
+/profile /chat/1666666 page not found instead of showing profile

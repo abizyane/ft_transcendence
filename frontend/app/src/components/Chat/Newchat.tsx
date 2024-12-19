@@ -5,6 +5,7 @@ import { useParams, useRouter } from "next/navigation";
 
 import { useEffect, useState } from "react";
 import { useFormState } from "react-dom";
+import toast from 'react-hot-toast';
 
 const Newchat = ({ isOpen, closeModal, handleUserClick }) => {
   const [input1, setInput1] = useState('');
@@ -17,8 +18,6 @@ const Newchat = ({ isOpen, closeModal, handleUserClick }) => {
   const router = useRouter();
   const handleSubmit = (e) => {
     e.preventDefault();
-    console.log("Input 1:", input1);
-    console.log("Input 2:", input2);
     closeModal();
   };
   const debounce = (func, delay) => {
@@ -46,7 +45,7 @@ const Newchat = ({ isOpen, closeModal, handleUserClick }) => {
       setUsers(data);
       setFilteredUsers(data);
     } catch (error) {
-      console.log("Error fetching users:", error);
+      toast.error("Error fetching users:", error);
     } finally {
       setLoading(false);
     }

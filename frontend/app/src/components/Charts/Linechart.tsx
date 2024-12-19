@@ -14,6 +14,8 @@ import {
 } from "chart.js";
 import { useEffect, useState } from "react";
 import Loader from "../loader/loader";
+import toast from 'react-hot-toast';
+
 
 ChartJS.register(
   LineElement,
@@ -53,9 +55,7 @@ const LineChart: React.FC<LineChartProps> = ({userid}) => {
           xp_gained: [],
         };
         
-        console.log("data dailyXP" , data);
         Object.keys(data.dailyXP).reverse().forEach(key => {
-          console.log("key" , key);
           const dayStats = data.dailyXP[key];
           newStats.labels.push(key);
           newStats.xp_gained.push(dayStats.xp_gained);
@@ -63,10 +63,10 @@ const LineChart: React.FC<LineChartProps> = ({userid}) => {
         
         setStats(newStats);
       } else {
-        console.log('Failed to fetch stats:', await response.json());
+        toast.error('Failed to fetch stats:', await response.json());
       }
     } catch (error) {
-      console.log('Error during the request:', error);
+      toast.err('Error during the request:');
     } finally {
       setLoading(false);
     }
@@ -75,7 +75,6 @@ const LineChart: React.FC<LineChartProps> = ({userid}) => {
   useEffect(() => {
     fetchExperience();
   }, []);
-  console.log("stats" , stats);
   const ChartData: ChartData<"line", number[]> = {
     labels: stats?.labels || ['D-6', 'D-5', 'D-4', 'D-3', 'D-2', 'D-1', 'D'],
     datasets: [

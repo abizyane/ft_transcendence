@@ -34,7 +34,7 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
         setGameCustomization(data);
       }
     } catch (error) {
-      console.error('Failed to fetch notifications:', error);
+      toast.error('Failed to fetch notifications:');
       let options = {
         user_paddle_color: "#e01b24",
         opponent_paddle_color: "#1a5fb4",
@@ -63,7 +63,6 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
       }
       return true;
     } catch (error) {
-      console.error('Failed to update game customization:', error);
       toast.error('Failed to update game customization');
       return false;
     }

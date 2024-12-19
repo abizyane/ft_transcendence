@@ -3,6 +3,7 @@
 import { useEffect } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Loader from "components/loader/loader";
+import toast from 'react-hot-toast';
 
 const OAuthPage = () => {
     const router = useRouter();
@@ -37,7 +38,7 @@ const OAuthPage = () => {
             router.push(`/login?error=${encodeURIComponent(errorData.message)}`);
           }
         } catch (error) {
-          console.error('OAuth verification failed', error);
+          toast.error('OAuth verification failed');
           router.push(`/login?error=${encodeURIComponent('OAuth verification failed')}`);
         }
       };

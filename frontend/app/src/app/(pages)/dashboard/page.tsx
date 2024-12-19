@@ -7,6 +7,8 @@ import Data from "../../data/Dashboarddata.json";
 import { useUser } from "@/services/context/usercontext";
 import { useDebugValue, useEffect, useState } from "react";
 import Loader from "@/components/loader/loader";
+import { toast } from "react-hot-toast";
+
 
 const Dashboard = () => {
   const { user: cUser } = useUser();
@@ -31,10 +33,10 @@ const Dashboard = () => {
         const data = await response.json();
         setDashboardData(data);
       } else {
-        console.log('Failed to fetch stats:', await response.json());
+        toast.error('Failed to fetch stats:', await response.json());
       }
     } catch (error) {
-      console.log('Error during the request:', error);
+      toast.error('Error during the request:');
     } finally {
       setLoading(false);
     }

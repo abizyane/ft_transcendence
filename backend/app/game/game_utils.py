@@ -49,6 +49,7 @@ class Ball:
         self.game.red.isHiting = False
         self.game.blue.isHiting = False
             
+            
     
     def reset_ball(self):
         self.posY = self.game.height / 2
@@ -66,7 +67,7 @@ class Player:
         self.id = id
         self.score = 0
         self.width = 2
-        self.height = 70
+        self.height = 60
         self.half_width = self.width / 2
         self.half_height = self.height / 2
         self.x = 0

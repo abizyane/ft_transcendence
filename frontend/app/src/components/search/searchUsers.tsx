@@ -2,6 +2,7 @@ import React from "react";
 import { useEffect, useRef, useState } from "react";
 
 import Link from "next/link";
+import toast from 'react-hot-toast';
 
 const searchUsers = () => {
   const [searchQuery, setSearchQuery] = useState("");
@@ -43,7 +44,7 @@ const searchUsers = () => {
       const data = await response.json();
       setUsers(data);
     } catch (error) {
-      console.log("Error fetching users:", error);
+      toast.error("Error fetching users:", error);
     } finally {
       setLoading(false);
     }
@@ -79,6 +80,8 @@ const searchUsers = () => {
       <label>
         <div className="w-full">
           <input
+            id="search"
+            name="search"
             className="hidden lg:block rounded-full py-2 pr-6 pl-10 w-full border bg-gray-800 border-gray-800 focus:border-violet-primary   focus:outline-none text-gray-200 focus:shadow-md transition duration-300 ease-in"
             placeholder="Search"
             type="text"

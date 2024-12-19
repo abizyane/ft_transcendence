@@ -19,7 +19,6 @@ export const handleLogin = async (
     });
 
     const responseData = await response.json();
-    console.log(responseData);
     if (response.ok) {
       setErrorMessage(null);
       setSuccessMessage('Login successful.');
@@ -33,7 +32,6 @@ export const handleLogin = async (
     }
   } catch (error) {
     setErrorMessage(() => 'An unexpected error occurred. Please try again.');
-    console.log('error',error)
     toast.error('Login error.')
   }
 };
@@ -76,7 +74,7 @@ export const handleLogin = async (
       }
     }
   } catch (error) {
-    console.error('An unexpected error occurred:', error);
+    toast.error('An unexpected error occurred');
     setErrorMessage('An unexpected error occurred. Please try again later.');
   }
 };
@@ -97,9 +95,9 @@ export const handleLogout = async (
       router.push('/auth/login');
     } else {
       const errorData = await response.json();
-      console.log(errorData);
+      toast.error("failed to logout");
     }
   } catch (error) {
-    console.log(error);
+    toast.error("failed to logout");
   }
 };

@@ -22,14 +22,12 @@ export default function Canvas ({socketRef, callback, scoreSetter , setWinner, s
     const keyDownHandler = (e) =>{
 
         if (e.key === 'w'){
-          console.log("down:", e.key)
           socketRef.current.send(JSON.stringify({
                       'command' : 'input',
                       'type' : 'keyW_up'
                   }))
         }
         else if (e.key === 's'){
-          console.log("dowm:", e.key)
           socketRef.current.send(JSON.stringify({
                       'command' : 'input',
                       'type' : 'keyS_up'
@@ -39,14 +37,12 @@ export default function Canvas ({socketRef, callback, scoreSetter , setWinner, s
 
     const keyUpHandler = (e) =>{
         if (e.key === 'w'){
-          console.log("up:", e.key)
           socketRef.current.send(JSON.stringify({
                       'command' : 'input',
                       'type' : 'keyW_down'
               }))
         }
         else if (e.key === 's'){
-          console.log("up: ", e.key)
           socketRef.current.send(JSON.stringify({
                       'command' : 'input',
                       'type' : 'keyS_down'
@@ -55,43 +51,10 @@ export default function Canvas ({socketRef, callback, scoreSetter , setWinner, s
     }
 
     useEffect(() => {
-      console.log("effect")
-
-        // if (socketRef.current && socketRef.current.readyState === WebSocket.OPEN){
-        //     if (keyWUp.current) {
-        //         console.log("yoyoyoyooyo")
-        //         socketRef.current.send(JSON.stringify({
-        //             'command' : 'input',
-        //             'type' : 'keyW_up'
-        //         }))
-        //         keyWUp.current = false
-        //     }if (keyWdown){
-        //         socketRef.current.send(JSON.stringify({
-        //             'command' : 'input',
-        //             'type' : 'keyW_down'
-        //     }))
-        //     keyWdown.current = false
-        //     }if (keySUp){
-        //         socketRef.current.send(JSON.stringify({
-        //             'command' : 'input',
-        //             'type' : 'keyS_up'
-        //     }))
-        //     keySUp.current = false
-        //     }if (keySDown){
-        //         socketRef.current.send(JSON.stringify({
-        //             'command' : 'input',
-        //             'type' : 'keyS_down'
-        //     }))
-        //     }
-        //     keySDown.current = false
-        // }else{
-        //     console.error("websocket is already closed")
-        // }
         window.addEventListener('keydown', keyDownHandler);
         window.addEventListener('keyup', keyUpHandler);
 
         return () => {
-            console.log("key lestners detroyed")
             window.removeEventListener('keydown', keyDownHandler);
             window.removeEventListener('keyup', keyUpHandler);
         };
@@ -99,7 +62,6 @@ export default function Canvas ({socketRef, callback, scoreSetter , setWinner, s
     }, [socketRef])
 
     useEffect(() => {
-        console.log("socket ref on  effect ", socketRef.current)
         if (socketRef.current) {
             socketRef.current.onmessage = async (event) => {
                 if (event.data instanceof Blob) {
@@ -112,14 +74,11 @@ export default function Canvas ({socketRef, callback, scoreSetter , setWinner, s
                         scoreSetter({one: floatArray[6], two: floatArray[7]})
                     }
                 } else {
-                    // console.log('Received non-binary data:', event.data);
                     const jsondata = JSON.parse(event.data)
                     if (jsondata.command == "setReady"){
                         callback(true)
-                        console.log("READY")
                     }
                     else if (jsondata.command == "wait"){
-                        console.log("not ready")
                         callback(false)
                     }
                     if (jsondata.msg){
@@ -133,7 +92,6 @@ export default function Canvas ({socketRef, callback, scoreSetter , setWinner, s
                                 setLooser(true);
                             callback(false)
                         }
-                        console.log(jsondata.msg)
                     }
                 }
             };

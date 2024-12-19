@@ -5,7 +5,7 @@ import { useUser } from "@/services/context/usercontext";
 import { useParams } from "next/navigation";
 import { useState, useEffect } from "react";
 import Loader from '@/components/loader/loader';
-
+import toast from 'react-hot-toast';
 import { format, formatDistanceToNow, isToday, isYesterday } from "date-fns";
 
 
@@ -134,10 +134,9 @@ const HistoryPage = () => {
     })
       .then(async (response) => {
         if (!response.ok) {
-          console.log("Response not ok:", response.status);
+          toast.error("Response not ok:", response.status);
         }
         const responseData = await response.json();
-        console.log(responseData)
         setGameHistory(responseData.history);
       })
       .finally(() => {
@@ -155,12 +154,10 @@ const HistoryPage = () => {
       })
         .then(async (response) => {
           if (!response.ok) {
-            console.log("Response not ok:", response.status);
+            toast.error("Response not ok:", response.status);
           }
           const responseData = await response.json();
           setTournamentHistory(responseData.tournaments);
-          console.log(responseData)
-
         })
         .finally(() => {
           setLoading(false);

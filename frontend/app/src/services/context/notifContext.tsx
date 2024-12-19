@@ -38,18 +38,16 @@ export const NotifProvider: React.FC<{ children: React.ReactNode }> = ({ childre
       const response = await fetch(process.env.NEXT_PUBLIC_HOST_URL+':8000/notifications/list', {credentials: 'include',});
       if (response.ok) {
         const data = await response.json();
-        console.log("notifications", data);
         setNotifications(data);
       }
     } catch (error) {
-      console.error('Failed to fetch notifications:', error);
+      toast.error('Failed to fetch notifications:');
     }
     setIsLoading(false);
   };
 
   const handleNotificationClick = (notification: Notification) => {
     console.log('Notification clicked:', notification);
-    // Add your logic here, e.g., redirecting to a specific page
   };
 
   const addNotification = (notification: Notification) => {
@@ -66,7 +64,6 @@ export const NotifProvider: React.FC<{ children: React.ReactNode }> = ({ childre
 
     ws.onmessage = (event) => {
       const data = JSON.parse(event.data);
-      console.log("data", data);
       if (data.type === 'chat_message') {
         addNotification({
           id: data.id,

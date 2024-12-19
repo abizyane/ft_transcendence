@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
+import toast from 'react-hot-toast';
 
 interface User {
   id: number;
@@ -37,7 +38,7 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
         setUser(data);
       }
     } catch (error) {
-      console.error('Failed to fetch user:', error);
+      toast.error('Failed to fetch user:');
     } finally {
       setUserloading(false);
     }

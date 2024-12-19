@@ -3,15 +3,35 @@ import { useState } from 'react';
 import solo from "../../../../public/solo.jpeg";
 import multiplayers from "../../../../public/multiplayers.jpeg";
 import Link from "next/link";
+import Instructions from '@/components/Instructions/page';
+
+
 
 const Page = () => {
 
   const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
-
+  const [modelopen,setModelOpen]=useState(false);
+  const handlehowtoplay=()=>{
+    setModelOpen(true);
+  }
+  const handleCloseInstructions = () => {
+    setModelOpen(false);
+  };
   return (
     <>
+           <div className="mb-8">
+      {modelopen ? (
+          <div className="flex justify-center items-start w-fit">
+            <Instructions setModal={setModelOpen} />
+          </div>
+      ) : (
+        <div className= "h-12 w-44   bg-gray-800/60 border border-violet-primary rounded-xl text-center">
+
+        <button className="text-white p-2 w-full h-full text-center hover:bg-gray-800 rounded-xl" onClick={handlehowtoplay}>How to Play</button>
+        </div>
+      )}
+    </div>
       <div className=" rounded-xl flex flex-col gap-4  w-fit  h-fit justify-center items-center md:flex-row mb-24 lg:mb-0 z-10">
-        
         <div
           onMouseEnter={() => setHoveredIndex(0)}
           onMouseLeave={() => setHoveredIndex(null)}
