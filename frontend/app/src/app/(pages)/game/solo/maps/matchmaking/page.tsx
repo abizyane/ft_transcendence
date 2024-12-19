@@ -1,20 +1,18 @@
 "use client";
 
+import { useEffect, useRef, useState, Suspense } from "react";
+import { useSearchParams, useRouter } from "next/navigation";
 import Image from "next/image";
 import Mars from "../../../../../../../public/Mars.jpeg";
-import { useEffect, useRef, useState } from "react";
 import VS from "../../../../../../../public/VS.jpeg";
 import Link from "next/link";
 import { useUser } from "@/services/context/usercontext";
-import { useSearchParams, useRouter } from "next/navigation";
 import Loader from "../../../../../../components/loader/loader";
 import Vsbotcanva from "@/components/Localcanva/page";
 import Localgamecanva from "@/components/twopcanvas/page";
 import Canvas from "@/components/Canva/page";
 import ConfettiComponent from "@/components/Celebration/win";
-import {toast} from 'react-hot-toast'
-
-
+import {toast} from 'react-hot-toast';
 
 // Default competitors and user data
 const defaultCompetitors = [
@@ -90,8 +88,7 @@ interface GameState {
   countdown: number | null;
 }
 
-const Page = () => {
-  // const [gameready, setReady] = useState(false);
+const MatchmakingContent = () => {
   const [gameState, setGameState] = useState<GameState>({
     gameready: false,
     countdown: null,
@@ -496,6 +493,21 @@ const Page = () => {
         </div>
       )}
     </>
+  );
+};
+
+const Page = () => {
+  return (
+    <Suspense fallback={
+      <div className="h-screen justify-center items-center flex flex-col">
+        <Loader />
+        <p className="text-zinc-600 font-medium text-2xl md:text-4xl">
+          Loading matchmaking...
+        </p>
+      </div>
+    }>
+      <MatchmakingContent />
+    </Suspense>
   );
 };
 
