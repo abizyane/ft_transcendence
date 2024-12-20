@@ -101,9 +101,6 @@ export default function Canvas ({socketRef, callback, scoreSetter , setWinner, s
       }, []);
 
 
-
-
-    /*Canvas Function */
     useEffect(()=>{
         const canvas = canvasRef.current
         if (canvas){

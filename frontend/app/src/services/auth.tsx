@@ -37,10 +37,6 @@ export const handleLogin = async (
 };
 
 
-// register
-// services/registrationSubmit.ts
-
-// registrationHandler.ts
  export const handleRegistrationSubmit = async (
     data: registerFormData,
     setSuccessMessage: React.Dispatch<React.SetStateAction<string | null>>,

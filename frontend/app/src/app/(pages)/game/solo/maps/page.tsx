@@ -32,7 +32,6 @@ const GalaxyContent = () => {
       </h1>
 
       <div className="flex flex-col md:flex-row md:justify-center w-full h-[113%] md:h-[76%] lg:h-[85%] flex-none items-center ">
-        {/* Mars */}
         <div
           onMouseEnter={() => setHoveredIndex(0)}
           onMouseLeave={() => setHoveredIndex(null)}
@@ -53,7 +52,6 @@ const GalaxyContent = () => {
           </Link>
         </div>
 
-        {/* Earth */}
         <div
           onMouseEnter={() => setHoveredIndex(1)}
           onMouseLeave={() => setHoveredIndex(null)}
@@ -74,7 +72,6 @@ const GalaxyContent = () => {
           </Link>
         </div>
 
-        {/* Jupiter */}
         <div
           onMouseEnter={() => setHoveredIndex(2)}
           onMouseLeave={() => setHoveredIndex(null)}

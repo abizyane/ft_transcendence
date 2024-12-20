@@ -40,7 +40,6 @@ class AbstractRoomManager(ABC):
 class RoomManager(AbstractRoomManager):
     def __init__(self):
         self.rooms = []
-    #Builder Call
     async def generate_room(self, _type, image_id=None, scope=None) -> Room :
         value:int = RoomType[_type].value
         if value == 1:
@@ -53,7 +52,6 @@ class RoomManager(AbstractRoomManager):
         else:
             raise ValueError("No such a type")
     
-    #Room LifeTime
     async def create_room(self, _type, image_id, scope) -> Room:
         new_room = await self.generate_room(_type, image_id, scope);
         self.rooms.append(new_room)
@@ -62,14 +60,12 @@ class RoomManager(AbstractRoomManager):
     def remove_room(self, _id) -> Room:
         return self.rooms.pop(_id)
 
-    #Room State
     def is_empty(self, _id) -> bool:
         return self.rooms[_id].is_empty()
 
     def is_ready(self, _id) -> bool:
         return self.rooms[_id].is_ready()
 
-    #Other Methods
     def get_room(self, _id) -> Room:
         return self.rooms[_id]
 

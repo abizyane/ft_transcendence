@@ -59,7 +59,6 @@ const Friends = () => {
     return <div className="text-red-500">{error}</div>;
   }
 
-  // // Block friend
   const handleblockFriend = async (userid) => {
     try {
       const response = await customFetch(process.env.NEXT_PUBLIC_API_URL+"/api/block", {
@@ -78,9 +77,7 @@ const Friends = () => {
     }
   };
 
-  // // Unblock friend
   const handleUnblockFriend = async (friendId) => {
-    // setUnblkloading(true);
     try {
       const response = await customFetch(process.env.NEXT_PUBLIC_API_URL+"/api/unblock", {
         method: "POST",
@@ -98,7 +95,7 @@ const Friends = () => {
     }
   };
 
-  // // Accept friend
+
   const handleAcceptFriend = async (friendId) => {
     try {
       const response = await customFetch(process.env.NEXT_PUBLIC_API_URL+"/api/accept_friend", {
@@ -116,7 +113,8 @@ const Friends = () => {
       toast.error("Error accepting friend");
     }
   };
-  // // Accept friend
+
+
   const handleRemoveFriend = async (friendId) => {
     try {
       const response = await customFetch(process.env.NEXT_PUBLIC_API_URL+"/api/remove_friend", {
@@ -135,7 +133,6 @@ const Friends = () => {
     }
   };
 
-  // // Reject friend
   const handleRejectFriend = async (friendId) => {
     try {
       const response = await customFetch(process.env.NEXT_PUBLIC_API_URL+"/api/reject_friend", {
@@ -178,7 +175,6 @@ const Friends = () => {
       Friends List
     </h1>
   
-    {/* Friends List */}
     <div
       className={`bg-gray-800/65 rounded-xl border w-full p-4 border-violet-primary ${listHeight} overflow-y-auto no-scrollbar p-41`}
     >
@@ -242,10 +238,8 @@ const Friends = () => {
       )}
     </div>
   
-    {/* Conditional rendering based on userId */}
     {userId === currentUser.id.toString() && (
       <>
-        {/* Request List */}
         <div className="lg:flex lg:gap-4 ">
           <div className="lg:flex lg:flex-col lg:w-full">
             <h1 className="text-white text-center w-full text-xl font-bold mb-4 mt-2">

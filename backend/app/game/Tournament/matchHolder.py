@@ -60,7 +60,7 @@ class PlayerHolder(Holder):
             raise ValueError("You Cant Upgrade AnyMore")
 
     def get_paddle_data(self):
-        return self.paddle.data() #paddle is Player class for Now
+        return self.paddle.data()
     
     def get_name(self):
         return self.competitor.name
@@ -79,8 +79,6 @@ class PlayerHolder(Holder):
     pass
 
 class MatchTreeBuilder(AbstractMatchBuilder):
-    # def __init__(self, match):
-    #     self.room = match
     @staticmethod
     def build_tree(holder:Holder, index:int ,lvl:int, competitor_generator,size):
         holder.lvl = lvl
@@ -139,21 +137,3 @@ class AbstractTournamentManager(ABC):
     def set_winner_lvl(self):
         pass
     
-# class TournamentManager(AbstractTournamentManager):
-#     def __init__(self, match_root):
-#         self.match_holder = match_root
-    
-#     def get_winner(self, competitors):
-#         winners = []
-#         for competitor in competitors:
-#             if competitor.won:
-#                 winners.append(competitor)
-#         return winners
-
-#     def update_tree(self, competitors):
-#         winners = self.get_winners(competitors)
-#         for winner in winners:
-#             winner.upgrade()
-#             winner.won = False
-#             winner.lvl -= 1
-        

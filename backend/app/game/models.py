@@ -4,7 +4,6 @@ from django.utils import timezone
 from django.db.models.query import EmptyQuerySet
 
 class Profile(models.Model):
-    # profile_id = models.AutoField(primary_key=True)
     user_id = models.OneToOneField(User, on_delete=models.CASCADE)
     level = models.FloatField(default=0)
     xp = models.IntegerField()
@@ -68,7 +67,6 @@ class Profile(models.Model):
         games = GameModel.get_all_games(self.id, isTournament)
         wins = 0
         for game in games:
-            # Get the player's PlayerModel instance for this game
             if game.player_1.profile == self:
                 player = game.player_1
             else:
@@ -81,7 +79,6 @@ class Profile(models.Model):
         games = GameModel.get_all_games(self.id)
         losses = 0
         for game in games:
-            # Get the player's PlayerModel instance for this game
             if game.player_1.profile == self:
                 player = game.player_1
             else:
@@ -94,7 +91,6 @@ class Profile(models.Model):
         games = GameModel.get_all_games(self.id)
         draws = 0
         for game in games:
-            # Get both players' scores
             if game.player_1.profile == self:
                 player_score = game.player_1.score
                 opponent_score = game.player_2.score
@@ -225,7 +221,6 @@ class TournamentModel(models.Model):
         FOUR = 'FOUR'
         EIGHT = 'EIGHT'
 
-    # tournament_id = models.AutoField(primary_key=True)
     name = models.CharField(max_length=100, default='AstroTournament')
     owner = models.ForeignKey(Profile, related_name='tournament_owner', null=True, on_delete=models.CASCADE)
     picture = models.TextField(null=True)
@@ -236,14 +231,6 @@ class TournamentModel(models.Model):
     updated = models.DateTimeField(default=timezone.now, null=False)
     created.editable = False
 
-    # def history(player:Profile):
-    #     games = GameModel.get_all_games(player_id=player.id);
-    #     for game in games :
-    #         score = Scores.objects.all()[game.id].get_player_game_score(player.id)
-    #         oppenent = game.get_opponent(player.id)
-    #         oppenent_score = self.get_player_game_score(player.id)
-    #         state = "Win" if score > oppenent_score else "Lose"
-    #         print(f'{player.get_username()} {score}  Vs  {oppenent.get_username()} {oppenent}')
     def get_tournament_xp(self,player_id:int)-> int:
         return self.get_player_game_xp(player_id)
 

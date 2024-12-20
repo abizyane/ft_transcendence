@@ -10,7 +10,6 @@ const searchUsers = () => {
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
-  // Debounce function
   const [timer, setTimer] = useState(undefined);
 
   const debounce = (func, delay) => {

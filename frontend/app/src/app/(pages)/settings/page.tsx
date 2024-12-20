@@ -19,7 +19,6 @@ const SettingsPage = () => {
 
         <h1 className="text-2xl sm:text-3xl font-bold mb-4 text-center">Settings</h1>
 
-        {/* Tab Navigation */}
         <div className="flex space-x-2 sm:space-x-4 pb-2 w-full">
           <button
             onClick={() => setActiveTab('profile')}
@@ -39,7 +38,6 @@ const SettingsPage = () => {
           </button>
         </div>
 
-        {/* Tab Content */}
         <div className="mt-6">
           {activeTab === 'profile' ? <ProfileSettings /> : <GameSettings />}
         </div>
@@ -65,7 +63,7 @@ const ProfileSettings = () => {
     const file = e.target.files?.[0];
     if (file) {
       setProfileImage(file);
-      const previewUrl = URL.createObjectURL(file); // Create a preview URL for the selected file
+      const previewUrl = URL.createObjectURL(file);
       setImagePreview(previewUrl);
     }
   };
@@ -93,7 +91,7 @@ const ProfileSettings = () => {
   };
   const updatePassword = async (formData: any) => {
       try {
-          const response = await customFetch(process.env.NEXT_PUBLIC_API_URL+'/api/changepassword', { // Added http://
+          const response = await customFetch(process.env.NEXT_PUBLIC_API_URL+'/api/changepassword', {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
               credentials: 'include',
@@ -111,11 +109,9 @@ const ProfileSettings = () => {
       }
   };
   const onSubmit = (formData: any) => {
-    // If `newPassword` is filled, call the updatePassword function
     if (formData.newPassword) {
         updatePassword(formData);
     }
-    // If a profile image is provided, handle the image upload
     if (profileImage) {
         handleImage(profileImage);
     }
@@ -202,7 +198,7 @@ const ProfileSettings = () => {
               <input
                 type="password"
                 {...register('confirmPassword', {
-                  // required: 'Please confirm your password',
+                  required: 'Please confirm your password',
                   validate: (value) => value === watch('newPassword') || 'Passwords do not match'
                 })}
                 className="w-3/4 sm:w-1/2 p-2 border rounded text-black"

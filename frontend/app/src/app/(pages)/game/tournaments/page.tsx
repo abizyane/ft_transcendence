@@ -77,7 +77,7 @@ const Page = () => {
     two:null,
     final:null
   });
-  //---------Tournament Map vars Start---------
+
   const defaultUser = {
     alias: 'player',
     profile_pic_url: Unknwon.src,
@@ -95,14 +95,7 @@ const Page = () => {
     setPlayers(users)
   }
 
-  //---------Tournament Map var END--------- 
 
-
-  const defaObj = {
-    name: "Tournament",
-    img: "/tournament1.jpg",
-    size: 0,
-  };
 
   const handleImageUpload = (e) => {
     const file = e.target.files[0];
@@ -191,7 +184,6 @@ const Page = () => {
     };
 
     return () => {
-      // Cleanup the WebSocket connection when component unmounts
       if (isConnected) {
         WebSocketRef.current.close();
       }
@@ -260,7 +252,6 @@ const Page = () => {
       return;
     }
     const command = "create";
-    // Prepare the data to send
     const roomData = {
       command,
       alias,
@@ -278,7 +269,6 @@ const Page = () => {
     }
   };
 
-  // Handle joining a tournament
   const handleJoinTournament = (tournament) => {
     tournament.command = "join";
     if (
@@ -394,8 +384,6 @@ const Page = () => {
             >
               <Canvas
                 socketRef={WebSocketRef}
-                // setWinner={setWinner}
-                // setLooser={setLooser}
                 callback={setReady}
                 scores={scores}
                 scoreSetter={setScores}
@@ -407,7 +395,7 @@ const Page = () => {
     )
   };
 
-  // Tournament map component
+
   const TournamentMap = ({ onPlay }: { onPlay: () => void }) => {
     const defaultUser = {
       username: "Player",
@@ -429,9 +417,6 @@ const Page = () => {
 
 
     const handleRoomUpdate = (users) => {
-      // const nextUserList = defaultUsers.map(
-      //   (user) => users.find((u) => u.id === user.id) || user
-      // );
       setPlayers(users);
     };
     useEffect(() => {
@@ -584,7 +569,6 @@ const Page = () => {
               </div>
               <div className="flex flex-col items-center lg:mb-48">
                 <img
-                // src={Line1.src}
                   src={Trophy.src}
                   alt="Trophy"
                   className="w-14 h-14 md:w-16 md:h-16 lg:w-12  lg:h-12  xl:w-18 xl:h-18 object-cover p-2"
@@ -683,7 +667,6 @@ const Page = () => {
             <div className="w-full h-full flex justify-center items-center">
               <div className="w-full max-w-7xl p-4 rounded-lg shadow-lg mt-8">
                 <div className="w-full lg:flex lg:gap-8">
-                  {/* Create Tournament Card */}
                   <div className="bg-gray-700/50 shadow-lg border border-violet-primary rounded-lg p-6 w-full lg:max-w-2xl lg:min-w-[350px] h-[500px] flex flex-col gap-6 space-y-6">
                     <h2 className="text-lg text-white text-center font-semibold mb-4">
                       Create Tournament
@@ -735,7 +718,6 @@ const Page = () => {
                     </form>
                   </div>
 
-                  {/* Join Tournament Card */}
                   <div className="bg-gray-700/50 shadow-lg rounded-lg p-6  w-full border border-violet-primary lg:min-w-[350px] h-[500px] no-scrollbar overflow-y-scroll mt-6 lg:mt-0">
                     <h2 className="text-lg text-center text-white font-semibold mb-10">
                       Join Tournament

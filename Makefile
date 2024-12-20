@@ -17,23 +17,10 @@ up:
 	@echo "${C_GREEN}Starting up services...${C_RESET}"
 	$(DC_CMD) up -d
 	@echo "${C_GREEN}Done!${C_RESET}"
-# @if ! docker network inspect astropong > /dev/null 2>&1; then \
-#     echo "${C_GREEN}Starting up services...${C_RESET}"; \
-#     $(DC_CMD) up -d; \
-#     echo "${C_GREEN}Done!${C_RESET}"; \
-# else \
-#     echo "${C_GREEN}Services are already up.${C_RESET}"; \
-# fi
 
-down: 
+down:
 	@echo "${C_RED}Stopping services...${C_RESET}"
 	$(DC_CMD) down
-# @if docker network inspect astropong > /dev/null 2>&1; then \
-#     echo "${C_RED}Stopping services...${C_RESET}"; \
-#     $(DC_CMD) down; \
-# else \
-#     echo "${C_RED}Services are already down.${C_RESET}"; \
-# fi
 
 test:
 	@echo "${C_YELLOW}Running tests...${C_RESET}"

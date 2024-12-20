@@ -45,32 +45,29 @@ class Ball {
     iscollide(){
       if (this.posY + this.rad >= this.game.height || this.posY - this.rad <= 0 )
             this.dirY *= -1
-      // if (this.posX < this.game.width * 1/4){
         let left_collission = this.posX - this.rad;
           if (left_collission <= 0){
               this.game.enemy.score += 1
               this.game.scoreBoard.update()
               this.reset_ball()
           }
-          if ((left_collission <= this.game.player.posX + this.game.player.width /*&& left_collission >= this.game.player.posX*/) && (this.posY >= this.game.player.posY && this.posY <= this.game.player.posY + this.game.player.height) && ! this.game.player.isHiting)
+          if ((left_collission <= this.game.player.posX + this.game.player.width ) && (this.posY >= this.game.player.posY && this.posY <= this.game.player.posY + this.game.player.height) && ! this.game.player.isHiting)
           {
             this.dirX *= -1
             this.game.player.isHiting = true
           }
-      // }
-      // else if (this.posX > this.game.width * 3/4){
+
         let right_collision = this.posX + this.rad
           if (right_collision >= this.game.width){
               this.game.player.score += 1
               this.game.scoreBoard.update()
               this.reset_ball()
           }
-          if ((right_collision >= this.game.enemy.posX /*&& right_collision <= this.game.enemy.posX + this.game.enemy.height*/) && (this.posY >= this.game.enemy.posY && this.posY <= this.game.enemy.posY + this.game.enemy.height) && ! this.game.enemy.isHiting)
+          if ((right_collision >= this.game.enemy.posX ) && (this.posY >= this.game.enemy.posY && this.posY <= this.game.enemy.posY + this.game.enemy.height) && ! this.game.enemy.isHiting)
             {
               this.dirX *= -1
               this.game.enemy.isHiting = true
             }
-      // }
       this.game.enemy.isHiting = false
       this.game.player.isHiting = false
     }
@@ -193,7 +190,6 @@ class Game{
       this.mouseX = 0;
       this.mouseY = 0;
       this.status = 1;
-    //   loadFonts();
 
       window.addEventListener('keydown', (e) => {
         if (e.key === "ArrowUp")
@@ -234,7 +230,6 @@ class Game{
       this.player.draw(ctx);
       this.ball.draw(ctx);
       this.enemy.draw(ctx);
-      // this.scoreBoard.draw(ctx);
     }
 
   }

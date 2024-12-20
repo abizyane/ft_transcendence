@@ -132,7 +132,7 @@ const HistoryPage = () => {
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({ id: userId }), // Pass the logged-in user's ID
+      body: JSON.stringify({ id: userId }),
       credentials: 'include',
     })
       .then(async (response) => {
@@ -154,12 +154,11 @@ const HistoryPage = () => {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ id: userId }), // Pass the logged-in user's ID
+        body: JSON.stringify({ id: userId }),
         credentials: 'include',
       })
         .then(async (response) => {
           if (!response.ok) {
-            // toast.error("Response not ok:", response.status);
             return;
           }
           const responseData = await response.json();
@@ -178,7 +177,6 @@ const HistoryPage = () => {
       <h1 className="text-2xl md:text-3xl lg:text-4xl font-bold text-white text-center mb-6">History</h1>
 
       <div className="flex flex-col lg:flex-row lg:space-x-8 space-y-6 lg:space-y-0">
-        {/* 1 VS 1 Section */}
         <div className="w-full lg:w-1/2 p-2 rounded-xl border border-violet-primary mb-6 lg:mb-0">
           <h2 className="text-xl md:text-2xl lg:text-3xl font-semibold text-center text-white mb-4">1 VS 1</h2>
           <div className="h-[518px] space-y-4 overflow-y-auto max-h-64 lg:max-h-[28rem] no-scrollbar">
@@ -199,7 +197,6 @@ const HistoryPage = () => {
           </div>
         </div>
 
-        {/* Tournament Section */}
         <div className="w-full lg:w-1/2 p-2 rounded-xl border border-violet-primary">
           <h2 className="text-xl md:text-2xl lg:text-3xl font-semibold text-center text-white mb-4">Tournaments</h2>
           <div className="space-y-6 overflow-y-auto max-h-[30rem] lg:max-h-[28rem] no-scrollbar">

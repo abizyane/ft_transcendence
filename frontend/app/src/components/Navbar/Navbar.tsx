@@ -159,7 +159,6 @@ const Navbar = () => {
             </div>
           </div>
         </div>
-        {/* log out on mobile  */}
         <div className="w-full lg:hidden flex justify-end items-center">
           <Link href="/settings" className = "mr-2">
             <Settings className=" text-white w-5 h-5" />

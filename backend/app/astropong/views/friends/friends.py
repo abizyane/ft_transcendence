@@ -17,7 +17,6 @@ from chat.serializers import UserSerializer as MinUserSerializer
 from rest_framework import generics
 from rest_framework.exceptions import NotAuthenticated, NotFound
 from asgiref.sync import async_to_sync
-# from rest_framework.pagination import PageNumberPagination
 
 User = get_user_model()
 
@@ -136,14 +135,10 @@ class UnblockFriendView(APIView):
             }, status=404)
 
 
-# class BlockedUsersPageNumberPagination(PageNumberPagination):
-#     page_size = 50
-
 class BlockedUsersList(generics.ListAPIView):
     
     permission_classes = [IsAuthenticated]
     serializer_class = MinUserSerializer
-    # pagination_class = BlockedUsersPageNumberPagination
 
     def get_queryset(self):
         if not self.request.user.is_authenticated:

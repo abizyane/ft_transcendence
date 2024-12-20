@@ -27,19 +27,6 @@ class LoginView(APIView):
         if not user.check_password(password):
             raise AuthenticationFailed("Password is incorrect!")
         
-        # login(request, user)
-        # if user.mfa_enabled:
-        #     if not otp:
-        #         return Response({
-        #             'error': 'OTP is required',
-        #             'mfa_enabled': True
-        #             }, status=400)
-        #     if not user.verify_otp(otp):
-        #         return Response({
-        #             'error': 'OTP is invalid',
-        #             'mfa_enabled': True
-        #             }, status=400)
-
         refresh = RefreshToken.for_user(user)
         user_data = UserSerializer(user, context={'request': request}).data
         response = Response(user_data)

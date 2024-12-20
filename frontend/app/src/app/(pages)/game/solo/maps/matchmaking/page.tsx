@@ -14,7 +14,7 @@ import Canvas from "@/components/Canva/page";
 import ConfettiComponent from "@/components/Celebration/win";
 import {toast} from 'react-hot-toast';
 
-// Default competitors and user data
+
 const defaultCompetitors = [
   {
     username: "player2",
@@ -40,7 +40,7 @@ const defaultCompetitors = [
 
 const randomizeUser = () => {
   const randomPic = `https://randomuser.me/api/portraits/women/${Math.floor(Math.random() * 100)}.jpg`;
-  const randomLevel = Math.floor(Math.random() * 100); // Random level between 0-100
+  const randomLevel = Math.floor(Math.random() * 100);
   const randomXP = Math.floor(Math.random() * 1000);
   const maxXPPerLevel = 1000;
   const remainingXP = ((randomXP % maxXPPerLevel) / maxXPPerLevel) * 100;
@@ -53,7 +53,6 @@ const randomizeUser = () => {
   };
 };
 
-// Avatar component for displaying user info
 function Avatar({ user }) {
   return (
     <div className="bg-[rgba(145,145,145,0.23)] p-4 rounded-lg flex flex-col items-center lg:min-h-[500px] lg:min-w-[300px] md:min-h-[300px] md:min-w-[300px] m-2">
@@ -142,7 +141,6 @@ const MatchmakingContent = () => {
     }
   };
 
-  // WebSocket connection for random matchmaking
   useEffect(() => {
     if (isRandomMatch && socketRef.current === null) {
       let url = process.env.NEXT_PUBLIC_API_URL.replace('http','ws')+"/ws/tournament/TWO/"
@@ -186,7 +184,6 @@ const MatchmakingContent = () => {
               }));
             }
 
-            // Update competitors from WebSocket data
             if (data.competitors) {
               if (data.competitors.length == 2) {
                 setIsSecondPlayerValid(true);

@@ -15,7 +15,6 @@ class NotificationConsumer(AsyncWebsocketConsumer):
             await self.send_error(f"{user} is not authenticated.")
             await self.close()
             return
-        # self.group_name += "_" + user.username
         await self.channel_layer.group_add(
             self.group_name,
             self.channel_name
@@ -51,8 +50,6 @@ class NotificationConsumer(AsyncWebsocketConsumer):
             await self.send_error(f"Invalid message type: {text_data_json['type']}")
 
     async def notify_online_user(self, username, online, user_id):
-        # await self.channel_layer.group_send(
-        #     "notifications",
         await self.channel_layer.group_send(
             "chat_room",
             {
@@ -62,17 +59,6 @@ class NotificationConsumer(AsyncWebsocketConsumer):
                 'user_id': user_id
             }
         )
-    
-    # async def user_status(self, event):
-    #     await self.channel_layer.group_send(
-    #         "chat_room",
-    #         {
-    #             'type': 'user_status',
-    #             'receiver': event['receiver'],
-    #             'is_online': event['is_online'],
-    #             'user_id': event['user_id']
-    #         }
-    #     )
   
     async def notification(self, event):
         receiver = event['receiver']
@@ -99,7 +85,7 @@ class NotificationConsumer(AsyncWebsocketConsumer):
                 'link': notification.link
             }))
 
-    async def notify_user(self, content, notification_type, receiver = None): #this can be used to notify all users or a specific user
+    async def notify_user(self, content, notification_type, receiver = None): 
         await self.channel_layer.group_send(
             "notifications",
             {
@@ -140,8 +126,6 @@ class NotificationConsumer(AsyncWebsocketConsumer):
 
     @database_sync_to_async
     def create_notification(self, receiver, type, content, link):
-        # user = self.get_user(receiver)
-        # if not user:
         try:
             receiver = User.objects.get(username=receiver)
         except User.DoesNotExist:

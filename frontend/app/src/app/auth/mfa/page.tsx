@@ -62,7 +62,6 @@ const MFAPage = () => {
             {errorMessage && (
               <div className="text-red-500 text-center mb-4">{errorMessage}</div>
             )}
-            {/* <div className="font-mont p-6 backdrop-blur-lg bg-gray-800/60  rounded-xl shadow-lg max-w-sm w-full  overflow-hidden"> */}
             <h2 className="text-3xl font-bold text-white mb-4">Two Factor Auth</h2>
               <div className="rounded-md shadow-sm">
                 

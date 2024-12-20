@@ -50,7 +50,7 @@ const History = () => {
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({ id: finalUserId }), // Pass the logged-in user's ID
+      body: JSON.stringify({ id: finalUserId }),
       credentials: 'include',
     })
       .then(async (response) => {
@@ -119,7 +119,6 @@ const History = () => {
         <div className="m-2 flex justify-between items-center">
           <p className="m-2 text-white text-2xl font-extrabold">History</p>
 
-          {/* Link to the user-specific history page */}
           <Link href={`/history/${finalUserId}`} key={finalUserId}>
             <div className="m-2 p-2 border-2 border-violet-primary backdrop-blur-lg rounded-xl hover:bg-violet-primary">
               <p className="text-white">View All</p>

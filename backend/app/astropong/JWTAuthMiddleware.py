@@ -88,12 +88,3 @@ class JWTAuthMiddleware(BaseMiddleware):
             raise TokenBackendError(f"Token backend error: {e}")
         except User.DoesNotExist:
             raise InvalidToken("User not found.")
-            # try:
-
-        #     # print("token ", token, flush=True)
-        #     access_token = AccessToken(token)
-        #     print("access_token", access_token['id'], flush=True)
-        #     return access_token
-        # except Exception as e:
-        #     print("error ex ",e)
-        #     return None

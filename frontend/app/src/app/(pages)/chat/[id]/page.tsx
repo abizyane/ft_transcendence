@@ -29,7 +29,6 @@ const UserChatPage = ({ currentUser }) => {
 
   useEffect(() => {
     setMessageContainerRef(messageContainerRef);
-    // scrollToBottom();
   }, [messageContainerRef]);
   
 useEffect(() => {
@@ -222,7 +221,6 @@ export default function Page() {
   const chatUserid = useParams();
   const { user: currentUser } = useUser();
   const { fetchMessages } = useChat();
-  // const [chatUser, setChatUser] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   

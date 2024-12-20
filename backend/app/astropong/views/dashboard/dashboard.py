@@ -72,7 +72,6 @@ class GamesHistoryView(APIView):
             history = []
             
             for game in games:
-                # Determine which PlayerModel belongs to the user and opponent
                 current_player = game.player_1 if game.player_1.profile.id == user_profile.id else game.player_2
                 player1 = game.player_1.profile
                 opponent_player = game.player_2.profile
@@ -130,7 +129,6 @@ class TopPlayersView(APIView):
     permission_classes = [IsAuthenticated]
     def get(self, request):
         try:
-            # user_profile = Profile.objects.get(user_id=request.user)
             top_players = Profile.objects.order_by('-xp')[:3]
             return Response({'topPlayers': 
                 ProfileSerializer(top_players, many=True, context={'request': request}).data
@@ -241,7 +239,6 @@ class DashboardView(APIView):
             userid = request.data.get('id')
             user_profile = Profile.objects.get(user_id=userid)
             
-            # Use the new Profile methods to get stats
             wins = user_profile.get_wins()
             losses = user_profile.get_losses()
             draws = user_profile.get_draws()

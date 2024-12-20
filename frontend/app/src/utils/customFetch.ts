@@ -1,5 +1,4 @@
 export const customFetch = async (url: string, options: RequestInit = {}) => {
-  // Ensure credentials are included by default
   const defaultOptions: RequestInit = {
     ...options,
     credentials: 'include',

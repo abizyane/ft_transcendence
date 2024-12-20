@@ -9,14 +9,12 @@ export default function Pong({ setModal }) {
       <div
         className="w-[340px] h-[540px] bg-gray-900/60 rounded-lg border border-violet-primary p-6  shadow-lg text-white relative"
       >
-        {/* Close Button */}
         <IoIosCloseCircle
           size={24}
           className="text-red-800 cursor-pointer absolute top-4 right-4"
           onClick={() => setModal(false)}
         />
 
-        {/* Modal Content */}
         <h1 className="text-2xl sm:text-3xl font-bold text-center mb-4">Pong Game Rules</h1>
         <p className="text-base sm:text-lg mb-4">
           In the Pong game, each player controls a paddle and attempts to hit a ball back and forth.

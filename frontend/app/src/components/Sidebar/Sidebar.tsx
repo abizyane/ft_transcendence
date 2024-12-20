@@ -1,6 +1,6 @@
 "use client";
 
-import { usePathname } from "next/navigation"; // Import the hook for detecting the current path
+import { usePathname } from "next/navigation";
 import Link from "next/link";
 import { AiFillAppstore } from "react-icons/ai";
 import { IoStatsChart, IoGameController } from "react-icons/io5";

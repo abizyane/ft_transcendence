@@ -80,8 +80,6 @@ const Friends = ({ user }) => {
                 >
                   <div className="flex items-center space-x-4">
                     <div className=" lg:relative h-12 w-12 rounded-full">
-
-                      {/* <span className={`h-3 w-3 ${friend.is_online ? "bg-green-500" : "bg-gray-500"} absolute bottom-0 right-1  rounded-full z-0`} /> */}
                       <img
                         src={friend.profile_pic_url}
                         alt="User Profile"

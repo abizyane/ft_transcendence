@@ -69,12 +69,6 @@ class UserIdView(APIView):
 
                 relation = Relationship.objects.filter(query).first()
 
-            # if not relation:
-            #     relation = Relationship.objects.create(
-            #         user1=user,
-            #         user2=request.user,
-            #         status=Relationship.Status.UNKNOWN
-            #     )
                 return Response(FriendSerializer(user, context={'request': request, 'relationships': relation}).data)
             except User.DoesNotExist:
                 return Response({'error': 'User doesnt exist'}, status=404)

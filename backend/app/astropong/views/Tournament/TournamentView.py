@@ -24,27 +24,9 @@ import os
 from django.conf import settings
 
 
-
-# class PublicTournamentView(APIView):
-#     permission_classes = [IsAuthenticated]
-#     def get(self, request):
-#         try:
-#             tournaments = TournamentModel.objects.filter(
-#                 (models.Q(state=TournamentModel.State.SCHEDULED) & 
-#                 models.Q(permission=TournamentModel.Permission.PUBLIC)) |
-#                 (models.Q(state=TournamentModel.State.SCHEDULED) & 
-#                 models.Q(permission=TournamentModel.Permission.PRIVATE) & 
-#                 (models.Q(players=request.user.profile) | models.Q(owner=request.user.profile) | models.Q(invites=request.user.profile))
-#             ))
-#             serializer = TournamentSerializer(tournaments, context={'request': request}, many=True)
-#             return Response(serializer.data, status=status.HTTP_200_OK)
-#         except TournamentModel.DoesNotExist:
-#             return Response([], status=status.HTTP_200_OK)
-    
 class TournamentPicUploadSerializer(serializers.Serializer):
     tournament_pic = serializers.ImageField(required=False)
     name = serializers.CharField()
-    # permission = serializers.CharField(default=TournamentModel.Permission.PUBLIC)
 
 
 class CreateTournamentView(APIView):
@@ -56,7 +38,6 @@ class CreateTournamentView(APIView):
             return Response({"message": "You must set a tournament alias to create a tournament"}, status=status.HTTP_400_BAD_REQUEST)
         if serializer.is_valid():
             name = serializer.validated_data['name']
-            # permission = serializer.validated_data['permission']
             if name is None:
                 return Response({"error": "Name is required"}, status=status.HTTP_400_BAD_REQUEST)
             tournament_pic_path = None

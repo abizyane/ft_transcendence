@@ -4,7 +4,6 @@ from django.core.exceptions import ValidationError
 from django.db import models
 import pyotp
 
-# Create your models here.
 
 class User(AbstractUser):
     username = models.CharField(max_length=100,unique=True)
@@ -103,8 +102,6 @@ class User(AbstractUser):
             ).first()
             if relationship is None:
                 raise Relationship.DoesNotExist
-            # if relationship.userWhoRequest == self:
-            #     raise ValidationError("You have to wait until you get accepted.")
             relationship.delete()
         except Relationship.DoesNotExist:
             raise ValidationError("No friend request from this user.")

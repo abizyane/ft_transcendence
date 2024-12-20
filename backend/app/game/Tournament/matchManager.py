@@ -22,7 +22,7 @@ class Tournament():
     def upgrade_competitor(self, competitor_name) -> None:
        self.p_holder[competitor_name].upgrade()
 
-#Manager
+
 class AbstractTournamentManager(ABC):
     def upgrade_winner(self, _winner):
         pass

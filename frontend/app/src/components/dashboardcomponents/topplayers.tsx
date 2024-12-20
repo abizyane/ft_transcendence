@@ -20,7 +20,6 @@ interface Player {
 
 const TopPlayers: React.FC = () => {
   const user = data.user;
-  // const topPlayers: Player[] = user.topPlayers;
   const [topPlayers, setTopPlayers] = useState<Player[]>([]);
   const [loading, setLoading] = useState(false);
 
@@ -36,7 +35,6 @@ const TopPlayers: React.FC = () => {
     .then(async (response) => {
       if (!response.ok) {
         toast.error("Response not ok:", response.status);
-        // throw new Error("User not found");
       }
       const responseData = await response.json();
       setTopPlayers(responseData.topPlayers);

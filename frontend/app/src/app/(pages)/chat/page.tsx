@@ -2,7 +2,7 @@
 import Link from "next/link";
 import { FiPlusCircle } from "react-icons/fi";
 import { useState } from "react";
-import Newchat from "@/components/Chat/Newchat"; // Adjust the import path as needed
+import Newchat from "@/components/Chat/Newchat";
 
 const Page = () => {
 

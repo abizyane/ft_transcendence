@@ -168,8 +168,6 @@ class ChatRoomConsumer(AsyncWebsocketConsumer):
 
     async def user_status(self, event):
         receiver = event['receiver']
-        # if receiver != self.scope['user'].username:
-        #     return
 
         await self.send(text_data=json.dumps({
             'type': 'user_status',

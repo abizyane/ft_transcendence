@@ -39,7 +39,6 @@ export function Chat({ children }: ChatLayoutProps) {
   const { user } = useUser();
   const [users, setUsers] = useState<User[]>([]);
   const [isSliderOpen, setIsSliderOpen] = useState(false);
-  // const [selectedId, setSelectedId] = useState<User | undefined>();
   const [isMobile, setIsMobile] = useState(false);
   const [searchValue, setSearchValue] = useState("");
   const router = useRouter();
@@ -65,7 +64,6 @@ export function Chat({ children }: ChatLayoutProps) {
   }, [conversations]);
 
   const openSlider = (user: User) => {
-    // setSelectedId(user);
     setIsSliderOpen(true);
   };
 
@@ -76,8 +74,6 @@ export function Chat({ children }: ChatLayoutProps) {
 
   const handleUserClick = (user: User) => {
     if (isMobile) openSlider(user);
-    // else setSelectedId(user);
-
     router.push(`/chat/${user.id}`);
   };
 
@@ -212,7 +208,6 @@ if (!conversations || !user)
 
     <div className=" w-full flex flex-col justify-start items-start">
       <div className="w-full flex lg:flex-row h-full flex-col-reverse">
-        {/* Main content */}
         <Newchat isOpen={isModalOpen} closeModal={closeModal} handleUserClick={handleUserClick} />
         <div className="w-full h-full lg:h-full flex flex-col justify-center items-center p-2">
           <div className="bg-gray-800/60 mt-8 mb-22 lg:mt-0 h-[400px] lg:h-[800px]   w-full text-gray-200 rounded-xl border-2 border-violet-primary flex">
@@ -247,7 +242,6 @@ if (!conversations || !user)
                   </form>
                 </div>
 
-                {/* User list */}
                 <div className="p-2 flex-1 md:w-full h-[240px] lg:h-[650px]  overflow-y-scroll">
                   {Object.values(searchValue ? searchConversations : conversations)
                     .sort((a, b) => 
@@ -292,7 +286,6 @@ if (!conversations || !user)
               </section>
             </div>
 
-            {/* Main Content (Children) */}
             <div className="flex-1 hidden lg:block ">
               {currentChat && (
                 <div className="px-6 py-4 flex  bg-gray-800/60 rounded-xl flex-row flex-none justify-start gap-4 items-center shadow">
@@ -353,7 +346,6 @@ if (!conversations || !user)
         </div>
       </div>
 
-      {/* Slide-out Sidebar (mobile) */}
       <div
         ref={messageContainerRef}
         className={`class="lg:hidden fixed  bg-gray-800 mt-10 pb-4 h-[400px] w-[95%] sm:w-[97%] m-2  text-gray-200 rounded-xl border-2 border-violet-primary  transition-transform transform ${
@@ -381,7 +373,7 @@ if (!conversations || !user)
                 <p className="font-bold">{currentChat.user.username}</p>
                 <p>{currentChat.user.is_online ? "Online" : "Offline"}</p>
                 </div>
-              </div>              
+              </div>
             </div>
             <div className="w-full  flex justify-end">
               <div className="h-8 w-8 rounded-full bg-gray-900 flex  justify-center items-center">

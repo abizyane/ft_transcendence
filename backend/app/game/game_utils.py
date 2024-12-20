@@ -27,8 +27,6 @@ class Ball:
     def checkCollide(self):
         if (self.posY + self.rad >= self.game.height or self.posY - self.rad <= 0 ):
             self.dirY *= -1
-        #blue Range 
-        # if (self.posX < self.game.width * 1/4):
         left_collision = self.posX - self.rad
         if (left_collision <= 0):
             self.game.red.score += 1
@@ -36,8 +34,6 @@ class Ball:
         if (self.check_paddle_collision(self.game.blue) and not self.game.blue.isHiting):
             self.dirX *= -1
             self.game.blue.isHiting = True
-        #red Range
-        # elif (self.posX > self.game.width * 3/4):
         right_collision = self.posX + self.rad
         if (right_collision >= self.game.width):
             self.game.blue.score += 1
@@ -45,7 +41,6 @@ class Ball:
         if (self.check_paddle_collision(self.game.red) and not self.game.red.isHiting):
             self.dirX *= -1
             self.game.red.isHiting = True
-        # else:
         self.game.red.isHiting = False
         self.game.blue.isHiting = False
             
@@ -63,7 +58,6 @@ class Ball:
 class Player:
     def __init__(self, channel_name=None, id=None, game=None):
         self.channel_name = channel_name
-        # self.user = username
         self.id = id
         self.score = 0
         self.width = 2

@@ -61,7 +61,6 @@ const UserInfo: React.FC<UserInfoProps> = ({ user, setUser }) => {
       .finally(() => setLoading(false));
   };
 
-  // Handle Add Friend
   const handleAddFriend = async () => {
     setLoading(true);
     try {
@@ -91,7 +90,6 @@ const UserInfo: React.FC<UserInfoProps> = ({ user, setUser }) => {
     }
   };
 
-  // Handle Block Friend
   const handleBlockFriend = async () => {
     setLoading(true);
     try {
@@ -110,8 +108,6 @@ const UserInfo: React.FC<UserInfoProps> = ({ user, setUser }) => {
         const data = await response.json();
         toast.success('Friend blocked successfully:');
         Router.push("/dashboard");
-        // Update the relationship after success
-        // onRelationshipChange("Blocked");
         fetchUser();
 
       } else {
@@ -125,7 +121,6 @@ const UserInfo: React.FC<UserInfoProps> = ({ user, setUser }) => {
     }
   };
 
-  // Handle Unblock Friend
   const handleUnblockFriend = async () => {
     setLoading(true);
     try {
@@ -143,8 +138,6 @@ const UserInfo: React.FC<UserInfoProps> = ({ user, setUser }) => {
       if (response.ok) {
         const data = await response.json();
         toast.success('Friend unblocked successfully:', data);
-        // Update the relationship after success
-        // onRelationshipChange("None");
         fetchUser();
 
       } else {
@@ -158,7 +151,6 @@ const UserInfo: React.FC<UserInfoProps> = ({ user, setUser }) => {
     }
   };
 
-  // Handle Remove Friend
   const handleRemoveFriend = async () => {
     setLoading(true);
     try {
@@ -176,8 +168,6 @@ const UserInfo: React.FC<UserInfoProps> = ({ user, setUser }) => {
       if (response.ok) {
         const data = await response.json();
         toast.success('Friend removed successfully:');
-        // Update the relationship after success
-        // onRelationshipChange("None");
         fetchUser();
 
       } else {
@@ -191,7 +181,6 @@ const UserInfo: React.FC<UserInfoProps> = ({ user, setUser }) => {
     }
   };
 
-  // Handle Accept Friend Request
   const handleAcceptFriend = async () => {
     setLoading(true);
     try {
@@ -209,8 +198,6 @@ const UserInfo: React.FC<UserInfoProps> = ({ user, setUser }) => {
       if (response.ok) {
         const data = await response.json();
         toast.success('Friend request accepted');
-        // Update the relationship after success
-        // onRelationshipChange("Friend");
         fetchUser();
 
       } else {
@@ -224,7 +211,6 @@ const UserInfo: React.FC<UserInfoProps> = ({ user, setUser }) => {
     }
   };
 
-  // Handle Reject Friend Request
   const handleRejectFriend = async () => {
     setLoading(true);
     try {

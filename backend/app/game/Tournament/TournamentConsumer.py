@@ -59,12 +59,6 @@ class TournamentConsumer(AsyncWebsocketConsumer):
     def check_token(self, token):
         try:
             game_invite = GameInvite.objects.get(token=token)
-            # try:
-            #     notif = Notifications.objects.get(link=f"/game/solo/maps?game=randommatch&token={token}")
-            #     notif.link = None
-            #     notif.save()
-            # except Notifications.DoesNotExist:
-            #     pass
             return game_invite.status == GameInvite.Status.PENDING
         except GameInvite.DoesNotExist:
             return False
@@ -91,16 +85,6 @@ class TournamentConsumer(AsyncWebsocketConsumer):
             }))
             await self.close()
             return
-        
-        # if user.username in TournamentConsumer.connected_users :
-        #     await self.accept()
-        #     await self.send(text_data=json.dumps({
-        #         "msg" : f"{user} user already connected.",
-        #         "type" : "error"
-        #     }))
-        #     await self.close()
-        #     return
-        # TournamentConsumer.connected_users.add(user.username)
         await self.accept()
         self.p_holder = PlayerHolder(CompetitorNamed(self.channel_name))
         self.set_competitor_info(username=user.username, img=build_absolute_image_uri(self.scope, user.profile_pic), userId=user.id)
@@ -176,12 +160,10 @@ class TournamentConsumer(AsyncWebsocketConsumer):
             self.match.game.players = self.match.get_players()
             self.p_holder.paddle.color = 'blue'
             opponent.paddle.color = 'red'
-            #Error Occure This Part 
             self.match.game.blue = self.p_holder.paddle
             self.match.game.red = opponent.paddle
             self.match.game.players[self.channel_name] = self.p_holder.paddle
             self.match.game.players[opponent.get_name()] = opponent.paddle
-            #*** Temporary Fixed This Way ***#
             players = {
                 "player_1" : {"username":self.competitor.alias, "img":self.competitor.img },
                 "player_2" : {"username":opponent.competitor.alias, "img":opponent.competitor.img}
@@ -250,8 +232,6 @@ class TournamentConsumer(AsyncWebsocketConsumer):
             self.match.game.set_winner()
 
         prev_match_name  = self.match_name
-
-        # self.game = None
         if self.p_holder.index % 2 != 0 :
             self.task.cancel()
 
@@ -267,17 +247,14 @@ class TournamentConsumer(AsyncWebsocketConsumer):
             await self.channel_layer.group_send(self.room.name,{
                 'type' : 'broadcast.room.state'
             })
-            # self.p_holder.paddle = None
             try :
-                self.p_holder.upgrade() # if err mean he won
+                self.p_holder.upgrade()
                 gc.collect()
                 await self.channel_layer.group_send(prev_match_name,{
                     'type' : 'room.update',
                 })
                 self.match = self.room.tournament.get_player_match(self.channel_name)
                 self.match_name = str(f'{self.room.name}m_{self.match.index}')
-                #send room state to every one in match
-                #
                 await self.channel_layer.group_add(self.match_name, self.channel_name)
                 if self.p_holder.back.is_ready():
                     await self.channel_layer.group_send(self.match_name, {
@@ -297,11 +274,7 @@ class TournamentConsumer(AsyncWebsocketConsumer):
                 }))
                 if self._type == "FOUR":
                     await self.save_tournament()
-            # await self.channel_layer.group_send(self.room.name,{
-            #     'type' : 'broadcast.room.state'
-            # })
         else:
-            # self.p_holder.paddle = None
             await self.award_xp(False)
     
             await self.send(text_data=json.dumps({
@@ -330,10 +303,6 @@ class TournamentConsumer(AsyncWebsocketConsumer):
                 'cooldown_timer': str(i)
             })) 
             await asyncio.sleep(1)
-        # await self.send(text_data=json.dumps({
-        #     'type': 'room',
-        #     'command' : 'setReady'
-        # }))
         await self.channel_layer.group_send(self.match_name, {
             'type' : 'init.game'
         })
@@ -355,19 +324,13 @@ class TournamentConsumer(AsyncWebsocketConsumer):
     async def disconnect(self, error_code):
         if self.alias :
             TournamentConsumer.rm.aliases.remove(self.alias)
-        # if self.user:
-            # TournamentConsumer.connected_users.remove(self.user.username)
         if self.room:
             if  self.room.started :
-                #set other player to winner
                 if self.match and self.match.is_ready():
                     await self.channel_layer.group_send(self.match_name, {
                         'type' : 'leave.state',
                         'player' : f'{self.channel_name}'
                     })
-                    # await self.channel_layer.group_send(self.match_name,{
-                    #     'type' : 'room.update',
-                    # })
 
             try:
                 self.p_holder.competitor.exit_room(self.room)
@@ -377,7 +340,6 @@ class TournamentConsumer(AsyncWebsocketConsumer):
                 await self.channel_layer.group_send(self.room.name,{
                         'type' : 'joined.competitor',
                     })
-                # del self.room.tournament.p_holders[self.channel_name]
             except RoomIsEmpty as e:
                 TournamentConsumer.rm.remove_room(self._type, self.room.name)
             if self._type == "FOUR":
@@ -459,7 +421,6 @@ class TournamentConsumer(AsyncWebsocketConsumer):
                 }) 
             except RoomRestriction as e:
                 TournamentConsumer.rm.remove_room(self.room._id)
-                #broadcast allrooms deletion
         else :
             await self.send(text_data=json.dumps({
                 'ErrorMsg' : 'You are not in a room'
@@ -470,7 +431,7 @@ class TournamentConsumer(AsyncWebsocketConsumer):
         user_left = event['left_player']
         await self.send(text_data=json.dumps({
             "type" : "room",
-            "msg" : f'user {left_player} has left', #alias later (!attention)
+            "msg" : f'user {left_player} has left',
             "competitors" : comp_info,
             "command" : "setCompetitors"
         }))
@@ -500,7 +461,7 @@ class TournamentConsumer(AsyncWebsocketConsumer):
                 }))
             await self.channel_layer.group_send(self.room.name, {
                 'type': 'ready.to.play',
-                'ready': self.room.is_ready()  # or False, depending on the logic
+                'ready': self.room.is_ready()
             })
             
         except RoomRestriction as e :

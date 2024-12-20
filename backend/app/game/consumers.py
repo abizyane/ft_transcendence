@@ -80,7 +80,6 @@ class GameConsumer(AsyncWebsocketConsumer) :
             self.action = 'JOIN'
         except (GameConsumer.NoGameInQueue, Game.RoomIsFull):
             queue_id = len(games_list)
-            # self.queue_id = queue_id
             last_game = self.create_new_game(queue_id)
             self.action = 'CREATE'
         return last_game,self.action
@@ -143,7 +142,6 @@ class GameConsumer(AsyncWebsocketConsumer) :
 
     @database_sync_to_async
     def create_game(self):
-        # ps = list(self.game.profiles.values())
         return GameModel.objects.create(player_1=self.player)
 
     @database_sync_to_async
@@ -227,10 +225,7 @@ class GameConsumer(AsyncWebsocketConsumer) :
     
     async def game_over(self, event):
         self.close()
-        # self.send(text_data=json.dumps{})
     def finalize_game(self):
-        #send End
-        #set_status_ end
         self.channel_layer.group_send(self.group_name, {
           'type': 'broadcast_game_start',
           'message' : 'End'  

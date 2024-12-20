@@ -25,7 +25,7 @@ class JWTAuthenticationMiddleware(MiddlewareMixin):
                     request.user = cached_user
                 else:
                     user = User.objects.get(id=user_id)
-                    cache.set(f"user_{user_id}", user, timeout=300)  # Cache for 5 minutes
+                    cache.set(f"user_{user_id}", user, timeout=300)
                     request.user = user
                 return
             except (TokenError, User.DoesNotExist):

@@ -1,5 +1,3 @@
-#!/bin/sh
-
 echo "Starting PostgreSQL setup..."
 
 if [ -z "$(ls -A "$PGDATA")" ]; then

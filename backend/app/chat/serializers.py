@@ -76,13 +76,6 @@ class ConversationSerializer(serializers.ModelSerializer):
     def get_receiver(self, obj):
         return UserSerializer(obj.receiver, context=self.context).data
     
-    # def get_relationship(self, obj):
-    #     current_user = self.context['request'].user
-    #     other_user = obj.sender if obj.sender.id != current_user.id else obj.receiver
-    #     user = User.objects.filter(id=other_user.id).first()
-    #     query = models.Q(user1=user, user2=current_user) | models.Q(user1=current_user, user2=user)
-    #     relation = Relationship.objects.filter(query).first()
-    #     return FriendSerializer(other_user, context={'request': self.context['request'], 'relationships': relation}).data['relationship']
 
     def to_representation(self, instance):
         current_user = self.context['request'].user
