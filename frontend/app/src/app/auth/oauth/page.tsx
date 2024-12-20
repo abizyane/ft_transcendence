@@ -33,11 +33,11 @@ const OAuthContent = () => {
           }
         } else {
           const errorData = await response.json();
-          router.push(`/login?error=${encodeURIComponent(errorData.message)}`);
+          router.push(`/auth/login?error=${encodeURIComponent(errorData.message)}`);
         }
       } catch (error) {
         toast.error('OAuth verification failed');
-        router.push(`/login?error=${encodeURIComponent('OAuth verification failed')}`);
+        router.push(`/auth/login?error=${encodeURIComponent('OAuth verification failed')}`);
       }
     };
 

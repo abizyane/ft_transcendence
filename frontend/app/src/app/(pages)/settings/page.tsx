@@ -61,103 +61,67 @@ const ProfileSettings = () => {
   );
 
 
-  const handleImageUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
+  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
     if (file) {
-      const formData = new FormData();
-      formData.append('image', file);
+      setProfileImage(file);
+      const previewUrl = URL.createObjectURL(file); // Create a preview URL for the selected file
+      setImagePreview(previewUrl);
+    }
+  };
+  const handleImage = async (profileImage: File) => {
+    const formData = new FormData();
+    formData.append('profile_pic', profileImage);
 
+    try {
+      const response = await customFetch(process.env.NEXT_PUBLIC_API_URL+'/api/upload_image', {
+        method: 'POST',
+        body: formData,
+        credentials: 'include',
+      });
+
+      const responseData = await response.json();
+      if (!response.ok) {
+        toast.error('Image upload failed');
+      } else {
+        toast.success('Image updated successfully');
+        fetchUser(); 
+      }
+    } catch (error) {
+      toast.error('Error uploading image');
+    }
+  };
+  const updatePassword = async (formData: any) => {
       try {
-        const response = await customFetch(process.env.NEXT_PUBLIC_API_URL+'/api/upload_image', {
-          method: 'POST',
-          body: formData,
-        });
-
-        if (response && response.ok) {
-          const data = await response.json();
-          toast.success('Profile picture updated successfully');
-          window.location.reload();
-        } else if (response) {
-          toast.error('Failed to upload image');
-        }
+          const response = await customFetch(process.env.NEXT_PUBLIC_API_URL+'/api/changepassword', { // Added http://
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              credentials: 'include',
+              body: JSON.stringify({ new_password: formData.newPassword }),
+          });
+          
+          const responseData = await response.json(); 
+          if (!response.ok) {
+              toast.error(responseData.message);
+          } else {
+              toast.success('Password updated successfully');
+          }
       } catch (error) {
-        toast.error('Error uploading image');
+        toast.error('Error:', error);
       }
-    }
   };
-
-  const handlePasswordChange = async (event: React.FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-    try {
-      const response = await customFetch(process.env.NEXT_PUBLIC_API_URL+'/api/changepassword', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          old_password: oldPassword,
-          new_password: newPassword,
-        }),
-      });
-
-      if (response && response.ok) {
-        toast.success('Password changed successfully');
-        setOldPassword('');
-        setNewPassword('');
-      } else if (response) {
-        toast.error('Failed to change password');
-      }
-    } catch (error) {
-      toast.error('Error changing password');
+  const onSubmit = (formData: any) => {
+    // If `newPassword` is filled, call the updatePassword function
+    if (formData.newPassword) {
+        updatePassword(formData);
     }
-  };
-
-  const handle2FAToggle = async () => {
-    try {
-      const response = await customFetch(process.env.NEXT_PUBLIC_API_URL+'/api/2fa_code', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      });
-
-      if (response && response.ok) {
-        const data = await response.json();
-        setQrCode(data.qr_code);
-        setShowQRCode(true);
-      } else if (response) {
-        toast.error('Failed to enable 2FA');
-      }
-    } catch (error) {
-      toast.error('Error enabling 2FA');
+    // If a profile image is provided, handle the image upload
+    if (profileImage) {
+        handleImage(profileImage);
     }
-  };
+};
 
-  const handleVerify2FA = async (event: React.FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-    try {
-      const response = await customFetch(process.env.NEXT_PUBLIC_API_URL+'/api/2fa_code', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          code: verificationCode,
-        }),
-      });
 
-      if (response && response.ok) {
-        toast.success('2FA enabled successfully');
-        setShowQRCode(false);
-        setVerificationCode('');
-        setIs2FAEnabled(true);
-      } else if (response) {
-        toast.error('Invalid verification code');
-      }
-    } catch (error) {
-      toast.error('Error verifying 2FA code');
-    }
-  };
 
   const disable2FA = async () => {
     try {
@@ -185,11 +149,8 @@ const ProfileSettings = () => {
         body: JSON.stringify({ otp: otpValue }),
       });
       const data = await response.json();
-      if (response.status === 200) {
-        toast.success(data.message);
-      }
       if (!response.ok) {
-        toast.error(data.error);
+        toast.error(data.message);
       }
     } catch (error) {
       toast.error('Error:', error);

@@ -66,7 +66,7 @@ class OAuthCallback(APIView):
             serializer.save()
             return self.loginUser(serializer.instance, self.request)
         except Exception as e:
-            return Response({'error': str(e)}, status=status.HTTP_401_UNAUTHORIZED)
+            return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
     
     def loginUser(self, user_instance, request):
         refresh = RefreshToken.for_user(user_instance)

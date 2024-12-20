@@ -12,7 +12,7 @@ export const handleLogin = async (
   router: NextRouter
 ) => {
   try {
-    const response = await customFetch(process.env.NEXT_PUBLIC_API_URL+'/api/login', {
+    const response = await fetch(process.env.NEXT_PUBLIC_API_URL+'/api/login', {
       method: 'POST',
       body: data,
       credentials: 'include',
