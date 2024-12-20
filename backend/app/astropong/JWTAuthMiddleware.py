@@ -21,7 +21,6 @@ class JWTAuthMiddleware(BaseMiddleware):
                     scope['user'] = user
                     return await super().__call__(scope, receive, send)
             except Exception as e:
-                print("Access token error:", e, flush=True)
                 refresh_token = self.get_token_from_scope(scope, "refresh")
                 if refresh_token:
                     try:
@@ -31,9 +30,9 @@ class JWTAuthMiddleware(BaseMiddleware):
                             scope['user'] = user
                             return await super().__call__(scope, receive, send)
                     except TokenBackendError as e:
-                        print("Refresh token error:", e, flush=True)
                         scope['error'] = f"Refresh token error: {str(e)}"
                         scope['user'] = AnonymousUser()
+                        
                 else:
                     scope['error'] = str(e)
                     scope['user'] = AnonymousUser()

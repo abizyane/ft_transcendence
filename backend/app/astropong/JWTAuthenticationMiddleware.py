@@ -6,6 +6,7 @@ from django.contrib.auth.models import AnonymousUser
 import requests
 from django.core.cache import cache
 from django.contrib.auth import get_user_model
+from django.http import HttpResponse
 
 User = get_user_model()
 class JWTAuthenticationMiddleware(MiddlewareMixin):
@@ -38,16 +39,21 @@ class JWTAuthenticationMiddleware(MiddlewareMixin):
                 request.META['HTTP_AUTHORIZATION'] = f'Bearer {new_access_token}'
                 
                 request.COOKIES['access'] = new_access_token
+                request.new_access_token = new_access_token
 
             except TokenError:
-                if request.COOKIES.get('isLoggedIn') is not None:
-                    request.delete_cookie('access')
-                    request.delete_cookie('refresh')
-                    request.delete_cookie('isLoggedIn')
                 request.user = AnonymousUser()
+                request.cookies_deleted = True
         else:
             if request.COOKIES.get('isLoggedIn') is not None:
-                request.delete_cookie('access')
-                request.delete_cookie('refresh')
-                request.delete_cookie('isLoggedIn')
-            request.user = AnonymousUser()
+                request.user = AnonymousUser()
+                request.cookies_deleted = True
+    
+    def process_response(self, request, response):
+        if getattr(request, 'new_access_token', None):
+            response.set_cookie('access', request.new_access_token, max_age=300)
+        if getattr(request, 'cookies_deleted', False):
+            response.delete_cookie('access')
+            response.delete_cookie('refresh')
+            response.delete_cookie('isLoggedIn')
+        return response

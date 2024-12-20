@@ -6,7 +6,7 @@ networks:
 
 volumes:
   node_modules:
-
+  pictures:
 services:
   nginx:
     build:
@@ -16,6 +16,7 @@ services:
     container_name: nginx
     volumes:
       - ./nginx/conf/nginx.conf:/etc/nginx/http.d/default.conf
+      - pictures:/media/pictures
     ports:
       - "1443:443"
     depends_on:
@@ -64,6 +65,7 @@ services:
     container_name: backend
     volumes:
       - ../backend/app:/app
+      - pictures:/app/pictures
     expose:
       - "8000"
     # ports:
