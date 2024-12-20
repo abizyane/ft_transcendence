@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { customFetch } from '@/utils/customFetch';
 
 interface Friend {
   id:number
@@ -14,15 +15,14 @@ export const useFriends = () => {
 
   const fetchFriends = async () => {
     try {
-      const response = await fetch(process.env.NEXT_PUBLIC_API_URL+'/api/friends/friends', {
-        method: 'GET',
-        credentials: 'include',
+      const response = await customFetch(process.env.NEXT_PUBLIC_API_URL+'/api/friends/friends', {
+        method: 'GET'
       });
 
-      if (response.ok) {
+      if (response && response.ok) {
         const responseData = await response.json();
         setFriends(responseData);
-      } else {
+      } else if (response) {
         const error = await response.json();
         setError('Failed to load friends');
       }
@@ -36,5 +36,5 @@ export const useFriends = () => {
     fetchFriends();
   }, []);
 
-  return { friends, loading, error ,fetchFriends };
+  return { friends, loading, error, fetchFriends };
 };

@@ -3,6 +3,7 @@ import { useEffect, useRef, useState } from "react";
 
 import Link from "next/link";
 import toast from 'react-hot-toast';
+import { customFetch } from '@/utils/customFetch';
 
 const searchUsers = () => {
   const [searchQuery, setSearchQuery] = useState("");
@@ -28,21 +29,20 @@ const searchUsers = () => {
   const fetchUsers = async (query) => {
     setLoading(true);
     try {
-      const response = await fetch(process.env.NEXT_PUBLIC_API_URL+"/api/searchuser", {
+      const response = await customFetch(process.env.NEXT_PUBLIC_API_URL+"/api/searchuser", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        credentials: "include",
         body: JSON.stringify({ username: query }),
       });
 
-      if (!response.ok) {
+      if (response && response.ok) {
+        const data = await response.json();
+        setUsers(data);
+      } else if (response) {
         throw new Error("Error fetching data");
       }
-
-      const data = await response.json();
-      setUsers(data);
     } catch (error) {
       toast.error("Error fetching users:", error);
     } finally {
@@ -65,7 +65,6 @@ const searchUsers = () => {
       document.removeEventListener("mousedown", handleClickOutside);
     }
 
-    // Cleanup in case the component unmounts
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, [isOpen]);
   const searchRef = useRef(null);
@@ -100,11 +99,14 @@ const searchUsers = () => {
                 users.map((user) => (
                   <Link href={`/profile/${user.id}`} key={user.id}>
                     <div className="flex items-center p-2 hover:bg-gray-100 cursor-pointer space-x-4">
-                      <img
-                        src={user.profile_pic_url || "default-image-url.jpg"}
-                        alt={`${user.username}'s profile`}
-                        className="w-10 h-10 rounded-full object-cover"
-                      />
+                      <div className=" lg:relative w-12 h-12">
+                        <span className={` h-3 w-3 bg-${user.is_online ? "green" : "gray"}-500 absolute bottom-0 right-1  rounded-full z-0`} />
+                        <img
+                          src={user.profile_pic_url}
+                          alt="User Profile"
+                          className="object-cover w-full h-full rounded-full"
+                        />
+                      </div>
                       <p className="text-sm font-medium text-white">
                         {user.username}
                       </p>

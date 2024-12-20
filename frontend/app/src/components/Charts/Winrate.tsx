@@ -4,6 +4,7 @@ import dataFromJson from '../../app/data/Dashboarddata.json';
 import { useEffect, useState } from 'react';
 import Loader from '../loader/loader';
 import toast from 'react-hot-toast';
+import { customFetch } from '@/utils/customFetch';
 
 ChartJS.register(ArcElement, Tooltip, Legend);
 
@@ -22,7 +23,7 @@ const DoughnutChart: React.FC<DoughnutChartProps>  = ({idUser}) => {
   const fetchWinrate = async () => {
     setLoading(true);
     try {
-      const response = await fetch(process.env.NEXT_PUBLIC_API_URL+'/api/win_rate', {
+      const response = await customFetch(process.env.NEXT_PUBLIC_API_URL+'/api/win_rate', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -30,15 +31,14 @@ const DoughnutChart: React.FC<DoughnutChartProps>  = ({idUser}) => {
         body: JSON.stringify({
           id: idUser,
         }),
-        credentials: 'include',
       });
 
-      if (response.ok) {
+      if (response && response.ok) {
         const data = await response.json() as DataWinRate;
         setData(data);
-      } else {
+      } else if (response) {
         const errorData = await response.json();
-        toast.error('Failed to accept friend request:');
+        toast.error('Failed to fetch win rate');
       }
     } catch (error) {
       toast.error('Error during the request');

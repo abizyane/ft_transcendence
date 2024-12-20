@@ -1,10 +1,10 @@
-
 import React, { useEffect, useState } from 'react';
 import { Bar } from 'react-chartjs-2'; 
 import { Chart as ChartJS, CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend } from 'chart.js';
 import Link from 'next/link';
 import Loader from '../loader/loader';
 import toast from 'react-hot-toast';
+import { customFetch } from '@/utils/customFetch';
 
 ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend);
 
@@ -15,7 +15,7 @@ const ProfileChart = ({ user }) => {
   const fetchStats = async () => {
     try {
       setLoading(true);
-      const response = await fetch(process.env.NEXT_PUBLIC_API_URL+'/api/weekly_stats', {
+      const response = await customFetch(process.env.NEXT_PUBLIC_API_URL+'/api/weekly_stats', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -23,10 +23,9 @@ const ProfileChart = ({ user }) => {
         body: JSON.stringify({
           id: user.id,
         }),
-        credentials: 'include',
       });
 
-      if (response.ok) {
+      if (response && response.ok) {
         const data = await response.json();
         let newStats = {
           labels: [],
@@ -44,7 +43,7 @@ const ProfileChart = ({ user }) => {
         });
         
         setStats(newStats);
-      } else {
+      } else if (response) {
         toast.error('Failed to fetch stats:', await response.json());
       }
     } catch (error) {

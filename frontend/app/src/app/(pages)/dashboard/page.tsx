@@ -8,6 +8,7 @@ import { useUser } from "@/services/context/usercontext";
 import { useDebugValue, useEffect, useState } from "react";
 import Loader from "@/components/loader/loader";
 import { toast } from "react-hot-toast";
+import { customFetch } from '@/utils/customFetch';
 
 
 const Dashboard = () => {
@@ -18,7 +19,7 @@ const Dashboard = () => {
   const fetchDashboard = async () => {
     try {
       setLoading(true);
-      const response = await fetch(process.env.NEXT_PUBLIC_API_URL+'/api/dashboard', {
+      const response = await customFetch(process.env.NEXT_PUBLIC_API_URL+'/api/dashboard', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -26,13 +27,12 @@ const Dashboard = () => {
         body: JSON.stringify({
           id: cUser.id,
         }),
-        credentials: 'include',
       });
 
-      if (response.ok) {
+      if (response && response.ok) {
         const data = await response.json();
         setDashboardData(data);
-      } else {
+      } else if (response) {
         toast.error('Failed to fetch stats:', await response.json());
       }
     } catch (error) {

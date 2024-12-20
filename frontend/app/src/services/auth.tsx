@@ -4,7 +4,7 @@ import { useRouter } from "next/navigation";
 import { registerFormData } from "@/components/Registration/Registration";
 import { cookies } from "next/headers";
 import toast from "react-hot-toast";
-
+import { customFetch } from "@/utils/customFetch";
 export const handleLogin = async (
   data: FormData,
   setSuccessMessage: React.Dispatch<React.SetStateAction<string | null>>,
@@ -12,7 +12,7 @@ export const handleLogin = async (
   router: NextRouter
 ) => {
   try {
-    const response = await fetch(process.env.NEXT_PUBLIC_API_URL+'/api/login', {
+    const response = await customFetch(process.env.NEXT_PUBLIC_API_URL+'/api/login', {
       method: 'POST',
       body: data,
       credentials: 'include',
@@ -48,7 +48,7 @@ export const handleLogin = async (
     router: any 
   ) => {
   try {
-    const response = await fetch(process.env.NEXT_PUBLIC_API_URL+'/api/register', {
+    const response = await customFetch(process.env.NEXT_PUBLIC_API_URL+'/api/register', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -85,7 +85,7 @@ export const handleLogout = async (
   router: NextRouter
 ) => {
   try {
-    const response = await fetch(process.env.NEXT_PUBLIC_API_URL+'/api/logout', {
+    const response = await customFetch(process.env.NEXT_PUBLIC_API_URL+'/api/logout', {
       method: 'POST',
       credentials: 'include',
     });

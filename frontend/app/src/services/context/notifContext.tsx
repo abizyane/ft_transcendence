@@ -2,6 +2,7 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { useUser } from './usercontext';
 import toast from "react-hot-toast";
+import { customFetch } from '@/utils/customFetch';
 
 
 interface Notification {
@@ -34,16 +35,14 @@ export const NotifProvider: React.FC<{ children: React.ReactNode }> = ({ childre
 
   const fetchNotifications = async () => {
     try {
-      setIsLoading(true);
-      const response = await fetch(process.env.NEXT_PUBLIC_API_URL+'/notifications/list/', {credentials: 'include',});
-      if (response.ok) {
+      const response = await customFetch(process.env.NEXT_PUBLIC_API_URL+'/notifications/list/');
+      if (response && response.ok) {
         const data = await response.json();
         setNotifications(data);
       }
     } catch (error) {
-      toast.error('Failed to fetch notifications:');
+      console.error('Error fetching notifications:', error);
     }
-    setIsLoading(false);
   };
 
   const handleNotificationClick = (notification: Notification) => {

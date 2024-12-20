@@ -9,6 +9,7 @@ import Link from "next/link";
 import toast from 'react-hot-toast';
 import { useRouter } from 'next/navigation';
 import { IoPersonRemove } from "react-icons/io5";
+import { customFetch } from "@/utils/customFetch";
 
 
 type User = {
@@ -36,7 +37,7 @@ const UserInfo: React.FC<UserInfoProps> = ({ user, setUser }) => {
   const [loading, setLoading] = useState(false);
   const Router = useRouter ();
   const fetchUser = async () => {
-    fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/userid`, {
+    customFetch(`${process.env.NEXT_PUBLIC_API_URL}/api/userid`, {
       method: 'POST',
       body: JSON.stringify({ id: user.id }),
       headers: {
@@ -64,7 +65,7 @@ const UserInfo: React.FC<UserInfoProps> = ({ user, setUser }) => {
   const handleAddFriend = async () => {
     setLoading(true);
     try {
-      const response = await fetch(process.env.NEXT_PUBLIC_API_URL+'/api/add_friend', {
+      const response = await customFetch(process.env.NEXT_PUBLIC_API_URL+'/api/add_friend', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -94,7 +95,7 @@ const UserInfo: React.FC<UserInfoProps> = ({ user, setUser }) => {
   const handleBlockFriend = async () => {
     setLoading(true);
     try {
-      const response = await fetch(process.env.NEXT_PUBLIC_API_URL+'/api/block', {
+      const response = await customFetch(process.env.NEXT_PUBLIC_API_URL+'/api/block', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -128,7 +129,7 @@ const UserInfo: React.FC<UserInfoProps> = ({ user, setUser }) => {
   const handleUnblockFriend = async () => {
     setLoading(true);
     try {
-      const response = await fetch(process.env.NEXT_PUBLIC_API_URL+'/api/unblock', {
+      const response = await customFetch(process.env.NEXT_PUBLIC_API_URL+'/api/unblock', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -161,7 +162,7 @@ const UserInfo: React.FC<UserInfoProps> = ({ user, setUser }) => {
   const handleRemoveFriend = async () => {
     setLoading(true);
     try {
-      const response = await fetch(process.env.NEXT_PUBLIC_API_URL+'/api/remove_friend', {
+      const response = await customFetch(process.env.NEXT_PUBLIC_API_URL+'/api/remove_friend', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -194,7 +195,7 @@ const UserInfo: React.FC<UserInfoProps> = ({ user, setUser }) => {
   const handleAcceptFriend = async () => {
     setLoading(true);
     try {
-      const response = await fetch(process.env.NEXT_PUBLIC_API_URL+'/api/accept_friend', {
+      const response = await customFetch(process.env.NEXT_PUBLIC_API_URL+'/api/accept_friend', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -227,7 +228,7 @@ const UserInfo: React.FC<UserInfoProps> = ({ user, setUser }) => {
   const handleRejectFriend = async () => {
     setLoading(true);
     try {
-      const response = await fetch(process.env.NEXT_PUBLIC_API_URL+'/api/reject_friend', {
+      const response = await customFetch(process.env.NEXT_PUBLIC_API_URL+'/api/reject_friend', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

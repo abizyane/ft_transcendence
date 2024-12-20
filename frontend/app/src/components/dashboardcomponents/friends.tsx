@@ -17,6 +17,7 @@ import Loader from "components/loader/loader";
 import { useUser } from "@/services/context/usercontext";
 import { toast } from "react-hot-toast";
 import { useRouter } from "next/navigation";
+import { customFetch } from "@/utils/customFetch";
 
 
 const Friends = ({ user }) => {
@@ -29,7 +30,7 @@ const Friends = ({ user }) => {
   if (userloading) return (<div className="w-full h-full flex justify-center items-center"><Loader /></div>);
   const inviteFriendToGame = async (friendId) => {
     try {
-      const response = await fetch(process.env.NEXT_PUBLIC_API_URL+"/api/invite_friend/", {
+      const response = await customFetch(process.env.NEXT_PUBLIC_API_URL+"/api/invite_friend/", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ friend_id: friendId }),

@@ -7,6 +7,7 @@ import { useState, useEffect } from "react";
 import Loader from '@/components/loader/loader';
 import toast from 'react-hot-toast';
 import { format, formatDistanceToNow, isToday, isYesterday } from "date-fns";
+import { customFetch } from "@/utils/customFetch";
 
 
 const MatchDetails = ({ match }: { match: Game }) => {
@@ -126,7 +127,7 @@ const HistoryPage = () => {
   
   useEffect(() => {
     setLoading(true);
-    fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/games_history`, {
+    customFetch(`${process.env.NEXT_PUBLIC_API_URL}/api/games_history`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -148,7 +149,7 @@ const HistoryPage = () => {
       });
       
       
-      fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/tournament_history`, {
+      customFetch(`${process.env.NEXT_PUBLIC_API_URL}/api/tournament_history`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

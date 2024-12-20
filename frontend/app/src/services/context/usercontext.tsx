@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
+import { customFetch } from '@/utils/customFetch';
 
 interface User {
   id: number;
@@ -32,21 +33,19 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const fetchUser = async () => {
     try {
-      const response = await fetch(process.env.NEXT_PUBLIC_API_URL+'/api/user', {credentials: 'include',});
-      if (response.ok) {
-        const data = await response.json();
-        setUser(data);
+      const response = await customFetch(process.env.NEXT_PUBLIC_API_URL+'/api/user');
+      if (response && response.ok) {
+        const userData = await response.json();
+        setUser(userData);
+        setUserloading(false);
       }
     } catch (error) {
-      toast.error('Failed to fetch user:');
-    } finally {
+      console.error('Error fetching user:', error);
       setUserloading(false);
     }
   };
 
-
   useEffect(() => {
-
     fetchUser();
   }, []);
 

@@ -4,6 +4,7 @@ import Loader from "components/loader/loader";
 import { useUser } from "@/services/context/usercontext";
 import { useParams } from 'next/navigation';
 import { format, formatDistanceToNow, isToday, isYesterday } from "date-fns";
+import { customFetch } from "@/utils/customFetch";
 
 interface User {
   username: string;
@@ -44,7 +45,7 @@ const History = () => {
 
   useEffect(() => {
     setLoading(true);
-    fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/games_history`, {
+    customFetch(`${process.env.NEXT_PUBLIC_API_URL}/api/games_history`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',

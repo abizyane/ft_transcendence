@@ -1,3 +1,4 @@
+import { customFetch } from '@/utils/customFetch';
 import { useState, useEffect } from 'react';
 import toast from 'react-hot-toast';
 
@@ -14,7 +15,7 @@ export const useBlockedFriends = () => {
 
   const fetchBlocked = async () => {
     try {
-      const response = await fetch(process.env.NEXT_PUBLIC_API_URL+'/api/blocked', {
+      const response = await customFetch(process.env.NEXT_PUBLIC_API_URL+'/api/blocked', {
         method: 'GET',
         credentials: 'include',
       });

@@ -1,3 +1,4 @@
+import { customFetch } from '@/utils/customFetch';
 import { useState, useEffect } from 'react';
 
 interface FriendRequest {
@@ -15,7 +16,7 @@ export const useFriendRequests = () => {
 
   const fetchRequests = async () => {
     try {
-      const response = await fetch(process.env.NEXT_PUBLIC_API_URL+'/api/friends/friend_requests/', {
+      const response = await customFetch(process.env.NEXT_PUBLIC_API_URL+'/api/friends/friend_requests/', {
         method: 'GET',
         credentials: 'include',
       });

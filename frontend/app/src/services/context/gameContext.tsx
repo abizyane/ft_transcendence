@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { useUser } from './usercontext';
 import toast from "react-hot-toast";
+import { customFetch } from '@/utils/customFetch';
 
 
 
@@ -28,7 +29,7 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const fetchGameCustomization = async () => {
     try {
       setIsLoading(true);
-      const response = await fetch(process.env.NEXT_PUBLIC_API_URL+'/api/game_customization', {credentials: 'include',});
+      const response = await customFetch(process.env.NEXT_PUBLIC_API_URL+'/api/game_customization', {credentials: 'include',});
       if (response.ok) {
         const data = await response.json();
         setGameCustomization(data);
@@ -48,7 +49,7 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const updateGameCustomization = async (data: GameContextType) => {
     try {
-      const response = await fetch(process.env.NEXT_PUBLIC_API_URL+'/api/game_customization', {
+      const response = await customFetch(process.env.NEXT_PUBLIC_API_URL+'/api/game_customization', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

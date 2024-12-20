@@ -16,6 +16,7 @@ import Expert from "../../../../../public/expert.svg";
 import Grandmaster from "../../../../../public/Grandmaster.svg";
 import ProfileChart from "@/components/Charts/profileChart";
 import toast from 'react-hot-toast';
+import { customFetch } from "@/utils/customFetch";
 
 // const user = data.user;
 // const values = user.charts.lineChart.data;
@@ -47,7 +48,7 @@ const Page = () => {
       setLoading(true);
       setError(null);
       try{
-      fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/userid`, {
+        customFetch(`${process.env.NEXT_PUBLIC_API_URL}/api/userid`, {
         method: 'POST',
         body: JSON.stringify({ id: userId }),
         headers: {

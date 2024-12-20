@@ -3,6 +3,7 @@ import React, { useEffect, useState } from 'react';
 import Profil from "../../../../public/Profil.jpg";
 import Loader from "components/loader/loader";
 import Link from 'next/link';
+import { customFetch } from '@/utils/customFetch';
 
 const players = [
   { rank: 1, name: "Alice Johnson", username: "@alicej", totalGames: 120, score: 9800 },
@@ -51,12 +52,17 @@ const page = () => {
   const [loading, setLoading] = useState(false);
   const fetchRanking = async () => {
     setLoading(true);
-    const response = await fetch(process.env.NEXT_PUBLIC_API_URL+"/api/ranking", {
+    const response = await customFetch(process.env.NEXT_PUBLIC_API_URL+"/api/ranking", {
       method: "GET",
       headers: { "Content-Type": "application/json" },
-      credentials: "include",
-    }).then((res) => res.json()).then((data) => {
-      setRanking(data.ranking);
+    }).then((res) => {
+      if (res && res.ok) {
+        return res.json();
+      }
+    }).then((data) => {
+      if (data) {
+        setRanking(data.ranking);
+      }
       setLoading(false);
     });
   }

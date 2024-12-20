@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 // import '@/loadEnvConfig'
 import toast from 'react-hot-toast';
 import { useRouter } from 'next/navigation';
+import { customFetch } from '@/utils/customFetch';
 
 interface Friend {
   id:number;
@@ -22,7 +23,7 @@ export const useFriendsof = (user:User) => {
   
     const fetchFriendsof = async () => {
       try {
-        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/friendsof/${user.id}`, {
+        const response = await customFetch(`${process.env.NEXT_PUBLIC_API_URL}/api/friendsof/${user.id}`, {
           method: 'GET',
           credentials: 'include',
         });

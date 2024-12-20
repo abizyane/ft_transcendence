@@ -18,6 +18,7 @@ import {
 import Loader from "components/loader/loader";
 import { useUser } from "@/services/context/usercontext";
 import toast from "react-hot-toast";
+import { customFetch } from "@/utils/customFetch";
 interface ChatLayoutProps {
   children: ReactNode;
 }
@@ -112,7 +113,7 @@ export function Chat({ children }: ChatLayoutProps) {
 
   const apiBlockUser = async (userid:number) => {
     try {
-      const response = await fetch(process.env.NEXT_PUBLIC_API_URL+'/api/block/', {
+      const response = await customFetch(process.env.NEXT_PUBLIC_API_URL+'/api/block/', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -142,7 +143,7 @@ export function Chat({ children }: ChatLayoutProps) {
 
   const apiUnblockUser = async (userid:number) => {
     try {
-      const response = await fetch(process.env.NEXT_PUBLIC_API_URL+'/api/unblock/', {
+      const response = await customFetch(process.env.NEXT_PUBLIC_API_URL+'/api/unblock/', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -186,7 +187,7 @@ export function Chat({ children }: ChatLayoutProps) {
   }
   const inviteFriendToGame = async (friendId) => {
     try {
-      const response = await fetch(process.env.NEXT_PUBLIC_API_URL+"/api/invite_friend/", {
+      const response = await customFetch(process.env.NEXT_PUBLIC_API_URL+"/api/invite_friend/", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ friend_id: friendId }),

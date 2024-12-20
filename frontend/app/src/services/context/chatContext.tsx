@@ -2,6 +2,7 @@ import React, { createContext, useContext, useState, useEffect } from 'react';
 import { useUser } from './usercontext';
 import { toast } from 'react-hot-toast';
 import { useRouter } from 'next/navigation';
+import { customFetch } from '@/utils/customFetch';
 
 interface Message {
   message_id: number;
@@ -79,40 +80,17 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const fetchConversations = async () => {
     try {
-      const response = await fetch(process.env.NEXT_PUBLIC_API_URL+'/chat/conversations/', {
-        credentials: 'include',
-        
-      });
-      if (response.ok) {
+      const response = await customFetch(process.env.NEXT_PUBLIC_API_URL+'/chat/conversations/');
+      if (response && response.ok) {
         const data = await response.json();
-        const newConversations: { [key: string]: Conversation } = {};
-        data.results.forEach((conv: any) => {
-          newConversations[conv.username] = {
-            user: {
-              id: conv.id,
-              username: conv.username,
-              profile_pic_url: conv.profile_pic_url,
-              relationship: conv.relationship,
-              is_online: conv.is_online
-            },
-            messages: [],
-            lastMessage: {
-              message_id: 0,
-              sender: conv.sender,
-              receiver: conv.receiver,
-              message: conv.message,
-              sender_id: conv.sender_id,
-              receiver_id: conv.receiver_id,
-              timestamp: conv.timestamp,
-              seen: conv.seen
-            },
-            unreadCount: conv.seen ? 0 : 1
-          };
+        const conversationsMap = {};
+        data.conversations.forEach((conv) => {
+          conversationsMap[conv.user.username] = conv;
         });
-        setConversations(newConversations);
+        setConversations(conversationsMap);
       }
     } catch (error) {
-      toast.error('Failed to fetch conversations:');
+      console.error('Error fetching conversations:', error);
     }
   };
 
@@ -143,15 +121,14 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
         return;
       }
       const url = resetPage ? `${process.env.NEXT_PUBLIC_API_URL}/chat/room/${userId}/` : nextPage;
-      const response = await fetch(url, {
-        credentials: 'include',
-      });
-      if (response.status === 404) {
+      const response = await customFetch(url);
+      
+      if (response && response.status === 404) {
         toast.error("user not found or blocked ");
         router.push("/dashboard");
         return;
       }
-      if (response.ok) {
+      if (response && response.ok) {
         const data = await response.json();
         setNextPage(data.next);
         const username = data.user.username;

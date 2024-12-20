@@ -4,6 +4,7 @@ import { useEffect, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Loader from "components/loader/loader";
 import toast from 'react-hot-toast';
+import { customFetch } from "@/utils/customFetch";
 
 const OAuthContent = () => {
   const router = useRouter();
@@ -17,7 +18,7 @@ const OAuthContent = () => {
 
     const verifyOAuth = async () => {
       try {
-        const response = await fetch(`${backendUrl}?${queryParams}`, {
+        const response = await customFetch(`${backendUrl}?${queryParams}`, {
           method: 'GET',
           credentials: 'include',
         });

@@ -15,6 +15,7 @@ import {
 import { useEffect, useState } from "react";
 import Loader from "../loader/loader";
 import toast from 'react-hot-toast';
+import { customFetch } from "@/utils/customFetch";
 
 
 ChartJS.register(
@@ -37,7 +38,7 @@ const LineChart: React.FC<LineChartProps> = ({userid}) => {
   const fetchExperience = async () => {
     try {
       setLoading(true);
-      const response = await fetch(process.env.NEXT_PUBLIC_API_URL+'/api/weekly_experience', {
+      const response = await customFetch(process.env.NEXT_PUBLIC_API_URL+'/api/weekly_experience', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

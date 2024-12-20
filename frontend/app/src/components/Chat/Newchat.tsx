@@ -1,5 +1,6 @@
 "use client";
 import { useChat } from "@/services/context/chatContext";
+import { customFetch } from "@/utils/customFetch";
 import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
 
@@ -29,7 +30,7 @@ const Newchat = ({ isOpen, closeModal, handleUserClick }) => {
   const fetchUsers = async () => {
     setLoading(true);
     try {
-      const response = await fetch(process.env.NEXT_PUBLIC_API_URL+"/api/friends/friends/", {
+      const response = await customFetch(process.env.NEXT_PUBLIC_API_URL+"/api/friends/friends/", {
         method: "GET",
         headers: {
           "Content-Type": "application/json",

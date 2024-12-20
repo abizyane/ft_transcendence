@@ -5,6 +5,7 @@ import { useState } from "react";
 import {useUser} from "@/services/context/usercontext";
 import { useRouter } from "next/navigation";
 import toast from 'react-hot-toast';
+import { customFetch } from "@/utils/customFetch";
 
 const MFAPage = () => {
 
@@ -18,7 +19,7 @@ const MFAPage = () => {
 
   const fetchUser = async () => {
     try {
-      const response = await fetch(process.env.NEXT_PUBLIC_API_URL+'/api/user', {credentials: 'include',});
+      const response = await customFetch(process.env.NEXT_PUBLIC_API_URL+'/api/user', {credentials: 'include',});
       if (response.ok) {
         const data = await response.json();
         router.push(`/profile/${data.id}`);
@@ -32,7 +33,7 @@ const MFAPage = () => {
   
   const submitOtp = async () => {
     try {
-      const response = await fetch(process.env.NEXT_PUBLIC_API_URL+'/api/2fa_code', {
+      const response = await customFetch(process.env.NEXT_PUBLIC_API_URL+'/api/2fa_code', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         credentials: 'include',

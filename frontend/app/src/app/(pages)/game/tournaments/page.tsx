@@ -12,6 +12,7 @@ import Unknwon from "../../../../../public/Unknown_person.jpeg";
 import { isReadable } from "stream";
 import Canvas from "@/components/Canva/page";
 import ConfettiComponent from "@/components/Celebration/win";
+import { customFetch } from "@/utils/customFetch";
 
 
 interface Comptetitor {
@@ -221,7 +222,7 @@ const Page = () => {
 
     try {
       setIsUploadingImage(true);
-      const response = await fetch(process.env.NEXT_PUBLIC_API_URL+'/api/upload_tournament_pic', {
+      const response = await customFetch(process.env.NEXT_PUBLIC_API_URL+'/api/upload_tournament_pic', {
         method: 'POST',
         body: formData,
         credentials: 'include',
