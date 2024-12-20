@@ -25,7 +25,7 @@ services:
     networks:
       - infra
     healthcheck:
-      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "https://localhost:443"]
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "https://localhost:1443"]
       interval: 10s
       timeout: 5s
       retries: 3

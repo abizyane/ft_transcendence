@@ -4,6 +4,9 @@ import type { NextRequest } from 'next/server'
 export function middleware(request: NextRequest) {
   const token = request.cookies.get('access')?.value
   const isLoggedIn = request.cookies.get('isLoggedIn')?.value
+  if (request.nextUrl.pathname === '/auth/mfa') {
+    return NextResponse.next()
+  }
   if (request.nextUrl.pathname === '/' && isLoggedIn === undefined) 
   {
     return NextResponse.next()
@@ -36,6 +39,7 @@ export const config = {
     '/profile/:id*',
     '/history/:id*',
     '/((?!auth/).)',
-    '/auth/:path*'
+    '/auth/:path*',
+    "/auth/mfa"
   ],
 }
