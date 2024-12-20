@@ -230,7 +230,7 @@ class TournamentModel(models.Model):
     owner = models.ForeignKey(Profile, related_name='tournament_owner', null=True, on_delete=models.CASCADE)
     picture = models.TextField(null=True)
     games = models.ManyToManyField(GameModel, related_name='tournament_games')
-    players = models.ManyToManyField(Profile, related_name="tournament_competitors" ,null=True)
+    players = models.ManyToManyField(Profile, related_name="tournament_competitors")
     winner = models.ForeignKey(Profile, related_name="tournament_winner" ,null=True, on_delete=models.CASCADE)
     created = models.DateTimeField(default=timezone.now, null=False)
     updated = models.DateTimeField(default=timezone.now, null=False)

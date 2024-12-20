@@ -7,7 +7,7 @@ export default function Pong({ setModal }) {
       className="fixed z-50 top-0 left-0 right-0 bottom-0 flex justify-center items-center bg-black bg-opacity-50"
     >
       <div
-        className="w-[120px] h-[480px] bg-gray-900/60 rounded-lg border border-violet-primary p-6 sm:p-8 shadow-lg text-white relative"
+        className="w-[340px] h-[540px] bg-gray-900/60 rounded-lg border border-violet-primary p-6  shadow-lg text-white relative"
       >
         {/* Close Button */}
         <IoIosCloseCircle

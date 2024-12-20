@@ -73,6 +73,22 @@ const Page = () => {
             </div>
           </Link>
         </div>
+        <div>
+        <Link
+            href={{
+              pathname: "/game/solo/maps/matchmaking",
+              query: { game: "vsbot" ,map : "jupiter" }
+            }}
+            className='h-full'
+          >
+            <div className="h-48 md:h-full bg-cover bg-center">
+              <button className="h-10 w-32 bg-gray-800/60 rounded-xl hover:bg-gray-800 text-white p-2 text-nowrap border border-violet-primary">
+
+              Quick Game
+              </button>
+            </div>
+          </Link>
+        </div>
       </div>
     </div>
   );

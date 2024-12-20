@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { useUser } from './usercontext';
 import { toast } from 'react-hot-toast';
+import { useRouter } from 'next/navigation';
 
 interface Message {
   message_id: number;
@@ -67,7 +68,9 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [typing, setTyping] = useState(false);
   const [messageContainerRef, setMessageContainerRef] = useState<React.RefObject<HTMLDivElement> | null>(null);
   const { user } = useUser();
+  const router = useRouter();
 
+  
   const handleScrollToBottom = () => {
     if (messageContainerRef?.current) {
       messageContainerRef.current.scrollTop = messageContainerRef.current.scrollHeight;
@@ -143,6 +146,11 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
       const response = await fetch(url, {
         credentials: 'include',
       });
+      if (response.status === 404) {
+        toast.error("user not found or blocked ");
+        router.push("/dashboard");
+        return;
+      }
       if (response.ok) {
         const data = await response.json();
         setNextPage(data.next);
@@ -176,7 +184,7 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
           [username]: updatedConversation
         }));
         sendSeenMessage(username, user?.username);
-
+        
         handleSetCurrentChat(username, updatedConversation);
       }
     } catch (error) {

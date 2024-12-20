@@ -2,7 +2,7 @@
 import React from "react";
 import Profil from "../../../../../public/Profil.jpg";
 import { useUser } from "@/services/context/usercontext";
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from 'next/navigation';
 import { useState, useEffect } from "react";
 import Loader from '@/components/loader/loader';
 import toast from 'react-hot-toast';
@@ -121,7 +121,9 @@ const HistoryPage = () => {
   const [tournamentHistory, setTournamentHistory] = useState<Tournament[]>([]);
   const [loading, setLoading] = useState(true);
   const { user: cUser, setUser } = useUser();
-
+  const router=useRouter();
+  
+  
   useEffect(() => {
     setLoading(true);
     fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/games_history`, {
@@ -134,7 +136,9 @@ const HistoryPage = () => {
     })
       .then(async (response) => {
         if (!response.ok) {
-          toast.error("Response not ok:", response.status);
+          toast.error("user not found or blocked ");
+          router.push("/dashboard");
+          return;
         }
         const responseData = await response.json();
         setGameHistory(responseData.history);
@@ -154,7 +158,8 @@ const HistoryPage = () => {
       })
         .then(async (response) => {
           if (!response.ok) {
-            toast.error("Response not ok:", response.status);
+            // toast.error("Response not ok:", response.status);
+            return;
           }
           const responseData = await response.json();
           setTournamentHistory(responseData.tournaments);
@@ -197,9 +202,19 @@ const HistoryPage = () => {
         <div className="w-full lg:w-1/2 p-2 rounded-xl border border-violet-primary">
           <h2 className="text-xl md:text-2xl lg:text-3xl font-semibold text-center text-white mb-4">Tournaments</h2>
           <div className="space-y-6 overflow-y-auto max-h-[30rem] lg:max-h-[28rem] no-scrollbar">
-            {tournamentHistory.map((tournament, index) => (
+          {loading ? (
+                <div className="flex w-full h-[28rem] items-center justify-center">
+                  <Loader />
+                </div>
+            ) :tournamentHistory?.length > 0 ? (
+            tournamentHistory.map((tournament, index) => (
               <TournamentDetails key={index} tournament={tournament} />
-            ))}
+            ))) : (
+              <div className="flex justify-center  h-[500px] items-center">
+
+              <p className="text-white text-center text-xl">No Games Found .</p>
+              </div>
+            )}
           </div>
         </div>
       </div>
