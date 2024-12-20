@@ -1,6 +1,6 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  reactStrictMode: true,
+  reactStrictMode: false,
   eslint: {
     ignoreDuringBuilds: true,
   },
@@ -13,7 +13,7 @@ const nextConfig = {
       {
         protocol: "https",
         hostname: 'localhost',
-        port: '1443',
+        port: '443',
         pathname: '/pictures/**'
       },
     ],

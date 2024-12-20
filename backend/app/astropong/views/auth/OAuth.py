@@ -16,7 +16,7 @@ User = get_user_model()
 class OAuth(APIView):
     AUTH_URL = "https://api.intra.42.fr/oauth/authorize"
     TOKEN_URL = "https://api.intra.42.fr/oauth/token"
-    REDIRECT_URI = f"https://localhost:1443/auth/oauth"
+    REDIRECT_URI = f"{os.environ.get('HOST_URL', 'https://localhost')}/auth/oauth"
     CLIENT_ID = "u-s4t2ud-e86add016b6a41e208d53d0c011abdc53a93f6e1ba65ba9605a37be5a8997a17"
     CLIENT_SECRET="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"
     def get(self, request, *args, **kwargs):
@@ -66,7 +66,7 @@ class OAuthCallback(APIView):
             serializer.save()
             return self.loginUser(serializer.instance, self.request)
         except Exception as e:
-            return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({'error': e}, status=status.HTTP_400_BAD_REQUEST)
     
     def loginUser(self, user_instance, request):
         refresh = RefreshToken.for_user(user_instance)
