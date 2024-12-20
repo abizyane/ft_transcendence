@@ -1,3 +1,4 @@
+import toast from 'react-hot-toast';
 export const customFetch = async (url: string, options: RequestInit = {}) => {
   const defaultOptions: RequestInit = {
     ...options,
@@ -14,7 +15,6 @@ export const customFetch = async (url: string, options: RequestInit = {}) => {
     
     return response;
   } catch (error) {
-    console.error('Fetch error:', error);
-    throw error;
+    toast.error('Fetch error', error);
   }
 }; 

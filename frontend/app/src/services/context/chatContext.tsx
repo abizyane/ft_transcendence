@@ -55,7 +55,7 @@ const ChatContext = createContext<ChatContextType | undefined>(undefined);
 export const useChat = () => {
   const context = useContext(ChatContext);
   if (!context) {
-    throw new Error('useChat must be used within a ChatProvider');
+    toast.error('useChat must be used within a ChatProvider');
   }
   return context;
 };
@@ -90,7 +90,7 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
         setConversations(conversationsMap);
       }
     } catch (error) {
-      console.error('Error fetching conversations:', error);
+      toast.error('Error fetching conversations', error);
     }
   };
 

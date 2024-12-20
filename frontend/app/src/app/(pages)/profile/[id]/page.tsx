@@ -18,6 +18,9 @@ import ProfileChart from "@/components/Charts/profileChart";
 import toast from 'react-hot-toast';
 import { customFetch } from "@/utils/customFetch";
 
+const user = data.user;
+const values = user.charts.lineChart.data;
+const gameHistory = user.history;
 
 const Page = () => {
   const { id: userId } = useParams();

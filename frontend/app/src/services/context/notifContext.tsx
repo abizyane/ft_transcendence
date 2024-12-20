@@ -23,7 +23,7 @@ const NotifContext = createContext<NotifContextType | undefined>(undefined);
 export const useNotif = () => {
   const context = useContext(NotifContext);
   if (!context) {
-    throw new Error('useNotif must be used within a NotifProvider');
+   toast.error('useNotif must be used within a NotifProvider');
   }
   return context;
 };
@@ -41,7 +41,7 @@ export const NotifProvider: React.FC<{ children: React.ReactNode }> = ({ childre
         setNotifications(data);
       }
     } catch (error) {
-      console.error('Error fetching notifications:', error);
+      toast.error('Error fetching notifications', error);
     }
   };
 

@@ -1,11 +1,12 @@
 import { customFetch } from "@/utils/customFetch";
+import toast from 'react-hot-toast';
 
 
 
 export const getUserData = async () => {
     const token = localStorage.getItem("jwt");
     if (!token) {
-      throw new Error('No token found');
+     toast.error('No token found');
     }
   
     const response = await customFetch(process.env.NEXT_PUBLIC_API_URL+'/api/user', {
@@ -16,10 +17,10 @@ export const getUserData = async () => {
       },
     });
     if (response.status === 403) {
-      throw new Error('token expired');
+     toast.error('token expired');
     } 
     else if (!response.ok) {
-      throw new Error('Failed to fetch user data');
+     toast.error('Failed to fetch user data');
     }
 
   
