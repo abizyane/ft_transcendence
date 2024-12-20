@@ -14,7 +14,7 @@ const SettingsPage = () => {
 
   return (
     <div className="w-full h-full m-4 p-4 flex justify-center items-center">
-      <div className='bg-gray-800/60 w-full h-fit text-white border-2 border-violet-primary p-4 sm:p-6 md:p-10 rounded-xl'>
+      <div className='bg-gray-800/60 w-full mb-24 lg:mb-0 h-fit text-white border-2 border-violet-primary p-4 sm:p-6 md:p-10 rounded-xl'>
 
         <h1 className="text-2xl sm:text-3xl font-bold mb-4 text-center">Settings</h1>
 

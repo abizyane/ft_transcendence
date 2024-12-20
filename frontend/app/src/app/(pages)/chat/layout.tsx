@@ -236,7 +236,7 @@ if (!conversations || !user)
                           type="text"
                           defaultValue=""
                           onChange={(e) => handleSearch(e.target.value)}
-                          placeholder="Search Messages"
+                          placeholder="Search Conversations"
                         />
                         <span className="absolute top-0 left-0 mt-3 ml-3 inline-block">
                           <FaSearch className="w-5 h-5 text-gray-400" />

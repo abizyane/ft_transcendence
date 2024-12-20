@@ -96,7 +96,7 @@ const Newchat = ({ isOpen, closeModal, handleUserClick }) => {
               id="input1"
               onKeyUp={handleSearchKeyUp}
               className="w-full mt-2 p-2 border text-black rounded"
-              placeholder="Search for a user"
+              placeholder="Search for a friend"
               required
             />
             <div className="absolute contents top-full left-0 w-full bg-gray-800 mt-2 rounded-md shadow-lg max-h-64 overflow-y-auto no-scrollbar">

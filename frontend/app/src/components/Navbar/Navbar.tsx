@@ -161,6 +161,9 @@ const Navbar = () => {
         </div>
         {/* log out on mobile  */}
         <div className="w-full lg:hidden flex justify-end items-center">
+          <Link href="/settings" className = "mr-2">
+            <Settings className=" text-white w-5 h-5" />
+          </Link>
           <button className="flex justify-end items-center mr-3" onClick={() => handleLogout(router)}>
             <LogOut className=" text-white w-5 h-5" />
             <span className=" text-white text-sm">Log out</span>
