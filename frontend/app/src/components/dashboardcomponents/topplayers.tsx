@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from "react";
 import Link from "next/link";
-import data from "../../app/data/Dashboarddata.json";
 import Loader from "components/loader/loader";
 import toast from 'react-hot-toast';
 import { customFetch } from "@/utils/customFetch";
@@ -19,7 +18,6 @@ interface Player {
 }
 
 const TopPlayers: React.FC = () => {
-  const user = data.user;
   const [topPlayers, setTopPlayers] = useState<Player[]>([]);
   const [loading, setLoading] = useState(false);
 

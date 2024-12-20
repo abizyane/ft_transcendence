@@ -1,6 +1,5 @@
 import { Doughnut } from 'react-chartjs-2';
 import { Chart as ChartJS, ArcElement, Tooltip, Legend } from 'chart.js';
-import dataFromJson from '../../app/data/Dashboarddata.json';
 import { useEffect, useState } from 'react';
 import Loader from '../loader/loader';
 import toast from 'react-hot-toast';

@@ -3,7 +3,6 @@ import DoughnutChart from "@/components/Charts/Winrate";
 import Profil from "../../../../public/Profil.jpg";
 import History from "@/components/dashboardcomponents/history";
 import LineChart from "../../../components/Charts/Linechart";
-import Data from "../../data/Dashboarddata.json";
 import { useUser } from "@/services/context/usercontext";
 import { useDebugValue, useEffect, useState } from "react";
 import Loader from "@/components/loader/loader";

@@ -1,7 +1,6 @@
 'use client'
 import UserInfo from "@/components/dashboardcomponents/userinfo";
 import Linechart from "@/components/Charts/Linechart";
-import data from "@/app/data/Dashboarddata.json";
 import History from "@/components/dashboardcomponents/history";
 import TopPlayers from "@/components/dashboardcomponents/topplayers";
 import Friends from "@/components/dashboardcomponents/friends";

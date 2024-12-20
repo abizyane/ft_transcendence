@@ -1,6 +1,5 @@
 import { Icon } from "@iconify/react";
 import Link from "next/link";
-import userData from "../../app/data/Dashboarddata.json";
 import { IoChatbubbleEllipsesSharp } from "react-icons/io5";
 import { FaTableTennisPaddleBall } from "react-icons/fa6";
 import { useFriendsof } from "@/services/friendsof";

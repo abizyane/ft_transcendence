@@ -50,7 +50,6 @@ const UserInfo: React.FC<UserInfoProps> = ({ user, setUser }) => {
           toast.error("Response not ok:");
           if (response.status == 400)
             {
-              throw new Error("You cannot see this profile");
               toast.error('you cannot see this profile');
               Router.push('dashboard');
             }
