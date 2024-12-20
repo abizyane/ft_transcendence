@@ -198,7 +198,7 @@ const ProfileSettings = () => {
               <input
                 type="password"
                 {...register('confirmPassword', {
-                  required: 'Please confirm your password',
+                  // required: 'Please confirm your password',
                   validate: (value) => value === watch('newPassword') || 'Passwords do not match'
                 })}
                 className="w-3/4 sm:w-1/2 p-2 border rounded text-black"

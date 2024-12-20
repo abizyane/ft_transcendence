@@ -145,9 +145,9 @@ class GameModel(models.Model):
 
     def get_opponent(self, player:Profile) -> Profile:
         if player.id == self.player_1.profile.id:
-            return self.player_2
+            return self.player_2.profile
         elif player.id == self.player_2.profile.id:
-            return self.player_1
+            return self.player_1.profile
         else:
             return None
     

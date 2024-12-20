@@ -135,6 +135,8 @@ REST_FRAMEWORK = {
     'DEFAULT_PERMISSION_CLASSES': [
         'rest_framework.permissions.IsAuthenticated',
     ],
+    'DEFAULT_VERSIONING_CLASS': 'rest_framework.versioning.NamespaceVersioning',
+    'URL_FIELD_NAME': 'url',
 }
 
 SIMPLE_JWT = {
@@ -157,3 +159,11 @@ DATABASES = {
         'PORT': os.getenv('POSTGRES_PORT', 5432),
     }
 }
+
+from rest_framework.reverse import reverse
+
+def prefixed_reverse(name, request=None, format=None):
+    if request:
+        api_prefix = "/api"
+        request_path = request.get_full_path()
+        # is_not_static = lambda N/ Ignore existing static or local

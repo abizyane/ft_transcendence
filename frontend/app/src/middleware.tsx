@@ -14,9 +14,13 @@ export function middleware(request: NextRequest) {
   if (!token && !request.url.includes('/auth/') && isLoggedIn !== 'True') {
     return NextResponse.redirect(new URL('/auth/login', request.url))
   }
-  if (isLoggedIn === 'True' && (request.nextUrl.pathname.includes('/auth/') || request.nextUrl.pathname === '/')) {
+  if (isLoggedIn === "True" && request.nextUrl.pathname === '/')
+  {
     return NextResponse.redirect(new URL('/dashboard', request.url))
   }
+  // if (isLoggedIn === 'True' && (request.nextUrl.pathname.includes('/auth/') || request.nextUrl.pathname === '/')) {
+  //   return NextResponse.redirect(new URL('/dashboard', request.url))
+  // }
   return NextResponse.next()
 }
 
