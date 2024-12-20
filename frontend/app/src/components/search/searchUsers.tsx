@@ -40,7 +40,7 @@ const searchUsers = () => {
         const data = await response.json();
         setUsers(data);
       } else if (response) {
-        throw new Error("Error fetching data");
+        toast.error("Error fetching data");
       }
     } catch (error) {
       toast.error("Error fetching users:", error);

@@ -2,7 +2,6 @@ import React, { useEffect, useState } from "react";
 import Link from "next/link";
 import Loader from "components/loader/loader";
 import toast from 'react-hot-toast';
-import { customFetch } from "@/utils/customFetch";
 
 interface User {
   id: number;
@@ -23,7 +22,7 @@ const TopPlayers: React.FC = () => {
 
   useEffect(() => {
     setLoading(true);
-    customFetch(`${process.env.NEXT_PUBLIC_API_URL}/api/top_players`, {
+    fetch(`${process.env.NEXT_PUBLIC_HOST_URL}:8000/api/top_players`, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',

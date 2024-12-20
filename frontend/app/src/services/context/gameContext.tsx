@@ -16,7 +16,7 @@ const GameContext = createContext<GameContextType | undefined>(undefined);
 export const useGame = () => {
   const context = useContext(GameContext);
   if (!context) {
-    throw new Error('useNotif must be used within a NotifProvider');
+    toast.error('useNotif must be used within a NotifProvider');
   }
   return context;
 };

@@ -39,7 +39,7 @@ const Newchat = ({ isOpen, closeModal, handleUserClick }) => {
       });
 
       if (!response.ok) {
-        throw new Error("Error fetching data");
+        toast.error("Error fetching data");
       }
 
       const data = await response.json();
