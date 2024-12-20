@@ -82,6 +82,12 @@ class TournamentConsumer(AsyncWebsocketConsumer):
     async def connect(self):
         self.user = None
         self.alias = None
+        self.room:Room = None
+        self.match = None
+        self.match_name = ''
+        self.task = None
+        self.game = None
+        self.state = ''
         user = self.scope['user']
         if user.is_anonymous or not user.is_authenticated:
             await self.accept()
@@ -92,15 +98,15 @@ class TournamentConsumer(AsyncWebsocketConsumer):
             await self.close()
             return
         
-        # if user.username in TournamentConsumer.connected_users :
-        #     await self.accept()
-        #     await self.send(text_data=json.dumps({
-        #         "msg" : f"{user} user already connected.",
-        #         "type" : "error"
-        #     }))
-        #     await self.close()
-        #     return
-        # TournamentConsumer.connected_users.add(user.username)
+        if user.username in TournamentConsumer.connected_users :
+            await self.accept()
+            await self.send(text_data=json.dumps({
+                "msg" : f"{user} user already connected.",
+                "type" : "error"
+            }))
+            await self.close()
+            return
+        TournamentConsumer.connected_users.add(user.username)
         await self.accept()
         self.p_holder = PlayerHolder(CompetitorNamed(self.channel_name))
         self.set_competitor_info(username=user.username, img=build_absolute_image_uri(self.scope, user.profile_pic), userId=user.id)
@@ -112,12 +118,6 @@ class TournamentConsumer(AsyncWebsocketConsumer):
                 'type' : 'broadcast.allrooms.state'
             })
         self.user = user
-        self.room:Room = None
-        self.match = None
-        self.match_name = ''
-        self.task = None
-        self.game = None
-        self.state = ''
         self.competitor.set_competition_type(self._type)
         if self._type == "TWO":
             token = None
@@ -354,8 +354,8 @@ class TournamentConsumer(AsyncWebsocketConsumer):
     async def disconnect(self, error_code):
         if self.alias :
             TournamentConsumer.rm.aliases.remove(self.alias)
-        # if self.user:
-            # TournamentConsumer.connected_users.remove(self.user.username)
+        if self.user:
+            TournamentConsumer.connected_users.remove(self.user.username)
         if self.room:
             if  self.room.started :
                 #set other player to winner
