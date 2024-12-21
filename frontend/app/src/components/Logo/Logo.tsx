@@ -11,7 +11,7 @@ const Logo = () => {
     alt="Logo" 
     width="100"
     height="50"
-    className="p-4"
+    className="pt-3 mr-6 lg:mr-0 lg:p-4"
   />
   </Link>
 </div>
