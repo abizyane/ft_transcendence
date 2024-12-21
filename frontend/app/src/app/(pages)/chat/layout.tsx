@@ -127,7 +127,7 @@ export function Chat({ children }: ChatLayoutProps) {
 
       } else {
         const errorData = await response.json();
-        toast.error('Failed to block friend:');
+        toast.error(errorData.error);
         return false;
       }
     } catch (error) {
@@ -157,7 +157,7 @@ export function Chat({ children }: ChatLayoutProps) {
 
       } else {
         const errorData = await response.json();
-        toast.error('Failed to block friend:');
+        toast.error(errorData.error);
         return false;
       }
     } catch (error) {

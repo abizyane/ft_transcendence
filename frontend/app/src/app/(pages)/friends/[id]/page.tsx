@@ -313,7 +313,7 @@ const Friends = () => {
                     <Link className="flex items-center" href={`/profile/${block.id}`} key={block.id}>
                       <div className="h-14 w-14 rounded-full overflow-hidden">
                         <img
-                          src={block.profile_pic}
+                          src={block.profile_pic_url}
                           alt="mode solo"
                           className="w-full h-full object-cover"
                         />
