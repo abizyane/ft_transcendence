@@ -162,7 +162,7 @@ class TournamentConsumer(AsyncWebsocketConsumer):
             print(f'Exception : p_holder.back {self.p_holder.back}', flush=True)
 
         await self.channel_layer.group_add(self.match_name, self.channel_name)
-        if not self.match.game and ((self.p_holder.index % 2) == 0):
+        if not self.match.game and ((self.p_holder.index % 2) != 0):
             self.match.game = Game(self.match.index)
             self.p_holder.paddle = Player(channel_name=self.channel_name, id=self.p_holder.index ,game=self.match.game)  
             opponent = self.match.get_opponent(self.p_holder)
