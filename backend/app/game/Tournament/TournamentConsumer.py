@@ -105,6 +105,7 @@ class TournamentConsumer(AsyncWebsocketConsumer):
         self.p_holder = PlayerHolder(CompetitorNamed(self.channel_name))
         self.set_competitor_info(username=user.username, img=build_absolute_image_uri(self.scope, user.profile_pic), userId=user.id)
         self.competitor = self.p_holder.competitor
+        await self.set_profile_info()
         self._type = self.scope['url_route']['kwargs']['competition_type']
         if self._type == "FOUR" :
             await self.channel_layer.group_add("FOUR", self.channel_name)
@@ -151,6 +152,12 @@ class TournamentConsumer(AsyncWebsocketConsumer):
             )
         serialized_message = MessageConsumerSerializer(message).data
         return serialized_message
+    
+    @database_sync_to_async
+    def set_profile_info(self):
+        profile = Profile.objects.get(user_id=self.competitor.user_id)
+        self.competitor.xp = profile.xp
+        self.competitor.level - profile.level
     
     async def init_game(self, event):
         try :

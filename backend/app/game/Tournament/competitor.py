@@ -20,6 +20,8 @@ class Competitor(AbstractCompetitor):
     def __init__(self, name):
         self.name = name
         self._id = -1
+        self.xp = 0
+        self.level = 0
         self.username = ''
         self.alias = ''
         self.room:Room = None
@@ -73,6 +75,8 @@ class Competitor(AbstractCompetitor):
             'profile_pic_url' : self.img,
             'lost' : self.islost,
             'id' : self.user_id,
+            'xp' : self.xp,
+            'level' : self.level
         }
     
     def get_allroom_info(self):
