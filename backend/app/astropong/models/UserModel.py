@@ -134,7 +134,7 @@ class User(AbstractUser):
                 (models.Q(user1=self) & models.Q(user2=friend)) | (models.Q(user1=friend) & models.Q(user2=self))).first()
             if relationship is None:
                 raise Relationship.DoesNotExist
-            if relationship.status == Relationship.Status.BLOCKED:
+            if relationship.status == Relationship.Status.BLOCKED and relationship.userWhoBlocked == self:
                 relationship.status = Relationship.Status.UNKNOWN
                 relationship.save()
             else:
