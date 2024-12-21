@@ -12,7 +12,9 @@ import { handleRegistrationSubmit } from "@/services/auth";
 const formSchema = z.object({
   username: z.string().min(4, 'Username must be at least 4 characters'),
   email: z.string().email('Invalid email address'),
-  password: z.string().min(8, 'Password must be at least 8 characters'),
+  password: z.string().min(8, 'Password must be at least 8 characters')
+    .regex(/[A-Z]/, 'Password must contain at least one uppercase letter')
+    .regex(/[!@#$+\-*%^&*(),.?":{}|<>]/, 'Password must contain at least one special character'),
   confirmpassword: z.string()
 }).refine((data) => data.password === data.confirmpassword, {
   message: 'Passwords must match',

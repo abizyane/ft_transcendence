@@ -455,7 +455,7 @@ const MatchmakingContent = () => {
         <div className="flex flex-col lg:flex-row gap-4 lg:gap-24 items-center justify-center lg:w-fit h-fit">
           {
             isRandomMatch && users[1]?.id ? (
-              <li key={`user-${users[0].id}`}>
+              <li className="list-none" key={`user-${users[0].id}`}>
                 <Avatar user={users[0]} />
               </li>
             ) : (
@@ -477,13 +477,13 @@ const MatchmakingContent = () => {
           {isVsBot && defaultCompetitors[2] && <Avatar user={defaultCompetitors[2]} />}
 
           {isRandomMatch && users[1]?.id && (
-            <li key={users[1].id}>
+            <li className="list-none"key={users[1].id}>
               <Avatar user={users[1]} />
             </li>
           )}
 
           {isRandomMatch && !users[1]?.id && (
-            <li key={randomUser.username}>
+            <li className="list-none"key={randomUser.username}>
               <Avatar user={randomUser} />
             </li>
           )}

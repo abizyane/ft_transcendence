@@ -159,6 +159,10 @@ const Navbar = () => {
             </div>
           </div>
         </div>
+        <div className="w-full lg:hidden mt-1 flex justify-end items-center">
+
+          <Searchusers />
+        </div>
         <div className="w-full lg:hidden flex justify-end items-center">
           <Link href="/settings" className = "mr-2">
             <Settings className=" text-white w-5 h-5" />
