@@ -34,6 +34,16 @@ class AddFriendView(APIView):
             friend = User.objects.get(id=friendId)
             try:
                 request.user.add_friend(friend)
+                channel_layer = get_channel_layer()
+                async_to_sync(channel_layer.group_send)(
+                    "notifications",
+                    {
+                        'type': 'notification',
+                        'receiver': friend.username,
+                        'notification_type': "friend_request",
+                        'content': f"{request.user.username} sent you a friend request",
+                    }
+                )
                 return Response({"message": "Friend request sent successfully."}, status=status.HTTP_200_OK)
             except ValidationError as e:
                 return Response({"error": e}, status=status.HTTP_400_BAD_REQUEST)
@@ -108,6 +118,15 @@ class BlockFriendView(APIView):
             friend = User.objects.get(id=friendId)
             try:
                 request.user.block_friend(friend)
+                channel_layer = get_channel_layer()
+                async_to_sync(channel_layer.group_send)(
+                    "chat_room",
+                    {
+                        'type': 'blocked',
+                        'receiver': friend.username,
+                        'sender': request.user.username
+                    }
+                )
                 return Response({"message": "User blocked."}, status=status.HTTP_200_OK)
             except ValidationError as e:
                 return Response({"error": e}, status=status.HTTP_400_BAD_REQUEST)

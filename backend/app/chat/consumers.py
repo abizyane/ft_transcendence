@@ -61,6 +61,9 @@ class ChatRoomConsumer(AsyncWebsocketConsumer):
         if message_type == 'read_message':
             await self.handle_read_message()
             return
+        if message_type == 'blocked':
+            await self.handle_blocked(text_data_json)
+            return
         
         relationship = await self.get_relationship(self.sender, self.receiver)
         if not relationship:
@@ -95,6 +98,29 @@ class ChatRoomConsumer(AsyncWebsocketConsumer):
         )
 
         await self.send_notification(self.sender, self.receiver, text_data_json['message']) 
+
+    async def handle_blocked(self, text_data_json):
+        await self.channel_layer.group_send(
+            self.group_name,
+            {
+                'type': 'blocked',
+                'sender': text_data_json['sender'],
+                'receiver': text_data_json['receiver'],
+            }
+        )
+
+    async def blocked(self, event):
+        receiver = event['receiver']
+        sender = event['sender']
+        if receiver != self.scope['user'].username and sender != self.scope['user'].username:
+            return
+
+        await self.send(text_data=json.dumps({
+            'receiver': receiver,
+            'sender': sender,
+            'type': 'blocked',
+        }))
+
 
     async def handle_typing(self):
         await self.channel_layer.group_send(

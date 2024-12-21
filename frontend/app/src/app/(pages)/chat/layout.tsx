@@ -242,7 +242,7 @@ if (!conversations || !user)
                   </form>
                 </div>
 
-                <div className="p-2 flex-1 md:w-full h-[240px] lg:h-[650px]  overflow-y-scroll">
+                <div className="p-2 flex-1 md:w-full h-[240px] lg:h-[650px]  overflow-y-scroll no-scrollbar">
                   {Object.values(searchValue ? searchConversations : conversations)
                     .sort((a, b) => 
                       new Date(b.lastMessage?.timestamp).getTime() - new Date(a.lastMessage?.timestamp).getTime()

@@ -63,7 +63,7 @@ export const NotifProvider: React.FC<{ children: React.ReactNode }> = ({ childre
 
     ws.onmessage = (event) => {
       const data = JSON.parse(event.data);
-      if (data.type === 'chat_message') {
+      if (data.type === 'chat_message' || data.type === 'friend_request') {
         addNotification({
           id: data.id,
           content: data.content,

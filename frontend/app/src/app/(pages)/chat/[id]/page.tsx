@@ -48,9 +48,7 @@ useEffect(() => {
       addMessage(newMessage);
       setInput("");
       setTimeout(scrollToBottom, 100);
-    } else {
-      toast.error("WebSocket is not open.");
-    }
+    } 
   };
 
 

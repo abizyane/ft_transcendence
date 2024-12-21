@@ -311,6 +311,16 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
+  const updateRelationship = (username:string, status:string) => {
+    setCurrentChat(prev=>({
+      ...prev,
+      user:{
+        ...prev.user,
+        relationship: status
+      }
+    }))
+  }
+
   useEffect(() => {
     if (ws) {
       ws.onmessage = (event) => {
@@ -331,7 +341,12 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
           }
            else if (data.type === "stop_typing") {
             setTyping(false);
-          } else if (data.message === "You must be friends in order to chat.") {
+          } else if(data.type === "blocked") {
+            if (user.username === data.receiver)
+              updateRelationship(data.sender, "Blocked")
+          } 
+          
+          else if (data.message === "You must be friends in order to chat.") {
             toast.error("You must be friends in order to chat.");
           }
         }
