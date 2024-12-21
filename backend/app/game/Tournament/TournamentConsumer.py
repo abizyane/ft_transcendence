@@ -613,12 +613,14 @@ class TournamentConsumer(AsyncWebsocketConsumer):
         if self.p_holder.paddle.color == 'blue':
             player_1, player_2 = curr_player, opponent
             score_1, score_2 = self.game.blue.score, self.game.red.score
+            alias_1, alias_2 = self.competitor.alias, self.match.get_opponent(self.p_holder).competitor.alias
         else:
             player_1, player_2 = opponent, curr_player
             score_1, score_2 = self.game.red.score, self.game.blue.score
+            alias_1, alias_2 = self.match.get_opponent(self.p_holder).competitor.alias, self.competitor.alias
         p_1 = PlayerModel.objects.create(
             profile=player_1,
-            alias = self.alias,
+            alias = alias_1,
             color = "blue",
             score = self.game.blue.score,
             state = self.game.blue.win_state
@@ -626,7 +628,7 @@ class TournamentConsumer(AsyncWebsocketConsumer):
 
         p_2 = PlayerModel.objects.create(
             profile=player_2,
-            alias = self.match.get_opponent(self.p_holder).competitor.alias,
+            alias = alias_2,
             color = "red",
             score = self.game.red.score,
             state = self.game.red.win_state
