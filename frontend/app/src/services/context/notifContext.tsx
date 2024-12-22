@@ -99,6 +99,11 @@ export const NotifProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   useEffect(() => {
       connectSocket();
     fetchNotifications();
+    return () => {
+      if (socket) {
+        socket.close();
+      }
+    }
   }, []);
 
   return (

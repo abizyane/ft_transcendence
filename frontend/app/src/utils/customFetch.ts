@@ -12,6 +12,14 @@ export const customFetch = async (url: string, options: RequestInit = {}) => {
       window.location.href = '/auth/login';
       return null;
     }
+    if (response.status === 403) {
+      const data = await response.json();
+      if (data.detail === "2FA verification required")
+      {
+        window.location.href = '/auth/mfa';
+        return null;
+      }
+    }
     
     return response;
   } catch (error) {

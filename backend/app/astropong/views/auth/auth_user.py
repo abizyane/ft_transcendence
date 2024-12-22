@@ -18,6 +18,7 @@ import pyotp
 import io
 import qrcode
 import re
+from django.core.cache import cache
 
 class UserView(APIView):
     permission_classes = [IsAuthenticated]
@@ -136,6 +137,8 @@ class MFAView(APIView):
             return Response({'error': 'MFA is already disabled'}, status=400)
         user.mfa_enabled = False
         request.session['2fa_verified'] = False
+        cache.delete(f"user_{user.id}")
+
         print("session", request.session['2fa_verified'], flush=True)
         user.save()
         return Response({'message': 'MFA disabled successfully'}, status=200)

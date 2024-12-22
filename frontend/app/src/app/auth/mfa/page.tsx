@@ -41,13 +41,16 @@ const MFAPage = () => {
       });
       const data = await response.json();
       if (!response.ok) {
-        toast.error( "Failed to fetch auth",data)
+        toast.error(data.error)
+      }
+      else
+      {
+        toast.success("2FA verification successful");
+        fetchUser();
       }
     } catch (error) {
-      toast.error('Error:');
+      toast.error('Invalid OTP');
     }
-    fetchUser();
-  
   }
 
   return (

@@ -156,8 +156,8 @@ const ProfileSettings = () => {
 
   return (
     <div>
-      <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
         <div className="flex flex-wrap sm:flex-nowrap gap-4 sm:gap-6 lg:gap-8">
+        <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
           <div className="flex flex-col space-y-4 w-full sm:w-1/2 lg:w-1/2">
             <div className="flex flex-col items-center">
               <label className="block font-semibold mb-2 mt-6 text-center">Upload New Picture</label>
@@ -206,6 +206,7 @@ const ProfileSettings = () => {
               {errors.confirmPassword && <p className="text-red-500 text-sm mb-4">{errors.confirmPassword.message}</p>}
             </div>
           </div>
+          </form>
 
           <div className="w-full sm:w-1/2 lg:w-1/2 flex flex-col justify-center items-center space-y-4 lg:ml-auto">
 
@@ -256,7 +257,6 @@ const ProfileSettings = () => {
             Save Changes
           </button>
         </div>
-      </form>
     </div>
   );
 };
@@ -314,7 +314,7 @@ const GameSettings = () => {
         
         <div className="flex flex-col items-center">
   <label htmlFor="paddleColor" className="text-sm font-medium text-white mb-2 lg:font-bold lg:text-nowrap lg:text-2xl">
-    Paddle Color
+    Left Paddle Color
   </label>
   <div className="relative w-24 h-6 border-2 border-white mt-2 rounded-full overflow-hidden">
     <input
@@ -331,7 +331,7 @@ const GameSettings = () => {
 
         <div className="flex flex-col items-center">
           <label htmlFor="opponentpaddle" className="text-sm font-medium text-white mb-2 lg:font-bold lg:text-nowrap lg:text-2xl">
-            Opponent Paddle Color
+            Right Paddle Color
           </label>
           <div className="relative w-24 border-2 border-white h-6 mt-2 rounded-full overflow-hidden">
             <input

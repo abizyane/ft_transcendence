@@ -3,6 +3,7 @@ from django.contrib.auth.models import AbstractUser
 from django.core.exceptions import ValidationError
 from django.db import models
 import pyotp
+from django.core.cache import cache
 
 
 class User(AbstractUser):
@@ -36,6 +37,7 @@ class User(AbstractUser):
         if pyotp.TOTP(self.mfa_secret).verify(otp):
             self.mfa_enabled = True
             self.save()
+            cache.delete(f"user_{self.id}")
             return True
         return False
     def add_friend(self, friend):
