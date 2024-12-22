@@ -4,8 +4,6 @@ POSTGRES_PASSWORD = 'astropassword'
 POSTGRES_HOST = 'postgres-db'
 POSTGRES_PORT = '5432'
 PGDATA = '/var/lib/postgresql/data'
-HOST_URL='https://10.11.7.8'
-API_URL='10.11.7.8/api'
 
 # Backend
 BACKEND_HOST = 'backend'
@@ -17,32 +15,9 @@ BACKEND_ALLOWED_HOSTS = '*'
 REDIS_HOST = 'redis'
 REDIS_PORT = '6379'
 
-# Elasticsearch
-ELASTICSEARCH_HOST = 'elasticsearch'
-ELASTICSEARCH_PORT = '9200'
-ELASTICSEARCH_INDEX = 'astropong'
-ELASTICSEARCH_TIMEOUT = '30'
-ELASTICSEARCH_MAX_RETRIES = '3'
-
-# Logstash
-LOGSTASH_HOST = 'logstash'
-LOGSTASH_PORT = '5044'
-LOGSTASH_INDEX = 'astropong'
-LOGSTASH_TIMEOUT = '30'
-LOGSTASH_MAX_RETRIES = '3'
-
-# Kibana
-KIBANA_HOST = 'kibana'
-KIBANA_PORT = '5601'
-KIBANA_USERNAME = 'kibana'
-KIBANA_PASSWORD = 'kibanapassword'
-
-# Grafana
-GRAFANA_HOST = 'grafana'
-GRAFANA_PORT = '3000'
-GRAFANA_USERNAME = 'grafana'
-GRAFANA_PASSWORD = 'grafanapassword'
-
-# Prometheus
-PROMETHEUS_HOST = 'prometheus'
-PROMETHEUS_PORT = '9090'
+# ELK
+ELASTIC_PASSWORD=password
+KIBANA_PASSWORD=password
+CLUSTER_NAME=astro-cluster
+ENCRYPTION_KEY=c34d38b3a14956121ff2170e5030b471551370178f43e5626eec58b04a30fae2
+# ENCRYPTION_KEY=132bf915a9ff713cf7befe04ea7ea68c2cb8dc12284f5e74e0921d58d99687f8
