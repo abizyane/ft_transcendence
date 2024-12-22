@@ -51,6 +51,9 @@ class OAuthCallback(APIView):
     
     def is_email_existing(self, email):
         return User.objects.filter(email=email).exists()
+    
+    def is_username_existing(self, username):
+        return User.objects.filter(username=username).exists()
 
     def createUserInfo(self, user, code):
         try:
@@ -90,6 +93,8 @@ class OAuthCallback(APIView):
             if self.is_email_existing(user['email']):
                 user = User.objects.filter(email=user['email']).get()
                 return self.loginUser(user, self.request)
+            elif self.is_username_existing(user['login']):
+                return Response({'error': "Username already exists"}, status=status.HTTP_400_BAD_REQUEST)
             else:
                 return self.createUserInfo(user, code)    
         else:

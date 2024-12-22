@@ -31,9 +31,13 @@ const OAuthContent = () => {
           if (data.mfa_enabled) {
             router.push(`/auth/mfa`);
           }
+        } else if (response.status === 400) {
+          const errorData = await response.json();
+          toast.error(errorData.error);
+          router.push(`/auth/login`);
         } else {
           const errorData = await response.json();
-          router.push(`/auth/login?error=${encodeURIComponent(errorData.message)}`);
+          router.push(`/auth/login?error=${encodeURIComponent(errorData.message || errorData.error)}`);
         }
       } catch (error) {
         toast.error('OAuth verification failed');

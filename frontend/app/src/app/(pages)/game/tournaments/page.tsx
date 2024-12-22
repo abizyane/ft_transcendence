@@ -140,7 +140,7 @@ const Page = () => {
       const received_data = JSON.parse(event.data);
       if (received_data.type == "error")
       {
-        toast.error(received_data.error);
+        toast.error(received_data.msg);
         router.push("/dashboard");
       }
       else if (received_data.type == "tournament_state")
