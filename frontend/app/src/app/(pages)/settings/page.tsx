@@ -146,7 +146,11 @@ const ProfileSettings = () => {
       });
       const data = await response.json();
       if (!response.ok) {
-        toast.error(data.message);
+        toast.error(data.error);
+      }
+      else
+      {
+        toast.success("2FA verification successful");
       }
     } catch (error) {
       toast.error('Error:', error);
@@ -157,8 +161,8 @@ const ProfileSettings = () => {
   return (
     <div>
         <div className="flex flex-wrap sm:flex-nowrap gap-4 sm:gap-6 lg:gap-8">
-        <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-          <div className="flex flex-col space-y-4 w-full sm:w-1/2 lg:w-1/2">
+        <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col space-y-4 w-full sm:w-1/2 lg:w-1/2">
+          <div className="">
             <div className="flex flex-col items-center">
               <label className="block font-semibold mb-2 mt-6 text-center">Upload New Picture</label>
               <div className="relative w-24 h-24 sm:w-32 sm:h-32 overflow-hidden">
@@ -206,7 +210,15 @@ const ProfileSettings = () => {
               {errors.confirmPassword && <p className="text-red-500 text-sm mb-4">{errors.confirmPassword.message}</p>}
             </div>
           </div>
-          </form>
+          <div className="flex justify-center w-full sm:w-1/2 mt-4 mx-auto">
+          <button
+            type="submit"
+            className="px-4 py-2 mt-10 bg-violet-800 text-white rounded"
+          >
+              Save Changes
+            </button>
+          </div>
+        </form>
 
           <div className="w-full sm:w-1/2 lg:w-1/2 flex flex-col justify-center items-center space-y-4 lg:ml-auto">
 
@@ -249,14 +261,7 @@ const ProfileSettings = () => {
         </div>
 
 
-        <div className="flex justify-center w-3/4 sm:w-1/2 mt-4 mx-auto">
-          <button
-            type="submit"
-            className="px-4 py-2 mt-10 bg-violet-800 text-white rounded"
-          >
-            Save Changes
-          </button>
-        </div>
+        
     </div>
   );
 };

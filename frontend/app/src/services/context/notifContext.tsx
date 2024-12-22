@@ -93,15 +93,19 @@ export const NotifProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     };
     
     setSocket(ws);
+    return ws;
   };
 
 
   useEffect(() => {
-      connectSocket();
-    fetchNotifications();
+      const ws = connectSocket();
+      fetchNotifications();
     return () => {
       if (socket) {
         socket.close();
+      }
+      if (ws) {
+        ws.close();
       }
     }
   }, []);

@@ -13,7 +13,7 @@ import { isReadable } from "stream";
 import Canvas from "@/components/Canva/page";
 import ConfettiComponent from "@/components/Celebration/win";
 import { customFetch } from "@/utils/customFetch";
-
+import { useRouter } from "next/navigation";
 
 interface Comptetitor {
   username: string;
@@ -71,7 +71,7 @@ const Page = () => {
   const [tournamentStarted, setTournamentStarted] = useState(false);
   const [matchPlayers, setMatchPlayers] = useState<Players | null>(null);
   const [isUploadingImage, setIsUploadingImage] = useState(false);
-
+  const router = useRouter();
   const [winners, setWinners] = useState<WinnersPlayers | null>({
     one:null,
     two:null,
@@ -138,7 +138,12 @@ const Page = () => {
       if (typeof event.data != "string")
         return;
       const received_data = JSON.parse(event.data);
-      if (received_data.type == "tournament_state")
+      if (received_data.type == "error")
+      {
+        toast.error(received_data.error);
+        router.push("/dashboard");
+      }
+      else if (received_data.type == "tournament_state")
         handleTournamentList(received_data);
       else if (received_data.approving){
         setTournamentMap(received_data.approving)
