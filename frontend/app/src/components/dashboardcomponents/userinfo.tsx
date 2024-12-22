@@ -242,7 +242,7 @@ const UserInfo: React.FC<UserInfoProps> = ({ user, setUser }) => {
 
   return (
     <>
-      <div className=" w-full rounded-xl p-2">
+      <div className=" w-full rounded-xl p-2 content-center	h-full">
         <div className="flex justify-around">   
           <div className="w-2/5">
             <div className="mb-4 max-w-full aspect-square  mx-auto">

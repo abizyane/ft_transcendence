@@ -71,7 +71,7 @@ function Avatar({ user }) {
         <div className="flex items-center h-2 w-full rounded-xl bg-white m-1">
           <div
             className="bg-violet-900 h-2 rounded-xl"
-            style={{ width: `${(user.xp / 1000) * 100}%` }}
+            style={{ width: `${user.progress}%` }}
           ></div>
         </div>
         <p className="flex justify-end text-white font-light text-xs mr-4 w-full m-1">
@@ -96,7 +96,7 @@ const MatchmakingContent = () => {
   const socketRef = useRef(null);
   const [users, setCompetitors] = useState(defaultCompetitors);
   const [scores, setScores] = useState({ one: 0, two: 0 });
-  const { user: currentUser } = useUser();
+  const { user: currentUser, fetchUser } = useUser();
   const searchParams = useSearchParams();
   const token = searchParams.get('token') || null;
 
@@ -254,6 +254,7 @@ const MatchmakingContent = () => {
 
   useEffect(() => {
     if (winner || looser) {
+      fetchUser();
       setDisplayCelebration(true);
     }
   }, [winner, looser]);

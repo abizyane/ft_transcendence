@@ -157,7 +157,8 @@ class TournamentConsumer(AsyncWebsocketConsumer):
     def set_profile_info(self):
         profile = Profile.objects.get(user_id=self.competitor.user_id)
         self.competitor.xp = profile.xp
-        self.competitor.level - profile.level
+        self.competitor.level = profile.level
+        self.competitor.progress = profile.get_progress()
     
     async def init_game(self, event):
         try :

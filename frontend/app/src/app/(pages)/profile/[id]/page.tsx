@@ -20,12 +20,12 @@ import { customFetch } from "@/utils/customFetch";
 const Page = () => {
   const { id: userId } = useParams();
   const { user: currentUser, userloading } = useUser();
-  const [user, setUser] = useState< User | null>(null);
+  const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [userLevel, setUserLevel] = useState(1);
-  const router=useRouter ();
-  
+  const router = useRouter();
+
   const levelImages = {
     1: Rookie.src,
     2: Challenger.src,
@@ -33,7 +33,7 @@ const Page = () => {
     4: Expert.src,
     5: Grandmaster.src,
   };
-  
+
 
   useEffect(() => {
     if (!userId || !currentUser) return;
@@ -42,34 +42,34 @@ const Page = () => {
     } else {
       setLoading(true);
       setError(null);
-      try{
+      try {
         customFetch(`${process.env.NEXT_PUBLIC_API_URL}/api/userid`, {
-        method: 'POST',
-        body: JSON.stringify({ id: userId }),
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        credentials: 'include',
-      })
-        .then((response) => {
-          if (response.status === 404) {
-            toast.error("user not found or blocked ");
-            router.push("/dashboard");
-            return;
-          }
-          else  if (!response.ok) {
-            toast.error("user not found or blocked ");
-            router.push("/dashboard");
-            return;
-          }
-          return response.json();
+          method: 'POST',
+          body: JSON.stringify({ id: userId }),
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          credentials: 'include',
         })
-        .then((data: User) => setUser(data))
-        .catch((err) => {
-          setError(err.message);
-        })
-        .finally(() => setLoading(false));
-      }catch(err){
+          .then((response) => {
+            if (response.status === 404) {
+              toast.error("user not found or blocked ");
+              router.push("/dashboard");
+              return;
+            }
+            else if (!response.ok) {
+              toast.error("user not found or blocked ");
+              router.push("/dashboard");
+              return;
+            }
+            return response.json();
+          })
+          .then((data: User) => setUser(data))
+          .catch((err) => {
+            setError(err.message);
+          })
+          .finally(() => setLoading(false));
+      } catch (err) {
         setError(err.message);
       }
     }
@@ -86,42 +86,42 @@ const Page = () => {
     return Rookie;
   };
 
-  if (userloading) return (<div className="w-full h-full flex justify-center items-center"><Loader/></div>);
-  if (loading) return (<div className="w-full h-full flex justify-center items-center"><Loader/></div>);
+  if (userloading) return (<div className="w-full h-full flex justify-center items-center"><Loader /></div>);
+  if (loading) return (<div className="w-full h-full flex justify-center items-center"><Loader /></div>);
   if (error) return <p>Error: {error}</p>;
   if (!user) return <p></p>;
   return (
-    <div className="mt-10  lg:p-10  flex  w-full px-1 overflow-hidden justify-center items-center">
-    <div className="flex-1 w-full flex flex-col items-center justify-center mb-14 mt-2 relative">
-      <div className="flex flex-col lg:flex-row w-full space-y-4 lg:space-y-0 lg:space-x-4">
-        <div className="bg-gray-800/60 backdrop-blur-sm rounded-xl lg:w-2/4 lg:border border-violet-primary mb-4 lg:mb-0">
-          <UserInfo user={user} setUser={setUser}/>
-        </div>
-        <div className="bg-gray-800/60 backdrop-blur-sm  rounded-xl flex-1 border border-violet-primary">
-          <p className="m-2 text-white text-2xl p-4 font-extrabold w-full">
+    <div className="mt-10  lg:p-10  flex h-[100%] w-full px-1 overflow-hidden justify-center items-center">
+      <div className="flex-1 w-full flex flex-col items-center justify-center mb-14 mt-2 relative">
+        <div className="flex flex-col lg:flex-row w-full space-y-4 lg:space-y-0 lg:space-x-4">
+          <div className="bg-gray-800/60 backdrop-blur-sm rounded-xl lg:w-2/4 lg:border border-violet-primary mb-4 lg:mb-0">
+            <UserInfo user={user} setUser={setUser} />
+          </div>
+          <div className="bg-gray-800/60 backdrop-blur-sm  rounded-xl flex-1 border border-violet-primary">
+            <p className="m-2 text-white text-2xl p-4 font-extrabold w-full">
               Rank
-          </p>
-          <div className="h-64  flex justify-center items-center">
-          <img
-            src={getLevelImage(userLevel)}
-            alt="User Rank"
-            className="w-full h-full object-contain rounded-2xl"
-          />
+            </p>
+            <div className="h-max  flex justify-center items-center">
+              <img
+                src={getLevelImage(userLevel)}
+                alt="User Rank"
+                className="object-contain rounded-2xl w-[25%]"
+              />
+            </div>
+          </div>
         </div>
+        <div className="flex flex-col lg:flex-row w-full space-y-4 lg:space-y-0 lg:space-x-4">
+          <ProfileChart user={user} />
+          {currentUser?.id == userId ?
+            <TopPlayers /> :
+            <div className="w-full lg:w-1/3 py-4 lg:h-full">
+              <History />
+            </div>
+          }
+          <Friends user={user} />
         </div>
-      </div>
-      <div className="flex flex-col lg:flex-row w-full space-y-4 lg:space-y-0 lg:space-x-4">
-        <ProfileChart user={user} />
-        {currentUser?.id == userId ? 
-         <TopPlayers /> :
-        <div className="w-full lg:w-1/3 py-4 lg:h-full">
-        <History/> 
-        </div>
-        }
-        <Friends user={user}/>
       </div>
     </div>
-  </div>
   )
 }
 

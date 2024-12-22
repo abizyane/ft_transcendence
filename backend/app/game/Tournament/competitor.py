@@ -22,6 +22,7 @@ class Competitor(AbstractCompetitor):
         self._id = -1
         self.xp = 0
         self.level = 0
+        self.progress = 0
         self.username = ''
         self.alias = ''
         self.room:Room = None
@@ -76,7 +77,8 @@ class Competitor(AbstractCompetitor):
             'lost' : self.islost,
             'id' : self.user_id,
             'xp' : self.xp,
-            'level' : self.level
+            'level' : self.level,
+            'progress': self.progress
         }
     
     def get_allroom_info(self):
