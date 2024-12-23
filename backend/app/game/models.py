@@ -27,12 +27,10 @@ class Profile(models.Model):
     def history(self):
         games = GameModel.get_all_games(self.id)
         if not games:
-            print('No game played Yet !')
             return None
         for game in games:
             score = game.get_player_game_score(self.id)
             opponent = game.get_opponent(self)
-            print(score, opponent)
 
     def increment_xp(self, xp):
         self.xp += xp
@@ -152,7 +150,6 @@ class GameModel(models.Model):
             return None
     
     def get_player_game_score(self,player_id:int)-> int:
-        print(self.player_1.profile.id, self.player_2.profile.id, flush=True)
         scoreObj = Scores.objects.get(id=self.id)
         if not scoreObj:
             return -1

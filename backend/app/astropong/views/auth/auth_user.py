@@ -49,6 +49,10 @@ class UserIdView(APIView):
 
     def post(self, request):
         iduser = request.data.get('id')
+        try:
+            iduser = int(iduser)
+        except Exception as e:
+            return Response({'error': 'IdUser must be a number'}, status=400)
         if iduser is None:
             return Response({'error': 'IdUser is required'}, status=400)
         try:
@@ -139,7 +143,6 @@ class MFAView(APIView):
         request.session['2fa_verified'] = False
         cache.delete(f"user_{user.id}")
 
-        print("session", request.session['2fa_verified'], flush=True)
         user.save()
         return Response({'message': 'MFA disabled successfully'}, status=200)
     

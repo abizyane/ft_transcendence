@@ -12,7 +12,6 @@ class Tournament():
         return self.p_holders[player_name]
     
     def get_player_match(self, player_name) -> MatchHolder:
-        print("test  ",self.p_holders[player_name].back, flush=True)
         return self.p_holders[player_name].back
 
     def upgrade_player(self, player_name):

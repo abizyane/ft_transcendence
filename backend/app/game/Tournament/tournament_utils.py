@@ -166,8 +166,6 @@ class RoomManagerNew(RoomManager):
         return self.type_four[room_name]
 
     async def getrandom_or_create(self, _type, token=None) :
-        print(self.type_two, flush=True)
-
         for i,r in  self.type_two.items():
             if token == None:
                 if not r.started and r.token == None:

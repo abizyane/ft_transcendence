@@ -21,8 +21,7 @@ class Ball:
                 return True
             return False
         except Exception as e:
-            print(e)
-
+            pass
 
     def checkCollide(self):
         if (self.posY + self.rad >= self.game.height or self.posY - self.rad <= 0 ):

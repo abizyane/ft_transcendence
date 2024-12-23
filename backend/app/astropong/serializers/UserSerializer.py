@@ -87,7 +87,6 @@ class FriendSerializer(serializers.ModelSerializer):
         relationships = self.context.get('relationships', None)
         request = self.context.get('request')
         if isinstance(relationships, list):
-            print("is array", type(relationships))
             for friend, relation in relationships:
                 if friend == obj:
                     return Relationship.Status(relation.status).label

@@ -59,10 +59,8 @@ class Room(RoomAbstract):
             self.imageModel = picture
             if self.imageModel:
                 self.imageUrl = build_absolute_image_uri(scope, picture.picture)
-                print("Image setted to ",self.imageUrl, flush=True)
         except Exception as e:
-            print(e, flush=True)
-            print("Image not found", flush=True)
+            pass
 
     def get_image(self):
         return self.imageUrl

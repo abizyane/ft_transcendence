@@ -22,7 +22,6 @@ const OAuthContent = () => {
           method: 'GET',
           credentials: 'include',
         });
-        console.log(response);
         if (response.status === 200) {
           const data = await response.json();
           router.push(`/profile/${data.id}`);
@@ -40,7 +39,6 @@ const OAuthContent = () => {
           router.push(`/auth/login?error=${encodeURIComponent(errorData.message || errorData.error)}`);
         }
       } catch (error) {
-        console.log(error);
         toast.error('OAuth verification failed');
         router.push(`/auth/login?error=${encodeURIComponent('OAuth verification failed')}`);
       }
