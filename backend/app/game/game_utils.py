@@ -7,22 +7,11 @@ class Ball:
         self.rad = 10
         self.posX = game.width / 2
         self.posY = game.height / 2
-        self.speed = 8
-        self.angle = 45
+        self.speed = 600
+        self.angle = 40
         self.dirX = math.cos(self.angle)
         self.dirY = math.sin(self.angle)
         pass
-
-    def check_paddle_collision(self, paddle) :
-        try :
-            dx = abs(self.posX - (paddle.x + paddle.half_width))
-            dy = abs(self.posY - (paddle.y + paddle.half_height))
-            if (dx <= self.rad - paddle.half_width and dy <= paddle.height + self.rad) :
-                return True
-            return False
-        except Exception as e:
-            print(e)
-
 
     def checkCollide(self):
         if (self.posY + self.rad >= self.game.height or self.posY - self.rad <= 0 ):
@@ -31,14 +20,14 @@ class Ball:
         if (left_collision <= 0):
             self.game.red.score += 1
             self.reset_ball()
-        if (self.check_paddle_collision(self.game.blue) and not self.game.blue.isHiting):
+        if ((left_collision <= self.game.blue.x  + self.game.blue.width ) and (self.posY >= self.game.blue.y and self.posY <= self.game.blue.y + self.game.blue.height) and not self.game.blue.isHiting):
             self.dirX *= -1
             self.game.blue.isHiting = True
         right_collision = self.posX + self.rad
         if (right_collision >= self.game.width):
             self.game.blue.score += 1
             self.reset_ball()
-        if (self.check_paddle_collision(self.game.red) and not self.game.red.isHiting):
+        if ((right_collision >= self.game.red.x) and (self.posY >= self.game.red.y and self.posY <= self.game.red.y + self.game.red.height) and not self.game.red.isHiting):
             self.dirX *= -1
             self.game.red.isHiting = True
         self.game.red.isHiting = False
@@ -52,8 +41,8 @@ class Ball:
 
     def update(self):
         self.checkCollide()
-        self.posX += (self.dirX * self.speed)
-        self.posY += (self.dirY * self.speed)
+        self.posX += (self.dirX * self.speed) * 0.01666
+        self.posY += (self.dirY * self.speed) * 0.01666
 
 class Player:
     def __init__(self, channel_name=None, id=None, game=None):
@@ -61,7 +50,7 @@ class Player:
         self.id = id
         self.score = 0
         self.width = 2
-        self.height = 60
+        self.height = 100
         self.half_width = self.width / 2
         self.half_height = self.height / 2
         self.x = 0
@@ -98,14 +87,15 @@ class Game:
         self.blue = None
         self.red = None
         self.max_score = 2
+        self.x_offset = 5
 
     def is_full(self):
         if len(self.players) == 2:
             raise self.RoomIsFull()
 
     def init_paddle_pos(self):
-        self.blue.x = 25
-        self.red.x = self.width - self.red.width - 25
+        self.blue.x = self.x_offset
+        self.red.x = self.width - self.red.width - self.x_offset
     def set_players(self, channel_name, id):
         self.is_full()
         if not self.players.get(channel_name):
