@@ -17,7 +17,7 @@ class Ball:
         try :
             dx = abs(self.posX - (paddle.x + paddle.half_width))
             dy = abs(self.posY - (paddle.y + paddle.half_height))
-            if (dx <= self.rad - paddle.half_width and dy <= paddle.height + self.rad) :
+            if (dx <= self.rad + paddle.half_width and dy <= paddle.height + self.rad) :
                 return True
             return False
         except Exception as e:
@@ -60,7 +60,7 @@ class Player:
         self.id = id
         self.score = 0
         self.width = 2
-        self.height = 60
+        self.height = 100
         self.half_width = self.width / 2
         self.half_height = self.height / 2
         self.x = 0
@@ -97,14 +97,15 @@ class Game:
         self.blue = None
         self.red = None
         self.max_score = 2
+        self.x_offset = 5
 
     def is_full(self):
         if len(self.players) == 2:
             raise self.RoomIsFull()
 
     def init_paddle_pos(self):
-        self.blue.x = 25
-        self.red.x = self.width - self.red.width - 25
+        self.blue.x = self.x_offset
+        self.red.x = self.width - self.red.width - self.x_offset
     def set_players(self, channel_name, id):
         self.is_full()
         if not self.players.get(channel_name):
