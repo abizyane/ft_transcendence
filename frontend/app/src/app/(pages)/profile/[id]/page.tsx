@@ -53,12 +53,12 @@ const Page = () => {
         })
           .then((response) => {
             if (response.status === 404) {
-              toast.error("user not found or blocked ");
+              toast.error("User not found or blocked ");
               router.push("/dashboard");
               return;
             }
             else if (!response.ok) {
-              toast.error("user not found or blocked ");
+              toast.error("User not found or blocked ");
               router.push("/dashboard");
               return;
             }

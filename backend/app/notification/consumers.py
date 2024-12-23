@@ -104,7 +104,7 @@ class NotificationConsumer(AsyncWebsocketConsumer):
             user.save()
             
         except Exception as e:
-            print(f"Error setting user {username} to {online}: {e}", flush=True)
+            pass
 
     @database_sync_to_async
     def mark_notification_as_seen(self, notification_id):
@@ -129,7 +129,6 @@ class NotificationConsumer(AsyncWebsocketConsumer):
         try:
             receiver = User.objects.get(username=receiver)
         except User.DoesNotExist:
-            print(f"User {receiver} does not exist")
             return None
         return Notifications.objects.create(user=receiver, type=type, content=content, link=link)
 

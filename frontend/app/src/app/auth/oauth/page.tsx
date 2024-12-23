@@ -22,20 +22,19 @@ const OAuthContent = () => {
           method: 'GET',
           credentials: 'include',
         });
-
         if (response.status === 200) {
           const data = await response.json();
           router.push(`/profile/${data.id}`);
-        } else if (response.status === 403) {
-          const data = await response.json();
-          if (data.mfa_enabled) {
-            router.push(`/auth/mfa`);
-          }
-        } else if (response.status === 400) {
+        }
+        else if (response.status === 403) {
+          router.push(`/auth/mfa`);
+        }
+        else if (response.status === 400) {
           const errorData = await response.json();
           toast.error(errorData.error);
           router.push(`/auth/login`);
-        } else {
+        }
+        else {
           const errorData = await response.json();
           router.push(`/auth/login?error=${encodeURIComponent(errorData.message || errorData.error)}`);
         }

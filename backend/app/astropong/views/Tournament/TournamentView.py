@@ -134,7 +134,6 @@ class UpdateTournamentPicView(APIView):
             tournament_id = request.data.get('tournament_id')
             tournament_pic_id = request.data.get('tournament_pic_id')
             tournament_pic = TournamentPic.objects.get(id=tournament_pic_id)
-            print(tournament_pic.user_id.id, request.user.id, flush=True)
             if tournament_pic.user_id.id != request.user.id:
                 return Response({'error': 'You are not the owner of this tournament 1 '}, status=403)
             tournament = TournamentModel.objects.get(id=tournament_id)

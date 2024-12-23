@@ -203,7 +203,6 @@ class ChatRoomConsumer(AsyncWebsocketConsumer):
         }))
 
     async def send_notification(self, sender, receiver, message):
-        print("sending notification", sender.username, receiver.username, flush=True)
         await self.channel_layer.group_send(
             'notifications_'+receiver.username,
             {

@@ -23,6 +23,7 @@ class TournamentHistoryView(APIView):
     def post(self, request):
         userid = request.data.get('id')
         try :
+            userid = int(userid)
             profile = Profile.objects.get(user_id=userid)
         except Exception as e:
             return Response({'error': 'Profile not found'}, status=404)
@@ -67,6 +68,10 @@ class GamesHistoryView(APIView):
             userid = request.data.get('id')
             if userid is None:
                 raise Profile.DoesNotExist
+            try:
+                userid = int(userid)
+            except Exception as e:
+                return Response({'error': 'IdUser must be a number'}, status=400)
             user_profile = Profile.objects.get(user_id=userid)
             games = GameModel.get_all_games(user_profile.id).order_by('-created')
             history = []
@@ -109,6 +114,10 @@ class PlayerWinRateView(APIView):
     def post(self, request):
         try:
             userid = request.data.get('id')
+            try:
+                userid = int(userid)
+            except Exception as e:
+                return Response({'error': 'IdUser must be a number'}, status=400)
             user_profile = Profile.objects.get(user_id=userid)
             
             wins = user_profile.get_wins()
@@ -153,6 +162,10 @@ class WeeklyStatsView(APIView):
     def post(self, request):
         try:
             userid = request.data.get('id')
+            try:
+                userid = int(userid)
+            except Exception as e:
+                return Response({'error': 'IdUser must be a number'}, status=400)
             user_profile = Profile.objects.get(user_id=userid)
             
             end_date = timezone.now().replace(hour=23, minute=59, second=59)
@@ -199,6 +212,10 @@ class WeeklyXPView(APIView):
     def post(self, request):
         try:
             userid = request.data.get('id')
+            try:
+                userid = int(userid)
+            except Exception as e:
+                return Response({'error': 'IdUser must be a number'}, status=400)
             user_profile = Profile.objects.get(user_id=userid)
             
             end_date = timezone.now().replace(hour=23, minute=59, second=59)
@@ -237,6 +254,10 @@ class DashboardView(APIView):
     def post(self, request):
         try:
             userid = request.data.get('id')
+            try:
+                userid = int(userid)
+            except Exception as e:
+                return Response({'error': 'IdUser must be a number'}, status=400)
             user_profile = Profile.objects.get(user_id=userid)
             
             wins = user_profile.get_wins()

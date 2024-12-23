@@ -44,7 +44,7 @@ class GameConsumer(AsyncWebsocketConsumer) :
             self.player_id
             self.action = ''
         except Exception as e:
-            print(f'Error: {e}')
+            pass
         await self.accept()
         await self.init_game()
         await self.init_2();
@@ -157,7 +157,6 @@ class GameConsumer(AsyncWebsocketConsumer) :
 
     async def receive(self, text_data):
         text_data_json = json.loads(text_data)
-        print(text_data_json)
         msgtype = text_data_json.get('type')
         if msgtype == 'input':
             await self.player_position(text_data_json)
@@ -191,7 +190,6 @@ class GameConsumer(AsyncWebsocketConsumer) :
                 'status': 'START'})
         players = []
         players = list(self.game.players.values())
-        print(players)
         players[0].color = 'blue'
         players[1].color = 'red'
         self.game.set_players_color()
@@ -217,7 +215,7 @@ class GameConsumer(AsyncWebsocketConsumer) :
                 })
                 await asyncio.sleep(fps)
             except Exception as e:
-                print(e)
+                pass
         self.game.set_winner()
         self.channel_layer.group_send(self.group_name,{
             'type': 'game_over'

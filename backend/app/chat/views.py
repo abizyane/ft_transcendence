@@ -99,6 +99,10 @@ class ChatRoomView(generics.ListAPIView):
 
     def get_queryset(self):
         user_id = self.kwargs['id']
+        try:
+            user_id = int(user_id)
+        except Exception as e:
+            return Response({'error': 'User id must be a number'}, status=400)
         if not self.request.user.is_authenticated:
             raise NotAuthenticated("You must be authenticated to access this resource.")
         try:

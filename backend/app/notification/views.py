@@ -53,6 +53,10 @@ class NotificationUpdateView(views.APIView):
             user = request.user
         except User.DoesNotExist:
             raise Http404("User not found.")
+        try:
+            notification_id = int(notification_id)
+        except Exception as e:
+            return Response({'error': 'Notification id must be a number'}, status=400)
         
         if notification_id is None:
             notifications = Notifications.objects.filter(user=user)

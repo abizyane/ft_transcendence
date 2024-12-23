@@ -26,6 +26,10 @@ class AddFriendView(APIView):
 
     def post(self, request):
         friendId = request.data.get('friend_id')
+        try:
+            friendId = int(friendId)
+        except Exception as e:
+            return Response({"error": "Friend id must be a number"}, status=status.HTTP_400_BAD_REQUEST)
         if friendId is None:
             return Response({"error": "Friend id is required"}, status=status.HTTP_400_BAD_REQUEST)
         try:
@@ -57,6 +61,10 @@ class RemoveFriendView(APIView):
     permission_classes = [IsAuthenticated]
     def post(self,request):
         friendId = request.data.get('friend_id')
+        try:
+            friendId = int(friendId)
+        except Exception as e:
+            return Response({"error": "Friend id must be a number"}, status=status.HTTP_400_BAD_REQUEST)
         if friendId is None:
             return Response({"error": "Friend id is required"}, status=status.HTTP_400_BAD_REQUEST)
         try:
@@ -75,6 +83,10 @@ class AcceptFriendRequestView(APIView):
     permission_classes = [IsAuthenticated]
     def post(self,request):
         friendId = request.data.get('friend_id')
+        try:
+            friendId = int(friendId)
+        except Exception as e:
+            return Response({"error": "Friend id must be a number"}, status=status.HTTP_400_BAD_REQUEST)
         if friendId is None:
             return Response({"error": "Friend id is required"}, status=status.HTTP_400_BAD_REQUEST)
         try:
@@ -92,6 +104,10 @@ class RejectFriendRequestView(APIView):
     permission_classes = [IsAuthenticated]
     def post(self,request):
         friendId = request.data.get('friend_id')
+        try:
+            friendId = int(friendId)
+        except Exception as e:
+            return Response({"error": "Friend id must be a number"}, status=status.HTTP_400_BAD_REQUEST)
         if friendId is None:
             return Response({"error": "Friend id is required"}, status=status.HTTP_400_BAD_REQUEST)
         try:
@@ -110,8 +126,12 @@ class BlockFriendView(APIView):
     permission_classes = [IsAuthenticated]
     def post(self,request):
         friendId = request.data.get('user_id')
+        try:
+            friendId = int(friendId)
+        except Exception as e:
+            return Response({"error": "Friend id must be a number"}, status=status.HTTP_400_BAD_REQUEST)
         if friendId is None:
-            return Response({"error": "User id is required"}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({"error": "Friend id is required"}, status=status.HTTP_400_BAD_REQUEST)
         try:
             if (request.user.id == friendId):
                 return Response({"error": "You cannot block yourself."}, status=status.HTTP_400_BAD_REQUEST)
@@ -139,8 +159,12 @@ class UnblockFriendView(APIView):
     permission_classes = [IsAuthenticated]
     def post(self,request):
         friendId = request.data.get('user_id')
+        try:
+            friendId = int(friendId)
+        except Exception as e:
+            return Response({"error": "Friend id must be a number"}, status=status.HTTP_400_BAD_REQUEST)
         if friendId is None:
-            return Response({"error": "User id is required"}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({"error": "Friend id is required"}, status=status.HTTP_400_BAD_REQUEST)
         try:
             friend = User.objects.get(id=friendId)
             try:
@@ -176,6 +200,12 @@ class FriendsOfView(APIView):
     permission_classes = [IsAuthenticated]
 
     def get(self, request, user_id):
+        try:
+            user_id = int(user_id)
+        except Exception as e:
+            return Response({"error": "User id must be a number"}, status=status.HTTP_400_BAD_REQUEST)
+        if user_id is None:
+            return Response({"error": "User id is required"}, status=status.HTTP_400_BAD_REQUEST)
         try:
             user = User.objects.get(id=user_id)
             relations = Relationship.objects.filter(

@@ -114,7 +114,6 @@ class MatchTreeBuilder(AbstractMatchBuilder):
     
     @staticmethod
     def visualize_tree(holder:Holder, lvl, size) -> None:
-        print("%s%s:%s" % (holder.lvl, ('m' if isinstance(holder, MatchHolder) else 'p'), holder.index))
         if (2 ** lvl) >= size :
             return
         MatchTreeBuilder.visualize_tree(holder.left, lvl + 1,size)

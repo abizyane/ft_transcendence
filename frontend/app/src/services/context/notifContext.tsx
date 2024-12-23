@@ -45,10 +45,6 @@ export const NotifProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     }
   };
 
-  const handleNotificationClick = (notification: Notification) => {
-    console.log('Notification clicked:', notification);
-  };
-
   const addNotification = (notification: Notification) => {
     setNotifications((prevNotifications) => [notification,...(prevNotifications || [])]);
   };
