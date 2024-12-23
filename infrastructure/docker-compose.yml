@@ -5,34 +5,12 @@ volumes:
     driver: local
   elasticsearch_data:
     driver: local
-   #  driver_opts:
-   #     type: none
-   #     device: ./elasticsearch/data
-   #     o: bind
   kibana_data:
     driver: local
-   #  driver_opts:
-   #     type: none
-   #     device: ./kibana/data
-   #     o: bind
   filebeat_data:
     driver: local
-   #  driver_opts:
-   #     type: none
-   #     device: ./filebeat/data
-   #     o: bind
   logstash_data:
     driver: local
-    # driver_opts:
-    #    type: none
-    #    device: ./logstash/data
-    #    o: bind
-  # database_data:
-  #   driver: local
-    # driver_opts:
-    #    type: none
-    #    device: ./database/data
-    #    o: bind
   node_modules:
     driver: local
   pictures:
@@ -54,6 +32,7 @@ services:
       - pictures:/media/pictures
     ports:
       - "443:443"
+      - "7500:7500"
     depends_on:
       - frontend
       - backend
@@ -246,6 +225,7 @@ services:
       - ELASTICSEARCH_USERNAME=kibana_system
       - ELASTICSEARCH_PASSWORD=${KIBANA_PASSWORD}
       - ELASTICSEARCH_SSL_CERTIFICATEAUTHORITIES=config/certs/ca/ca.crt
+
     depends_on:
       elasticsearch:
         condition: service_healthy
