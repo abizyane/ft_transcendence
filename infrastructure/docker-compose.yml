@@ -52,15 +52,8 @@ services:
       dockerfile: Dockerfile
     image: frontend:sa
     container_name: frontend
-    # volumes:
-    #   - ../frontend/app:/app
-    #   - node_modules:/app/node_modules
     expose:
       - "3000"
-    # ports:
-    #   - "3000:3000"
-    # env_file:
-    #   - .env.next
     depends_on:
       - backend
     networks:
@@ -103,12 +96,8 @@ services:
       dockerfile: Dockerfile
     image: database:sa
     container_name: ${POSTGRES_HOST}
-    # volumes:
-    #   - ./database/data:/var/lib/postgresql/data
     expose:
       - "5432"
-    ports:
-      - "5432:5432"
     env_file:
       - .env
     networks:
@@ -218,8 +207,8 @@ services:
     volumes:
       - certs:/usr/share/kibana/config/certs
       - kibana_data:/usr/share/kibana/data
-    ports:
-      - "5601:5601"
+    expose:
+      - "5601"
     environment:
       - ELASTICSEARCH_HOSTS=https://elasticsearch:9200
       - ELASTICSEARCH_USERNAME=kibana_system
