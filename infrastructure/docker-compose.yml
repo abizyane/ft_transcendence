@@ -149,127 +149,127 @@ services:
       - infra
     restart: always
 
-  # elk_setup:
-  #   build:
-  #     context: ./elk_setup
-  #     dockerfile: Dockerfile
-  #   image: elk_setup:sa
-  #   container_name: elk_setup
-  #   volumes:
-  #     - certs:/usr/share/elasticsearch/config/certs
-  #     - "/var/run/docker.sock:/var/run/docker.sock:ro"
-  #   environment:
-  #     - ELASTIC_PASSWORD=${ELASTIC_PASSWORD}
-  #     - KIBANA_PASSWORD=${KIBANA_PASSWORD}
-  #   networks:
-  #     - infra
-  #   healthcheck:
-  #     test: ["CMD-SHELL", "[ -f config/certs/elasticsearch/elasticsearch.crt ]"]
-  #     interval: 1s
-  #     timeout: 5s
-  #     retries: 120
+  elk_setup:
+    build:
+      context: ./elk_setup
+      dockerfile: Dockerfile
+    image: elk_setup:sa
+    container_name: elk_setup
+    volumes:
+      - certs:/usr/share/elasticsearch/config/certs
+      - "/var/run/docker.sock:/var/run/docker.sock:ro"
+    environment:
+      - ELASTIC_PASSWORD=${ELASTIC_PASSWORD}
+      - KIBANA_PASSWORD=${KIBANA_PASSWORD}
+    networks:
+      - infra
+    healthcheck:
+      test: ["CMD-SHELL", "[ -f config/certs/elasticsearch/elasticsearch.crt ]"]
+      interval: 1s
+      timeout: 5s
+      retries: 120
   
-  # elasticsearch:
-  #   image: docker.elastic.co/elasticsearch/elasticsearch:8.17.0
-  #   container_name: elasticsearch
-  #   volumes:
-  #     - certs:/usr/share/elasticsearch/config/certs
-  #     - elasticsearch_data:/usr/share/elasticsearch/data
-  #   ports:
-  #     - "9200:9200"
-  #   environment:
-  #     - discovery.type=single-node
-  #     - ELASTIC_PASSWORD=${ELASTIC_PASSWORD}
-  #     - xpack.security.enabled=true
-  #     - xpack.security.http.ssl.enabled=true
-  #     - xpack.security.http.ssl.key=certs/elasticsearch/elasticsearch.key
-  #     - xpack.security.http.ssl.certificate=certs/elasticsearch/elasticsearch.crt
-  #     - xpack.security.http.ssl.certificate_authorities=certs/ca/ca.crt
-  #     - xpack.security.transport.ssl.enabled=true
-  #     - xpack.security.transport.ssl.key=certs/elasticsearch/elasticsearch.key
-  #     - xpack.security.transport.ssl.certificate=certs/elasticsearch/elasticsearch.crt
-  #     - xpack.security.transport.ssl.certificate_authorities=certs/ca/ca.crt
-  #     - xpack.security.transport.ssl.verification_mode=certificate
-  #     - xpack.license.self_generated.type=basic
-  #   networks:
-  #    - infra
-  #   mem_limit: 1g
-  #   depends_on:
-  #     elk_setup:
-  #       condition: service_healthy
-  #   healthcheck:
-  #     test: [ "CMD-SHELL", "curl -s --cacert config/certs/ca/ca.crt https://localhost:9200 | grep -q 'missing authentication credentials'"]
-  #     interval: 10s
-  #     timeout: 10s
-  #     retries: 120
-  #   restart: always
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:8.17.0
+    container_name: elasticsearch
+    volumes:
+      - certs:/usr/share/elasticsearch/config/certs
+      - elasticsearch_data:/usr/share/elasticsearch/data
+    ports:
+      - "9200:9200"
+    environment:
+      - discovery.type=single-node
+      - ELASTIC_PASSWORD=${ELASTIC_PASSWORD}
+      - xpack.security.enabled=true
+      - xpack.security.http.ssl.enabled=true
+      - xpack.security.http.ssl.key=certs/elasticsearch/elasticsearch.key
+      - xpack.security.http.ssl.certificate=certs/elasticsearch/elasticsearch.crt
+      - xpack.security.http.ssl.certificate_authorities=certs/ca/ca.crt
+      - xpack.security.transport.ssl.enabled=true
+      - xpack.security.transport.ssl.key=certs/elasticsearch/elasticsearch.key
+      - xpack.security.transport.ssl.certificate=certs/elasticsearch/elasticsearch.crt
+      - xpack.security.transport.ssl.certificate_authorities=certs/ca/ca.crt
+      - xpack.security.transport.ssl.verification_mode=certificate
+      - xpack.license.self_generated.type=basic
+    networks:
+     - infra
+    mem_limit: 1g
+    depends_on:
+      elk_setup:
+        condition: service_healthy
+    healthcheck:
+      test: [ "CMD-SHELL", "curl -s --cacert config/certs/ca/ca.crt https://localhost:9200 | grep -q 'missing authentication credentials'"]
+      interval: 10s
+      timeout: 10s
+      retries: 120
+    restart: always
 
-  # logstash:
-  #   image: docker.elastic.co/logstash/logstash:8.17.0
-  #   container_name: logstash
-  #   user: root
-  #   expose:
-  #     - "5044"
-  #   volumes:
-  #     - certs:/usr/share/logstash/certs
-  #     - logstash_data:/usr/share/logstash/data
-  #     - "./logstash/conf/logstash.conf:/usr/share/logstash/pipeline/logstash.conf:ro"
-  #   environment:
-  #     - xpack.monitoring.enabled=false
-  #     - ELASTIC_USER=elastic
-  #     - ELASTIC_PASSWORD=${ELASTIC_PASSWORD}
-  #     - ELASTIC_HOSTS=https://elasticsearch:9200
-  #   mem_limit: 1g
-  #   networks:
-  #    - infra
-  #   depends_on:
-  #     elasticsearch:
-  #       condition: service_healthy
-  #   healthcheck:
-  #     test: ["CMD-SHELL", "curl -s -I http://localhost:9600 | grep -q 'HTTP/1.1 200 OK'"]
-  #     interval: 10s
-  #     timeout: 10s
-  #     retries: 120
-  #   restart: always
+  logstash:
+    image: docker.elastic.co/logstash/logstash:8.17.0
+    container_name: logstash
+    user: root
+    expose:
+      - "5044"
+    volumes:
+      - certs:/usr/share/logstash/certs
+      - logstash_data:/usr/share/logstash/data
+      - "./logstash/conf/logstash.conf:/usr/share/logstash/pipeline/logstash.conf:ro"
+    environment:
+      - xpack.monitoring.enabled=false
+      - ELASTIC_USER=elastic
+      - ELASTIC_PASSWORD=${ELASTIC_PASSWORD}
+      - ELASTIC_HOSTS=https://elasticsearch:9200
+    mem_limit: 1g
+    networks:
+     - infra
+    depends_on:
+      elasticsearch:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "curl -s -I http://localhost:9600 | grep -q 'HTTP/1.1 200 OK'"]
+      interval: 10s
+      timeout: 10s
+      retries: 120
+    restart: always
 
-  # kibana:
-  #   image: docker.elastic.co/kibana/kibana:8.17.0
-  #   container_name: kibana
-  #   volumes:
-  #     - certs:/usr/share/kibana/config/certs
-  #     - kibana_data:/usr/share/kibana/data
-  #   ports:
-  #     - "5601:5601"
-  #   environment:
-  #     - ELASTICSEARCH_HOSTS=https://elasticsearch:9200
-  #     - ELASTICSEARCH_USERNAME=kibana_system
-  #     - ELASTICSEARCH_PASSWORD=${KIBANA_PASSWORD}
-  #     - ELASTICSEARCH_SSL_CERTIFICATEAUTHORITIES=config/certs/ca/ca.crt
-  #   depends_on:
-  #     elasticsearch:
-  #       condition: service_healthy
-  #   healthcheck:
-  #     test: ["CMD-SHELL", "curl -s -I http://localhost:5601 | grep -q 'HTTP/1.1 302 Found'"]
-  #     interval: 10s
-  #     timeout: 10s
-  #     retries: 120
-  #   networks:
-  #    - infra
-  #   restart: always
+  kibana:
+    image: docker.elastic.co/kibana/kibana:8.17.0
+    container_name: kibana
+    volumes:
+      - certs:/usr/share/kibana/config/certs
+      - kibana_data:/usr/share/kibana/data
+    ports:
+      - "5601:5601"
+    environment:
+      - ELASTICSEARCH_HOSTS=https://elasticsearch:9200
+      - ELASTICSEARCH_USERNAME=kibana_system
+      - ELASTICSEARCH_PASSWORD=${KIBANA_PASSWORD}
+      - ELASTICSEARCH_SSL_CERTIFICATEAUTHORITIES=config/certs/ca/ca.crt
+    depends_on:
+      elasticsearch:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "curl -s -I http://localhost:5601 | grep -q 'HTTP/1.1 302 Found'"]
+      interval: 10s
+      timeout: 10s
+      retries: 120
+    networks:
+     - infra
+    restart: always
 
-  # filebeat:
-  #   image: docker.elastic.co/beats/filebeat:7.17.26
-  #   container_name: filebeat
-  #   user: root
-  #   volumes:
-  #     - filebeat_data:/usr/share/filebeat/data
-  #     - "./filebeat/conf/filebeat.yml:/usr/share/filebeat/filebeat.yml"
-  #     - "/var/run/docker.sock:/var/run/docker.sock:ro"
-  #     - "/var/lib/docker/containers:/var/lib/docker/containers:ro"
-  #     - certs:/usr/share/filebeat/certs
-  #   networks:
-  #    - infra
-  #   depends_on:
-  #     logstash:
-  #       condition: service_healthy
-  #   restart: always
+  filebeat:
+    image: docker.elastic.co/beats/filebeat:7.17.26
+    container_name: filebeat
+    user: root
+    volumes:
+      - filebeat_data:/usr/share/filebeat/data
+      - "./filebeat/conf/filebeat.yml:/usr/share/filebeat/filebeat.yml"
+      - "/var/run/docker.sock:/var/run/docker.sock:ro"
+      - "/var/lib/docker/containers:/var/lib/docker/containers:ro"
+      - certs:/usr/share/filebeat/certs
+    networks:
+     - infra
+    depends_on:
+      logstash:
+        condition: service_healthy
+    restart: always

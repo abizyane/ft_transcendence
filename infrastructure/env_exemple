@@ -4,8 +4,8 @@ POSTGRES_PASSWORD = 'astropassword'
 POSTGRES_HOST = 'postgres-db'
 POSTGRES_PORT = '5432'
 PGDATA = '/var/lib/postgresql/data'
-HOST_URL='https://10.11.7.8'
-API_URL='10.11.7.8/api'
+HOST_URL='https://10.11.3.2'
+API_URL='10.11.3.2/api'
 
 # Backend
 BACKEND_HOST = 'backend'
@@ -20,6 +20,3 @@ REDIS_PORT = '6379'
 # ELK
 ELASTIC_PASSWORD=password
 KIBANA_PASSWORD=password
-CLUSTER_NAME=astro-cluster
-ENCRYPTION_KEY=c34d38b3a14956121ff2170e5030b471551370178f43e5626eec58b04a30fae2
-# ENCRYPTION_KEY=132bf915a9ff713cf7befe04ea7ea68c2cb8dc12284f5e74e0921d58d99687f8
