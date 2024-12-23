@@ -232,7 +232,7 @@ class TournamentConsumer(AsyncWebsocketConsumer):
         while not self.game.status:
             await asyncio.sleep(1/40)
             self.game.update()
-            self.game.update_status()
+            # self.game.update_status()
             await self.channel_layer.group_send(self.match_name, {
                 'type' : 'send.pos'
             })

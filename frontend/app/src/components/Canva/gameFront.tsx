@@ -50,8 +50,8 @@ class Player
         this.color = init.color
     }
     drawRect(ctx){
-        ctx.fillRect(this.posX, this.posY, this.width, this.height);
-        ctx.strokeRect(this.posX, this.posY, this.width, this.height );
+        ctx.fillRect(this.posX, this.posY + 10, this.width, this.height -10);
+        ctx.strokeRect(this.posX, this.posY + 10, this.width, this.height - 10);
     }
     draw(ctx){
         ctx.fillStyle = this.color;

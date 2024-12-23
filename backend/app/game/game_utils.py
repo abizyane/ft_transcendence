@@ -7,8 +7,8 @@ class Ball:
         self.rad = 10
         self.posX = game.width / 2
         self.posY = game.height / 2
-        self.speed = 8
-        self.angle = 45
+        self.speed = 600
+        self.angle = 40
         self.dirX = math.cos(self.angle)
         self.dirY = math.sin(self.angle)
         pass
@@ -22,7 +22,7 @@ class Ball:
         if (left_collision <= 0):
             self.game.red.score += 1
             self.reset_ball()
-        if ((left_collision <= self.game.blue.x  + self.game.blue.width and left_collision > self.game.blue.x) and (self.posY >= self.game.blue.y and self.posY <= self.game.blue.y + self.game.blue.height) and not self.game.blue.isHiting):
+        if ((left_collision <= self.game.blue.x  + self.game.blue.width ) and (self.posY >= self.game.blue.y and self.posY <= self.game.blue.y + self.game.blue.height) and not self.game.blue.isHiting):
             self.dirX *= -1
             self.game.blue.isHiting = True
         #red Range
@@ -31,7 +31,7 @@ class Ball:
         if (right_collision >= self.game.width):
             self.game.blue.score += 1
             self.reset_ball()
-        if ((right_collision >= self.game.red.x and right_collision <= self.game.red.x + self.game.red.width) and (self.posY >= self.game.red.y and self.posY <= self.game.red.y + self.game.red.height) and not self.game.red.isHiting):
+        if ((right_collision >= self.game.red.x) and (self.posY >= self.game.red.y and self.posY <= self.game.red.y + self.game.red.height) and not self.game.red.isHiting):
             self.dirX *= -1
             self.game.red.isHiting = True
         # else:
@@ -46,8 +46,8 @@ class Ball:
 
     def update(self):
         self.checkCollide()
-        self.posX += (self.dirX * self.speed)
-        self.posY += (self.dirY * self.speed)
+        self.posX += (self.dirX * self.speed) * 0.01666
+        self.posY += (self.dirY * self.speed) * 0.01666
 
 class Player:
     def __init__(self, channel_name=None, id=None, game=None):
