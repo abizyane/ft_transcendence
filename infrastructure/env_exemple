@@ -4,8 +4,8 @@ POSTGRES_PASSWORD = 'astropassword'
 POSTGRES_HOST = 'postgres-db'
 POSTGRES_PORT = '5432'
 PGDATA = '/var/lib/postgresql/data'
-HOST_URL='https://10.11.3.2'
-API_URL='10.11.3.2/api'
+HOST_URL='https://10.13.2.13'
+API_URL='10.13.2.13/api'
 
 # Backend
 BACKEND_HOST = 'backend'

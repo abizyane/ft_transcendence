@@ -3,20 +3,14 @@ C_GREEN = \033[1;32m
 C_YELLOW = \033[1;33m
 C_RESET = \033[0m
 
-DC_CMD = @docker compose -f infrastructure/docker-compose.yml
+DC_CMD = @docker compose -f ./docker-compose.yml
 DATA_PATH = ./infrastructure/database/data
-ELK_PATH = ./infrastructure/
 
 all: build up
 
 build:
 	@echo "${C_GREEN}Starting Building...${C_RESET}"
 	@mkdir -p $(DATA_PATH)
-	@mkdir -p $(ELK_PATH)elasticsearch/data
-	@mkdir -p $(ELK_PATH)kibana/data
-	@mkdir -p $(ELK_PATH)logstash/data
-	@mkdir -p $(ELK_PATH)filebeat/data
-	@mkdir -p $(ELK_PATH)elk_setup/certs
 	$(DC_CMD) build
 
 up:
@@ -61,11 +55,6 @@ fclean: clean
 	@echo "${C_RED}Full cleaning Done!${C_RESET}"
 
 dclean: fclean
-	@rm -rf $(ELK_PATH)elasticsearch/data
-	@rm -rf $(ELK_PATH)kibana/data
-	@rm -rf $(ELK_PATH)logstash/data
-	@rm -rf $(ELK_PATH)filebeat/data
-	@rm -rf $(ELK_PATH)elk_setup/certs
 	@echo "${C_RED}ELK Data Removed!${C_RESET}"
 	@rm -rf $(DATA_PATH)
 	@echo "${C_RED}Postgres data Removed!${C_RESET}"

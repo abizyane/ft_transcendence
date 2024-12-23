@@ -23,12 +23,12 @@ networks:
 services:
   nginx:
     build:
-      context: ./nginx
+      context: ./infrastructure/nginx
       dockerfile: Dockerfile
     image: nginx:sa
     container_name: nginx
     volumes:
-      - ./nginx/conf/nginx.conf:/etc/nginx/http.d/default.conf
+      - ./infrastructure/nginx/conf/nginx.conf:/etc/nginx/http.d/default.conf
       - pictures:/media/pictures
     ports:
       - "443:443"
@@ -48,7 +48,7 @@ services:
 
   frontend:
     build: 
-      context: ../frontend
+      context: ./infrastructure/frontend
       dockerfile: Dockerfile
     image: frontend:sa
     container_name: frontend
@@ -67,12 +67,11 @@ services:
 
   backend:
     build: 
-      context: ../backend
+      context: ./infrastructure/backend
       dockerfile: Dockerfile
     image: backend:sa
     container_name: backend
     volumes:
-      - ../backend/app:/app
       - pictures:/app/pictures
     expose:
       - "8000"
@@ -80,7 +79,7 @@ services:
       - database
       - redis
     env_file:
-      - .env
+      - ./infrastructure/.env
     networks:
       - infra
     healthcheck:
@@ -92,14 +91,14 @@ services:
 
   database:
     build:
-      context: ./database
+      context: ./infrastructure/database
       dockerfile: Dockerfile
     image: database:sa
     container_name: ${POSTGRES_HOST}
     expose:
       - "5432"
     env_file:
-      - .env
+      - ./infrastructure/.env
     networks:
       - infra
     healthcheck:
@@ -120,7 +119,7 @@ services:
 
   elk_setup:
     build:
-      context: ./elk_setup
+      context: ./infrastructure/elk_setup
       dockerfile: Dockerfile
     image: elk_setup:sa
     container_name: elk_setup
@@ -182,7 +181,7 @@ services:
     volumes:
       - certs:/usr/share/logstash/certs
       - logstash_data:/usr/share/logstash/data
-      - "./logstash/conf/logstash.conf:/usr/share/logstash/pipeline/logstash.conf:ro"
+      - "./infrastructure/logstash/conf/logstash.conf:/usr/share/logstash/pipeline/logstash.conf:ro"
     environment:
       - xpack.monitoring.enabled=false
       - ELASTIC_USER=elastic
@@ -233,7 +232,7 @@ services:
     user: root
     volumes:
       - filebeat_data:/usr/share/filebeat/data
-      - "./filebeat/conf/filebeat.yml:/usr/share/filebeat/filebeat.yml"
+      - "./infrastructure/filebeat/conf/filebeat.yml:/usr/share/filebeat/filebeat.yml"
       - "/var/run/docker.sock:/var/run/docker.sock:ro"
       - "/var/lib/docker/containers:/var/lib/docker/containers:ro"
       - certs:/usr/share/filebeat/certs
