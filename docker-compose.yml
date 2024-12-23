@@ -48,7 +48,7 @@ services:
 
   frontend:
     build: 
-      context: ./infrastructure/frontend
+      context: ./frontend
       dockerfile: Dockerfile
     image: frontend:sa
     container_name: frontend
@@ -67,7 +67,7 @@ services:
 
   backend:
     build: 
-      context: ./infrastructure/backend
+      context: ./backend
       dockerfile: Dockerfile
     image: backend:sa
     container_name: backend
@@ -79,7 +79,7 @@ services:
       - database
       - redis
     env_file:
-      - ./infrastructure/.env
+      - .env
     networks:
       - infra
     healthcheck:
@@ -98,7 +98,7 @@ services:
     expose:
       - "5432"
     env_file:
-      - ./infrastructure/.env
+      - .env
     networks:
       - infra
     healthcheck:
