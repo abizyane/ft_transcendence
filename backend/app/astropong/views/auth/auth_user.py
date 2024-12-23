@@ -58,7 +58,7 @@ class UserIdView(APIView):
                 ).first()
                 if relation is not None:
                     if relation.status == Relationship.Status.BLOCKED:
-                        return Response({'error': 'You cannot see this user'}, status=403)
+                        return Response({'error': 'You cannot see this user'}, status=400)
             except Relationship.DoesNotExist:
                 pass
             try:

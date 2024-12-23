@@ -18,16 +18,17 @@ export const handleLogin = async (
       credentials: 'include',
     });
 
-    const responseData = await response.json();
     if (response.ok) {
       setErrorMessage(null);
       setSuccessMessage('Login successful.');
       toast.success('Login successful.')
+      const responseData = await response.json();
+      
       router.push(`/profile/${responseData.id}`);
     } else if (response.status === 401) {
       setErrorMessage(() => 'Invalid email or password');
       toast.error('Invalid email or password.');
-    } else if (response.status === 403 && responseData.mfa_enabled) {
+    } else if (response.status === 403) {
       router.push(`/auth/mfa`);
     }
   } catch (error) {
