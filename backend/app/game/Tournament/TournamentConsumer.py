@@ -34,6 +34,7 @@ def build_absolute_image_uri(scope, relative_path):
     return urljoin(base_url,settings.MEDIA_URL + relative_path)
 
 class Command(Enum):
+    NULL = 0
     CREATE = 1
     JOIN = 2
     LEAVE = 3
@@ -130,7 +131,6 @@ class TournamentConsumer(AsyncWebsocketConsumer):
                 return
             self.room = await TournamentConsumer.rm.getrandom_or_create(_type=self._type, token=token)
             self.competitor.join_room(self.room)
-            print('l'+self.room.name+'l', flush=True)
             await self.channel_layer.group_add(self.room.name, self.channel_name)
             await self.channel_layer.group_send(self.room.name, {
                 'type' : 'joined.competitor'
@@ -161,14 +161,8 @@ class TournamentConsumer(AsyncWebsocketConsumer):
         self.competitor.progress = profile.get_progress()
     
     async def init_game(self, event):
-        try :
-            self.match = self.p_holder.back
-            self.match_name = str(f'{self.room.name}m_{self.match.index}')
-        except Exception as e :
-            print(f'Exception : alias {self.competitor.alias}', flush=True)
-            print(f'Exception : p_holder {self.p_holder}', flush=True)
-            print(f'Exception : p_holder.back {self.p_holder.back}', flush=True)
-
+        self.match = self.p_holder.back
+        self.match_name = str(f'{self.room.name}m_{self.match.index}')
         await self.channel_layer.group_add(self.match_name, self.channel_name)
         if not self.match.game and ((self.p_holder.index % 2) != 0):
             self.match.game = Game(self.match.index)
@@ -237,7 +231,6 @@ class TournamentConsumer(AsyncWebsocketConsumer):
                 'type' : 'send.pos'
             })
         self.game.status = 1
-        print(self.match.state)
         await self.channel_layer.group_send(self.match_name,{
             'type' : 'finalize.match'
         })
@@ -246,7 +239,6 @@ class TournamentConsumer(AsyncWebsocketConsumer):
         if not self.game.status == 1 :
             return
         if not self.match.state == "LEAVE" :
-            print(self.match.state)
             self.match.game.set_winner()
 
         prev_match_name  = self.match_name
@@ -255,7 +247,6 @@ class TournamentConsumer(AsyncWebsocketConsumer):
 
         if self.p_holder.is_won():
             game_id = await self.save_game()
-            print(game_id, flush=True)
             self.room.winners.append(self.competitor)
             await self.award_xp(True)
 
@@ -356,7 +347,6 @@ class TournamentConsumer(AsyncWebsocketConsumer):
                 self.p_holder.competitor.exit_room(self.room)
                 self.room.competitors[0].is_host = True
                 del self.room.p_holders[self.channel_name]
-                print(self.room.p_holders, flush=True)
                 await self.channel_layer.group_send(self.room.name,{
                         'type' : 'joined.competitor',
                     })
@@ -376,14 +366,14 @@ class TournamentConsumer(AsyncWebsocketConsumer):
         competitor.join_room(self.room)
     
     def command_switch(self,command) -> int:
-        return (Command.CREATE.value * int(command == "create") + 
+        return ((self._type == "FOUR") *(Command.CREATE.value * int(command == "create") + 
                 Command.SETIMAGE.value * int(command == "set_image") +
                 Command.JOIN.value * int(command == "join") +
                 Command.LEAVE.value * int(command == "leave") +
-                Command.INPUT.value * int(command == "input") +
                 Command.JOINRANDOM.value * int(command == "join_random") +
-                Command.PLAY.value * int(command == "play") +
-                Command.ALIAS.value * int(command == "setAlias")
+                Command.ALIAS.value * int(command == "setAlias")) +
+                Command.INPUT.value * int(command == "input") +
+                Command.PLAY.value * int(command == "play")
                 )
 
     async def create_room(self,data):
@@ -429,22 +419,6 @@ class TournamentConsumer(AsyncWebsocketConsumer):
             'type' : 'tournament_state',
             'room' : [room.get_data() for room in TournamentConsumer.rm.type_four.values()],
         }))
-    
-    
-    async def leave_room(self):
-        if self.competitor and self.room :
-            try :
-                self.competitor.exit_room(self.room)
-                await self.group_send(self.room.name, {
-                    'type' : 'left.msg',
-                    'left_player' : self.competitor.username
-                }) 
-            except RoomRestriction as e:
-                TournamentConsumer.rm.remove_room(self.room._id)
-        else :
-            await self.send(text_data=json.dumps({
-                'ErrorMsg' : 'You are not in a room'
-            }))
 
     async def left_msg(self, event):
         comp_info = self.p_holder.competitor.get_allroom_info()
@@ -458,7 +432,6 @@ class TournamentConsumer(AsyncWebsocketConsumer):
         
     async def join_room(self,data):
         name = data.get('name')
-        print(name, flush=True)
         try :
             room = TournamentConsumer.rm.get_room(self._type, name)
             self.room = self.competitor.join_room(room)
@@ -508,13 +481,8 @@ class TournamentConsumer(AsyncWebsocketConsumer):
             'winners' : self.room.get_winners_info()
         }))
     
-    def join_random_room(self, _type):
-        self.room = self.competitor.random_room_request(TournamentConsumer.rm)
-        self.competitor.join_room(self.room)
-    
     async def play(self):
         if self.room.is_ready() and self.competitor.is_host:
-            print(list(self.room.p_holders.values()) , flush=True)
             competitors_gen = iter(list(self.room.p_holders.values()))
             self.room.holder = MatchTreeBuilder.build_tree(MatchHolder(),0, 1, competitors_gen, self.room.size)
             MatchTreeBuilder.visualize_tree(holder=self.room.holder, lvl=0, size=self.room.size)
@@ -580,28 +548,27 @@ class TournamentConsumer(AsyncWebsocketConsumer):
 
         match self.command_switch(command) :
             case Command.CREATE.value :
-                print(command, flush=True)
                 await self.create_room(recv_data)
+
             case Command.SETIMAGE.value :
                 await self.set_image(recv_data, self.scope)
             
             case Command.JOIN.value :
                 await self.join_room(recv_data)
 
-            case Command.LEAVE.value :
-                await self.leave_room()
-            
-            case Command.JOINRANDOM :
-                await self.join_random_room()
-        
             case Command.INPUT.value :
                 self.handle_input(recv_data)
-    
+
             case Command.PLAY.value :
                 await self.play()
             
             case Command.ALIAS.value :
                 await self.setAlias(recv_data)
+            
+            case Command.NULL.value :
+                await self.send(text_data=json.dumps({
+                    'ErrorMsg' : 'No such command'
+                }))
     
     async def leave_state(self, event):
         self.match.state = "LEAVE"
