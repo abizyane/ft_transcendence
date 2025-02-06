@@ -31,7 +31,7 @@ services:
       - ./infrastructure/nginx/conf/nginx.conf:/etc/nginx/http.d/default.conf
       - pictures:/media/pictures
     ports:
-      - "443:443"
+      - "1443:443"
       - "7500:7500"
     depends_on:
       - frontend
@@ -234,7 +234,7 @@ services:
       - filebeat_data:/usr/share/filebeat/data
       - "./infrastructure/filebeat/conf/filebeat.yml:/usr/share/filebeat/filebeat.yml"
       - "/var/run/docker.sock:/var/run/docker.sock:ro"
-      - "/var/lib/docker/containers:/var/lib/docker/containers:ro"
+      - "./infrastructure/containers:/var/lib/docker/containers:ro"
       - certs:/usr/share/filebeat/certs
     networks:
      - infra
