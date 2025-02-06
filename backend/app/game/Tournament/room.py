@@ -30,7 +30,7 @@ class RoomAbstract(ABC):
 
     pass
 def build_absolute_image_uri(scope, relative_path):
-    host = dict(scope['headers']).get(b'host', b'localhost').decode('utf-8')
+    host = dict(scope['headers']).get(b'host', b'localhost:1443').decode('utf-8')
     scheme = scope.get('scheme', 'http')
     base_url = f"{scheme}://{host}"
     if relative_path is None:

@@ -15,7 +15,7 @@ import os
 from datetime import timedelta
 
 BASE_DIR = Path(__file__).resolve().parent.parent
-MEDIA_URL = os.getenv("HOST_URL", "https://localhost")+"/pictures/"
+MEDIA_URL = os.getenv("HOST_URL", "https://localhost:1443")+"/pictures/"
 MEDIA_ROOT = os.path.join(BASE_DIR, 'pictures')
 STATIC_URL = '/static/'
 

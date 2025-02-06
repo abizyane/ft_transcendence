@@ -11,6 +11,7 @@ all: build up
 build:
 	@echo "${C_GREEN}Starting Building...${C_RESET}"
 	@mkdir -p $(DATA_PATH)
+	@mkdir -p ./infrastructure/containers	
 	$(DC_CMD) build
 
 up:
