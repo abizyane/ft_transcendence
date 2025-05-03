@@ -3,8 +3,8 @@ import { getUserData } from "./user";
 import { useRouter } from "next/navigation";
 import { registerFormData } from "@/components/Registration/Registration";
 import { cookies } from "next/headers";
-
-
+import toast from "react-hot-toast";
+import { customFetch } from "@/utils/customFetch";
 export const handleLogin = async (
   data: FormData,
   setSuccessMessage: React.Dispatch<React.SetStateAction<string | null>>,
@@ -12,35 +12,32 @@ export const handleLogin = async (
   router: NextRouter
 ) => {
   try {
-    const response = await fetch('http://localhost:8000/api/login', {
+    const response = await fetch(process.env.NEXT_PUBLIC_API_URL+'/api/login', {
       method: 'POST',
       body: data,
       credentials: 'include',
     });
 
-    const responseData = await response.json();
-    console.log(responseData);
     if (response.ok) {
       setErrorMessage(null);
       setSuccessMessage('Login successful.');
+      toast.success('Login successful.')
+      const responseData = await response.json();
+      
       router.push(`/profile/${responseData.id}`);
     } else if (response.status === 401) {
-      const errorData = await response.json();
       setErrorMessage(() => 'Invalid email or password');
-    } else if (response.status === 403 && responseData.mfa_enabled) {
+      toast.error('Invalid email or password.');
+    } else if (response.status === 403) {
       router.push(`/auth/mfa`);
-      
     }
   } catch (error) {
     setErrorMessage(() => 'An unexpected error occurred. Please try again.');
+    toast.error('Login error.')
   }
 };
 
 
-// register
-// services/registrationSubmit.ts
-
-// registrationHandler.ts
  export const handleRegistrationSubmit = async (
     data: registerFormData,
     setSuccessMessage: React.Dispatch<React.SetStateAction<string | null>>,
@@ -48,14 +45,13 @@ export const handleLogin = async (
     router: any 
   ) => {
   try {
-    const response = await fetch('http://localhost:8000/api/register', {
+    const response = await customFetch(process.env.NEXT_PUBLIC_API_URL+'/api/register', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify(data),
     });
- 
     if (response.ok) {
       setErrorMessage(null);
       setSuccessMessage('Registration successful! Redirecting...');
@@ -75,7 +71,7 @@ export const handleLogin = async (
       }
     }
   } catch (error) {
-    console.error('An unexpected error occurred:', error);
+    toast.error('An unexpected error occurred');
     setErrorMessage('An unexpected error occurred. Please try again later.');
   }
 };
@@ -86,7 +82,7 @@ export const handleLogout = async (
   router: NextRouter
 ) => {
   try {
-    const response = await fetch('http://localhost:8000/api/logout', {
+    const response = await customFetch(process.env.NEXT_PUBLIC_API_URL+'/api/logout', {
       method: 'POST',
       credentials: 'include',
     });
@@ -96,9 +92,9 @@ export const handleLogout = async (
       router.push('/auth/login');
     } else {
       const errorData = await response.json();
-      console.log(errorData);
+      toast.error("failed to logout");
     }
   } catch (error) {
-    console.log(error);
+    toast.error("failed to logout");
   }
 };

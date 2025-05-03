@@ -1,3 +1,4 @@
+from game.models import TournamentPic
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.exceptions import AuthenticationFailed
@@ -16,6 +17,8 @@ from rest_framework.parsers import MultiPartParser, FormParser
 import pyotp
 import io
 import qrcode
+import re
+from django.core.cache import cache
 
 class UserView(APIView):
     permission_classes = [IsAuthenticated]
@@ -46,6 +49,10 @@ class UserIdView(APIView):
 
     def post(self, request):
         iduser = request.data.get('id')
+        try:
+            iduser = int(iduser)
+        except Exception as e:
+            return Response({'error': 'IdUser must be a number'}, status=400)
         if iduser is None:
             return Response({'error': 'IdUser is required'}, status=400)
         try:
@@ -55,22 +62,21 @@ class UserIdView(APIView):
                 ).first()
                 if relation is not None:
                     if relation.status == Relationship.Status.BLOCKED:
-                        return Response({'error': 'You cannot see this user'}, status=403)
+                        return Response({'error': 'You cannot see this user'}, status=400)
             except Relationship.DoesNotExist:
                 pass
-            user = User.objects.filter(id=iduser).first()
+            try:
+                user = User.objects.filter(id=iduser).first()
+                if user is None:
+                    raise User.DoesNotExist
 
-            query = models.Q(user1=user, user2=request.user) | models.Q(user1=request.user, user2=user)
+                query = models.Q(user1=user, user2=request.user) | models.Q(user1=request.user, user2=user)
 
-            relation = Relationship.objects.filter(query).first()
+                relation = Relationship.objects.filter(query).first()
 
-            # if not relation:
-            #     relation = Relationship.objects.create(
-            #         user1=user,
-            #         user2=request.user,
-            #         status=Relationship.Status.UNKNOWN
-            #     )
-            return Response(FriendSerializer(user, context={'request': request, 'relationships': relation}).data)
+                return Response(FriendSerializer(user, context={'request': request, 'relationships': relation}).data)
+            except User.DoesNotExist:
+                return Response({'error': 'User doesnt exist'}, status=404)
         except User.DoesNotExist:
             return Response({'error': 'User doesnt exist'}, status=404)
 
@@ -96,6 +102,7 @@ class UploadProfilePicView(APIView):
 
             return Response({"message": "Profile picture uploaded successfully", "profile_pic_url": request.build_absolute_uri(settings.MEDIA_URL + profile_pic_path)})
         return Response(serializer.errors, status=400)
+
 class UsersView(APIView):
     permission_classes = [IsAuthenticated]
 
@@ -133,7 +140,61 @@ class MFAView(APIView):
         if not user.mfa_enabled:
             return Response({'error': 'MFA is already disabled'}, status=400)
         user.mfa_enabled = False
-        request.session['2fa_verified'] = None
+        request.session['2fa_verified'] = False
+        cache.delete(f"user_{user.id}")
+
         user.save()
         return Response({'message': 'MFA disabled successfully'}, status=200)
+    
+class GameCustomizationView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def validate_color(self, color):
+        if not color:
+            return False
+        color = color.lstrip('#')
+        if len(color) not in [6, 8]:
+            return False
+        try:
+            int(color, 16)
+            return True
+        except ValueError:
+            return False
+    
+    def get(self, request):
+        user = request.user
+        return Response({
+            'user_paddle_color': user.profile.user_paddle_color,
+            'opponent_paddle_color': user.profile.opponent_paddle_color,
+            'ball_color': user.profile.ball_color
+        }, status=200)
+    def post(self, request):
+        user = request.user
+        user_paddle_color = request.data.get('user_paddle_color')
+        opponent_paddle_color = request.data.get('opponent_paddle_color')
+        ball_color = request.data.get('ball_color')
+        if not user_paddle_color or not opponent_paddle_color or not ball_color:
+            return Response({'error': 'All fields are required'}, status=400)
+        if not self.validate_color(user_paddle_color):
+            return Response({'error': 'Invalid user paddle color'}, status=400)
+        if not self.validate_color(opponent_paddle_color):
+            return Response({'error': 'Invalid opponent paddle color'}, status=400)
+        if not self.validate_color(ball_color):
+            return Response({'error': 'Invalid ball color'}, status=400)
+        user.profile.user_paddle_color = user_paddle_color
+        user.profile.opponent_paddle_color = opponent_paddle_color
+        user.profile.ball_color = ball_color
+        user.profile.save()
+        return Response({'message': 'Game customization updated successfully',
+                         'data': {
+                            'user_paddle_color': user_paddle_color,
+                            'opponent_paddle_color': opponent_paddle_color,
+                            'ball_color': ball_color
+                         }
+                         }, status=200)
         
+
+class PingView(APIView):
+    permission_classes = [IsAuthenticated]
+    def get(self, request):
+        return Response({'message': 'pong'}, status=200)

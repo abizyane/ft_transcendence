@@ -3,16 +3,18 @@ from ..models.UserModel import User, Relationship
 from game.models import Profile
 from urllib.parse import urljoin
 from django.conf import settings
-from django.db import models
+from django.db.models import Q
 import pyotp
 
 class UserSerializer(serializers.ModelSerializer):
     profile_pic_url = serializers.SerializerMethodField()
     xp = serializers.SerializerMethodField()
+    level = serializers.SerializerMethodField()
+    progress = serializers.SerializerMethodField()
 
     class Meta:
         model = User
-        fields = ['id', 'email', 'username', 'password','profile_pic','profile_pic_url','mfa_enabled','xp']
+        fields = ['id', 'email', 'username', 'password','profile_pic','profile_pic_url','mfa_enabled','xp','level','tournament_alias', 'is_online', 'progress']
         extra_kwargs = {
             'password': {'write_only':True},
             'profile_pic': {'write_only':True}
@@ -34,11 +36,16 @@ class UserSerializer(serializers.ModelSerializer):
             return None
         default_image_url = urljoin(request.build_absolute_uri(settings.MEDIA_URL), "Profil.jpg")
         if obj.profile_pic:
-            return request.build_absolute_uri(obj.profile_pic)
+            return urljoin(request.build_absolute_uri(settings.MEDIA_URL), obj.profile_pic)
         return default_image_url
     def get_xp(self, obj):
         return obj.profile.xp if hasattr(obj, 'profile') else 0
+    
+    def get_level(self, obj):
+        return obj.profile.level if hasattr(obj, 'profile') else 0
 
+    def get_progress(self, obj):
+        return obj.profile.get_progress() if hasattr(obj, 'profile') else 0
 
 class RelationshipSerializer(serializers.ModelSerializer):
     friend = serializers.SerializerMethodField()
@@ -60,10 +67,12 @@ class FriendSerializer(serializers.ModelSerializer):
     relationship = serializers.SerializerMethodField()
     sender_id = serializers.SerializerMethodField()
     xp = serializers.SerializerMethodField()
+    level = serializers.SerializerMethodField()
+    progress = serializers.SerializerMethodField()
 
     class Meta:
         model = User
-        fields = ['id', 'username', 'email', 'profile_pic_url', 'is_online', 'relationship','sender_id', 'xp']
+        fields = ['id', 'username', 'email', 'profile_pic_url', 'is_online', 'relationship','sender_id', 'xp','level', 'progress']
 
     def get_profile_pic_url(self, obj):
         request = self.context.get('request')
@@ -71,13 +80,13 @@ class FriendSerializer(serializers.ModelSerializer):
             return None
         default_image_url = urljoin(request.build_absolute_uri(settings.MEDIA_URL), "Profil.jpg")
         if obj.profile_pic:
-            return request.build_absolute_uri(obj.profile_pic)
+            return urljoin(request.build_absolute_uri(settings.MEDIA_URL), obj.profile_pic)
         return default_image_url
 
     def get_relationship(self, obj):
-        relationships = self.context.get('relationships', [])
+        relationships = self.context.get('relationships', None)
+        request = self.context.get('request')
         if isinstance(relationships, list):
-            print("is array", type(relationships))
             for friend, relation in relationships:
                 if friend == obj:
                     return Relationship.Status(relation.status).label
@@ -86,6 +95,9 @@ class FriendSerializer(serializers.ModelSerializer):
             if relationships.user1 == obj or relationships.user2 == obj:
                 return relationships.get_status_display()
         elif relationships is None:
+            rel = Relationship.objects.filter(Q(user1=obj, user2=request.user) | Q(user2=obj, user1=request.user))
+            if rel.exists():
+                return rel.first().get_status_display()
             return "Unknown"
 
     def get_sender_id(self, obj):
@@ -100,3 +112,9 @@ class FriendSerializer(serializers.ModelSerializer):
             
     def get_xp(self, obj):
         return obj.profile.xp if hasattr(obj, 'profile') else 0
+    
+    def get_level(self, obj):
+        return obj.profile.level if hasattr(obj, 'profile') else 0
+    
+    def get_progress(self, obj):
+        return obj.profile.get_progress() if hasattr(obj, 'profile') else 0

@@ -1,4 +1,6 @@
+import { customFetch } from '@/utils/customFetch';
 import { useState, useEffect } from 'react';
+import toast from 'react-hot-toast';
 
 interface BlockedFriend {
   id:number;
@@ -13,21 +15,20 @@ export const useBlockedFriends = () => {
 
   const fetchBlocked = async () => {
     try {
-      const response = await fetch('http://localhost:8000/api/blocked', {
+      const response = await customFetch(process.env.NEXT_PUBLIC_API_URL+'/api/blocked', {
         method: 'GET',
         credentials: 'include',
       });
 
       if (response.ok) {
         const responseData = await response.json();
-        console.log(responseData);
         setBlocked(responseData);
       } else {
         const errorData = await response.json();
-        console.log('Failed to load friend blocked');
+        toast.error('Failed to load friend blocked');
       }
     } catch (error) {
-      console.log('Error fetching friend blocked');
+      toast.error('Error fetching friend blocked');
     } finally {
       setblkLoading(false);
     }

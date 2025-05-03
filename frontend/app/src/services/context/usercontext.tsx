@@ -1,4 +1,6 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
+import toast from 'react-hot-toast';
+import { customFetch } from '@/utils/customFetch';
 
 interface User {
   id: number;
@@ -10,8 +12,9 @@ interface User {
 
 interface UserContextType {
   user: User | null;
+  setUser: () => void;
   loading: boolean;
-  fetchUser: () => void;
+  updateProfile: () => void;
 }
 
 const UserContext = createContext<UserContextType | undefined>(undefined);
@@ -19,7 +22,7 @@ const UserContext = createContext<UserContextType | undefined>(undefined);
 export const useUser = () => {
   const context = useContext(UserContext);
   if (!context) {
-    throw new Error('useUser must be used within a UserProvider');
+    toast.error('useUser must be used within a UserProvider');
   }
   return context;
 };
@@ -30,19 +33,19 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const fetchUser = async () => {
     try {
-      const response = await fetch('http://localhost:8000/api/user', {credentials: 'include',});
-      if (response.ok) {
-        const data = await response.json();
-        setUser(data);
+      const response = await customFetch(process.env.NEXT_PUBLIC_API_URL+'/api/user');
+      if (response && response.ok) {
+        const userData = await response.json();
+        setUser(userData);
+        setUserloading(false);
       }
     } catch (error) {
-      console.error('Failed to fetch user:', error);
-    } finally {
+      toast.error('Error fetching user:');
       setUserloading(false);
     }
   };
-  useEffect(() => {
 
+  useEffect(() => {
     fetchUser();
   }, []);
 

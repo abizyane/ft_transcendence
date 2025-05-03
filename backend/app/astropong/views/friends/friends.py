@@ -1,5 +1,9 @@
+import secrets
 from django.core.exceptions import ValidationError
 from django.db import models
+
+from notification.models import Notifications
+from game.models import GameInvite
 from ...models.UserModel import Relationship
 from ...serializers.UserSerializer import FriendSerializer, UserSerializer
 from rest_framework.views import APIView
@@ -7,18 +11,25 @@ from rest_framework.decorators import api_view, permission_classes
 from rest_framework.response import Response
 from django.contrib.auth import get_user_model
 from rest_framework import status
-
+from rest_framework.permissions import IsAuthenticated
+from channels.layers import get_channel_layer
 from chat.serializers import UserSerializer as MinUserSerializer
 from rest_framework import generics
 from rest_framework.exceptions import NotAuthenticated, NotFound
-# from rest_framework.pagination import PageNumberPagination
+from asgiref.sync import async_to_sync
 
 User = get_user_model()
 
 
 class AddFriendView(APIView):
+    permission_classes = [IsAuthenticated]
+
     def post(self, request):
         friendId = request.data.get('friend_id')
+        try:
+            friendId = int(friendId)
+        except Exception as e:
+            return Response({"error": "Friend id must be a number"}, status=status.HTTP_400_BAD_REQUEST)
         if friendId is None:
             return Response({"error": "Friend id is required"}, status=status.HTTP_400_BAD_REQUEST)
         try:
@@ -27,6 +38,16 @@ class AddFriendView(APIView):
             friend = User.objects.get(id=friendId)
             try:
                 request.user.add_friend(friend)
+                channel_layer = get_channel_layer()
+                async_to_sync(channel_layer.group_send)(
+                    "notifications",
+                    {
+                        'type': 'notification',
+                        'receiver': friend.username,
+                        'notification_type': "friend_request",
+                        'content': f"{request.user.username} sent you a friend request",
+                    }
+                )
                 return Response({"message": "Friend request sent successfully."}, status=status.HTTP_200_OK)
             except ValidationError as e:
                 return Response({"error": e}, status=status.HTTP_400_BAD_REQUEST)
@@ -37,8 +58,13 @@ class AddFriendView(APIView):
             }, status=404)
 
 class RemoveFriendView(APIView):
+    permission_classes = [IsAuthenticated]
     def post(self,request):
         friendId = request.data.get('friend_id')
+        try:
+            friendId = int(friendId)
+        except Exception as e:
+            return Response({"error": "Friend id must be a number"}, status=status.HTTP_400_BAD_REQUEST)
         if friendId is None:
             return Response({"error": "Friend id is required"}, status=status.HTTP_400_BAD_REQUEST)
         try:
@@ -54,8 +80,13 @@ class RemoveFriendView(APIView):
             }, status=404)
 
 class AcceptFriendRequestView(APIView):
+    permission_classes = [IsAuthenticated]
     def post(self,request):
         friendId = request.data.get('friend_id')
+        try:
+            friendId = int(friendId)
+        except Exception as e:
+            return Response({"error": "Friend id must be a number"}, status=status.HTTP_400_BAD_REQUEST)
         if friendId is None:
             return Response({"error": "Friend id is required"}, status=status.HTTP_400_BAD_REQUEST)
         try:
@@ -70,15 +101,20 @@ class AcceptFriendRequestView(APIView):
                 "error": "User not found"
             }, status=404)
 class RejectFriendRequestView(APIView):
+    permission_classes = [IsAuthenticated]
     def post(self,request):
         friendId = request.data.get('friend_id')
+        try:
+            friendId = int(friendId)
+        except Exception as e:
+            return Response({"error": "Friend id must be a number"}, status=status.HTTP_400_BAD_REQUEST)
         if friendId is None:
             return Response({"error": "Friend id is required"}, status=status.HTTP_400_BAD_REQUEST)
         try:
             friend = User.objects.get(id=friendId)
             try:
                 request.user.refuse_friend_request(friend)
-                return Response({"message": "Friend request accepted."}, status=status.HTTP_200_OK)
+                return Response({"message": "Friend request rejected."}, status=status.HTTP_200_OK)
             except ValidationError as e:
                 return Response({"error": e}, status=status.HTTP_400_BAD_REQUEST)
         except User.DoesNotExist:
@@ -87,16 +123,30 @@ class RejectFriendRequestView(APIView):
             }, status=404)
         
 class BlockFriendView(APIView):
+    permission_classes = [IsAuthenticated]
     def post(self,request):
         friendId = request.data.get('user_id')
+        try:
+            friendId = int(friendId)
+        except Exception as e:
+            return Response({"error": "Friend id must be a number"}, status=status.HTTP_400_BAD_REQUEST)
         if friendId is None:
-            return Response({"error": "User id is required"}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({"error": "Friend id is required"}, status=status.HTTP_400_BAD_REQUEST)
         try:
             if (request.user.id == friendId):
                 return Response({"error": "You cannot block yourself."}, status=status.HTTP_400_BAD_REQUEST)
             friend = User.objects.get(id=friendId)
             try:
                 request.user.block_friend(friend)
+                channel_layer = get_channel_layer()
+                async_to_sync(channel_layer.group_send)(
+                    "chat_room",
+                    {
+                        'type': 'blocked',
+                        'receiver': friend.username,
+                        'sender': request.user.username
+                    }
+                )
                 return Response({"message": "User blocked."}, status=status.HTTP_200_OK)
             except ValidationError as e:
                 return Response({"error": e}, status=status.HTTP_400_BAD_REQUEST)
@@ -106,10 +156,15 @@ class BlockFriendView(APIView):
             }, status=404)
         
 class UnblockFriendView(APIView):
+    permission_classes = [IsAuthenticated]
     def post(self,request):
         friendId = request.data.get('user_id')
+        try:
+            friendId = int(friendId)
+        except Exception as e:
+            return Response({"error": "Friend id must be a number"}, status=status.HTTP_400_BAD_REQUEST)
         if friendId is None:
-            return Response({"error": "User id is required"}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({"error": "Friend id is required"}, status=status.HTTP_400_BAD_REQUEST)
         try:
             friend = User.objects.get(id=friendId)
             try:
@@ -123,12 +178,10 @@ class UnblockFriendView(APIView):
             }, status=404)
 
 
-# class BlockedUsersPageNumberPagination(PageNumberPagination):
-#     page_size = 50
-
 class BlockedUsersList(generics.ListAPIView):
+    
+    permission_classes = [IsAuthenticated]
     serializer_class = MinUserSerializer
-    # pagination_class = BlockedUsersPageNumberPagination
 
     def get_queryset(self):
         if not self.request.user.is_authenticated:
@@ -144,7 +197,15 @@ class BlockedUsersList(generics.ListAPIView):
         return blocked_users
     
 class FriendsOfView(APIView):
+    permission_classes = [IsAuthenticated]
+
     def get(self, request, user_id):
+        try:
+            user_id = int(user_id)
+        except Exception as e:
+            return Response({"error": "User id must be a number"}, status=status.HTTP_400_BAD_REQUEST)
+        if user_id is None:
+            return Response({"error": "User id is required"}, status=status.HTTP_400_BAD_REQUEST)
         try:
             user = User.objects.get(id=user_id)
             relations = Relationship.objects.filter(
@@ -170,6 +231,8 @@ class FriendsOfView(APIView):
             }, status=404)
     
 class ListFriendView(APIView):
+    permission_classes = [IsAuthenticated]
+
     def get(self, request, relationship_type=None):
         user = request.user
         friends_with_relationship = []
@@ -202,3 +265,48 @@ class ListFriendView(APIView):
             context={'request': request, 'relationships': friends_with_relationship}
         )
         return Response(serializer.data)
+
+
+class InviteFriendView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request):
+        user = request.user
+        friendId = request.data.get('friend_id')
+        if friendId is None:
+            return Response({"error": "Friend id is required"}, status=status.HTTP_400_BAD_REQUEST)
+        try:
+            friend = User.objects.get(id=friendId)
+            if friend == user:
+                return Response({"error": "You cannot invite yourself to a game."}, status=status.HTTP_400_BAD_REQUEST)
+        except User.DoesNotExist:
+            return Response({"error": "User not found"}, status=status.HTTP_404_NOT_FOUND)
+        
+        try:
+            relations = Relationship.objects.filter(
+                ((models.Q(user1=user) & models.Q(user2=friend)) |
+                (models.Q(user1=friend) & models.Q(user2=user))) &
+                models.Q(status=Relationship.Status.FRIEND)
+            )
+            if not relations.exists():
+                return Response({"error": "You must be friends with this user to invite them to a game."}, status=status.HTTP_400_BAD_REQUEST)
+            token = secrets.token_urlsafe(32)
+            GameInvite.objects.create(user_created=user, user_invited=friend, token=token, status=GameInvite.Status.PENDING)
+            
+            channel_layer = get_channel_layer()
+            async_to_sync(channel_layer.group_send)(
+                "notifications",
+                {
+                    'type': 'notification',
+                    'receiver': friend.username,
+                    'notification_type': "game_invite",
+                    'content': f"{user.username} invited you to a game",
+                    'link': f"/game/solo/maps?game=randommatch&token={token}"
+                }
+            )
+            return Response({
+                "message": "Friend invited.",
+                "token": token
+            }, status=status.HTTP_200_OK)
+        except User.DoesNotExist:
+            return Response({"error": "User not found"}, status=status.HTTP_404_NOT_FOUND)

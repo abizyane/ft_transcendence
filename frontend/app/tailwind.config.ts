@@ -61,7 +61,10 @@ const config: Config = {
   			}
   		},
   		fontFamily: {
-  			mont: ["Montserrat", "sans-serif"]
+  			mont: [
+  				'Montserrat',
+  				'sans-serif'
+  			]
   		},
   		screens: {
   			xs: '320px',

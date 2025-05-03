@@ -1,30 +1,40 @@
+from django.db import models
+from astropong.serializers.UserSerializer import FriendSerializer
 from rest_framework import serializers
 from .models import Message
-from astropong.models.UserModel import User
+from astropong.models.UserModel import Relationship, User
 from urllib.parse import urljoin
 from django.conf import settings
 
 class UserSerializer(serializers.ModelSerializer):
-    profile_pic = serializers.SerializerMethodField()
+    profile_pic_url = serializers.SerializerMethodField()
 
     class Meta:
         model = User
-        fields = ['id', 'username', 'profile_pic', 'is_online']
+        fields = ['id', 'username', 'profile_pic_url', 'is_online']
 
-    def get_profile_pic(self, obj):
+    def get_profile_pic_url(self, obj):
         request = self.context.get('request')
         if request is None:
             return None
         default_image_url = urljoin(request.build_absolute_uri(settings.MEDIA_URL), "Profil.jpg")
         if obj.profile_pic:
-            return request.build_absolute_uri(obj.profile_pic)
+            return urljoin(request.build_absolute_uri(settings.MEDIA_URL), obj.profile_pic)
         return default_image_url
 
 class MessageConsumerSerializer(serializers.ModelSerializer):
+    sender = serializers.SerializerMethodField()
+    receiver = serializers.SerializerMethodField()
+
+    def get_sender(self, obj):
+        return obj.sender.username
+
+    def get_receiver(self, obj):
+        return obj.receiver.username
 
     class Meta:
         model = Message
-        fields = ['message_id', 'sender', 'receiver', 'message', 'timestamp', 'seen']
+        fields = ['message_id', 'sender', 'receiver', 'sender_id', 'receiver_id', 'message', 'timestamp', 'seen', 'notification']
 
 class MessageSerializer(serializers.ModelSerializer):
     sender = UserSerializer(read_only=True)
@@ -36,8 +46,9 @@ class MessageSerializer(serializers.ModelSerializer):
             'sender': instance.sender.username,
             'receiver': instance.receiver.username,
             'message': instance.message,
-            'timestamp': instance.timestamp,
-            'seen': instance.seen
+            'timestamp': str(instance.timestamp),
+            'seen': instance.seen,
+            'notification': instance.notification
         }
 
 class ChatRoomSerializer(serializers.Serializer):
@@ -49,23 +60,39 @@ class ChatRoomSerializer(serializers.Serializer):
     def to_representation(self, instance):
         user = instance['receiver'] if instance['sender'].username == self.context['request'].user.username else instance['sender']
         return {
-            'user': UserSerializer(user, context=self.context).data,
+            'user': FriendSerializer(user, context=self.context).data,
             'messages': self.get_messages(instance),
             'next': instance['next'],
             'previous': instance['previous'],
         }
 
 class ConversationSerializer(serializers.ModelSerializer):
-    sender = UserSerializer(read_only=True)
-    receiver = UserSerializer(read_only=True)
+    sender = serializers.SerializerMethodField()
+    receiver = serializers.SerializerMethodField()
+    relationship = serializers.SerializerMethodField()
+    def get_sender(self, obj):
+        return UserSerializer(obj.sender, context=self.context).data
+    
+    def get_receiver(self, obj):
+        return UserSerializer(obj.receiver, context=self.context).data
+    
 
     def to_representation(self, instance):
+        current_user = self.context['request'].user
+        other_user = instance.sender if instance.sender.id != current_user.id else instance.receiver
+        user = User.objects.filter(id=other_user.id).first()
+        query = models.Q(user1=user, user2=current_user) | models.Q(user1=current_user, user2=user)
+        relation = Relationship.objects.filter(query).first()
+        
         return {
-            'id': instance.sender.id if instance.sender.id != self.context['request'].user.id else instance.receiver.id,
-            'username': instance.sender.username if instance.sender.username != self.context['request'].user.username else instance.receiver.username,
-            'profile_pic': instance.sender.profile_pic if instance.sender.username != self.context['request'].user.username else instance.receiver.profile_pic,
-            'is_online': instance.sender.is_online if instance.sender.username != self.context['request'].user.username else instance.receiver.is_online,
+            'id': other_user.id,
+            'username': other_user.username,
+            'profile_pic_url': UserSerializer(other_user, context=self.context).data['profile_pic_url'],
+            'is_online': other_user.is_online,
+            'relationship': FriendSerializer(other_user, context={'request': self.context['request'], 'relationships': relation}).data['relationship'],
             'message': instance.message,
+            'sender': instance.sender.username,
             'timestamp': instance.timestamp,
-            'seen': instance.seen
+            'seen': instance.seen,
+            'notification': instance.notification
         }

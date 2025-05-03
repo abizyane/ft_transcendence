@@ -4,6 +4,8 @@ import LoginForm from "components/login/LoginForm";
 import { useState } from "react";
 import {useUser} from "@/services/context/usercontext";
 import { useRouter } from "next/navigation";
+import toast from 'react-hot-toast';
+import { customFetch } from "@/utils/customFetch";
 
 const MFAPage = () => {
 
@@ -17,21 +19,21 @@ const MFAPage = () => {
 
   const fetchUser = async () => {
     try {
-      const response = await fetch('http://localhost:8000/api/user', {credentials: 'include',});
+      const response = await customFetch(process.env.NEXT_PUBLIC_API_URL+'/api/user', {credentials: 'include',});
       if (response.ok) {
         const data = await response.json();
         router.push(`/profile/${data.id}`);
 
       }
     } catch (error) {
-      console.error('Failed to fetch user:', error);
+      toast.error('Failed to fetch user:');
     } finally {
     }
   };
   
   const submitOtp = async () => {
     try {
-      const response = await fetch('http://localhost:8000/api/2fa_code', {
+      const response = await customFetch(process.env.NEXT_PUBLIC_API_URL+'/api/2fa_code', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         credentials: 'include',
@@ -39,14 +41,16 @@ const MFAPage = () => {
       });
       const data = await response.json();
       if (!response.ok) {
-        console.error(data)
+        toast.error(data.error)
       }
-      console.log(data.message);
+      else
+      {
+        toast.success("2FA verification successful");
+        fetchUser();
+      }
     } catch (error) {
-      console.error('Error:', error);
+      toast.error('Invalid OTP');
     }
-    fetchUser();
-  
   }
 
   return (
@@ -61,7 +65,6 @@ const MFAPage = () => {
             {errorMessage && (
               <div className="text-red-500 text-center mb-4">{errorMessage}</div>
             )}
-            {/* <div className="font-mont p-6 backdrop-blur-lg bg-gray-800/60  rounded-xl shadow-lg max-w-sm w-full  overflow-hidden"> */}
             <h2 className="text-3xl font-bold text-white mb-4">Two Factor Auth</h2>
               <div className="rounded-md shadow-sm">
                 

@@ -9,15 +9,16 @@ from rest_framework.permissions import AllowAny
 from ...serializers.UserSerializer import UserSerializer
 from rest_framework import status
 from rest_framework_simplejwt.tokens import RefreshToken
+import os
 User = get_user_model()
 
 @permission_classes([AllowAny])
 class OAuth(APIView):
     AUTH_URL = "https://api.intra.42.fr/oauth/authorize"
     TOKEN_URL = "https://api.intra.42.fr/oauth/token"
-    REDIRECT_URI = "http://localhost:3000/auth/oauth"
+    REDIRECT_URI = f"{os.environ.get('HOST_URL', 'https://localhost')}/auth/oauth"
     CLIENT_ID = "u-s4t2ud-e86add016b6a41e208d53d0c011abdc53a93f6e1ba65ba9605a37be5a8997a17"
-    CLIENT_SECRET="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"
+    CLIENT_SECRET="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"
     def get(self, request, *args, **kwargs):
         payload = {
             'client_id': self.CLIENT_ID,
@@ -42,7 +43,6 @@ class OAuthCallback(APIView):
             "redirect_uri": OAuth.REDIRECT_URI
         }
         response = requests.post(OAuth.TOKEN_URL, data=payload)
-        print(response.json())
         if response.status_code != 200:
             return Response("Invalid request", status=status.HTTP_401_UNAUTHORIZED)
         resp = response.json()
@@ -51,10 +51,12 @@ class OAuthCallback(APIView):
     
     def is_email_existing(self, email):
         return User.objects.filter(email=email).exists()
+    
+    def is_username_existing(self, username):
+        return User.objects.filter(username=username).exists()
 
     def createUserInfo(self, user, code):
         try:
-            print("image ; ", user['image']['versions']['small'])
             serializer = UserSerializer(data={
                 'email': user['email'],
                 'username': user['login'],
@@ -65,23 +67,19 @@ class OAuthCallback(APIView):
             })
             serializer.is_valid(raise_exception=True)
             serializer.save()
-            return self.loginUser(serializer.instance)
+            return self.loginUser(serializer.instance, self.request)
         except Exception as e:
-            print("Error", str(e))
-            return Response({'error': str(e)}, status=status.HTTP_401_UNAUTHORIZED)
+            return Response({'error': e}, status=status.HTTP_400_BAD_REQUEST)
     
     def loginUser(self, user_instance, request):
-        print(user_instance)
-
         refresh = RefreshToken.for_user(user_instance)
-        user_data = UserSerializer(user_instance).data
+        user_data = UserSerializer(user_instance, context={'request': self.request}).data
         
-        print("Serialized data:", user_data)
-        print("User model instance:", user_instance) 
         response = Response(user_data)
         
-        response.set_cookie(key='refresh', value=str(refresh),samesite='None', httponly=True, secure=True)
-        response.set_cookie(key='access', value=str(refresh.access_token),samesite='None', httponly=True, secure=True)
+        response.set_cookie(key='refresh', value=str(refresh), httponly=True)
+        response.set_cookie(key='access', value=str(refresh.access_token), httponly=True)
+        response.set_cookie(key='isLoggedIn', value=str(True), httponly=False)
         if user_instance.mfa_enabled:
             response.status_code = 403
             request.session['2fa_verified'] = False
@@ -95,6 +93,8 @@ class OAuthCallback(APIView):
             if self.is_email_existing(user['email']):
                 user = User.objects.filter(email=user['email']).get()
                 return self.loginUser(user, self.request)
+            elif self.is_username_existing(user['login']):
+                return Response({'error': "Username already exists"}, status=status.HTTP_400_BAD_REQUEST)
             else:
                 return self.createUserInfo(user, code)    
         else:

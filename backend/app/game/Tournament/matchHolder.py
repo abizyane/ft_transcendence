@@ -54,12 +54,13 @@ class PlayerHolder(Holder):
             else:
                 tmp.right = self
             self.lvl = match.lvl
+            self.index = match.index
             self.back = tmp
         else:
             raise ValueError("You Cant Upgrade AnyMore")
 
     def get_paddle_data(self):
-        return self.paddle.data() #paddle is Player class for Now
+        return self.paddle.data()
     
     def get_name(self):
         return self.competitor.name
@@ -70,16 +71,14 @@ class PlayerHolder(Holder):
         elif _cmd == "keyW_down":
             self.paddle.isW = False
         elif _cmd == "keyS_up":
-            self.paddle.isW = True
+            self.paddle.isS = True
         elif _cmd == "keyS_down":
-            self.paddle.isW = False
+            self.paddle.isS = False
     def is_won(self):
         return self.paddle.win_state == 'WIN'
     pass
 
 class MatchTreeBuilder(AbstractMatchBuilder):
-    # def __init__(self, match):
-    #     self.room = match
     @staticmethod
     def build_tree(holder:Holder, index:int ,lvl:int, competitor_generator,size):
         holder.lvl = lvl
@@ -115,7 +114,6 @@ class MatchTreeBuilder(AbstractMatchBuilder):
     
     @staticmethod
     def visualize_tree(holder:Holder, lvl, size) -> None:
-        print("%s%s:%s" % (holder.lvl, ('m' if isinstance(holder, MatchHolder) else 'p'), holder.index))
         if (2 ** lvl) >= size :
             return
         MatchTreeBuilder.visualize_tree(holder.left, lvl + 1,size)
@@ -138,21 +136,3 @@ class AbstractTournamentManager(ABC):
     def set_winner_lvl(self):
         pass
     
-# class TournamentManager(AbstractTournamentManager):
-#     def __init__(self, match_root):
-#         self.match_holder = match_root
-    
-#     def get_winner(self, competitors):
-#         winners = []
-#         for competitor in competitors:
-#             if competitor.won:
-#                 winners.append(competitor)
-#         return winners
-
-#     def update_tree(self, competitors):
-#         winners = self.get_winners(competitors)
-#         for winner in winners:
-#             winner.upgrade()
-#             winner.won = False
-#             winner.lvl -= 1
-        

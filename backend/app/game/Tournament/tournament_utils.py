@@ -2,8 +2,18 @@ from abc import ABC,abstractmethod
 from .room import *
 from enum import Enum
 from .roomlister import RoomLister
+from .room_restrict import MustHaveName, RoomNameAlreadyExist, RoomRequestNameRequired, RoomNotExist, RoomRestriction
 
 RoomType = Enum('RoomType', ['TWO', 'FOUR', 'EIGHT'])
+
+RoomTypes = {
+    "TWO": "TwoPlayersRoom",
+    "FOUR": "FourPlayersRoom"
+}
+RM_TYPE = {
+    2: "TWO",
+    4: "FOUR"
+}
 
 class AbstractRoomManager(ABC):
     @abstractmethod
@@ -30,60 +40,64 @@ class AbstractRoomManager(ABC):
 class RoomManager(AbstractRoomManager):
     def __init__(self):
         self.rooms = []
-    #Builder Call
-    def generate_room(self, _type) -> Room :
+    async def generate_room(self, _type, image_id=None, scope=None) -> Room :
         value:int = RoomType[_type].value
         if value == 1:
+            
             return TwoPlayersRoom()
         elif value == 2:
-            return FourPlayersRoom()
+            room = FourPlayersRoom()
+            await room.set_image(image_id, scope)
+            return room
         else:
             raise ValueError("No such a type")
     
-    #Room LifeTime
-    def create_room(self, _type) -> Room:
-        new_room = self.generate_room(_type);
+    async def create_room(self, _type, image_id, scope) -> Room:
+        new_room = await self.generate_room(_type, image_id, scope);
         self.rooms.append(new_room)
         return new_room
 
     def remove_room(self, _id) -> Room:
         return self.rooms.pop(_id)
 
-    #Room State
     def is_empty(self, _id) -> bool:
         return self.rooms[_id].is_empty()
 
     def is_ready(self, _id) -> bool:
         return self.rooms[_id].is_ready()
 
-    #Other Methods
     def get_room(self, _id) -> Room:
         return self.rooms[_id]
 
-    def get_available_rooms(_type:str):
+    def get_available_rooms(self, _type:str):
         return (lambda room : room.ready, self.rooms)
 
-
 class RoomListManager(RoomManager):
-    RoomTypes = {
-        "TWO": "TwoPlayersRoom",
-        "FOUR": "FourPlayersRoom"
-    }
-    RM_TYPE = {
-        2: "TWO",
-        4: "FOUR"
-    }
+
     _id = 0
     def __init__(self):
         super().__init__()
         self.not_ready = RoomLister()
         self.ready = RoomLister()
+        self.names = {4:{}}
+
+    def name_handle(self, _type, name):
+        if _type == RM_TYPE[4] and not name:
+            raise MustHaveName
+        if name in self.names[4]:
+            raise UsedName(name)
+        if name:
+            self.names[4].add(name)
  
-    def create_room(self, _type):
-        new_room = super().create_room(_type)
-        self.not_ready.append(new_room)
-        self.naming_room(new_room)
-        return new_room
+    def create_room(self, _type, name=None):
+        try:
+            self.name_handle(_type=type, name=name)
+            new_room = super().create_room(_type)
+            self.not_ready.append(new_room)
+            self.naming_room(new_room, name=name)
+            return new_room
+        except Exception as e :
+            raise
     
     def remove_ready(self, room:Room):
         self.ready.remove(room)
@@ -99,5 +113,86 @@ class RoomListManager(RoomManager):
     def switch_to_ready(self, room:Room):
         self.ready.append(self.not_ready.remove(room))
 
-    def naming_room(self, room:Room):
-        room.name =  f'room_{RoomListManager.RoomTypes[ RoomListManager.RM_TYPE[room.size] ]}.{RoomListManager._id}'
+    def naming_room(self, room:Room, name=None):
+        room.name =  name if name else f'room_{RoomListManager.RoomTypes[ RoomListManager.RM_TYPE[room.size] ]}.{RoomListManager._id}'
+
+    class MustHaveName(Exception):
+        def __init__(self):
+            super().__init__(message="Name Your Room")
+        
+    class UsedName(Exception):
+        def __init__(self, name:str):
+            super().__init__(message=f'the room name: {name} already exist please change the room name')
+
+
+class RoomManagerNew(RoomManager):
+    def __init__(self):
+        self.aliases = set()
+        self.type_four_name = {4:set()}
+        self.type_two = {}
+        self.type_four = {}
+        self.type_two_id = 0
+    
+    async def create_type_two_room(self, token=None):
+        room = await self.generate_room(RM_TYPE[2])
+        room.token = token
+        room.name = f'room_{self.type_two_id}'
+        self.type_two[room.name] = room
+        self.type_two_id += 1
+        return room
+
+    async def create_type_four_room(self, name, image_id, scope):
+        if not name:
+            raise MustHaveName
+        if name in self.type_four_name[4]:
+            raise RoomNameAlreadyExist(name)
+        self.type_four_name[4].add(name)
+        self.type_four[name] = await self.generate_room(RM_TYPE[4], image_id, scope)
+        self.type_four[name].name = name
+        return self.type_four[name]
+
+
+    async def create_room(self, _type:str, name, image_id, scope):
+        if _type == RM_TYPE[2]:
+            return self.create_type_two();
+        elif _type == RM_TYPE[4] :
+            return await self.create_type_four_room(name, image_id, scope)
+
+    def get_room(self, _type ,room_name):
+        if not room_name :
+            raise RoomRequestNameRequired()
+        if room_name not in self.type_four_name[4]:
+            raise RoomNotExist(room_name)
+        return self.type_four[room_name]
+
+    async def getrandom_or_create(self, _type, token=None) :
+        for i,r in  self.type_two.items():
+            if token == None:
+                if not r.started and r.token == None:
+                    return r
+            else:
+                if not r.started and r.token == token:
+                    return r
+        return await self.create_type_two_room(token)
+    """
+    get all in type four rooms needed data
+    """
+    def rooms_data(self) :
+        return list(room.get_data() for room in self.type_four.values())
+    
+    """
+    remove tournament name and tournament
+    """
+    def remove_room(self, _type, _id):
+        if _type == RM_TYPE[2]:
+            self.remove_type_two_room(_id)
+        elif _type == RM_TYPE[4]:
+            self.remove_type_four_room(_id)
+    
+    def remove_type_four_room(self, room_name):
+        self.type_four_name[4].remove(room_name)
+        del self.type_four[room_name]
+
+    def remove_type_two_room(self, room_id):
+        self.type_two_id -= 1
+        del self.type_two[room_id]

@@ -1,5 +1,5 @@
-import Image from "next/image"
 import Link from "next/link";
+import Log from "../../../public/Logo1.png";
 
 const Logo = () => {
   return (
@@ -7,10 +7,11 @@ const Logo = () => {
 <div className=" top-0 left-0">
   <Link href="/">
   <img 
-    src="https://res.cloudinary.com/dwxvnezhn/image/upload/f_auto,q_auto/v1/pics/nbs3tv67mny656ohbayx" 
+    src={Log.src}
     alt="Logo" 
-    width="80"
+    width="100"
     height="50"
+    className="pt-3 mr-6 lg:mr-0 lg:p-4"
   />
   </Link>
 </div>

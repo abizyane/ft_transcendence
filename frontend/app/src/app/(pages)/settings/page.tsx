@@ -3,24 +3,26 @@
 import { useForm } from 'react-hook-form';
 import { useState } from 'react';
 import { Switch } from "@/components/ui/switch"
-import {useUser} from "@/services/context/usercontext";
-import { disableCache } from '@iconify/react';
+import { useUser } from "@/services/context/usercontext";
+import toast from 'react-hot-toast';
+import Loader from "@/components/loader/loader";
+import { useGame } from '@/services/context/gameContext';
+import { customFetch } from '@/utils/customFetch';
+
 
 const SettingsPage = () => {
-   
   const [activeTab, setActiveTab] = useState<'profile' | 'game'>('profile');
 
   return (
-    <div className="w-full h-full m-20 px-20">
-      <div className='bg-gray-800/60 w-full h-full text-white border-2 border-violet-primary p-20'>
+    <div className="w-full h-full m-4 p-4 flex justify-center items-center">
+      <div className='bg-gray-800/60 w-full mb-24 lg:mb-0 h-fit text-white border-2 border-violet-primary p-4 sm:p-6 md:p-10 rounded-xl'>
 
-        <h1 className="text-3xl font-bold mb-4 text-center">Settings</h1>
+        <h1 className="text-2xl sm:text-3xl font-bold mb-4 text-center">Settings</h1>
 
-        {/* Tab Navigation */}
-        <div className="flex space-x-4 pb-2 w-full">
+        <div className="flex space-x-2 sm:space-x-4 pb-2 w-full">
           <button
             onClick={() => setActiveTab('profile')}
-            className={`px-4 py-2 w-1/2 ${
+            className={`px-4 py-2 sm:px-6 sm:py-3 w-1/2 ${
               activeTab === 'profile' ? 'border-b-2 border-white text-white' : 'text-gray-500'
             }`}
           >
@@ -28,7 +30,7 @@ const SettingsPage = () => {
           </button>
           <button
             onClick={() => setActiveTab('game')}
-            className={`px-4 py-2 w-1/2 ${
+            className={`px-4 py-2 sm:px-6 sm:py-3 w-1/2 ${
               activeTab === 'game' ? 'border-b-2 border-white text-white' : 'text-gray-500'
             }`}
           >
@@ -36,7 +38,6 @@ const SettingsPage = () => {
           </button>
         </div>
 
-        {/* Tab Content */}
         <div className="mt-6">
           {activeTab === 'profile' ? <ProfileSettings /> : <GameSettings />}
         </div>
@@ -45,53 +46,99 @@ const SettingsPage = () => {
   );
 };
 
-
-
-
-
 const ProfileSettings = () => {
-    const { register, handleSubmit, formState: { errors }, watch } = useForm();
-    const [profileImage, setProfileImage] = useState<File | null>(null);
-    const [is2FAEnabled, setIs2FAEnabled] = useState(false);
-    const [otpValue, setOtpValue] = useState('');
+  const { register, handleSubmit, formState: { errors }, watch } = useForm();
+  const [profileImage, setProfileImage] = useState<File | null>(null);
+  const [otpValue, setOtpValue] = useState('');
+  const [imagePreview, setImagePreview] = useState<string | null>(null);
+  const { user, fetchUser } = useUser();
+  if (!user) return (
+    <div className="w-full h-full flex items-center justify-center">
+      <Loader />
+    </div>
+  );
 
-    const {user, fetchUser} =useUser();
-    if(!user)
-        return null;
-  
-  const onSubmit = (data: any) => {
-    console.log("Form Data:", data);
-    console.log("Profile Image:", profileImage);
-    console.log("2FA Enabled:", is2FAEnabled);
-  };
 
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
       setProfileImage(file);
+      const previewUrl = URL.createObjectURL(file);
+      setImagePreview(previewUrl);
     }
   };
-  
+  const handleImage = async (profileImage: File) => {
+    const formData = new FormData();
+    formData.append('profile_pic', profileImage);
+
+    try {
+      const response = await customFetch(process.env.NEXT_PUBLIC_API_URL+'/api/upload_image', {
+        method: 'POST',
+        body: formData,
+        credentials: 'include',
+      });
+
+      const responseData = await response.json();
+      if (!response.ok) {
+        toast.error('Image upload failed');
+      } else {
+        toast.success('Image updated successfully');
+        fetchUser(); 
+      }
+    } catch (error) {
+      toast.error('Error uploading image');
+    }
+  };
+  const updatePassword = async (formData: any) => {
+      try {
+          const response = await customFetch(process.env.NEXT_PUBLIC_API_URL+'/api/changepassword', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              credentials: 'include',
+              body: JSON.stringify({ new_password: formData.newPassword }),
+          });
+          
+          const responseData = await response.json(); 
+          if (!response.ok) {
+              toast.error(responseData.message);
+          } else {
+              toast.success('Password updated successfully');
+          }
+      } catch (error) {
+        toast.error('Error:', error);
+      }
+  };
+  const onSubmit = (formData: any) => {
+    if (formData.newPassword) {
+        updatePassword(formData);
+    }
+    if (profileImage) {
+        handleImage(profileImage);
+    }
+};
+
+
+
   const disable2FA = async () => {
     try {
-      const response = await fetch('http://localhost:8000/api/2fa_code', {
+      const response = await customFetch(process.env.NEXT_PUBLIC_API_URL+'/api/2fa_code', {
         method: 'DELETE',
         headers: { 'Content-Type': 'application/json' },
         credentials: 'include',
       });
       const data = await response.json();
       if (!response.ok) {
-        console.error(data)
+        toast.error(data.message);
       }
-      console.log(data.message);
     } catch (error) {
-      console.error('Error:', error);
+      toast.error('Error:', error);
     }
     fetchUser();
   };
+
   const handleVerifyOtp = async () => {
     try {
-      const response = await fetch('http://localhost:8000/api/2fa_code', {
+      const response = await customFetch(process.env.NEXT_PUBLIC_API_URL+'/api/2fa_code', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         credentials: 'include',
@@ -99,155 +146,242 @@ const ProfileSettings = () => {
       });
       const data = await response.json();
       if (!response.ok) {
-        console.error(data)
+        toast.error(data.error);
       }
-      console.log(data.message);
+      else
+      {
+        toast.success("2FA verification successful");
+      }
     } catch (error) {
-      console.error('Error:', error);
+      toast.error('Error:', error);
     }
     fetchUser();
-
   };
 
   return (
     <div>
-    <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-    <div className="flex flex-wrap lg:flex-nowrap gap-8">
-      <div className="flex flex-col space-y-4 w-full lg:w-1/2 relative">
-        <div className="flex flex-col items-center">
-          <label className="block font-semibold mb-2 mt-6">Upload New Picture</label>
-          <div className="relative w-32 h-32  overflow-hidden">
-    <img
-      src={user.profile_pic_url}
-      alt="Profile"
-      className="w-full h-full object-cover  rounded-full"
-    />
-<div
-    className="absolute bottom-0 right-0 w-10 h-10 order-1 bg-white rounded-full flex items-center justify-center cursor-pointer text-blue-500 border-2 border-blue-500 "
-    onClick={() => document.getElementById('fileInput')?.click()}
-  >
-    &#43;
-  </div>
+        <div className="flex flex-wrap sm:flex-nowrap gap-4 sm:gap-6 lg:gap-8">
+        <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col space-y-4 w-full sm:w-1/2 lg:w-1/2">
+          <div className="">
+            <div className="flex flex-col items-center">
+              <label className="block font-semibold mb-2 mt-6 text-center">Upload New Picture</label>
+              <div className="relative w-24 h-24 sm:w-32 sm:h-32 overflow-hidden">
+                <img
+                  src={imagePreview || user.profile_pic_url}
+                  alt="Profile"
+                  className="w-full h-full object-cover rounded-full"
+                />
+                <div
+                  className="absolute bottom-0 right-0 w-8 h-8 sm:w-10 sm:h-10 bg-gray-900 rounded-full flex items-center justify-center  text-violet-800 border-2 border-violet-800 cursor-pointer"
+                  onClick={() => document.getElementById('fileInput')?.click()}
+                >
+                  &#43;
+                </div>
+              </div>
+              <input
+                type="file"
+                id="fileInput"
+                accept="image/*"
+                onChange={handleImageUpload}
+                className="hidden"
+              />
+            </div>
 
-</div>
-
-<input
-  type="file"
-  id="fileInput"
-  accept="image/*"
-  onChange={handleImageUpload}
-  className="hidden"
-/>
-
-
-          <input
-            type="file"
-            id="fileInput"
-            accept="image/*"
-            onChange={handleImageUpload}
-            className="hidden"
-          />
-        </div>
-            {/* New Password */}
-            <div className='text-center'>
-              <label className="block font-semibold mb-4">New Password </label>
+            <div className="text-center">
+              <label className="block font-semibold mb-4">New Password</label>
               <input
                 type="password"
-                {...register('newPassword', { required: 'Password is required', minLength: { value: 8, message: 'Password must be at least 8 characters' } })}
-                className="w-1/2 p-2 border rounded text-black"
+                {...register('newPassword', { minLength: { value: 8, message: 'Password must be at least 8 characters' } })}
+                className="w-3/4 sm:w-1/2 p-2 border rounded text-black"
               />
               {errors.newPassword && <p className="text-red-500 text-sm mt-4">{errors.newPassword.message}</p>}
             </div>
 
-            {/* Confirm Password */}
-            <div className='text-center'>
+            <div className="text-center">
               <label className="block font-semibold mb-4">Confirm Password</label>
               <input
                 type="password"
                 {...register('confirmPassword', {
-                  required: 'Please confirm your password',
+                  // required: 'Please confirm your password',
                   validate: (value) => value === watch('newPassword') || 'Passwords do not match'
                 })}
-                className="w-1/2 p-2 border rounded text-black"
+                className="w-3/4 sm:w-1/2 p-2 border rounded text-black"
               />
               {errors.confirmPassword && <p className="text-red-500 text-sm mb-4">{errors.confirmPassword.message}</p>}
             </div>
           </div>
+          <div className="flex justify-center w-full sm:w-1/2 mt-4 mx-auto">
+          <button
+            type="submit"
+            className="px-4 py-2 mt-10 bg-violet-800 text-white rounded"
+          >
+              Save Changes
+            </button>
+          </div>
+        </form>
 
-          {/* Right Section: 2FA Toggle and QR Code */}
-          <div className="w-full lg:w-1/2 flex flex-col justify-center items-center space-y-4">
-            {/* <div className="flex items-center">
-              <label className="font-semibold mr-2">Enable Two-Factor Authentication (2FA)</label>
-              <Switch />
+          <div className="w-full sm:w-1/2 lg:w-1/2 flex flex-col justify-center items-center space-y-4 lg:ml-auto">
 
-            </div> */}
-
-            {/* QR Code for 2FA */}
-            { user.mfa_enabled === false && (
-              <div className="mt-4 justify-center text-center lg:text-center">
-                <p className="font-semibold text-center">Scan this QR code to enable 2FA:</p>
-                <div className="flex justify-center lg:justify-center mt-2">
-                  <img src="http://localhost:8000/api/2fa_code" alt="2FA QR Code" className="min-w-24 min-h-24 w-[50%] h-[50%] lg:w-[80%] lg:h-[80%]" />
+            {user.mfa_enabled === false && (
+              <div className="mt-4 text-center lg:text-left">
+                <p className="font-semibold">Scan this QR code to enable 2FA:</p>
+                <div className="flex justify-center lg:justify-start mt-2">
+                  <img src={process.env.NEXT_PUBLIC_API_URL+"/api/2fa_code"} alt="2FA QR Code" className="w-20 h-20 sm:w-24 sm:h-24 lg:w-32 lg:h-32" />
                 </div>
-                <div className='flex mt-4 justify-center items-end'>
+                <div className="flex mt-4 justify-center lg:justify-start items-end">
                   <div>
-                    <p className="flex font-semibold text-center mb-1">OTP:</p>
+                    <p className="font-semibold mb-1">OTP:</p>
                     <input value={otpValue}
                       onChange={(e) => setOtpValue(e.target.value)}
-                      className='flex border rounded text-black'></input>
+                      className='border rounded text-black w-2/3 sm:w-1/2'
+                    />
                   </div>
                   <button
-                    type="submit"
                     onClick={handleVerifyOtp}
-                    className="px-4 py-2 ml-4 flex bg-blue-500 text-white rounded"
+                    className="px-4 py-2 ml-4 bg-violet-800 text-white rounded"
                   >
                     Enable 2FA
                   </button>
                 </div>
-                
               </div>
             )}
-            { user.mfa_enabled === true && (
-              <div className="mt-4 w-full flex flex-col justify-center items-center text-center lg:text-center">
-                <p className="font-semibold text-center">2FA is enabled for your account.</p>
+
+            {user.mfa_enabled === true && (
+              <div className="mt-4 w-full text-center md:text-left">
+                <p className="font-semibold">2FA is enabled for your account.</p>
                 <button
-                    type="submit"
-                    onClick={disable2FA}
-                    className="px-4 py-2 ml-4 flex mt-4 bg-blue-500 text-white rounded text-center"
-                  >
-                    Disable 2FA
-                  </button>
+                  onClick={disable2FA}
+                  className="px-4 py-2 mt-4 bg-blue-500 text-white rounded"
+                >
+                  Disable 2FA
+                </button>
               </div>
-                
-              )}
+            )}
           </div>
         </div>
 
-        {/* Submit Button */}
-        <div className="flex justify-center w-1/2 mt-4">
-          <button
-            type="submit"
-            className="px-4 py-2 mt-10 bg-blue-500 text-white rounded"
-          >
-            Save Changes
-          </button>
-        </div>
-      </form>
+
+        
     </div>
   );
 };
 
 
+const GameSettings = () => {
+  const {gameCustomization,isLoading, updateGameCustomization} = useGame();
+  const [paddleColor, setPaddleColor] = useState(gameCustomization.user_paddle_color);
+  const [opponentColor, setOpponentColor] = useState(gameCustomization.opponent_paddle_color);
+  const [ballColor, setBallColor] = useState(gameCustomization.ball_color);
 
+  const changeColor = (type, color) => {
+    if (type === 'paddle') {
+      setPaddleColor(color);
+    } else if (type === 'ball') {
+      setBallColor(color);
+    } else {
+      setOpponentColor(color);
+    }
+  };
 
+  const loadColors = () => {
+    setPaddleColor(gameCustomization.user_paddle_color);
+    setOpponentColor(gameCustomization.opponent_paddle_color);
+    setBallColor(gameCustomization.ball_color);
+  };
 
+  const resetColors = () => {
+    setPaddleColor('#0015ff');
+    setOpponentColor('#ff0000');
+    setBallColor('#ffffff');
+  };
 
-// Game Settings Component
-const GameSettings = () => (
-  <div>
-    <h2 className="text-xl font-semibold mb-2">Game Settings</h2>
-    <p>Adjust your game preferences here.</p>
+  const saveSettings = () => {
+    updateGameCustomization({
+      user_paddle_color: paddleColor,
+      opponent_paddle_color: opponentColor,
+      ball_color: ballColor
+    }).then((res) => {
+      if (!res) {
+        loadColors();
+      }
+    });
+  };
+
+  if (isLoading) return (
+    <div className="w-full h-full flex items-center justify-center">
+      <Loader />
+    </div>
+  );
+  return (
+    <div className="max-w-xl mx-auto p-6">
+
+      <div className="flex flex-col md:flex-row gap-6 lg:gap-16 justify-center items-center">
+        
+        <div className="flex flex-col items-center">
+  <label htmlFor="paddleColor" className="text-sm font-medium text-white mb-2 lg:font-bold lg:text-nowrap lg:text-2xl">
+    Left Paddle Color
+  </label>
+  <div className="relative w-24 h-6 border-2 border-white mt-2 rounded-full overflow-hidden">
+    <input
+      type="color"
+      id="paddleColor"
+      name="paddleColor"
+      value={paddleColor}
+      onChange={(e) => changeColor('paddle', e.target.value)}
+      className="absolute inset-0 w-full h-full bg-transparent border-none rounded-full"
+    />
   </div>
-);
+</div>
 
+
+        <div className="flex flex-col items-center">
+          <label htmlFor="opponentpaddle" className="text-sm font-medium text-white mb-2 lg:font-bold lg:text-nowrap lg:text-2xl">
+            Right Paddle Color
+          </label>
+          <div className="relative w-24 border-2 border-white h-6 mt-2 rounded-full overflow-hidden">
+            <input
+              type="color"
+              id="opponentpaddle"
+              name="opponentpaddle"
+              value={opponentColor}  
+              onChange={(e) => changeColor('opponent', e.target.value)}  
+              className="absolute inset-0 w-full h-full bg-transparent  rounded-full"
+            />
+          </div>
+        </div>
+
+        <div className="flex flex-col items-center">
+          <label htmlFor="ballColor" className="text-sm font-medium text-white mb-2 mt-4 lg:font-bold lg:text-nowrap lg:text-2xl">
+            Ball Color
+          </label>
+          <div className="relative w-12 h-12 border-2 border-white rounded-full overflow-hidden ">
+            <input
+              type="color"
+              id="ballColor"
+              name="ballColor"
+              value={ballColor}
+              onChange={(e) => changeColor('ball', e.target.value)}
+              className="absolute inset-0 w-full h-full bg-transparent outline-none	border-none  rounded-full"
+            />
+          </div>
+        </div>
+      </div>
+
+      <div className="mt-6 flex justify-center gap-4 lg:gap-20">
+        <button
+          onClick={saveSettings}
+          className="px-6 py-2 bg-violet-800 text-white rounded-lg "
+        >
+          Save
+        </button>
+        <button
+          onClick={resetColors}
+          className="px-6 py-2 bg-gray-600 text-white rounded-lg "
+        >
+          Reset
+        </button>
+      </div>
+    </div>
+);
+  };
 export default SettingsPage;

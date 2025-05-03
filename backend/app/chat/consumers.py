@@ -4,13 +4,16 @@ from channels.db import database_sync_to_async
 from django.db.models import Q
 from .models import Message
 from astropong.models.UserModel import User, Relationship
-from .serializers import MessageConsumerSerializer
-from channels.layers import get_channel_layer
-from datetime import datetime
+from .serializers import MessageConsumerSerializer, UserSerializer
+from django.core.cache import cache
 
 class ChatRoomConsumer(AsyncWebsocketConsumer):
     async def connect(self):
-        self.room_group_name = "chat_room"
+        self.group_name = "chat_room"
+        
+        self.sender = None
+        self.receiver = None
+        self.latest_type = None
 
         user = self.scope["user"]
         if user.is_anonymous or not user.is_authenticated:
@@ -20,14 +23,17 @@ class ChatRoomConsumer(AsyncWebsocketConsumer):
             return
 
         await self.channel_layer.group_add(
-            self.room_group_name,
+            self.group_name,
             self.channel_name
         )
         await self.accept()
 
     async def disconnect(self, close_code):
+        if self.sender and self.receiver and self.latest_type == 'typing':
+            await self.handle_stop_typing()
+
         await self.channel_layer.group_discard(
-            self.room_group_name,
+            self.group_name,
             self.channel_name
         )
         await self.close()
@@ -37,69 +43,125 @@ class ChatRoomConsumer(AsyncWebsocketConsumer):
         if not text_data_json:
             return
         
-        sender = text_data_json.get('sender')
-        receiver = text_data_json.get('receiver')
+        self.sender = text_data_json.get('sender')
+        self.receiver = text_data_json.get('receiver')
         
-        if sender != self.scope['user'].username and receiver != self.scope['user'].username:
+        if self.sender != self.scope['user'].username and self.receiver != self.scope['user'].username:
             return
         
-        sender, receiver = await self.get_users()
+        self.sender, self.receiver = await self.get_users()
 
-        if not sender or not receiver:
+        if not self.sender or not self.receiver:
             await self.send_error('User not found.')
             return
 
+        message_type = text_data_json.get('type')
+        self.latest_type = message_type
 
-        relationship = await self.get_relationship(sender, receiver)
+        if message_type == 'read_message':
+            await self.handle_read_message()
+            return
+        if message_type == 'blocked':
+            await self.handle_blocked(text_data_json)
+            return
+        
+        relationship = await self.get_relationship(self.sender, self.receiver)
         if not relationship:
             await self.send_error('You must be friends in order to chat.')
             return
 
-        message_type = text_data_json.get('type')
         if message_type == 'chat_message':
             await self.handle_chat_message(text_data_json)
         elif message_type == 'typing':
-            await self.handle_typing(text_data_json)
+            await self.handle_typing()
         elif message_type == 'stop_typing':
-            await self.handle_stop_typing(text_data_json)
+            await self.handle_stop_typing()
+        elif message_type == 'delete_message':
+            await self.handle_delete_message(text_data_json)
+        elif message_type == 'online_users':
+            await self.handle_online_users()
         else:
             await self.send_error('Invalid message type.')
 
     async def handle_chat_message(self, text_data_json):
         message = await self.save_message(self.sender, self.receiver, text_data_json['message'])
         await self.channel_layer.group_send(
-            self.room_group_name,
+            self.group_name,
             {
                 'type': 'chat_message',
                 'message': MessageConsumerSerializer(message).data,
+                'sender': self.sender.username,
+                'receiver': self.receiver.username,
+                'sender_id': self.sender.id,
+                'receiver_id': self.receiver.id,
             }
         )
 
-        await self.send_notification(self.sender, self.receiver) 
+        await self.send_notification(self.sender, self.receiver, text_data_json['message']) 
 
-    async def handle_typing(self, text_data_json):
+    async def handle_blocked(self, text_data_json):
         await self.channel_layer.group_send(
-            self.room_group_name,
+            self.group_name,
+            {
+                'type': 'blocked',
+                'sender': text_data_json['sender'],
+                'receiver': text_data_json['receiver'],
+            }
+        )
+
+    async def blocked(self, event):
+        receiver = event['receiver']
+        sender = event['sender']
+        if receiver != self.scope['user'].username and sender != self.scope['user'].username:
+            return
+
+        await self.send(text_data=json.dumps({
+            'receiver': receiver,
+            'sender': sender,
+            'type': 'blocked',
+        }))
+
+
+    async def handle_typing(self):
+        await self.channel_layer.group_send(
+            self.group_name,
             {
                 'type': 'typing',
-                'sender': self.sender,
-                'receiver': self.receiver,
+                'sender': self.sender.username,
+                'receiver': self.receiver.username,
+                'sender_id': self.sender.id,
+                'receiver_id': self.receiver.id,
             }
         )
 
-    async def handle_stop_typing(self, text_data_json):
+    async def handle_stop_typing(self):
         await self.channel_layer.group_send(
-            self.room_group_name,
+            self.group_name,
             {
                 'type': 'stop_typing',
-                'sender': self.sender,
-                'receiver': self.receiver,
+                'sender': self.sender.username,
+                'receiver': self.receiver.username,
+                'sender_id': self.sender.id,
+                'receiver_id': self.receiver.id,
             }
         )
+
+    async def handle_read_message(self):
+        await self.mark_messages_as_read(self.sender, self.receiver)
+
+    async def handle_delete_message(self, text_data_json):
+        await self.delete_message(text_data_json['message_id'])
+
+    async def handle_online_users(self):
+        online_users = await self.get_online_users()
+        await self.send(text_data=json.dumps({
+            'type': 'online_users',
+            'users': UserSerializer(online_users, many=True, context={'request': self.scope['request']}).data,
+        }))
 
     async def chat_message(self, event):
         receiver = event['receiver']
-        if receiver != self.scope['user'].username:
+        if receiver != self.scope['user'].username and self.sender != self.scope['user'].username:
             return
 
         message = event['message']
@@ -130,37 +192,26 @@ class ChatRoomConsumer(AsyncWebsocketConsumer):
             'receiver': event['receiver'],
         }))
 
-    async def send_notification(self, sender, receiver):
-        channel_layer = get_channel_layer()
-        await channel_layer.group_send(
-            'notifications_' + receiver.username,
+    async def user_status(self, event):
+        receiver = event['receiver']
+
+        await self.send(text_data=json.dumps({
+            'type': 'user_status',
+            'username': receiver,
+            'user_id': event['user_id'],
+            'is_online': event['is_online']
+        }))
+
+    async def send_notification(self, sender, receiver, message):
+        await self.channel_layer.group_send(
+            'notifications_'+receiver.username,
             {
                 'type': 'notification',
-                'content': f'New message from {sender.username}',
-                'sender': sender.username,
+                'content': f'New message from {sender.username}\n{message}',
                 'receiver': receiver.username,
                 'notification_type': 'chat_message',
-                'timestamp': str(datetime.now()),
-                'seen': False,
             }
         )
-
-    @database_sync_to_async
-    def get_user(self, username):
-        try:
-            return User.objects.get(username=username)
-        except User.DoesNotExist:
-            return None
-
-    @database_sync_to_async
-    def get_relationship(self, sender, receiver):
-        return Relationship.objects.filter(
-            Q(user1=sender, user2=receiver) | Q(user1=receiver, user2=sender),
-            status=Relationship.Status.FRIEND).exists()
-
-    @database_sync_to_async
-    def save_message(self, sender, receiver, message):
-        return Message.objects.create(sender=sender, receiver=receiver, message=message)
 
     async def validate_json(self, text_data):
         try:
@@ -179,3 +230,53 @@ class ChatRoomConsumer(AsyncWebsocketConsumer):
             'message': error_message,
             'type': 'error',
         }))
+
+    @database_sync_to_async
+    def get_online_users(self):
+        friends_relationships = Relationship.objects.filter(Q(user1=self.scope['user']) | Q(user2=self.scope['user']), status=Relationship.Status.FRIEND)
+        friends_usernames = [relationship.user1.username if relationship.user1 != self.scope['user'] else relationship.user2.username for relationship in friends_relationships]
+        online_users = User.objects.filter(username__in=friends_usernames, is_online=True)
+        return online_users
+
+
+    @database_sync_to_async
+    def delete_message(self, message_id):
+        Message.objects.filter(id=message_id).delete()
+
+    @database_sync_to_async
+    def mark_messages_as_read(self, sender, receiver):
+        Message.objects.filter(sender=sender, receiver=receiver, seen=False).update(seen=True)
+
+    @database_sync_to_async
+    def get_user(self, username):
+        cached_user = cache.get(f"user_{username}")
+        if cached_user:
+            return cached_user
+        else:
+            try:
+                user = User.objects.get(username=username)
+                cache.set(f"user_{username}", user, timeout=300)
+                return user
+            except User.DoesNotExist:
+                return None
+
+    @database_sync_to_async
+    def get_relationship(self, sender, receiver):
+        combined_key = f"relationship_{sender.username}_{receiver.username}" if sender.username < receiver.username else f"relationship_{receiver.username}_{sender.username}"
+        relationship = cache.get(combined_key)
+        if relationship:
+            return relationship
+        else:
+            relationship = Relationship.objects.filter(
+                Q(user1=sender, user2=receiver) | Q(user1=receiver, user2=sender),
+                status=Relationship.Status.FRIEND).exists()
+            cache.set(combined_key, relationship, timeout=30)
+            return relationship
+
+    @database_sync_to_async
+    def save_message(self, sender, receiver, message):
+        return Message.objects.create(
+            sender=sender,
+            receiver=receiver,
+            message=message
+        )

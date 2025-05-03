@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import Logo from "components/Logo/Logo";
+import toast, { Toaster } from 'react-hot-toast';
+
 
 export const metadata: Metadata = {
   title: "ft_transcendence",
@@ -23,13 +25,21 @@ export default function RootLayout({
           className="object-cover w-full h-full absolute top-0 left-0 z-0"
         >
           <source
-            src="https://res.cloudinary.com/dwxvnezhn/video/upload/f_auto:video,q_auto/v1/Videos/a3j7djxismi7plce7vzh"
+            src="/bg.mp4"
             type="video/mp4"
           />
         </video>
         <div className="absolute inset-0 bg-black/70 w-full h-full"></div>
         <div className="relative z-10">
           {children}
+        <Toaster toastOptions={{
+          className: '',
+          style: {
+            border: '2px solid violet',
+            backgroundColor: 'darkviolet',
+            color:'white'
+          },
+        }}/>
         </div>
       </body>
     </html>

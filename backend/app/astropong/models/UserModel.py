@@ -3,8 +3,8 @@ from django.contrib.auth.models import AbstractUser
 from django.core.exceptions import ValidationError
 from django.db import models
 import pyotp
+from django.core.cache import cache
 
-# Create your models here.
 
 class User(AbstractUser):
     username = models.CharField(max_length=100,unique=True)
@@ -22,6 +22,7 @@ class User(AbstractUser):
 
     mfa_secret = models.CharField(max_length=500, null=True)
     mfa_enabled = models.BooleanField(default=False)
+    tournament_alias = models.CharField(max_length=100, null=True)
 
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = ['username']
@@ -36,6 +37,7 @@ class User(AbstractUser):
         if pyotp.TOTP(self.mfa_secret).verify(otp):
             self.mfa_enabled = True
             self.save()
+            cache.delete(f"user_{self.id}")
             return True
         return False
     def add_friend(self, friend):
@@ -102,8 +104,6 @@ class User(AbstractUser):
             ).first()
             if relationship is None:
                 raise Relationship.DoesNotExist
-            # if relationship.userWhoRequest == self:
-            #     raise ValidationError("You have to wait until you get accepted.")
             relationship.delete()
         except Relationship.DoesNotExist:
             raise ValidationError("No friend request from this user.")
@@ -117,6 +117,8 @@ class User(AbstractUser):
             ).first()
             if relationship is None:
                 raise Relationship.DoesNotExist
+            if relationship.status == Relationship.Status.BLOCKED:
+                raise ValidationError("You already blocked this user.")
             relationship.userWhoBlocked = self
             relationship.status = Relationship.Status.BLOCKED
             relationship.save()
@@ -134,7 +136,7 @@ class User(AbstractUser):
                 (models.Q(user1=self) & models.Q(user2=friend)) | (models.Q(user1=friend) & models.Q(user2=self))).first()
             if relationship is None:
                 raise Relationship.DoesNotExist
-            if relationship.status == Relationship.Status.BLOCKED:
+            if relationship.status == Relationship.Status.BLOCKED and relationship.userWhoBlocked == self:
                 relationship.status = Relationship.Status.UNKNOWN
                 relationship.save()
             else:
@@ -158,3 +160,6 @@ class Relationship(models.Model):
 
     def __str__(self):
         return str(self.user1) + " - " + str(self.user2) + ": " + self.status
+    
+    def get_status_display(self):
+        return self.Status(self.status).label

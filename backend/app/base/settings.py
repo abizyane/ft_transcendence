@@ -14,25 +14,17 @@ from pathlib import Path
 import os
 from datetime import timedelta
 
-# Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
-MEDIA_URL = "/pictures/"
+MEDIA_URL = os.getenv("HOST_URL", "https://localhost:1443")+"/pictures/"
 MEDIA_ROOT = os.path.join(BASE_DIR, 'pictures')
+STATIC_URL = '/static/'
 
-
-# Quick-start development settings - unsuitable for production
-# See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
-
-# SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = 'django-insecure-qq!eb^hc2*i6ime4#b7p4vwik#b=yzjil61ifm0f#*j5yfov'
 
-# SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['*'] # For development purposes only - anbedelha b localhost:3000 menbe3d 
+ALLOWED_HOSTS = ['*']
 
-
-# Application definition
 
 INSTALLED_APPS = [
     'daphne',
@@ -55,9 +47,9 @@ MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
-    'django.contrib.auth.middleware.AuthenticationMiddleware',  # Populates request.user
-    'astropong.JWTAuthenticationMiddleware.JWTAuthenticationMiddleware',  # Relies on request.user
-    'astropong.TwoFactorMiddleware.TwoFactorAuthMiddleware',  # Needs request.user
+    'django.contrib.auth.middleware.AuthenticationMiddleware',  
+    'astropong.JWTAuthenticationMiddleware.JWTAuthenticationMiddleware', 
+    'astropong.TwoFactorMiddleware.TwoFactorAuthMiddleware',  
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
@@ -88,13 +80,12 @@ CHANNEL_LAYERS = {
     'default': {
         'BACKEND': 'channels_redis.core.RedisChannelLayer',
         'CONFIG': {
-            "hosts": [('127.0.0.1', 6379)],
+            "hosts": [('redis', 6379)],
         },
     },
 }
 
-# Password validation
-# https://docs.djangoproject.com/en/4.2/ref/settings/#auth-password-validators
+
 
 AUTH_PASSWORD_VALIDATORS = [
     {
@@ -112,9 +103,6 @@ AUTH_PASSWORD_VALIDATORS = [
 ]
 
 
-# Internationalization
-# https://docs.djangoproject.com/en/4.2/topics/i18n/
-
 LANGUAGE_CODE = 'en-us'
 
 TIME_ZONE = 'UTC'
@@ -124,37 +112,26 @@ USE_I18N = True
 USE_TZ = True
 
 
-# Static files (CSS, JavaScript, Images)
-# https://docs.djangoproject.com/en/4.2/howto/static-files/
-
-STATIC_URL = 'static/'
-
-# Default primary key field type
-# https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
-
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-# SESSION_ENGINE = 'django.contrib.sessions.backends.signed_cookies'
-# SESSION_COOKIE_NAME = "sessionid" 
-# SESSION_COOKIE_SECURE = False  # Set to True in production with HTTPS
-# SESSION_COOKIE_HTTPONLY = True 
 
+USE_X_FORWARDED_HOST = True
 CORS_ORIGIN_ALLOW_ALL=True
 CORS_ALLOW_CREDENTIALS=True
 AUTH_USER_MODEL = 'astropong.User'
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [
-        # 'rest_framework.authentication.SessionAuthentication',
-        # 'rest_framework.authentication.BasicAuthentication',
-        'rest_framework_simplejwt.authentication.JWTAuthentication',  # Enable JWT authentication
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
     ],
     'DEFAULT_PERMISSION_CLASSES': [
-        'rest_framework.permissions.IsAuthenticated',  # Enforce authentication globally
+        'rest_framework.permissions.IsAuthenticated',
     ],
+    'DEFAULT_VERSIONING_CLASS': 'rest_framework.versioning.NamespaceVersioning',
+    'URL_FIELD_NAME': 'url',
 }
 
 SIMPLE_JWT = {
-    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=60),  
+    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=120),  
     'REFRESH_TOKEN_LIFETIME': timedelta(days=1),
     'ROTATE_REFRESH_TOKENS': False,
     'BLACKLIST_AFTER_ROTATION': False,
@@ -173,3 +150,11 @@ DATABASES = {
         'PORT': os.getenv('POSTGRES_PORT', 5432),
     }
 }
+
+from rest_framework.reverse import reverse
+
+def prefixed_reverse(name, request=None, format=None):
+    if request:
+        api_prefix = "/api"
+        request_path = request.get_full_path()
+        # is_not_static = lambda N/ Ignore existing static or local

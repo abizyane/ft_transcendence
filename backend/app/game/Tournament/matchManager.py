@@ -1,6 +1,6 @@
 from abc import ABC, abstractmethod
 from .matchHolder import Holder, MatchHolder, PlayerHolder
-
+from .competitor import Competitor
 
 class Tournament():
     def __init__(self):
@@ -22,7 +22,7 @@ class Tournament():
     def upgrade_competitor(self, competitor_name) -> None:
        self.p_holder[competitor_name].upgrade()
 
-#Manager
+
 class AbstractTournamentManager(ABC):
     def upgrade_winner(self, _winner):
         pass

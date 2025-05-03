@@ -12,10 +12,9 @@ import { handleLogin } from "@/services/auth";
 
 const formSchema = z.object({
   email: z.string().email("Invalid email address"),
-  password: z.string().min(8, "Password must be at least 8 characters"),
-  // Uncomment additional validation if needed
-  // .regex(/[A-Z]/, 'Password must contain at least one uppercase letter')
-  // .regex(/[!@#$+\-*%^&*(),.?":{}|<>]/, 'Password must contain at least one special character'),
+  password: z.string().min(8, "Password must be at least 8 characters")
+  .regex(/[A-Z]/, 'Password must contain at least one uppercase letter')
+  .regex(/[!@#$+\-*%^&*(),.?":{}|<>]/, 'Password must contain at least one special character')
 });
 
 type FormData = z.infer<typeof formSchema>;
@@ -49,7 +48,6 @@ const LoginForm = () => {
       {errorMessage && (
         <div className="text-red-500 text-center mb-4">{errorMessage}</div>
       )}
-    {/* <div className="font-mont p-6 backdrop-blur-lg bg-gray-800/60  rounded-xl shadow-lg max-w-sm w-full  overflow-hidden"> */}
         <h2 className="text-3xl font-bold text-white mb-4">Login</h2>
         <form className="mt-8 space-y-6" autoComplete="off" onSubmit={handleSubmit(onSubmit)}>
           <div className="rounded-md shadow-sm">
@@ -103,16 +101,15 @@ const LoginForm = () => {
         <div className="text-center text-sm text-white mt-4">Or continue with</div>
         <div className="w-full flex justify-center mt-4">
         <a
-  type="button"
-  className="relative flex justify-center items-center w-12 h-12 bg-white rounded-full p-1"
-  href="http://localhost:8000/api/42OAuth"
->
+        type="button"
+        className="relative flex justify-center items-center w-12 h-12 bg-white rounded-full p-1"
+        href={process.env.NEXT_PUBLIC_API_URL+"/api/42OAuth"}
+      >
   <img
-    src="https://res.cloudinary.com/dwxvnezhn/image/upload/f_auto,q_auto/v1/pics/hxangc1kyhtibnepmygf"
+    src="/42.png"
     alt="42 Logo"
-    className="w-8 h-8 rounded-full"
-    width={24}
-    height={24}
+    className="w-10 h-10 rounded-full"
+
   />
 </a>
 </div>

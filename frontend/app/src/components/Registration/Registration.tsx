@@ -12,7 +12,9 @@ import { handleRegistrationSubmit } from "@/services/auth";
 const formSchema = z.object({
   username: z.string().min(4, 'Username must be at least 4 characters'),
   email: z.string().email('Invalid email address'),
-  password: z.string().min(8, 'Password must be at least 8 characters'),
+  password: z.string().min(8, 'Password must be at least 8 characters')
+    .regex(/[A-Z]/, 'Password must contain at least one uppercase letter')
+    .regex(/[!@#$+\-*%^&*(),.?":{}|<>]/, 'Password must contain at least one special character'),
   confirmpassword: z.string()
 }).refine((data) => data.password === data.confirmpassword, {
   message: 'Passwords must match',
@@ -35,7 +37,7 @@ const Registration = () => {
     handleRegistrationSubmit(data, setSuccessMessage, setErrorMessage, router);
   };
   return (
-    <div className="font-mont p-6 backdrop-blur-lg bg-gray-800/60 rounded-xl shadow-lg max-w-sm w-full">
+    <div className="font-mont p-6 backdrop-blur-lg bg-gray-800/30 rounded-xl shadow-lg max-w-sm w-full">
       {successMessage && (
         <div className="text-green-500 text-center mb-4">{successMessage}</div>
       )}
@@ -102,18 +104,19 @@ const Registration = () => {
           Or continue with
         </div>
         <div className="w-full flex justify-center mt-4">
-        <button
+        <a
   type="button"
   className="relative flex justify-center items-center w-12 h-12 bg-white rounded-full p-1"
+  href={process.env.NEXT_PUBLIC_API_URL+"/api/42OAuth"}
 >
   <img
-    src="https://res.cloudinary.com/dwxvnezhn/image/upload/f_auto,q_auto/v1/pics/hxangc1kyhtibnepmygf"
+    src="/42.png"
     alt="42 Logo"
-    className="w-8 h-8 rounded-full"
+    className="w-10 h-10 rounded-full"
     width={24}
     height={24}
   />
-</button>
+</a>
         </div>
         <div className="text-center text-white mt-4">
           Already have an account?&nbsp;

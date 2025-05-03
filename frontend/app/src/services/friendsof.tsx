@@ -1,9 +1,13 @@
 import { useState, useEffect } from 'react';
+import toast from 'react-hot-toast';
+import { useRouter } from 'next/navigation';
+import { customFetch } from '@/utils/customFetch';
 
 interface Friend {
   id:number;
   username: string;
   profile_pic_url: string;
+  is_online: boolean;
   xp: number;
 }
 interface User{
@@ -13,10 +17,12 @@ export const useFriendsof = (user:User) => {
   const [friends, setFriends] = useState<Friend[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
+  const router = useRouter ();
 
+  
     const fetchFriendsof = async () => {
       try {
-        const response = await fetch(`http://localhost:8000/api/friendsof/${user.id}`, {
+        const response = await customFetch(`${process.env.NEXT_PUBLIC_API_URL}/api/friendsof/${user.id}`, {
           method: 'GET',
           credentials: 'include',
         });
@@ -26,7 +32,9 @@ export const useFriendsof = (user:User) => {
           setFriends(responseData);
         } else {
           const error = await response.json();
-          setError('Failed to load friends');
+          toast.error("friends not found");
+          router.push('/dashboard');
+          return;
         }
       } catch (error) {
         setError('Error fetching friends');

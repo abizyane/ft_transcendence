@@ -1,20 +1,21 @@
 'use client'
 import UserInfo from "@/components/dashboardcomponents/userinfo";
 import Linechart from "@/components/Charts/Linechart";
-import data from "@/app/data/Dashboarddata.json";
 import History from "@/components/dashboardcomponents/history";
 import TopPlayers from "@/components/dashboardcomponents/topplayers";
 import Friends from "@/components/dashboardcomponents/friends";
 import { useParams, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { useUser } from "@/services/context/usercontext";
-
-
-
-const user = data.user;
-const values = user.charts.lineChart.data;
-const gameHistory = user.history;
-
+import Loader from "components/loader/loader";
+import Rookie from "../../../../../public/Rookie.svg";
+import Challenger from "../../../../../public/Challenger.svg";
+import Legend from "../../../../../public/Legend.svg";
+import Expert from "../../../../../public/expert.svg";
+import Grandmaster from "../../../../../public/Grandmaster.svg";
+import ProfileChart from "@/components/Charts/profileChart";
+import toast from 'react-hot-toast';
+import { customFetch } from "@/utils/customFetch";
 
 const Page = () => {
   const { id: userId } = useParams();
@@ -22,63 +23,107 @@ const Page = () => {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [userLevel, setUserLevel] = useState(1);
+  const router = useRouter();
+
+  const levelImages = {
+    1: Rookie.src,
+    2: Challenger.src,
+    3: Legend.src,
+    4: Expert.src,
+    5: Grandmaster.src,
+  };
+
 
   useEffect(() => {
-    if (!userId) return;
+    if (!userId || !currentUser) return;
     if (currentUser?.id === userId) {
       setUser(currentUser);
     } else {
       setLoading(true);
       setError(null);
-      fetch(`http://localhost:8000/api/userid`, {
-        method: 'POST',
-        body: JSON.stringify({ id: userId }),
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        credentials: 'include',
-      })
-        .then((response) => {
-          if (!response.ok) {
-            console.log("Response not ok:", response.status);
-            throw new Error("User not found");
-          }
-          return response.json();
+      try {
+        customFetch(`${process.env.NEXT_PUBLIC_API_URL}/api/userid`, {
+          method: 'POST',
+          body: JSON.stringify({ id: userId }),
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          credentials: 'include',
         })
-        .then((data: User) => setUser(data))
-        .catch((err) => setError(err.message))
-        .finally(() => setLoading(false));
+          .then((response) => {
+            if (response.status === 404) {
+              toast.error("User not found or blocked ");
+              router.push("/dashboard");
+              return;
+            }
+            else if (!response.ok) {
+              toast.error("User not found or blocked ");
+              router.push("/dashboard");
+              return;
+            }
+            return response.json();
+          })
+          .then((data: User) => setUser(data))
+          .catch((err) => {
+            setError(err.message);
+          })
+          .finally(() => setLoading(false));
+      } catch (err) {
+        setError(err.message);
+      }
     }
   }, [userId, currentUser]);
+  useEffect(() => {
+    if (user && user.level !== undefined) {
+      const level = Math.floor(user.level / 5) + 1;
+      setUserLevel(level);
+    }
+  }, [user]);
 
-  if (userloading) return <p className="text-white">Loading...</p>;
-  if (loading) return <p>Loading...</p>;
+  const getLevelImage = (level) => {
+    if (levelImages[level]) return levelImages[level];
+    return Rookie;
+  };
+
+  if (userloading) return (<div className="w-full h-full flex justify-center items-center"><Loader /></div>);
+  if (loading) return (<div className="w-full h-full flex justify-center items-center"><Loader /></div>);
   if (error) return <p>Error: {error}</p>;
-  if (!user) return <p>No user found.</p>;
+  if (!user) return <p></p>;
   return (
-    <div className="mt-10 lg:mt-0 flex flex-1  w-full px-1 overflow-hidden justify-center items-center">
-    <div className="flex-1 w-full flex flex-col items-center justify-center mb-14 mt-2 relative">
-      <div className="flex flex-col lg:flex-row w-full space-y-4 lg:space-y-0 lg:space-x-4">
-        <div className="bg-gray-800/60 backdrop-blur-sm rounded-xl lg:w-2/4 lg:border border-violet-primary mb-4 lg:mb-0">
-          <UserInfo user={user} setUser={setUser}/>
-        </div>
-        <div className="bg-gray-800/60 backdrop-blur-sm  rounded-xl flex-1 border border-violet-primary">
-          <p className="m-2 text-white text-2xl p-4 font-extrabold w-full">
-            Experience Performance
-          </p>
-          <div className=" w-[90%] h-[90%] justify-center items-center">
-            <Linechart data={values} />
+    <div className="mt-10  lg:p-10  flex h-[100%] w-full px-1 overflow-hidden justify-center items-center">
+      <div className="flex-1 w-full flex flex-col items-center justify-center mb-14 mt-2 relative">
+        <div className="flex flex-col lg:flex-row w-full space-y-4 lg:space-y-0 lg:space-x-4">
+          <div className="bg-gray-800/60 backdrop-blur-sm rounded-xl lg:w-2/4 lg:border border-violet-primary mb-4 lg:mb-0">
+            <UserInfo user={user} setUser={setUser} />
+          </div>
+          <div className="bg-gray-800/60 backdrop-blur-sm  rounded-xl flex-1 border border-violet-primary">
+            <p className="m-2 text-white text-2xl p-4 font-extrabold w-full">
+              Rank
+            </p>
+            <div className="h-max  flex justify-center items-center">
+              <img
+                src={getLevelImage(userLevel)}
+                alt="User Rank"
+                className="object-contain rounded-2xl w-[25%]"
+              />
+            </div>
           </div>
         </div>
-      </div>
-      <div className="flex flex-col lg:flex-row w-full space-y-4 lg:space-y-0 lg:space-x-4">
-        <History />
-        <TopPlayers />
-        <Friends user={user}/>
+        <div className="flex flex-col lg:flex-row w-full space-y-4 lg:space-y-0 lg:space-x-4">
+          <ProfileChart user={user} />
+          {currentUser?.id == userId ?
+            <TopPlayers /> :
+            <div className="w-full lg:w-1/3 py-4 lg:h-full">
+              <History />
+            </div>
+          }
+          <Friends user={user} />
+        </div>
       </div>
     </div>
-  </div>
   )
 }
 
 export default Page
+

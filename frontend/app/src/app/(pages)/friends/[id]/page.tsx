@@ -21,10 +21,13 @@ import { useUser } from "@/services/context/usercontext";
 import { request } from "http";
 import Loader from '../../../../components/loader/loader';
 import Link from "next/link";
-
+import { useRouter } from "next/navigation";
+import { toast } from "react-hot-toast";
+import { customFetch } from "@/utils/customFetch";
 const Friends = () => {
   const param = useParams();
   const userId = param.id;
+  const router = useRouter();
 
   const { user: currentUser, userloading } = useUser();
   const { friends, loading, error, fetchFriendsof } = useFriendsof({
@@ -42,15 +45,11 @@ const Friends = () => {
   if (error) {
     return <div className="text-red-500">{error}</div>;
   }
-  // console.log(user);
-  // const [unblkloading, setUnblkloading] = useState(false);
-  // const [unblkerror, setUnblkerror] = useState(false);
-  // console.log(" ", userloading)
+
   const isFriendListAlone = userId === currentUser.id.toString();
   const listHeight = isFriendListAlone
     ? "h-[230px] lg:h-[600px]"
     : "h-[400px] lg:h-[800px]";
-  console.log(listHeight);
 
   if (loading) {
     return <div>Loading...</div>;
@@ -60,10 +59,9 @@ const Friends = () => {
     return <div className="text-red-500">{error}</div>;
   }
 
-  // // Block friend
   const handleblockFriend = async (userid) => {
     try {
-      const response = await fetch("http://localhost:8000/api/block", {
+      const response = await customFetch(process.env.NEXT_PUBLIC_API_URL+"/api/block", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ user_id: userid }),
@@ -75,15 +73,13 @@ const Friends = () => {
         fetchBlocked();
       }
     } catch (error) {
-      console.log("Error blocking friend:", error);
+      toast.error("Error blocking friend:");
     }
   };
 
-  // // Unblock friend
   const handleUnblockFriend = async (friendId) => {
-    // setUnblkloading(true);
     try {
-      const response = await fetch("http://localhost:8000/api/unblock", {
+      const response = await customFetch(process.env.NEXT_PUBLIC_API_URL+"/api/unblock", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ user_id: friendId }),
@@ -95,14 +91,14 @@ const Friends = () => {
         fetchBlocked();
       }
     } catch (error) {
-      console.log("Error unblocking friend:", error);
+      toast.error("Error unblocking friend");
     }
   };
 
-  // // Accept friend
+
   const handleAcceptFriend = async (friendId) => {
     try {
-      const response = await fetch("http://localhost:8000/api/accept_friend", {
+      const response = await customFetch(process.env.NEXT_PUBLIC_API_URL+"/api/accept_friend", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ friend_id: friendId }),
@@ -114,13 +110,14 @@ const Friends = () => {
         fetchBlocked();
       }
     } catch (error) {
-      console.log("Error accepting friend:", error);
+      toast.error("Error accepting friend");
     }
   };
-  // // Accept friend
+
+
   const handleRemoveFriend = async (friendId) => {
     try {
-      const response = await fetch("http://localhost:8000/api/remove_friend", {
+      const response = await customFetch(process.env.NEXT_PUBLIC_API_URL+"/api/remove_friend", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ friend_id: friendId }),
@@ -132,14 +129,13 @@ const Friends = () => {
         fetchBlocked();
       }
     } catch (error) {
-      console.log("Error accepting friend:", error);
+      toast.error("Error accepting friend:");
     }
   };
 
-  // // Reject friend
   const handleRejectFriend = async (friendId) => {
     try {
-      const response = await fetch("http://localhost:8000/api/reject_friend", {
+      const response = await customFetch(process.env.NEXT_PUBLIC_API_URL+"/api/reject_friend", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ friend_id: friendId }),
@@ -149,50 +145,70 @@ const Friends = () => {
         fetchRequests();
       }
     } catch (error) {
-      console.log("Error rejecting friend:", error);
+      toast.error("Error rejecting friend");
+    }
+  };
+  const inviteFriendToGame = async (friendId) => {
+    try {
+      const response = await customFetch(process.env.NEXT_PUBLIC_API_URL+"/api/invite_friend", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ friend_id: friendId }),
+        credentials: "include",
+      });
+      const data = await response.json();
+      if (response.ok) {
+        const token = data.token;
+        toast.success("Friend invited to game");
+        router.push(`/game/solo/maps?game=randommatch&token=${token}`);
+      } else {
+        toast.error(data.error);
+      }
+    } catch (error) {
+      toast.error("Error rejecting friend");
     }
   };
 
-  console.log("curruser", currentUser.id.toString());
   return (
     <div className="w-full lg:max-w-[1200px] p-2 mb-24 lg:h-full">
-      <h1 className="text-white text-center w-full text-xl lg:text-3xl font-bold mb-4 mt-2">
-        Friends List
-      </h1>
-
-      {/* Friends List */}
-
-      <div
-        className={`bg-gray-800/65 rounded-xl border w-full p-4 border-violet-primary ${listHeight} grid grid-cols-1 lg:grid-cols-2 gap-4  overflow-y-auto no-scrollbar p-41`}
-        >
-        {friends?.map((friend, index) => (
-          
+    <h1 className="text-white text-center w-full text-xl lg:text-3xl font-bold mb-4 mt-2">
+      Friends List
+    </h1>
+  
+    <div
+      className={`bg-gray-800/65 rounded-xl border w-full p-4 border-violet-primary ${listHeight} overflow-y-auto no-scrollbar p-41`}
+    >
+      {friends?.length > 0 ? (
+        friends.map((friend, index) => (
           <div
             key={index}
-            className="flex justify-center items-center bg-gray-700/70 h-[90px] w-full hover:bg-gray-600 transition-shadow border border-gray-600 rounded-lg p-4 shadow-lg hover:shadow-2xl"
+            className="flex justify-center items-center bg-gray-700/70 h-[90px] w-full hover:bg-gray-600 transition-shadow border border-gray-600 rounded-lg p-4 my-2 shadow-lg hover:shadow-2xl"
           >
-          <Link className="flex items-center " href={`/profile/${friend.id}`} key={friend.id}>
-            <div className="h-14 w-14 rounded-full overflow-hidden">
-              <img
-                src={friend.profile_pic_url}
-                alt="friend"
-                className="w-full h-full object-cover"
-              />
-            </div>
-            <div className="flex flex-col justify-center ml-4">
-              <span className="text-md font-semibold text-white">
-                {friend.username}
-              </span>
-            </div>
-          </Link>
+            <Link className="flex items-center " href={`/profile/${friend.id}`} key={friend.id}>
+              <div className=" lg:relative h-14 w-14 rounded-full">
+                <img
+                  src={friend.profile_pic_url}
+                  alt="User Profile"
+                  className="object-cover w-full h-full rounded-full"
+                />
+              </div>
+              <div className="flex flex-col justify-center ml-4">
+                <span className="text-md font-semibold text-white">
+                  {friend.username}
+                </span>
+              </div>
+            </Link>
             <div className="ml-auto flex space-x-2 lg:space-x-4">
+              <Link href={`/chat/${friend.id}`}>
+                <button
+                  aria-label="Chat"
+                  className="hover:text-blue-500 text-white transition-colors"
+                >
+                  <IoChatbubbleEllipsesSharp className="w-6 h-6 text-blue-600 hover:text-blue-900" />
+                </button>
+              </Link>
               <button
-                aria-label="Chat"
-                className="hover:text-blue-500 text-white transition-colors"
-              >
-                <IoChatbubbleEllipsesSharp className="w-6 h-6 text-blue-600 hover:text-blue-900" />
-              </button>
-              <button
+                onClick={() => inviteFriendToGame(friend.id)}
                 aria-label="Invite"
                 className="hover:text-red-500 text-white transition-colors"
               >
@@ -203,55 +219,54 @@ const Friends = () => {
                   <FaEllipsisV />
                 </DropdownMenuTrigger>
                 <DropdownMenuContent className="mr-14 lg:mr-32 bg-gray-800/60 border-violet-primary">
-                  <DropdownMenuItem
-                   onClick={() => { handleRemoveFriend(friend.id)}}>
+                  <DropdownMenuItem onClick={() => { handleRemoveFriend(friend.id)}}>
                     <span className="text-white">Unfriend</span>
                   </DropdownMenuItem>
                   <DropdownMenuSeparator className="bg-black" />
-                  <DropdownMenuItem
-                    onClick={() => handleblockFriend(friend.id)}
-                    >
+                  <DropdownMenuItem onClick={() => handleblockFriend(friend.id)}>
                     <span className="text-white">Block</span>
                   </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
             </div>
           </div>
-        ))}
-      </div>
-
-      {/* </div> */}
-      {/* Conditional rendering based on userId */}
-      {userId === currentUser.id.toString() && (
-        <>
-          {/* Request List */}
-          <div className="lg:flex lg:gap-4 ">
-            <div className="lg:flex lg:flex-col lg:w-full  ">
-              <h1 className="text-white text-center w-full text-xl font-bold mb-4 mt-2 ">
-                Request List
-              </h1>
-              <div className="bg-gray-800/65 rounded-xl border w-full border-violet-primary grid grid-cols-1 gap-4   h-[250px] overflow-y-auto no-scrollbar p-4">
-                {requests?.map((request, index) => (
+        ))
+      ) : (
+        <div className="text-center text-white">
+          No data found
+        </div>
+      )}
+    </div>
+  
+    {userId === currentUser.id.toString() && (
+      <>
+        <div className="lg:flex lg:gap-4 ">
+          <div className="lg:flex lg:flex-col lg:w-full">
+            <h1 className="text-white text-center w-full text-xl font-bold mb-4 mt-2">
+              Request List
+            </h1>
+            <div className="bg-gray-800/65 rounded-xl border w-full border-violet-primary gap-4 h-[250px] overflow-y-auto no-scrollbar p-4">
+              {requests?.length > 0 ? (
+                requests.map((request, index) => (
                   <div
                     key={index}
                     className="flex items-center h-[90px] bg-gray-700/70 hover:bg-gray-600 transition-shadow border border-gray-600 rounded-lg p-4 shadow-lg hover:shadow-2xl"
                   >
-                   <Link className="flex items-center" href={`/profile/${request.id}`} key={request.id}>
-                    <div className="h-14 w-14 rounded-full overflow-hidden ">
-                      <img
-                        src={request.profile_pic_url}
-                        alt="mode solo"
-                        className="w-full h-full object-cover"
-                      />
-                    </div>
-                    <div className="flex flex-col justify-center ml-4">
-                      <span className="text-md font-semibold text-white">
-                        {request.username}
-                      </span>
-                    </div>
+                    <Link className="flex items-center" href={`/profile/${request.id}`} key={request.id}>
+                      <div className="h-14 w-14 rounded-full overflow-hidden">
+                        <img
+                          src={request.profile_pic_url}
+                          alt="mode solo"
+                          className="w-full h-full object-cover"
+                        />
+                      </div>
+                      <div className="flex flex-col justify-center ml-4">
+                        <span className="text-md font-semibold text-white">
+                          {request.username}
+                        </span>
+                      </div>
                     </Link>
                     <div className="ml-auto flex space-x-4">
-                      {/* Check if the current user is the sender */}
                       {request.sender_id === currentUser.id ? (
                         <span className="text-white font-black tracking-[1.5px]">
                           Pending
@@ -276,32 +291,38 @@ const Friends = () => {
                       )}
                     </div>
                   </div>
-                ))}
-              </div>
+                ))
+              ) : (
+                <div className="text-center text-white">
+                  No data found
+                </div>
+              )}
             </div>
-            <div className="lg:flex lg:flex-col lg:w-full">
-              <h1 className="text-white text-center w-full text-xl font-bold mb-4 mt-2 ">
-                Blocked List
-              </h1>
-              <div className="bg-gray-800/65 rounded-xl border w-full border-violet-primary grid grid-cols-1  gap-4   h-[250px] overflow-y-auto no-scrollbar p-4">
-                {blocked?.map((block, index) => (
+          </div>
+          <div className="lg:flex lg:flex-col lg:w-full">
+            <h1 className="text-white text-center w-full text-xl font-bold mb-4 mt-2 ">
+              Blocked List
+            </h1>
+            <div className="bg-gray-800/65 rounded-xl border w-full border-violet-primary grid grid-cols-1 gap-4 h-[250px] overflow-y-auto no-scrollbar p-4">
+              {blocked?.length > 0 ? (
+                blocked.map((block, index) => (
                   <div
                     key={index}
-                    className="flex items-center  h-[90px] bg-gray-700/70 hover:bg-gray-600 transition-shadow border border-gray-600 rounded-lg p-4 shadow-lg hover:shadow-2xl"
+                    className="flex items-center h-[90px] bg-gray-700/70 hover:bg-gray-600 transition-shadow border border-gray-600 rounded-lg p-4 shadow-lg hover:shadow-2xl"
                   >
-                  <Link  className="flex items-center" href={`/profile/${block.id}`} key={block.id}>
-                    <div className="h-14 w-14 rounded-full overflow-hidden">
-                      <img
-                        src={block.profile_pic}
-                        alt="mode solo"
-                        className="w-full h-full object-cover"
+                    <Link className="flex items-center" href={`/profile/${block.id}`} key={block.id}>
+                      <div className="h-14 w-14 rounded-full overflow-hidden">
+                        <img
+                          src={block.profile_pic_url}
+                          alt="mode solo"
+                          className="w-full h-full object-cover"
                         />
-                    </div>
-                    <div className="flex flex-col justify-center ml-4">
-                      <span className="text-md font-semibold text-white">
-                        {block.username}
-                      </span>
-                    </div>
+                      </div>
+                      <div className="flex flex-col justify-center ml-4">
+                        <span className="text-md font-semibold text-white">
+                          {block.username}
+                        </span>
+                      </div>
                     </Link>
                     <div className="ml-auto flex space-x-4">
                       <button
@@ -319,13 +340,19 @@ const Friends = () => {
                       </span>
                     </div>
                   </div>
-                ))}
-              </div>
+                ))
+              ) : (
+                <div className="text-center text-white">
+                  No data found
+                </div>
+              )}
             </div>
           </div>
-        </>
-      )}
-    </div>
+        </div>
+      </>
+    )}
+  </div>
+  
   );
 };
 

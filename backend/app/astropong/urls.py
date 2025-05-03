@@ -1,12 +1,17 @@
 from django.contrib import admin
 from django.urls import path, include
+
+from .views.Tournament.TournamentView import UploadTournamentPicView, UpdateTournamentPicView
 from .views.auth.register import RegisterView
 from .views.auth.login import LoginView ,UserListView
 from .views.auth.logout import LogoutView
 from .views.auth.OAuth import OAuth, OAuthCallback
-from .views.auth.auth_user import UserView,MFAView, UsersView, ChangePasswordView, UserIdView, UploadProfilePicView
+from .views.auth.auth_user import UserView,MFAView, UsersView, ChangePasswordView, UserIdView, UploadProfilePicView,PingView
 from .views.auth.refresh import RefreshTokenView
-from .views.friends.friends import AddFriendView, ListFriendView, AcceptFriendRequestView, RemoveFriendView, RejectFriendRequestView,FriendsOfView, BlockFriendView,UnblockFriendView, BlockedUsersList
+from .views.friends.friends import AddFriendView, ListFriendView, AcceptFriendRequestView, RemoveFriendView, RejectFriendRequestView,FriendsOfView, BlockFriendView,UnblockFriendView, BlockedUsersList, InviteFriendView
+from .views.dashboard.dashboard import GamesHistoryView, PlayerRanking, PlayerWinRateView, TopPlayersView, WeeklyStatsView, WeeklyXPView, DashboardView
+from .views.auth.auth_user import GameCustomizationView
+from .views.dashboard.dashboard import TournamentHistoryView
 
 urlpatterns = [
     path('register', RegisterView.as_view(), name='register'),
@@ -36,4 +41,20 @@ urlpatterns = [
     path('reject_friend', RejectFriendRequestView.as_view(), name='reject_friend'),
     path('remove_friend', RemoveFriendView.as_view(), name='remove_friend'),
 
+    path('games_history', GamesHistoryView.as_view(), name='games_history'),
+    path('win_rate', PlayerWinRateView.as_view(), name='win_rate'),
+    path('top_players', TopPlayersView.as_view(), name='top_players'),
+    path('ranking', PlayerRanking.as_view(), name='ranking'),
+    path('weekly_stats', WeeklyStatsView.as_view(), name='weekly_stats'),
+    path('weekly_experience', WeeklyXPView.as_view(), name='weekly_experience'),
+    path('dashboard', DashboardView.as_view(), name='dashboard'),
+    path('tournament_history', TournamentHistoryView.as_view(), name='tournament_history'),
+
+    path('upload_tournament_pic', UploadTournamentPicView.as_view(), name='upload_tournament_pic'),
+    path('update_tournament_pic', UpdateTournamentPicView.as_view(), name='update_tournament_pic'),
+    path('game_customization', GameCustomizationView.as_view(), name='game_customization'),
+    path('ping', PingView.as_view(), name='ping'),
+
+    path('invite_friend', InviteFriendView.as_view(), name='invite_friend'),
 ]
+    
